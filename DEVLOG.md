@@ -17,6 +17,21 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.12: K7-PARITY: E10 construction matches E0; FusionDance unchanged
+*2026-11-22*
+
+### K7-PARITY: E10 construction parity and FusionDance unchanged
+- **Question:** does the new `train.py` builder leave FusionDance bit-identical, and does E10 match E0 exactly in params and FLOPs?
+- **Result** (CPU, `results/K7-parity.json`):
+  - state_dicts, model config, RNG state and FLOPs are **bit-identical** to the old construction for E0, E1, E2, E3 and E9 (re-checked after the `gdn_neg_eigval` change);
+  - E10: total 13,767,552 = E0, non-embedding 10,621,824 = E0, FLOPs per token 9.676e7 = E0;
+  - E10 at init: loss 9.094, tied embeddings.
+- **Verdict vs prediction:** PASS.
+- **What it means:** E10 vs E0 is a clean implementation comparison. Caveat (ledger C91 PARTIAL): a 101-step GPU replay of E0 matched the v0.3.0 log at step 0 exactly (9.0900) but read 2.8370 vs 2.8460 at step 100. Likely GPU nondeterminism, but unproven; an old-vs-new replay is the first Phase 2 item.
+- **Card:** experiments/cards/K7-parity.md
+
+---
+
 ## v0.4.11: E10 registered: Hugging Face Llama reference control
 *2026-11-22*
 

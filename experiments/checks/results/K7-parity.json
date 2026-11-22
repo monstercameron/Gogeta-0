@@ -1,0 +1,147 @@
+{
+  "check": "K7-parity",
+  "claims": [
+    "E10 control"
+  ],
+  "prediction": "(a) bit-identical state_dicts, configs and RNG state for all FusionDance configs; (b) E10 total 13,767,552 / non-emb 10,621,824 params, identical to E0, and identical train FLOPs/token; (c) loss at init within 0.1 nats of ln(8192) = 9.011.",
+  "criterion": "PASS if (a) holds exactly for every FusionDance config, (b) E10 and E0 param counts differ by < 0.5% (total and non-embedding) and FLOPs/token by < 0.5%, and (c) |loss_init - ln V| < 0.5.",
+  "verdicts": {
+    "fusiondance_unchanged": "PASS: bit-identical construction for 5 configs",
+    "e10_matches_e0": "PASS: total 13,767,552 vs 13,767,552, non-emb 10,621,824 vs 10,621,824, FLOPs/token 9.676e+07 vs 9.676e+07",
+    "e10_sane": "PASS: loss at init 9.094, tied True",
+    "pass": true
+  },
+  "data": {
+    "fusiondance": {
+      "e0_dense": {
+        "tensors": 39,
+        "same_keys": true,
+        "bit_identical": true,
+        "same_config": true,
+        "same_rng_after": true,
+        "same_flops": true,
+        "params": {
+          "total": 13767552,
+          "embedding": 3145728,
+          "prelude": 10621440,
+          "core": 0,
+          "coda": 0,
+          "other": 384,
+          "non_embedding": 10621824
+        }
+      },
+      "e1_hybrid": {
+        "tensors": 72,
+        "same_keys": true,
+        "bit_identical": true,
+        "same_config": true,
+        "same_rng_after": true,
+        "same_flops": true,
+        "params": {
+          "total": 14237796,
+          "embedding": 3145728,
+          "prelude": 11091684,
+          "core": 0,
+          "coda": 0,
+          "other": 384,
+          "non_embedding": 11092068
+        }
+      },
+      "e2_looped": {
+        "tensors": 58,
+        "same_keys": true,
+        "bit_identical": true,
+        "same_config": true,
+        "same_rng_after": true,
+        "same_flops": true,
+        "params": {
+          "total": 12606488,
+          "embedding": 3145728,
+          "prelude": 1770240,
+          "core": 5624216,
+          "coda": 1770240,
+          "other": 296064,
+          "non_embedding": 9460760
+        }
+      },
+      "e3_ternary": {
+        "tensors": 72,
+        "same_keys": true,
+        "bit_identical": true,
+        "same_config": true,
+        "same_rng_after": true,
+        "same_flops": true,
+        "params": {
+          "total": 14237796,
+          "embedding": 3145728,
+          "prelude": 11091684,
+          "core": 0,
+          "coda": 0,
+          "other": 384,
+          "non_embedding": 11092068
+        }
+      },
+      "e9_unlooped": {
+        "tensors": 55,
+        "same_keys": true,
+        "bit_identical": true,
+        "same_config": true,
+        "same_rng_after": true,
+        "same_flops": true,
+        "params": {
+          "total": 12310808,
+          "embedding": 3145728,
+          "prelude": 9164696,
+          "core": 0,
+          "coda": 0,
+          "other": 384,
+          "non_embedding": 9165080
+        }
+      }
+    },
+    "e0_vs_e10": {
+      "e0_params": {
+        "total": 13767552,
+        "embedding": 3145728,
+        "prelude": 10621440,
+        "core": 0,
+        "coda": 0,
+        "other": 384,
+        "non_embedding": 10621824
+      },
+      "e10_params": {
+        "total": 13767552,
+        "embedding": 3145728,
+        "layers": 10621440,
+        "other": 384,
+        "non_embedding": 10621824
+      },
+      "e0_flops_per_token": 96758784.0,
+      "e10_flops_per_token": 96758784.0,
+      "total_diff": 0,
+      "non_emb_diff": 0
+    },
+    "e10_sanity": {
+      "tied": true,
+      "init_std": {
+        "embed": 0.020003966987133026,
+        "q_proj": 0.01993064023554325,
+        "o_proj": 0.019898846745491028,
+        "down_proj": 0.020010607317090034
+      },
+      "e0_init_std": {
+        "embed": 0.020002128556370735,
+        "qkv": 0.020039189606904984,
+        "o (residual-scaled)": 0.0057786861434578896
+      },
+      "loss_init": 9.093811988830566,
+      "ln_vocab": 9.010913347279288
+    }
+  },
+  "ran_at": "2026-11-22T17:18:03",
+  "runtime_s": 5.4,
+  "git_commit": "ea3aa5be5b627d251883eb7d47326a7bf887f124",
+  "git_describe": "v0.3.5-4-gea3aa5b-dirty",
+  "torch": "2.14.1+cu130",
+  "device": "cpu"
+}

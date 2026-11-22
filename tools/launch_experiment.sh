@@ -2,7 +2,7 @@
 # Launch one registered experiment's training run (inside WSL), the same way every time.
 #
 #   bash tools/launch_experiment.sh <EXPERIMENT_ID> [--seed N] [--dry-run] [--foreground]
-#                                   [--no-compile] [--max-tokens N] [--wait-cool]
+#                                   [--no-compile] [--max-tokens N] [--lr X] [--wait-cool]
 #
 # What it does:
 #   1. Looks up the experiment's config in experiments/experiments.json (fails if none).
@@ -21,6 +21,8 @@
 #   --foreground    run attached (output to the terminal and the log); still takes the GPU slot
 #   --no-compile    drop --compile
 #   --max-tokens N  override train.max_tokens (a shorter run than the registered config!)
+#   --lr X          override train.lr, the peak learning rate (K7 sweeps, tuned-LR runs); the run
+#                   config records it (train.lr and cli_overrides)
 #   --wait-cool     if the GPU is >= 85 C, poll until it is < 75 C instead of refusing
 #
 # Files ($DATA = $GOGETA_DATA, default ~/fusiondance-data):
@@ -46,15 +48,16 @@ TEMP_RESUME=75   # --wait-cool waits until below this (C)
 COOL_POLL=30     # seconds between temperature readings while waiting
 CODE_PATHS=(gogeta configs tools tests requirements.txt)   # same list as gogeta/tracking.py
 
-usage() { sed -n '2,32p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,34p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
 die() { echo "launch_experiment: $1" >&2; exit "${2:-1}"; }
 
 # ----------------------------------------------------------------------------- arguments
-EID="" SEED="" SEED_GIVEN=0 DRY=0 FG=0 COMPILE=1 MAXTOK="" WAITCOOL=0
+EID="" SEED="" SEED_GIVEN=0 DRY=0 FG=0 COMPILE=1 MAXTOK="" LR="" WAITCOOL=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --seed)       SEED=${2:-}; SEED_GIVEN=1; shift 2 || die "--seed needs a value" 2 ;;
     --max-tokens) MAXTOK=${2:-}; shift 2 || die "--max-tokens needs a value" 2 ;;
+    --lr)         LR=${2:-}; shift 2 || die "--lr needs a value" 2 ;;
     --dry-run)    DRY=1; shift ;;
     --foreground) FG=1; shift ;;
     --no-compile) COMPILE=0; shift ;;
@@ -69,6 +72,7 @@ EID=${EID^^}
 [[ "$EID" =~ ^E[0-9]+$ ]] || die "experiment id must look like E3, got: $EID" 2
 [[ -z "$SEED" || "$SEED" =~ ^[0-9]+$ ]] || die "--seed must be a non-negative integer" 2
 [[ -z "$MAXTOK" || "$MAXTOK" =~ ^[1-9][0-9]*$ ]] || die "--max-tokens must be a positive integer" 2
+[[ -z "$LR" || "$LR" =~ ^([0-9]+\.?[0-9]*|\.[0-9]+)([eE][-+]?[0-9]+)?$ ]] || die "--lr must be a positive number, e.g. 2e-3" 2
 
 # ----------------------------------------------------------------------------- registry lookup
 command -v python3 >/dev/null || die "python3 not found (needed to read the registry)"
@@ -108,9 +112,10 @@ print(c.get("experiment", ""))
 print(t.get("dataset", ""))
 print(t.get("seed", 0))
 print(t.get("max_tokens", ""))
+print(t.get("lr", ""))
 PY
 ) || die "cannot parse config $CONFIG"
-{ read -r CFG_EID; read -r DATASET; read -r CFG_SEED; read -r CFG_MAXTOK; } <<<"$CFGINFO"
+{ read -r CFG_EID; read -r DATASET; read -r CFG_SEED; read -r CFG_MAXTOK; read -r CFG_LR; } <<<"$CFGINFO"
 SEED=${SEED:-$CFG_SEED}
 
 STAMP=$(date +%Y%m%d-%H%M%S)
@@ -125,6 +130,7 @@ CMD=("$PY" -m gogeta.train --config "$CONFIG")
 CMD+=(--require-clean)
 (( SEED_GIVEN )) && CMD+=(--seed "$SEED")
 [[ -n "$MAXTOK" ]] && CMD+=(--max-tokens "$MAXTOK")
+[[ -n "$LR" ]] && CMD+=(--lr "$LR")
 
 # ----------------------------------------------------------------------------- helpers
 CHECKS=() NFAIL=0 NWARN=0
@@ -281,6 +287,7 @@ case "$REG_STATUS" in
   *)       pass "registry status" "$REG_STATUS (set it to 'running' in experiments.json when the run starts, AGENTS.md 5)" ;;
 esac
 [[ -n "$MAXTOK" ]] && warn "max tokens" "override $MAXTOK (config says $CFG_MAXTOK): not the registered run"
+[[ -n "$LR" ]] && warn "learning rate" "override $LR (config says $CFG_LR); recorded in the run config"
 
 # dashboard (warning only: logging works without it)
 if curl -s -m 3 "$DASH_URL/" 2>/dev/null | grep -q "Trackio Dashboard"; then
@@ -300,7 +307,7 @@ print_plan() {
   local mode=$1
   echo "== Gogeta-0 launch: $EID seed $SEED  [$mode]"
   echo "experiment : $EID  \"$TITLE\"  (registry status: $REG_STATUS)"
-  echo "config     : $CONFIG  (dataset $DATASET, max_tokens ${MAXTOK:-$CFG_MAXTOK})"
+  echo "config     : $CONFIG  (dataset $DATASET, max_tokens ${MAXTOK:-$CFG_MAXTOK}, lr ${LR:-$CFG_LR})"
   echo "preflight  :"
   printf '%s\n' "${CHECKS[@]}"
   echo "cwd        : $REPO"

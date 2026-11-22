@@ -17,6 +17,18 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.10: Campaign runner + launcher --lr
+*2026-11-22*
+
+**What**:
+- **`tools/launch_campaign.sh <file>`** runs one launch per line via `launch_experiment.sh --foreground --wait-cool`, sequentially and detached (setsid nohup, PID and state files). It waits while the GPU slot is held, any GPU process exists, or the GPU is ≥ 85 °C; it retries transient refusals and aborts on persistent ones; it has `--status`, `--resume`, `--wait` and `--stop`.
+- **`launch_experiment.sh --lr X`:** validated, passed to `gogeta.train --lr`, shown in the plan with a WARN, and recorded in the run config. Written by the cleanup agent as a patch outside its permissions; reviewed and applied by the main agent.
+
+**Results**: the runner was tested end to end by the cleanup agent with a stub launcher and a fake `nvidia-smi` (two bugs fixed). The main agent re-tested `--lr` with dry runs (`--lr 2e-3` accepted and recorded; `--lr abc` rejected).
+**Not verified**: a real campaign hasn't run yet.
+
+---
+
 ## v0.4.9: Science gaps: wrong claims corrected everywhere, gap list
 *2026-11-22*
 

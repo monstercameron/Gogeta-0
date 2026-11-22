@@ -1,0 +1,42 @@
+{
+  "name": "code-py-v1",
+  "source": "OpenCoder-LLM/opc-annealing-corpus",
+  "configs": [
+    "algorithmic_corpus",
+    "synthetic_code_snippet"
+  ],
+  "license": "ODC-By",
+  "vocab_size": 8192,
+  "eos_id": 0,
+  "pad_id": 1,
+  "dtype": "uint16",
+  "seed": 1234,
+  "splits": {
+    "val": {
+      "docs": 4000,
+      "tokens": 1059160,
+      "chars": 3938783,
+      "chars_per_token": 3.719,
+      "sha256_16": "32e4b0ede9211f61"
+    },
+    "train": {
+      "docs": 987154,
+      "tokens": 262412848,
+      "chars": 976520477,
+      "chars_per_token": 3.721,
+      "sha256_16": "db61140a667350e3"
+    }
+  },
+  "filter": {
+    "rows": 8404155,
+    "python": 997044,
+    "empty": 1,
+    "too_long": 0,
+    "dupes": 5889,
+    "kept": 991154,
+    "train_docs": 987154,
+    "val_docs": 4000,
+    "train_chars": 976520477,
+    "val_chars": 3938783
+  }
+}

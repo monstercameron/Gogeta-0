@@ -4,7 +4,7 @@
     "arc": "Base Form",
     "title": "Dense transformer baseline",
     "question": "What does a plain ~10M-param causal transformer reach on TinyStories at our compute budget? Every later arc is measured against this.",
-    "prediction": "",
+    "prediction": "Written 2026-11-22 before the run. After 200M tokens of Python (code-py-v1), full-val loss lands in 0.90-1.30 nats/token (about 0.35-0.50 bits/char). Throughput about 170k tok/s compiled, about 20 min. Samples are syntactically plausible Python with coherent short functions but frequent logic errors.",
     "ingredients": [
       "full attention",
       "bf16"
@@ -16,7 +16,7 @@
     ],
     "status": "planned",
     "version": null,
-    "config": null,
+    "config": "configs/e0_dense.json",
     "results": {},
     "notes": ""
   },
@@ -25,7 +25,7 @@
     "arc": "Ki Control",
     "title": "Linear-time mixers",
     "question": "Can Gated DeltaNet (vs Mamba-2 vs sliding-window only) plus one global attention layer match the baseline, while memory stops growing with context?",
-    "prediction": "",
+    "prediction": "Written 2026-11-22 before the run. Same depth, about the same params as E0, but only one full-attention layer. Val loss within +-2% of E0 and more likely slightly better (hybrids tend to win at short context; the 100-step bench was already lower: 2.58 vs 2.84). About 1.7x slower wall-clock than E0 because of the GDN kernels (100k vs 173k tok/s). If it is worse than E0 by >3%, suspect the GDN parametrisation or the SWA window.",
     "ingredients": [
       "Gated DeltaNet",
       "Mamba-2",
@@ -38,7 +38,7 @@
     ],
     "status": "planned",
     "version": null,
-    "config": null,
+    "config": "configs/e1_hybrid.json",
     "results": {},
     "notes": ""
   },
@@ -47,7 +47,7 @@
     "arc": "Time Chamber",
     "title": "Looped core block",
     "question": "Does one shared core block looped r times match a deeper unshared model with far fewer parameters? Does quality keep improving when r at test time exceeds r in training?",
-    "prediction": "",
+    "prediction": "Written 2026-11-22 before the run. At r=4 (about 2x E0's FLOPs/token, 11% fewer non-emb params), val loss matches E0 within +-3%, so we expect no win per token yet; the claim to test is the r curve. Predicted shape: r=1 clearly worse (> +10% vs r=4); r=2 < r=1; r=4 about r=6 (flat); r=8 about the same or slightly better than r=4; r=12 (beyond the trained max of 7) flat or slightly worse, not a collapse. Training is stable (no loss spikes > 0.5 after warmup).",
     "ingredients": [
       "shared core",
       "random r in training",
@@ -59,7 +59,7 @@
     ],
     "status": "planned",
     "version": null,
-    "config": null,
+    "config": "configs/e2_looped.json",
     "results": {},
     "notes": ""
   },

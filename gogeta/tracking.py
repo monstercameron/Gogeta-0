@@ -52,7 +52,12 @@ def git_info() -> dict:
         "branch": g("rev-parse", "--abbrev-ref", "HEAD"),
         "describe": g("describe", "--tags", "--always", "--dirty"),
         "dirty": bool(g("status", "--porcelain")),
+        # only paths that can change results; editing notes/docs mid-run must not block a queue
+        "code_dirty": bool(g("status", "--porcelain", "--", *CODE_PATHS)),
     }
+
+
+CODE_PATHS = ("gogeta", "configs", "tools", "tests", "requirements.txt")
 
 
 class Run:
@@ -74,10 +79,11 @@ class Run:
         stamp = _dt.datetime.now().strftime("%Y%m%d-%H%M%S")
         self.name = name or f"{experiment}-{stamp}" + (f"-s{seed}" if seed is not None else "")
         self.git = git_info()
-        if require_clean and self.git["dirty"]:
+        if require_clean and self.git["code_dirty"]:
             raise RuntimeError(
-                "Refusing to start: the repo has uncommitted changes, and this run was marked "
-                "require_clean (results that go into a tagged version must match committed code)."
+                "Refusing to start: code paths (gogeta/, configs/, tools/, tests/, requirements.txt) have "
+                "uncommitted changes, and this run was marked require_clean (results that go into a "
+                "tagged version must match committed code)."
             )
         self.summary: dict = {}
         self.dir = DATA / "runs" / self.name
@@ -94,6 +100,7 @@ class Run:
             "meta_git_commit": self.git["commit"],
             "meta_git_describe": self.git["describe"],
             "meta_git_dirty": self.git["dirty"],
+            "meta_git_code_dirty": self.git["code_dirty"],
         }
         self._t = None
         if self.backend == "trackio":

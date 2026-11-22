@@ -1,0 +1,20 @@
+{
+  "experiment": "E2",
+  "description": "The initial FusionDance arch in full precision: prelude [SWA] -> core [GDN, GDN, SWA] x r -> coda [full attn]. Train r ~ U{1..7} (mean 4), backprop through the last 4 loops; eval at r=4.",
+  "model": {
+    "vocab_size": 8192, "d_model": 384, "n_heads": 6, "mlp_hidden": 1024,
+    "prelude": ["swa"],
+    "core": ["gdn", "gdn", "swa"],
+    "coda": ["attn"],
+    "loops": 4, "loops_min": 1, "loops_max": 7, "bptt_loops": 4,
+    "window": 256, "max_seq_len": 1024, "ternary": false
+  },
+  "train": {
+    "dataset": "code-py-v1", "seq_len": 1024, "batch_size": 32,
+    "max_tokens": 200000000,
+    "lr": 0.003, "min_lr_frac": 0.1, "warmup_steps": 300,
+    "weight_decay": 0.1, "beta1": 0.9, "beta2": 0.95, "grad_clip": 1.0,
+    "eval_every": 250, "eval_seqs": 128, "seed": 0,
+    "eval_loops": [1, 2, 4, 6, 8, 12]
+  }
+}

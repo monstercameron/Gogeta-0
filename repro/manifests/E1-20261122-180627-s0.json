@@ -1,0 +1,275 @@
+{
+  "schema": 1,
+  "kind": "gogeta-run-manifest",
+  "run": "E1-20261122-180627-s0",
+  "experiment": "E1",
+  "status": "done",
+  "provenance": "back-filled from meta.json/summary.json by repro/manifest.py after the run",
+  "generated_at": "2026-11-22T18:21:47",
+  "started": "2026-11-22T18:06:30",
+  "finished": "2026-11-22T18:08:57",
+  "seed": 0,
+  "seed_note": "train.seed also seeds torch, the data sampler and the loop-count RNG (+1)",
+  "precision": {
+    "source": "static scan of gogeta/train.py at 1290f8a",
+    "autocast_dtype": [
+      "bfloat16"
+    ],
+    "tf32_matmul": true
+  },
+  "deterministic_mode": {
+    "enabled": false,
+    "use_deterministic_algorithms": false,
+    "cudnn_deterministic": false
+  },
+  "code": {
+    "commit": "1290f8af376e115d4ab2fa26658a63fe066d11b9",
+    "branch": "main",
+    "describe": "v0.4.25-dirty",
+    "dirty_at_start": true,
+    "code_dirty_at_start": false,
+    "commit_in_repo": true,
+    "code_paths": [
+      "gogeta",
+      "configs",
+      "tools",
+      "tests",
+      "requirements.txt"
+    ],
+    "code_exactly_recoverable": true,
+    "code_note": "code paths were clean at start, so the files at this commit are the files that ran",
+    "gogeta_py_files_at_commit": {
+      "gogeta/__init__.py": "bfb4b651c532188b320fecbb135180a39f039a76ff343c74e745f1796fb17107",
+      "gogeta/hf.py": "317bc696131b483464e4c5ff7da1c64c0bacdcf8e7cf75e932a755bf040757e4",
+      "gogeta/model.py": "9f0de5a593a8220af90e3ae6bdd4134ce2fc2785d4ef2284396233ae18be2b25",
+      "gogeta/tracking.py": "6771f8040c5ffa73d5807c1200d7b151c974dca839992962266bde5159537d71",
+      "gogeta/train.py": "482e4bfff40b89094b92f78306e3b583e9f03d43b609738cd158c76bd6eb6f2b"
+    },
+    "gogeta_code_sha256": "8806a2da0217c2f5e137e8bb29d616ffaa128e5949525ff746455645c4895871",
+    "trees": {
+      "gogeta": "4d2316b433494cab28696a40e5051e86fafc0e0c",
+      "configs": "0f43ae0126424456d1339f0f695457ab9543af3d",
+      "tools": "adf3d45b7e8449c1bea18a8daf9fae73f59c8c40",
+      "tests": "9de238917f23af4b88ed6b2def2c313de5de60ee",
+      "requirements.txt": "d18d441a95d75abd14e580225bd3fa82cdfa570a"
+    },
+    "tags_at_commit": [
+      "v0.4.25"
+    ]
+  },
+  "config": {
+    "file": "configs/e1_hybrid.json",
+    "file_sha256_at_commit": "622b918b6b7195fe70a0f618ffd1895d18c7d50398acc68d00be0c56dc3e5a3d",
+    "file_sha256_note": "from `git show <commit>:<file>`; valid as the run's config iff code_exactly_recoverable",
+    "effective": {
+      "config_file": "configs/e1_hybrid.json",
+      "arch": "fusiondance",
+      "cli_overrides": {
+        "max_tokens": 20000000,
+        "seed": 0,
+        "lr": 0.012
+      },
+      "model": {
+        "vocab_size": 8192,
+        "d_model": 384,
+        "n_heads": 6,
+        "mlp_hidden": 1024,
+        "prelude": [
+          "swa",
+          "gdn",
+          "gdn",
+          "swa",
+          "gdn",
+          "attn"
+        ],
+        "core": [],
+        "coda": [],
+        "loops": 4,
+        "loops_min": 1,
+        "loops_max": 7,
+        "bptt_loops": 4,
+        "window": 256,
+        "max_seq_len": 1024,
+        "rope_base": 10000.0,
+        "conv_size": 4,
+        "gdn_neg_eigval": false,
+        "ternary": false,
+        "tie_embeddings": true
+      },
+      "train": {
+        "dataset": "code-py-v1",
+        "seq_len": 1024,
+        "batch_size": 32,
+        "max_tokens": 20000000,
+        "lr": 0.012,
+        "min_lr_frac": 0.1,
+        "warmup_steps": 300,
+        "weight_decay": 0.1,
+        "beta1": 0.9,
+        "beta2": 0.95,
+        "grad_clip": 1.0,
+        "eval_every": 250,
+        "eval_seqs": 128,
+        "seed": 0
+      },
+      "compile": true
+    },
+    "effective_sha256": "dfca26e368617277b29ec67e78588855da36a07670271a30c51bdc3afaf1c66e",
+    "cli_overrides": {
+      "max_tokens": 20000000,
+      "seed": 0,
+      "lr": 0.012
+    }
+  },
+  "dataset": {
+    "name": "code-py-v1",
+    "files": {
+      "docs_train.jsonl": {
+        "bytes": 1053376166,
+        "sha256": "fb2bb23fccfa8cea8abcde98b7649be639b5402e5bff06795d77559147d96917",
+        "used_by_training": false,
+        "mtime_before_run_start": true
+      },
+      "docs_val.jsonl": {
+        "bytes": 4249988,
+        "sha256": "f821d119e552fd94e69414f35849f323cd6d3e9744c771b68da7b563e7e377a9",
+        "used_by_training": false,
+        "mtime_before_run_start": true
+      },
+      "filter_stats.json": {
+        "bytes": 203,
+        "sha256": "5dcdeffe64417b58d715e863d1a56b9273792a33334fc4cc4014e5892abd5ea8",
+        "used_by_training": false,
+        "mtime_before_run_start": true
+      },
+      "meta.json": {
+        "bytes": 846,
+        "sha256": "653f400ea914f0ed1ad4b7208ea8ae1b8c72a7b619795fc42431cb27deb34b92",
+        "used_by_training": true,
+        "mtime_before_run_start": true
+      },
+      "tokenizer.json": {
+        "bytes": 549017,
+        "sha256": "0e75f39f9a6b3d743cf75bb48189cfb567ed498ed62c5237e6db9f59884a4d72",
+        "used_by_training": true,
+        "mtime_before_run_start": true
+      },
+      "train.bin": {
+        "bytes": 524825696,
+        "sha256": "db61140a667350e3030fe2a7467fbb92bdba1b24a1b8f19836953748d3316d20",
+        "used_by_training": true,
+        "mtime_before_run_start": true
+      },
+      "val.bin": {
+        "bytes": 2118320,
+        "sha256": "32e4b0ede9211f61d7aa7aea28aa7ecf406e04f02948b0ad0250ddbd41c385d4",
+        "used_by_training": true,
+        "mtime_before_run_start": true
+      }
+    },
+    "source": "OpenCoder-LLM/opc-annealing-corpus",
+    "split_sha256_16": {
+      "val": "32e4b0ede9211f61",
+      "train": "db61140a667350e3"
+    },
+    "note": "hashed when this manifest was built; mtimes predating run start support (not prove) that they are the run's bytes"
+  },
+  "environment": {
+    "recorded_at_run_time": {
+      "torch": "unknown (not recorded at run time)",
+      "cuda": "unknown (not recorded at run time)",
+      "nvidia_driver": "unknown (not recorded at run time)",
+      "gpu": "unknown (not recorded at run time)",
+      "python": "unknown (not recorded at run time)",
+      "pip_freeze_sha256": "unknown (not recorded at run time)",
+      "tracker": "trackio"
+    },
+    "at_manifest_time": {
+      "note": "measured when this manifest was built; equals the run-time environment only if nothing changed since (cannot be proven for back-filled manifests)",
+      "measured_at": "2026-11-22T18:21:46",
+      "host_python": "3.12.3",
+      "kernel": "6.18.33.2-microsoft-standard-WSL2",
+      "gpu": "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU)",
+      "nvidia_driver": "621.24",
+      "python_executable": "/root/.venvs/gogeta/bin/python",
+      "n_packages": 74,
+      "pip_freeze_sha256": "04cce383cad01703e35c01dca544caed5c94bd3db39171fdb1a36f56c6c19190",
+      "key_packages": {
+        "flash-linear-attention": "0.6.0",
+        "numpy": "2.5.5",
+        "pyarrow": "26.0.1",
+        "tokenizers": "0.23.3",
+        "torch": "2.14.1+cu130",
+        "trackio": "0.45.1",
+        "transformers": "5.24.0",
+        "triton": "3.8.0"
+      }
+    },
+    "requirements_txt_sha256_at_commit": "024d49a80da5acdeaaf02bd4595c46b0cec1a06ecc136d04f46ddd9c487356aa"
+  },
+  "artifacts": {
+    "summary_json": {
+      "bytes": 2329,
+      "sha256": "2a68a99b3fd8645d5de043d2fea6a5bc2b3fa1bc94c4d1b55b21cc3efdd763d6",
+      "name": "summary.json"
+    },
+    "meta_json": {
+      "bytes": 1783,
+      "sha256": "cb40868025b3faf5b18d8654cb840062b7141fcde119173be55e0605b46bb0ea",
+      "name": "meta.json"
+    },
+    "samples_txt": {
+      "bytes": 1905,
+      "sha256": "de3222e6aac0b84bbfc70e9261dc46f151a437c8ff61a80b1082490317caa215",
+      "name": "samples.txt"
+    },
+    "checkpoint": {
+      "bytes": 56974900,
+      "sha256": "69aa2c5365e4f3555edf51204353152b3f5c6daa81c51988908755b78b3e4fb5",
+      "name": "model.pt"
+    },
+    "train_log": {
+      "bytes": 1879,
+      "sha256": "d79f922b79bcc7c29af0298ccc1cda156cb59f079e48a281489f6952a6e16c72",
+      "name": "E1-s0-20261122-180616.log"
+    },
+    "train_log_note": "log hashed at manifest time; logs are append-only text files from the launcher"
+  },
+  "metrics": {
+    "val_loss": 1.0656424730843226,
+    "val_bits_per_char": 0.41316772676146274,
+    "tokens": 20021248.0,
+    "flops": 1822490158694400.0,
+    "steps": 611,
+    "wall_min": 2.303528054555257,
+    "tokens_per_s": 144859.30223719016,
+    "peak_mem_gb": 7.104104995727539,
+    "params_total": 14237796,
+    "params_non_embedding": 11092068,
+    "flops_per_token_default": 91027800.0
+  },
+  "launch": {
+    "argv": [
+      "python",
+      "-m",
+      "gogeta.train",
+      "--config",
+      "configs/e1_hybrid.json",
+      "--max-tokens",
+      "20000000",
+      "--seed",
+      "0",
+      "--lr",
+      "0.012",
+      "--compile"
+    ],
+    "cwd": "<repo root at the commit above>",
+    "python": "~/.venvs/gogeta/bin/python",
+    "require_clean_at_run_time": "unknown (not recorded at run time)",
+    "env_vars": {
+      "GOGETA_TRACKER": "trackio",
+      "GOGETA_DATA": "unknown (not recorded at run time)"
+    }
+  },
+  "manifest_sha256": "df8fbe88f39c61158552863100a2b5466ec0519a114e26baf37166a801bb6b70"
+}

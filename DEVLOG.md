@@ -17,6 +17,35 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.39: Reproducibility (A5): manifests, reproduce, CPU replay, science lint; ledger-status rule
+*2026-11-22*
+
+### A5 reproducibility (rigor workstream)
+**What**: from a subagent, reviewed by the main agent.
+- **`repro/manifest.py`** builds an immutable per-run manifest after the fact: code SHA plus per-file hashes, config sha256, dataset sha256s, checkpoint/summary/log hashes, precision, deterministic flag, launch argv. It has a self-hash and refuses to overwrite. Anything not recorded at run time (torch/CUDA/driver/pip-freeze at train time) is written literally as "unknown (not recorded at run time)", never guessed.
+- **12 back-filled manifests** in `repro/manifests/` (E0, E1 ×6, E2, E10 ×4).
+- **`repro/reproduce.py`** is read-only: it checks the tree, data and config hashes against a manifest, prints the exact launch command, and `--compare` gives BITWISE / STATISTICAL / NOT REPRODUCED against the tolerances in `notes/reproducibility.md`.
+- **`repro/cpu_replay.py`** is the cheapest blind-replay tier: rebuilding E0 from its manifest on CPU gives a step-0 loss of **9.0899 vs the logged 9.0900**. That confirms seed, init and data order. It's attention-only configs only.
+- **`repro/lint_science.py`** is a registry-consistency linter.
+- **`notes/reproducibility.md`**: the nondeterminism inventory, bitwise vs statistical reproduction, provisional tolerances (|Δ val_loss| ≤ max(0.004, 2 × seed sd)), and a blind-replication checklist.
+- **`notes/patches/repro-manifest-at-run-end.patch`** (unapplied): `meta.json` records env info, a `--deterministic` flag, and the manifest is written at run end.
+
+**Results**:
+- Main-agent re-run: `repro.test_repro` **13/13 OK**; no secrets in the files.
+- `reproduce.py` on E0: data and config MATCH; code MISMATCH because HEAD has moved on (expected).
+- **Lint at v0.4.36, 12 FAILs:**
+  - E0/E1/E2 lack a DEVLOG `### <ID>` block;
+  - K7-parity's results were committed before its PREDICTIONS section;
+  - K9 and SQ70 have their predictions in their scripts, not in PREDICTIONS.md;
+  - 6 done queue items cite no version.
+
+  These are queued as fixes; the K7-parity ordering one is recorded as a real pre-registration lapse.
+
+### Ledger-status rule (registered before any E1/E11 Phase 2b result)
+The first Codex quick review (`notes/reviews/quick/2026-11-22-1836-statistician.md`, GPT-6 Luna, 49 s) pointed out that the registered C5 rule can pass while the 95% CI includes 0. A dated clarification was appended to `experiments/checks/PREDICTIONS.md`: **the ledger status is the stricter of the registered verdict and the statistics policy** (Holm-adjusted CI excluding 0, or TOST); otherwise it's PARTIAL with the reason. Leave-one-seed-out sensitivity is mandatory (new SQ94). The doc-bootstrap idea was merged into SQ112.
+
+---
+
 ## v0.4.38: Hourly claim audit: 8 Codex auditors, 6-hour cool-down per claim
 *2026-11-22*
 

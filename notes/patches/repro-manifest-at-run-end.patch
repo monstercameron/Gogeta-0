@@ -1,0 +1,87 @@
+diff --git a/gogeta/tracking.py b/gogeta/tracking.py
+index d78181d..ef98d4f 100644
+--- a/gogeta/tracking.py
++++ b/gogeta/tracking.py
+@@ -26,2 +26,3 @@ from __future__ import annotations
+ import datetime as _dt
++import hashlib
+ import json
+@@ -29,3 +30,5 @@ import os
+ import pathlib
++import platform
+ import subprocess
++import sys
+ 
+@@ -59,2 +62,31 @@ def git_info() -> dict:
+ 
++def env_info() -> dict:
++    """Run-time environment, recorded in meta.json["env"] (the audit's manifest reads it from there; never typed)."""
++    info = {"python": platform.python_version(), "platform": platform.platform()}
++    try:
++        import torch
++
++        info.update(torch=torch.__version__, cuda=torch.version.cuda, cudnn=str(torch.backends.cudnn.version()))
++        if torch.cuda.is_available():
++            info.update(gpu=torch.cuda.get_device_name(0), gpu_capability=list(torch.cuda.get_device_capability(0)))
++    except Exception as e:  # never fail a run over provenance
++        info["torch_error"] = f"{type(e).__name__}: {e}"
++    try:
++        o = subprocess.run(["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"],
++                           capture_output=True, text=True, timeout=15)
++        info["nvidia_driver"] = o.stdout.strip().splitlines()[0] if o.returncode == 0 and o.stdout.strip() else None
++    except Exception:
++        info["nvidia_driver"] = None
++    try:
++        o = subprocess.run([sys.executable, "-m", "pip", "freeze"], capture_output=True, text=True, timeout=60)
++        lines = sorted(l.strip() for l in o.stdout.splitlines() if l.strip())
++        info["pip_freeze_sha256"] = hashlib.sha256("
++".join(lines).encode()).hexdigest() if lines else None
++        info["n_packages"] = len(lines)
++    except Exception:
++        info["pip_freeze_sha256"] = None
++    info["env_vars"] = {k: os.environ.get(k) for k in ("GOGETA_TRACKER", "GOGETA_DATA", "CUBLAS_WORKSPACE_CONFIG")}
++    return info
++
++
+ CODE_PATHS = ("gogeta", "configs", "tools", "tests", "requirements.txt")
+@@ -81,2 +113,3 @@ class Run:
+         self.git = git_info()
++        self.env = env_info()
+         if require_clean and self.git["code_dirty"]:
+@@ -156,2 +189,3 @@ class Run:
+             "git": self.git,
++            "env": self.env,
+             "tracker": os.environ.get("GOGETA_TRACKER", "trackio"),
+diff --git a/gogeta/train.py b/gogeta/train.py
+index 105e1e5..e4fcf91 100644
+--- a/gogeta/train.py
++++ b/gogeta/train.py
+@@ -180,2 +180,5 @@ def main():
+     ap.add_argument("--compile", action="store_true", help="torch.compile the model")
++    ap.add_argument("--deterministic", action="store_true",
++                    help="CUBLAS_WORKSPACE_CONFIG + torch.use_deterministic_algorithms(True, warn_only=True) + "
++                         "cudnn.deterministic (SQ140). Off by default: results to date used the fast nondeterministic path")
+     ap.add_argument("--bench", type=int, default=0, help="only time N steps, no tracking/eval/ckpt")
+@@ -196,2 +199,7 @@ def main():
+     device = "cuda"
++    if args.deterministic:
++        os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")  # must precede the first cuBLAS call
++        torch.use_deterministic_algorithms(True, warn_only=True)     # warnings are kept in the log, not hidden
++        torch.backends.cudnn.deterministic = True
++        torch.backends.cudnn.benchmark = False
+     torch.manual_seed(tc["seed"])
+@@ -223,3 +231,3 @@ def main():
+                    "params": pc, "flops_per_token_at_default_loops": model.flops_per_token(tc["seq_len"]),
+-                   "compile": args.compile, "dataset_meta": {k: data.meta[k] for k in ("name", "source", "vocab_size")}}
++                   "compile": args.compile, "deterministic": args.deterministic, "dataset_meta": {k: data.meta[k] for k in ("name", "source", "vocab_size")}}
+         run = Run(cfg["experiment"], config=run_cfg, seed=tc["seed"], require_clean=args.require_clean)
+@@ -303,2 +311,9 @@ def main():
+         print(f"done: {run.dir}", flush=True)
++        try:  # provenance must never fail a finished run (repro/manifest.py is stdlib-only)
++            import sys
++            sys.path.insert(0, str(ROOT / "repro"))
++            from manifest import write_manifest
++            print(f"manifest: {write_manifest(run.dir, run.dir)}", flush=True)  # $GOGETA_DATA/runs/<name>/<name>.json
++        except Exception as e:
++            print(f"manifest not written: {type(e).__name__}: {e}", flush=True)
+     except BaseException as e:

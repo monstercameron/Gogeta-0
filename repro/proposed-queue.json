@@ -1,0 +1,54 @@
+{
+  "proposed_by": "A5 reproducibility",
+  "note": "Merge into experiments/queue.json via tools/queue.py add; not applied.",
+  "items": [
+    {
+      "id": "SQ140",
+      "kind": "side-quest",
+      "title": "SQ140: same-seed determinism, E0/E1 default vs --deterministic, each run twice (10M tokens); checkpoint sha256 + loss gaps",
+      "why": "C183-C186; measures the same-seed spread behind the 0.004 reproduction tolerance (notes/reproducibility.md).",
+      "depends_on": ["Q1"],
+      "resources": {"type": "gpu", "est_minutes": 30},
+      "ready": false,
+      "missing": [
+        "notes/patches/repro-manifest-at-run-end.patch applied and committed (adds --deterministic)",
+        "PREDICTION SQ140 (repro/proposed-predictions.md) committed in a registered version"
+      ],
+      "needs_human": false,
+      "launch": null,
+      "status": "blocked",
+      "source": "repro/proposed-side-quests.md SQ140; repro/proposed-predictions.md",
+      "note": "Prediction (fixed in proposed-predictions.md): E0-det bitwise (65%), E1-det not bitwise (65%), default pairs abs(d val_loss) 0.0005-0.004 (E0), up to 0.006 (E1)."
+    },
+    {
+      "id": "SQ141",
+      "kind": "side-quest",
+      "title": "SQ141: C91 closed: E0 first 100 steps twice (same code) and once with v0.3.0 code",
+      "why": "C187: is 2.8370 vs 2.8460 nondeterminism or a code change?",
+      "depends_on": [],
+      "resources": {"type": "gpu", "est_minutes": 10},
+      "ready": false,
+      "missing": ["PREDICTION SQ141 committed"],
+      "needs_human": false,
+      "launch": null,
+      "status": "blocked",
+      "source": "repro/proposed-side-quests.md SQ141",
+      "note": "Can be folded into SQ140 (its E0-default pair at step 100). Old-code run via git archive into scratch (no worktree)."
+    },
+    {
+      "id": "SQ142",
+      "kind": "side-quest",
+      "title": "SQ142: blind replication dry run, CPU tier (fresh clone + fresh venv; reproduce.py + cpu_replay.py on E0's manifest)",
+      "why": "C189; first end-to-end test of notes/reproducibility.md section 5.",
+      "depends_on": [],
+      "resources": {"type": "cpu", "est_minutes": 20},
+      "ready": true,
+      "missing": [],
+      "needs_human": true,
+      "launch": null,
+      "status": "queued",
+      "source": "repro/proposed-side-quests.md SQ142",
+      "note": "needs_human: building a fresh venv installs packages, which subagents may not do."
+    }
+  ]
+}

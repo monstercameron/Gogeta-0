@@ -1,0 +1,337 @@
+{
+  "tool": "repro/lint_science.py",
+  "root": "/mnt/c/Users/mreca/Desktop/Gogeta-0",
+  "head": "642e455a1fa3d45c85ab4e5e2811b4cd75e75c2c",
+  "summary": {
+    "E": {
+      "pass": 0,
+      "warn": 0,
+      "fail": 3
+    },
+    "C": {
+      "pass": 23,
+      "warn": 0,
+      "fail": 0
+    },
+    "P": {
+      "pass": 9,
+      "warn": 0,
+      "fail": 3
+    },
+    "Q": {
+      "pass": 7,
+      "warn": 0,
+      "fail": 6
+    }
+  },
+  "total_fail": 12,
+  "total_warn": 0,
+  "findings": [
+    {
+      "check": "E",
+      "subject": "E0",
+      "level": "fail",
+      "message": "no DEVLOG '### E0' block"
+    },
+    {
+      "check": "E",
+      "subject": "E1",
+      "level": "fail",
+      "message": "no DEVLOG '### E1' block"
+    },
+    {
+      "check": "E",
+      "subject": "E2",
+      "level": "fail",
+      "message": "no DEVLOG '### E2' block"
+    },
+    {
+      "check": "C",
+      "subject": "C1",
+      "level": "pass",
+      "message": "1 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C2",
+      "level": "pass",
+      "message": "1 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C3",
+      "level": "pass",
+      "message": "1 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C8",
+      "level": "pass",
+      "message": "3 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C10",
+      "level": "pass",
+      "message": "1 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C11",
+      "level": "pass",
+      "message": "1 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C15",
+      "level": "pass",
+      "message": "4 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C18",
+      "level": "pass",
+      "message": "6 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C43",
+      "level": "pass",
+      "message": "4 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C44",
+      "level": "pass",
+      "message": "4 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C80",
+      "level": "pass",
+      "message": "2 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C81",
+      "level": "pass",
+      "message": "2 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C90",
+      "level": "pass",
+      "message": "3 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C95",
+      "level": "pass",
+      "message": "5 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C100",
+      "level": "pass",
+      "message": "1 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C101",
+      "level": "pass",
+      "message": "3 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C103",
+      "level": "pass",
+      "message": "4 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C106",
+      "level": "pass",
+      "message": "2 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C107",
+      "level": "pass",
+      "message": "2 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C109",
+      "level": "pass",
+      "message": "1 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C110",
+      "level": "pass",
+      "message": "2 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C111",
+      "level": "pass",
+      "message": "2 cited artifact(s) exist"
+    },
+    {
+      "check": "C",
+      "subject": "C131",
+      "level": "pass",
+      "message": "2 cited artifact(s) exist"
+    },
+    {
+      "check": "P",
+      "subject": "K1",
+      "level": "pass",
+      "message": "PREDICTIONS.md section committed f1b4ebd before results 54ad92a"
+    },
+    {
+      "check": "P",
+      "subject": "K2",
+      "level": "pass",
+      "message": "PREDICTIONS.md section committed f1b4ebd before results d361389"
+    },
+    {
+      "check": "P",
+      "subject": "K3",
+      "level": "pass",
+      "message": "PREDICTIONS.md section committed f1b4ebd before results 7cf93fe"
+    },
+    {
+      "check": "P",
+      "subject": "K4",
+      "level": "pass",
+      "message": "PREDICTIONS.md section committed f1b4ebd before results f2eb0c4"
+    },
+    {
+      "check": "P",
+      "subject": "K5",
+      "level": "pass",
+      "message": "PREDICTIONS.md section committed f1b4ebd before results 8098118"
+    },
+    {
+      "check": "P",
+      "subject": "K6",
+      "level": "pass",
+      "message": "PREDICTIONS.md section committed f1b4ebd before results e197476"
+    },
+    {
+      "check": "P",
+      "subject": "K7-parity",
+      "level": "fail",
+      "message": "earliest prediction (PREDICTIONS.md section, 3b77e05) is AFTER the results commit 57c2b90"
+    },
+    {
+      "check": "P",
+      "subject": "K7",
+      "level": "pass",
+      "message": "PREDICTIONS.md section committed 3b77e05 before results 1290f8a"
+    },
+    {
+      "check": "P",
+      "subject": "K8",
+      "level": "pass",
+      "message": "PREDICTIONS.md section committed 3b77e05 before results bd5fd3e"
+    },
+    {
+      "check": "P",
+      "subject": "K9",
+      "level": "fail",
+      "message": "no PREDICTION section for K9 found in experiments/checks/PREDICTIONS.md or side-quests.md history (results first committed be9bf89)"
+    },
+    {
+      "check": "P",
+      "subject": "SQ6",
+      "level": "pass",
+      "message": "PREDICTIONS.md section committed 4a3e361 before results 186f33d"
+    },
+    {
+      "check": "P",
+      "subject": "SQ70",
+      "level": "fail",
+      "message": "no PREDICTION section for SQ70 found in experiments/checks/PREDICTIONS.md or side-quests.md history (results first committed 8a2e5f3)"
+    },
+    {
+      "check": "Q",
+      "subject": "Q1",
+      "level": "pass",
+      "message": "references v0.4.11, v0.4.13, v0.4.7"
+    },
+    {
+      "check": "Q",
+      "subject": "Q2",
+      "level": "pass",
+      "message": "references v0.4.10"
+    },
+    {
+      "check": "Q",
+      "subject": "Q3",
+      "level": "fail",
+      "message": "done but references no version (no `version` field, no vX.Y.Z in notes)"
+    },
+    {
+      "check": "Q",
+      "subject": "K7",
+      "level": "fail",
+      "message": "done but references no version (no `version` field, no vX.Y.Z in notes)"
+    },
+    {
+      "check": "Q",
+      "subject": "Q30",
+      "level": "fail",
+      "message": "done but references no version (no `version` field, no vX.Y.Z in notes)"
+    },
+    {
+      "check": "Q",
+      "subject": "Q4",
+      "level": "pass",
+      "message": "references v0.4.26"
+    },
+    {
+      "check": "Q",
+      "subject": "Q5",
+      "level": "fail",
+      "message": "done but references no version (no `version` field, no vX.Y.Z in notes)"
+    },
+    {
+      "check": "Q",
+      "subject": "K8",
+      "level": "pass",
+      "message": "references v0.3.0, v0.4.26"
+    },
+    {
+      "check": "Q",
+      "subject": "Q6",
+      "level": "fail",
+      "message": "done but references no version (no `version` field, no vX.Y.Z in notes)"
+    },
+    {
+      "check": "Q",
+      "subject": "Q9",
+      "level": "pass",
+      "message": "references v0.3.0"
+    },
+    {
+      "check": "Q",
+      "subject": "HW-REG",
+      "level": "pass",
+      "message": "references v0.4.27"
+    },
+    {
+      "check": "Q",
+      "subject": "SQ70",
+      "level": "fail",
+      "message": "done but references no version (no `version` field, no vX.Y.Z in notes)"
+    },
+    {
+      "check": "Q",
+      "subject": "K9",
+      "level": "pass",
+      "message": "references v0.4.30"
+    }
+  ]
+}

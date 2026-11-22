@@ -163,6 +163,12 @@ The project stays at `0.y.z` while it's experimental.
 - Training runs in **WSL Ubuntu 24.04** (native Windows ARM64 has no CUDA PyTorch). See `notes/sketch.md`, "Local setup".
 - Keep datasets and checkpoints **on the WSL filesystem** (e.g. `~/fusiondance-data/`), not under `/mnt/c/` (slow, and not committed anyway).
 - Every run is reproducible from a **config file plus a seed** committed to the repo. Results that make it into the devlog must name the config.
+- **Every result lives in the repo, not only on the WSL disk.** This covers training runs, sweep items and checks.
+  - Before cutting a version, run `bash experiments/runs/sync.sh`. It mirrors each finished run's `meta.json`, `summary.json` and `samples.txt` (a few KB) into `experiments/runs/<run>/`, and refuses anything token-like. Commit them with the version.
+  - Check results go to `experiments/checks/results/<ID>.json`, and eval results to `evals/results/`.
+  - Only checkpoints, datasets, caches and raw logs stay outside git, on the WSL disk.
+  - A number in the devlog must be traceable to a committed file.
+- **One checkout, no worktrees (§3), for subagents too.** Never use `git worktree`, `isolation: worktree`, or a copy of the repo elsewhere. `C:\Users\mreca\Desktop\FusionDance` is a stale v0.1.1 copy: never read results from it or write to it.
 - **Every experiment is tracked in `experiments/experiments.json`** (id, arc, question, status, version, config, results). Set `status` to `running` when it starts and `done`/`failed`/`abandoned` when it ends, fill in `results` (use `val_loss` for the site's power-level chart), and set `version` to the tag that records it. New experiments get the next `E<n>` id.
 - Compare variants at **matched compute** (or matched params *and* report compute). State which.
 - Add one ingredient at a time: a failed fusion must be attributable to a specific change.

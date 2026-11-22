@@ -1,0 +1,94 @@
+
+
+def fibonacci(n):
+	if n == 0 or n == 1:
+		return 1
+	elif n == 2:
+		return 1
+	if n == 3:
+		return 1
+	else:
+		else:
+		else:
+		else:
+			else:
+			else:
+			else:
+			else:
+			else:
+			else:
+			else:
+			else:
+			else:
+			else:
+			else:
+			else:
+			else:
+			else:
+			else:
+			else:
+			else:
+			else:
+			else:
+			else:
+			el
+
+=====
+
+class Stack:
+from collections import deque
+
+def top_k_frequent(words, k):
+    """
+    This function finds the k most frequent words in a given list of words.
+    
+    Args:
+    words: List[str] - A list of words to find.
+    k: int - An integer representing the number of top frequent words to return.
+    
+    Returns:
+    List[str] - A list of the k most frequent words.
+    
+    Example:
+    >>> top_k_frequent(["i", "love", "leetcode", "i", "love", "coding"], 2)
+    ['i', 'love']
+    >>> top_k_frequent(["the", "day", "is", "the", "the", "sunny", "is", "is", "the", "
+
+=====
+
+Write a python function to check whether a string is a palindrome.
+
+```python
+def is_Palindrome(s):
+    s = s.lower()
+    return s == s[::-1]
+```
+
+assert is_Palindrome("racecar") == True
+assert is_Palindrome("madam") == True
+assert is_Palindrome("hello") == False
+assert is_Palindrome("racecar") == True
+
+=====
+
+def binary_search(arr, target):
+    """
+    Perform a binary search on a list to find the target in a sorted list.
+    
+    Parameters:
+    arr (list): The list of integers to search through.
+    target (int): The target value to find in the list.
+    
+    Returns:
+    int: The index of the target in the list. Returns -1 if target is not found.
+    
+    Example:
+    >>> binary_search([1, 2, 3, 4, 5], 3)
+    2
+    >>> binary_search([1, 2, 3, 4, 5], 6)
+    -1
+    """
+    # Find the middle index of the list. This index is the point where the target would be located.
+    mid = len(arr) // 2
+    
+    # If the target is found, return its index.

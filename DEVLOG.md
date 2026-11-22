@@ -17,6 +17,24 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.23: Run records in the repo; no-worktree rule restated
+*2026-11-22*
+
+**What** (the human, about `experiments/checks/results/` and worktrees: why isn't this in the repo?):
+- **Audit:**
+  - The repo has exactly one checkout and no worktrees (`git worktree list`: only `C:/Users/mreca/Desktop/Gogeta-0 [main]`).
+  - All 8 check results (K1–K6, K7-parity, sq_06) are tracked and on GitHub.
+  - **The gap was the training runs:** 15 run folders (`meta.json`, `summary.json`, `samples.txt`) existed only on the WSL disk under `~/fusiondance-data/runs/`. That includes E0/E1/E2's records and the K7 sweep runs, so the devlog's training numbers had no committed source file.
+  - The old `C:\Users\mreca\Desktop\FusionDance` folder is a stale v0.1.1 copy; it has no results.
+- **Fix:** `experiments/runs/sync.sh` mirrors each finished run's record files into `experiments/runs/<run>/` (a few KB each; refuses token-like strings; never checkpoints or data). This version commits 11 runs: E0 s0, E1 s0 (v0.3.0), E2 s0, a smoke run, and the 7 K7 sweep runs finished so far. The 4 without a `summary.json` are skipped: E9 s0 and E2 s1 were killed before finishing, one smoke run, and the K7 run still in flight.
+- **Root cause:** the generic `runs/` rule in `.gitignore` (from v0.1.0, meant for training output folders) also matched `experiments/runs/`, so run records could never be committed. `.gitignore` now re-includes `/experiments/runs/`.
+- **AGENTS §5:**
+  - every result lives in the repo; run `sync.sh` before each version, and only checkpoints, data, caches and raw logs stay outside git;
+  - one checkout, no worktrees, for subagents too;
+  - never read from or write to the stale FusionDance copy.
+
+---
+
 ## v0.4.22: 3D page: FizzBuzz Play trace, legend, polish, label-leak fix
 *2026-11-22*
 

@@ -17,6 +17,20 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.3: K4: Ternary gap vs model size
+*2026-11-22*
+
+**What**: check K4 (Ternary gap vs model size): script, results JSON and card. Prediction committed in `f1b4ebd` before it ran.
+
+### K4: Ternary gap vs model size
+- **Question:** Does the ternary quality gap shrink with size at our scale? (C17)
+- **Result:** Mean relative gap **15.32% / 13.76% / 10.55%** at d = 64/128/256 (2 seeds, decreasing within each seed; `results/K4.json`).
+- **Verdict vs prediction:** Hit on the trend; the gaps are larger than predicted (12/8/5%). Local analogue VERIFIED, so C17 is PARTIAL (3B parity untestable here).
+- **What it means:** Ternary costs ~10%+ at tiny sizes; E3 should run at E1's tuned LR and be judged against this trend.
+- **Card:** experiments/cards/K4.md
+
+---
+
 ## v0.4.2: K3: MQAR associative recall (invalid)
 *2026-11-22*
 

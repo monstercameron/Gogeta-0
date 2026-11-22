@@ -1,0 +1,264 @@
+{
+  "check": "K4",
+  "claims": [
+    "C17"
+  ],
+  "prediction": "The gap shrinks as d grows (for example ~12% -> ~8% -> ~5%), and all gaps are positive.",
+  "criterion": "C17's local analogue ('the gap shrinks with size at our scale') is VERIFIED if the mean relative gap strictly decreases from d=64 to d=128 to d=256. The 3B-parity part stays UNVERIFIED (not testable here), so the overall status is at best PARTIAL.",
+  "verdicts": {
+    "C17_local": "VERIFIED (gap strictly shrinks: d=64: 15.32%, d=128: 13.75%, d=256: 10.55%) -> ledger status at best PARTIAL",
+    "criterion_pass": true,
+    "all_gaps_positive": true,
+    "mean_rel_gap_pct": {
+      "64": 15.315,
+      "128": 13.755,
+      "256": 10.546
+    }
+  },
+  "data": {
+    "model": "2 blocks [gdn, attn] (prelude, no loop), heads=d/64, mlp=3d, vocab 8192",
+    "train": {
+      "steps": 600,
+      "batch": 64,
+      "seq_len": 512,
+      "tokens": 19660800,
+      "lr": 0.003,
+      "warmup": 100,
+      "schedule": "cosine to 0.1x",
+      "optimizer": "AdamW(0.9,0.95) wd 0.1, clip 1.0, bf16 autocast",
+      "data_order": "random train windows, np.random.default_rng(seed); same for fp and ternary"
+    },
+    "val": "first 64 non-overlapping 512-token windows of val.bin (+1 for targets)",
+    "runs": [
+      {
+        "seed": 0,
+        "d": 64,
+        "ternary": false,
+        "val_loss": 2.306769609451294,
+        "final_train_loss": 2.340627670288086,
+        "params": {
+          "total": 636162,
+          "embedding": 524288,
+          "prelude": 111810,
+          "core": 0,
+          "coda": 0,
+          "other": 64,
+          "non_embedding": 111874
+        },
+        "train_s": 76.5
+      },
+      {
+        "seed": 0,
+        "d": 64,
+        "ternary": true,
+        "val_loss": 2.6727256774902344,
+        "final_train_loss": 2.730595111846924,
+        "params": {
+          "total": 636162,
+          "embedding": 524288,
+          "prelude": 111810,
+          "core": 0,
+          "coda": 0,
+          "other": 64,
+          "non_embedding": 111874
+        },
+        "train_s": 45.7
+      },
+      {
+        "seed": 0,
+        "d": 128,
+        "ternary": false,
+        "val_loss": 1.7425928115844727,
+        "final_train_loss": 1.7577000856399536,
+        "params": {
+          "total": 1493700,
+          "embedding": 1048576,
+          "prelude": 444996,
+          "core": 0,
+          "coda": 0,
+          "other": 128,
+          "non_embedding": 445124
+        },
+        "train_s": 51.2
+      },
+      {
+        "seed": 0,
+        "d": 128,
+        "ternary": true,
+        "val_loss": 1.997107982635498,
+        "final_train_loss": 2.02925443649292,
+        "params": {
+          "total": 1493700,
+          "embedding": 1048576,
+          "prelude": 444996,
+          "core": 0,
+          "coda": 0,
+          "other": 128,
+          "non_embedding": 445124
+        },
+        "train_s": 59.8
+      },
+      {
+        "seed": 0,
+        "d": 256,
+        "ternary": false,
+        "val_loss": 1.3978631496429443,
+        "final_train_loss": 1.4062654972076416,
+        "params": {
+          "total": 3873096,
+          "embedding": 2097152,
+          "prelude": 1775688,
+          "core": 0,
+          "coda": 0,
+          "other": 256,
+          "non_embedding": 1775944
+        },
+        "train_s": 72.7
+      },
+      {
+        "seed": 0,
+        "d": 256,
+        "ternary": true,
+        "val_loss": 1.5509591102600098,
+        "final_train_loss": 1.557494878768921,
+        "params": {
+          "total": 3873096,
+          "embedding": 2097152,
+          "prelude": 1775688,
+          "core": 0,
+          "coda": 0,
+          "other": 256,
+          "non_embedding": 1775944
+        },
+        "train_s": 92.6
+      },
+      {
+        "seed": 1,
+        "d": 64,
+        "ternary": false,
+        "val_loss": 2.308533191680908,
+        "final_train_loss": 2.2002899646759033,
+        "params": {
+          "total": 636162,
+          "embedding": 524288,
+          "prelude": 111810,
+          "core": 0,
+          "coda": 0,
+          "other": 64,
+          "non_embedding": 111874
+        },
+        "train_s": 39.9
+      },
+      {
+        "seed": 1,
+        "d": 64,
+        "ternary": true,
+        "val_loss": 2.649411916732788,
+        "final_train_loss": 2.5653507709503174,
+        "params": {
+          "total": 636162,
+          "embedding": 524288,
+          "prelude": 111810,
+          "core": 0,
+          "coda": 0,
+          "other": 64,
+          "non_embedding": 111874
+        },
+        "train_s": 45.2
+      },
+      {
+        "seed": 1,
+        "d": 128,
+        "ternary": false,
+        "val_loss": 1.7800464630126953,
+        "final_train_loss": 1.644450306892395,
+        "params": {
+          "total": 1493700,
+          "embedding": 1048576,
+          "prelude": 444996,
+          "core": 0,
+          "coda": 0,
+          "other": 128,
+          "non_embedding": 445124
+        },
+        "train_s": 49.2
+      },
+      {
+        "seed": 1,
+        "d": 128,
+        "ternary": true,
+        "val_loss": 2.009737253189087,
+        "final_train_loss": 1.8934584856033325,
+        "params": {
+          "total": 1493700,
+          "embedding": 1048576,
+          "prelude": 444996,
+          "core": 0,
+          "coda": 0,
+          "other": 128,
+          "non_embedding": 445124
+        },
+        "train_s": 60.0
+      },
+      {
+        "seed": 1,
+        "d": 256,
+        "ternary": false,
+        "val_loss": 1.409903645515442,
+        "final_train_loss": 1.286324143409729,
+        "params": {
+          "total": 3873096,
+          "embedding": 2097152,
+          "prelude": 1775688,
+          "core": 0,
+          "coda": 0,
+          "other": 256,
+          "non_embedding": 1775944
+        },
+        "train_s": 71.4
+      },
+      {
+        "seed": 1,
+        "d": 256,
+        "ternary": true,
+        "val_loss": 1.5528724193572998,
+        "final_train_loss": 1.4278632402420044,
+        "params": {
+          "total": 3873096,
+          "embedding": 2097152,
+          "prelude": 1775688,
+          "core": 0,
+          "coda": 0,
+          "other": 256,
+          "non_embedding": 1775944
+        },
+        "train_s": 92.2
+      }
+    ],
+    "rel_gap_by_seed": {
+      "64": {
+        "0": 0.15864439454185006,
+        "1": 0.1476603092735593
+      },
+      "128": {
+        "0": 0.14605544643536347,
+        "1": 0.12903640154855522
+      },
+      "256": {
+        "0": 0.10952142250560842,
+        "1": 0.10140322304762213
+      }
+    },
+    "mean_rel_gap": {
+      "64": 0.15315235190770468,
+      "128": 0.13754592399195936,
+      "256": 0.10546232277661527
+    }
+  },
+  "ran_at": "2026-11-22T16:55:22",
+  "runtime_s": 757.7,
+  "git_commit": "ea3aa5be5b627d251883eb7d47326a7bf887f124",
+  "git_describe": "v0.3.5-4-gea3aa5b-dirty",
+  "torch": "2.14.1+cu130",
+  "device": "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU)"
+}

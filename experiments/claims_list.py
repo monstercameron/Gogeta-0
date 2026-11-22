@@ -657,9 +657,7 @@ class Store:
             event = {"seq": len(events) + 1, **{k: v for k, v in event.items() if k != "seq"}}
             if validate:
                 ids = {f.stem for f in self.files()}
-                c = self.build(cid, events + [event])
-                fails = [f for f in self.check_claim(c, ids) if f[0] == "fail" and f[2] not in ("last_verified",)
-                         or f[0] == "fail" and f[2] == "last_verified" and event.get("status") in SETTLED]
+                fails = [f for f in self.check_claim(self.build(cid, events + [event]), ids) if f[0] == "fail"]
                 pre = {(f[2], f[3]) for f in self.check_claim(self.build(cid, events), ids) if f[0] == "fail"}
                 fails = [f for f in fails if (f[2], f[3]) not in pre]   # only refuse what THIS event breaks
                 if fails:
@@ -708,7 +706,7 @@ class Store:
         e = {"ts": now_iso(), "version": version, "actor": actor, "event": event, "status": status or None,
              "qual": qual or "", "reason": reason or "", "evidence": self.resolve_pointers(evidence),
              "limitations": [{"text": l} for l in limitations if l.strip()]}
-        if (status or cur) in SETTLED and status:
+        if status in SETTLED:
             e["verified_at"] = {"commit": verified_commit or self.head(), "date": verified_date or dt.date.today().isoformat(),
                                 "basis": "given" if verified_commit else "HEAD of the checkout when the event was recorded"}
         if evidence_class:

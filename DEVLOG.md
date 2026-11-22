@@ -17,6 +17,19 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.51: A6 numerics: final hand-back
+*2026-11-22*
+
+The A6 numerics subagent has finished. Its files were committed earlier as the in-progress snapshot v0.4.48 (tags are never moved); this entry records the final status and changes no files.
+
+- Verified by the main agent: 49/49 CPU checks pass (`run_numerical_suite.py`: SUITE PASS; api_contract 10, reference_blocks 24, error_budget 5, mutation_controls 10). GPU part (SQ150) written, not yet run. The commit agent did not re-run it (no torch on the Windows side).
+- Reported by the subagent, not yet verified: the positional-call scan finds 1 unsafe site (the deliberate C2 reproduction, allow-listed) and 29 fragile-but-correct positional calls (SQ154).
+- Reported by the subagent: the error budget replaces the ad-hoc 2e-3 / 3e-2 tolerances.
+- Reported by the subagent: the fp32 chunk kernel shows 3.1x more error on the GPU than the emulation predicts, unexplained (SQ153).
+- Reported by the subagent: `nn.RMSNorm`'s default eps makes GDN `out_norm` not scale-free for about 0.6% of tokens at init (proposed C199).
+
+---
+
 ## v0.4.50: Byte-level research: snapshot (in progress)
 *2026-11-22*
 

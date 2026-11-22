@@ -11,7 +11,7 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
   - Tiny models (e.g. d=128, 2–4 layers), synthetic or subsampled data, short runs.
   - Target **≤ 15 minutes** (CPU-only if possible). If it can't run that fast, shrink it until it can.
   - Many tiny checks beat one big run.
-- **Verifiable means reproducible:** one script per check in `experiments/checks/` (seeded, runnable from the repo root, printing the measured numbers and a PASS/FAIL against the stated criterion). Commit it. Write the expected result and the pass criterion **before** running. Log the run in `notes/LABNOTEBOOK.md` with the exact numbers.
+- **Verifiable means reproducible:** one script per check in `experiments/checks/` (seeded, runnable from the repo root, printing the measured numbers and a PASS/FAIL against the stated criterion). Commit it as part of a tagged version (no WIP commits, §1). Write the expected result and the pass criterion **before** running. Log the run in `notes/LABNOTEBOOK.md` with the exact numbers.
 - **The claims ledger is the source of truth:** `experiments/claims.md` lists every claim with its source, status and evidence. The statuses:
   - `VERIFIED`: a local check passed; cite the script, numbers and commit.
   - `REFUTED`: a local check failed. Keep it: a refuted claim is a result.
@@ -45,12 +45,34 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
 - **Promote winners:** if a side quest shows a real advantage, register it as a proper experiment (`E<n>`) with a prediction, or fold it into the design (`notes/sketch.md` decisions log). Report dead ends too.
 - Side quests must not stall the main ladder or start heavy training. If one needs more than a small run, propose it to the human instead.
 
+## 0c. Status updates every 10 minutes
+
+- **While any work runs longer than ~10 minutes** (training, a campaign, checks, background subagents), give the human a **short status update at least every 10 minutes**. Don't go quiet until the end.
+- **Each update covers:**
+  - what is running (GPU job, CPU jobs, subagents) and its progress (step/total, ETA);
+  - GPU slot and temperature (`bash experiments/launch/status.sh`);
+  - what finished since the last update, with its key numbers;
+  - anything blocked or needing the human's decision.
+
+  Keep it to a few lines, and say plainly when nothing has changed.
+- **Report only what's observed:** read logs, `status.sh`, results files and subagent notifications. Never predict or invent progress. A subagent that hasn't reported is "still running", not "nearly done".
+- **Agents may schedule the recurring check themselves** (e.g. a session cron job every 10 minutes that only reads status and reports; it must not start new work). Cancel it when nothing is running any more.
+
 ## 1. Devlog = commits = versions
 
 - **Every devlog entry is exactly one commit and exactly one git tag.** No entry without a commit, and no tagged commit without an entry.
 - Entries go at the **top** of `DEVLOG.md` (newest first) and use the template at the bottom of that file.
 - The entry is committed **in the same commit** as the work it describes. Then the commit is tagged.
 - A commit can't contain its own hash, so entries reference their **version tag**, not a hash.
+- **Every experiment of any kind is saved, version-tagged and summarised in the devlog, not only the main-line ones.**
+  - **The E-series (`E<n>`) is reserved for main-thesis experiments** (the FusionDance architecture ladder).
+  - Everything else is an experiment too and gets the same treatment: verification checks (`K<n>`), side quests (`SQ<n>`), diagnostics, sweeps, benchmark/eval runs, reproductions.
+  - For each completed, failed, inconclusive or interrupted experiment:
+    1. **Save it:** results files (`experiments/checks/results/*.json`, run `summary.json`, curves), its card in `experiments/cards/<ID>.md`, the ledger rows it affects, and the lab-notebook entry, all committed.
+    2. **Version-tag it:** the commit that records it is a devlog version with an annotated tag (§1, §2).
+    3. **Summarise it in `DEVLOG.md`:** each experiment gets **its own `### <ID>: <title>` block** in the entry, giving the question, the result with its numbers, the verdict vs the prediction, and what it means for the project. A single table row isn't enough.
+  - Several experiments that finish together may share one version and entry, but each still gets its own `###` summary block.
+  - Bump MINOR for an E-series result or a batch of checks that changes a claim's status; PATCH for a small or inconclusive one.
 - **Always add devlog entries.** Every piece of finished work that changes the repo ends with a `DEVLOG.md` entry (and its commit and tag) before it's called done. That includes:
   - an experiment started, finished, failed or interrupted;
   - a check (§0) or side quest (§0b) with results;
@@ -58,7 +80,12 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
   - a docs or site change;
   - a decision made in conversation.
 
-  If a session did several things, one entry can cover them, but nothing is left unrecorded at the end of a session. Small WIP commits *between* entries are fine (e.g. committing predictions before a run); the work isn't finished until the entry is cut.
+  If a session did several things, one entry can cover them, but nothing is left unrecorded at the end of a session.
+- **No WIP commits. Every commit is a version:** a `DEVLOG.md` entry plus an annotated tag, tied to an experiment or a piece of finished work.
+  - When something must be committed *before* a run (predictions, configs, check scripts, per §0 and §6), cut a small **PATCH version for it**, e.g. `v0.4.1: E10 registered (config + prediction)`. Its devlog entry says what was registered and that it hasn't run yet.
+  - The results then land in a later version.
+  - If unrelated work is also uncommitted at that moment, include it in the same version's entry rather than making a separate untagged commit.
+  - *History note:* commits `0dc7491`, `eecdaeb`, `f1b4ebd`, `4a3e361`, `21fb049`, `ea3aa5b` were untagged WIP commits made before this rule. They stay as they are, because run and check results cite their hashes as provenance. The next version's devlog entry lists the unpushed ones.
 - Before committing a version, run `python tools/build_site_data.py` so the site (`docs/`) matches `DEVLOG.md` and `experiments/experiments.json`. The generated `docs/data/site-data.js` is part of the same commit.
 - With each version, also bump `version` in `pyproject.toml` and the version badge (and the status line, if the headline changed) in `README.md`.
 - Tags are **annotated**: `git tag -a vX.Y.Z -m "vX.Y.Z: <entry title>"`.
@@ -120,9 +147,23 @@ The project stays at `0.y.z` while it's experimental.
 
 - **Environment:** WSL venv at `~/.venvs/gogeta`, installed from `requirements.txt`. Run everything from the repo root (inside WSL, the Windows checkout is under `/mnt/c/...`).
 - **All runs go through `gogeta.tracking.Run`.** Training code never imports `trackio` or `wandb` directly. The backend is `GOGETA_TRACKER=trackio|wandb|none` (default `trackio`, fully local; data in `~/fusiondance-data/trackio`, run folders in `~/fusiondance-data/runs/`).
-- **Write the prediction first.** Fill an experiment's `prediction` field in `experiments.json` *before* its first run starts, and commit it. Don't edit it afterwards; the result gets compared against it.
+- **Write the prediction first.** Fill an experiment's `prediction` field in `experiments.json` *before* its first run starts, and commit it **as a tagged "registered" version** (§1: no WIP commits). Don't edit it afterwards; the result gets compared against it.
 - **Provenance:** every run records its git commit, `git describe`, dirty flag, config and seed (done by `Run`). Runs whose results go into a tagged version must use `--require-clean`, which refuses to start if **code paths** (`gogeta/ configs/ tools/ tests/ requirements.txt`) have uncommitted changes. Don't edit code paths while a queue (`tools/run_queue.sh`) is waiting to start runs.
 - **Lab notebook:** `notes/LABNOTEBOOK.md` is append-only and timestamped. Record every setup step, observation (with numbers), decision (with reason), bug and dead end as it happens, using the OBS / DEC / TODO / ⚠ markers. After each experiment, add a results table, a **prediction scorecard** (hit/miss per predicted claim), and the interpretation. The devlog summarises; the notebook is the evidence.
+- **Every experiment gets its own documentation card, and everything is listed in one index.**
+  - Each experiment (`E<n>`), check (`K<n>`) and run side quest (`SQ<n>`) gets an agent-facing card: `experiments/cards/<ID>.md`, from `experiments/cards/_TEMPLATE.md`. The card has:
+    - front matter: `id`, `type`, `title`, `status`, `headline`, `reuse`;
+    - question and prediction (pointer + commit);
+    - how to run it (config, launch script, commit, compute);
+    - a table of runs (run ids, seeds, commits, status);
+    - results with verdicts;
+    - **artifact paths** (checkpoints, logs, Trackio run, result JSONs, curves);
+    - **"How to reuse this"** (and what not to reuse it for);
+    - caveats and links (claims, side quests, write-up, notebook, devlog).
+  - Create the card when the experiment gets a config (or when a check or side quest first runs), and update it after every run.
+  - `experiments/INDEX.md` is **generated** by `tools/build_experiment_index.py` (also run by `tools/build_site_data.py`) from the registry, cards, check results and the side-quest log. Never hand-edit it. ⚠ in the index marks a missing card: fix it before cutting a version.
+  - **Before designing a new experiment, read `experiments/INDEX.md`** to see what was already run, what it found, and what you can reuse instead of retraining (e.g. the E2 checkpoint for loop diagnostics).
+  - Cards are the agents' reference; the plain-English write-ups below are for humans. Keep both.
 - **Experiment page with a plain-English explainer (required at the end of every experiment).** Before the version that records an experiment's results is cut:
   1. Write `experiments/writeups/E<n>.md` with these sections, in order: **What it means, in plain English** (a `>` callout at the top that someone with no ML background can understand on its own: what was tried, what happened, why it matters; real numbers, everyday analogies, no hype), **What we tested**, **Results** (charts via `{{chart:curves …}}` / `{{chart:loops …}}`), **Breakdown of the findings** (every claim tied to a measured number), **Prediction scorecard**, **Caveats**, **What's next**.
   2. Save the run's eval curve as `experiments/curves/E<n>.json` (`[step, tokens, val_loss]` points from the training log) so the page can chart it.
@@ -153,6 +194,8 @@ The project stays at `0.y.z` while it's experimental.
 | `experiments/curves/E<n>.json` | Eval-loss curve points used by the experiment-page charts |
 | `site-src/learn.md` | Newcomer primer ("Start here") → `docs/learn.html` |
 | `notes/LABNOTEBOOK.md` | Timestamped, append-only evidence (see §6) |
+| `experiments/INDEX.md` | **Generated** lookup table of every experiment, check and side quest (status, headline, reuse, card link). Read it first. |
+| `experiments/cards/<ID>.md` | Agent-facing documentation card per experiment/check/side quest (template: `_TEMPLATE.md`) |
 | `experiments/claims.md` | **Claims ledger** (§0): every claim we rely on, with source, status and evidence |
 | `experiments/checks/` | One small, seeded verification script per claim (§0), each ≤ ~15 min; side-quest scripts are prefixed `sq_` |
 | `experiments/side-quests.md` | Side-quest log (§0b): ideas, status, outcomes |

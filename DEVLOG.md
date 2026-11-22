@@ -17,6 +17,38 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.3.6: Research reviews, experiment cards + index, process rules
+*2026-11-22*
+
+**What**
+- **Rules (AGENTS.md):**
+  - §0b side quests;
+  - §0c status updates every 10 minutes;
+  - §5 compute budget (1 GPU job + ≤ 8 CPU jobs, 85 °C cool-down), launcher usage, a TRL venv and sandbox rule;
+  - §6 one card per experiment plus a generated `experiments/INDEX.md`;
+  - §1 **every experiment of any kind is saved, version-tagged and gets its own devlog block**, with the E-series reserved for the main thesis;
+  - §1 **no WIP commits: every commit is a tagged version**.
+- **Experiment cards** (`experiments/cards/`, from `_TEMPLATE.md`) for E0–E3, and `tools/build_experiment_index.py` (also run by `build_site_data.py`; supports `--registry` / `--tracked-only`).
+- **Research:**
+  - `notes/research-looped.md`: 12 looped-transformer papers, 2025–26;
+  - `notes/review-competitors.md`: fact-check of a pasted analysis on MixerLoop, Auron and TR-Mamba2-Attn;
+  - `notes/smollm2-reference.md`: SmolLM2-135M downloaded (rev `93efa2f`, sha256 matches the Hub, Apache-2.0) as an external sanity reference;
+  - refs: `10-qwen` (Qwen3.8-Next architecture, FlashNext-RL, Qwen3) and `11-looped-2026` (12 papers).
+
+**Results**: no training.
+**Findings**:
+- "Inkling 2" is Thinking Machines' Inkling 2 Small: a mixture-of-experts transformer, not looped.
+- There's no Qwen4 paper on arXiv; Qwen3.8-Flash-Next is the official Qwen4 preview.
+- LT2 (2605.20670) already loops GDN hybrids, but no one combines loops with ternary weights.
+- The pasted analysis overstated MixerLoop (41.5% of the gain at 110M, not "much").
+- At matched FLOPs, loops lose on LM loss in every paper that checks.
+
+**Notes**: the ledger and side-quest rows proposed by these reviews are committed with v0.4.6. The site isn't regenerated in this version, because its sources are mid-edit by the cleanup agent.
+**History**: unpushed untagged WIP commits made before the no-WIP rule: `f1b4ebd` (K1–K6 predictions), `4a3e361` (SQ6 prediction, compute rules), `21fb049` (launch scripts), `ea3aa5b` (TRL scaffold). Check results cite their hashes as provenance, so they stay.
+**Next**: one tagged version per check (v0.4.0–v0.4.6), then E11 registered.
+
+---
+
 ## v0.3.5: Trust but verify: a local check for every claim
 *2026-11-22*
 
@@ -206,5 +238,14 @@ E2 loss vs eval loops: r1 0.669 · r2 0.627 · **r4 0.619** · r6 0.624 · r8 0.
 **Decisions**: what we chose and why
 **Findings / surprises**: incl. failures
 **Next**: the next 1–3 steps
+
+One block per experiment recorded in this version (E-series, checks K, side quests SQ, sweeps, evals…):
+
+### <ID>: <title>
+- **Question:** what it tested (and which claim/side quest)
+- **Result:** the numbers, with run id / result file and commit
+- **Verdict vs prediction:** hit / miss / inconclusive, against the committed criterion
+- **What it means:** one or two sentences for the project
+- **Card:** experiments/cards/<ID>.md
 
 -->

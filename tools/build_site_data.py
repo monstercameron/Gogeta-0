@@ -97,6 +97,10 @@ def main():
     pages = build_pages(data["experiments"], version)
     print(f"wrote {len(pages)} pages: {', '.join(pathlib.Path(p).name for p in pages)}")
 
+    # Agent-facing lookup table of every experiment/check/side quest (experiments/INDEX.md).
+    import build_experiment_index
+    build_experiment_index.main()
+
 
 if __name__ == "__main__":
     main()

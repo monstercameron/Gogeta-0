@@ -83,7 +83,45 @@ PAPERS = {
         ("2505.24760", "Reasoning Gym", "Procedural reasoning tasks with verifiers"),
         ("2505.11831", "ARC-AGI-2", "Puzzle benchmark"),
     ]),
+    "10-qwen": ("Qwen family (the Qwen4 architecture preview)", [
+        ("2608.30320", "Qwen3.8-Next architecture",
+         "Official Qwen design report for Qwen3.8-Flash-Next, the Qwen4 preview: 3:1 GDN/sparse-attention hybrid, "
+         "gated residuals, n-gram embeddings, Muon; ablations + training stability"),
+        ("2610.28998", "FlashNext-RL",
+         "Third-party (2 authors): long-horizon agentic RL for Qwen3.8-Flash-Next on prime-rl + vLLM; RL systems lessons"),
+        ("2505.09388", "Qwen3 Technical Report", "Baseline the Qwen3.x line builds on"),
+    ]),
+    "11-looped-2026": ("Looped transformers 2025–2026 (notes: notes/research-looped.md)", [
+        ("2510.25741", "Ouro (LoopLM)",
+         "ByteDance looped LMs (1.4B/2.6B, 7.7T tokens), entropy-regularised exit gate; also peaks at the trained T=4 "
+         "and degrades at T=5-8, like our E2"),
+        ("2605.20670", "LT2 Linear-Time Looped Transformers",
+         "CLOSEST PRIOR ART for loop + GDN + sparse/window attention (0.6B/1.3B); no ternary, no prelude/coda split"),
+        ("2607.10110", "CHASE (Looped Mamba)",
+         "Looped Mamba-2 / hybrid LMs (50M-370M); iso-FLOP deeper non-looped still wins on perplexity"),
+        ("2604.12946", "Parcae",
+         "Loop instability = injection with spectral radius >= 1; contractive diagonal injection + prelude norm; "
+         "test-time looping saturates near the trained mean"),
+        ("2606.18524", "Loop-muP",
+         "Shared-weight loop increments add coherently (norm ~ N); scale residual branches by 1/N for LR transfer"),
+        ("2605.18797", "Fully Looped Transformer",
+         "Residual explosion + gradient oscillation in loops; prev-loop state as attention query; stable to 12 loops"),
+        ("2604.21254", "Hyperloop Transformers",
+         "Loop-level hyper-connections (diagonal sigmoid mixing, loop embedding); looped models lose more under INT4 PTQ"),
+        ("2602.11451", "LoopFormer",
+         "Budget-conditioned elastic depth: time/step-size conditioning + shortcut-consistency loss (M <= trained L)"),
+        ("2606.29983", "Learned Stochastic Stopping",
+         "Loop extrapolation is high-variance across seeds; randomised / RL-learned loop counts stabilise it"),
+        ("2604.21106", "Iso-Depth Scaling Laws (loops)",
+         "One recurrence worth r^0.46 unique blocks; truncated BPTT lowers it to 0.38, hyper-connections raise it to 0.65"),
+        ("2610.31943", "Agreement not Normalisation (loops)",
+         "Removing Ouro's loop-boundary norm: from-scratch 19M models extrapolate better without it (16 seeds)"),
+        ("2603.08391", "Adaptive Loops and Memory",
+         "Per-layer PonderNet-style halting + learnable loop scales (init ~identity) + memory banks; ~200M, 14B tokens"),
+    ]),
 }
+# Note (2026-11-22): no Qwen4 paper exists on arXiv (title search "Qwen4" returned nothing); Qwen3.8-Flash-Next is
+# Alibaba's announced Qwen4 architecture preview. Re-check and add Qwen4 here when an official report appears.
 
 
 def safe(name):

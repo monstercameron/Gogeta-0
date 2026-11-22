@@ -278,6 +278,7 @@ class CockpitApp(App):
         self.run_worker(job, thread=True, group=name, exit_on_error=False)
 
     def action_tab(self, tid: str) -> None:
+        self.set_focus(None)  # a focused Button in the old pane otherwise swallows the tab switch
         self.query_one("#tabs", TabbedContent).active = tid
 
     def action_help(self) -> None:

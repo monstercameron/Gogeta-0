@@ -111,6 +111,7 @@ class LiveRepoTests(unittest.TestCase):
         self.assertNotIn("error", core.experiment("E10"))
         self.assertIn("error", core.experiment("NOPE999"))
 
+    @unittest.skipUnless(core.RUNS_DIR.exists() and any(core.RUNS_DIR.glob("*/summary.json")), "live run data exists only in WSL")
     def test_search_index_runs(self):
         self.assertGreater(core.search("Gated DeltaNet")["count"], 0)
         self.assertGreater(core.index()["count"], 5)
@@ -274,6 +275,7 @@ class LogDbTests(TmpDB):
         self.assertEqual(logdb.stats()["events"], 1)
         self.assertTrue(logdb.sql("select * from events union all select * from events", limit=1)["truncated"])
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "needs a Linux path that cannot exist (/proc)")
     def test_writers_never_raise_when_db_unavailable(self):
         with mock.patch.dict(os.environ, {"GOGETA_COCKPIT_DB": "/proc/nonexistent/x.sqlite"}):
             self.assertIsNone(logdb.event("t", "info", "k", "m"))

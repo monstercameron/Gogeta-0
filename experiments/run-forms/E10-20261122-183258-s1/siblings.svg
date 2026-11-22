@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" width="640" height="300" role="img" font-family="system-ui,-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
+<title>Val loss, runs of E10 at this budget</title><desc>Final validation loss per run; this run is labelled.</desc>
+<text x="66" y="20" font-size="14" font-weight="600" fill="#767672">Val loss, runs of E10 at this budget</text>
+<line x1="66.0" y1="237.9" x2="614.0" y2="237.9" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="241.9" text-anchor="end" font-size="11" fill="#767672">5.8e-1</text>
+<line x1="66.0" y1="190.6" x2="614.0" y2="190.6" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="194.6" text-anchor="end" font-size="11" fill="#767672">5.8e-1</text>
+<line x1="66.0" y1="143.4" x2="614.0" y2="143.4" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="147.4" text-anchor="end" font-size="11" fill="#767672">5.8e-1</text>
+<line x1="66.0" y1="96.1" x2="614.0" y2="96.1" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="100.1" text-anchor="end" font-size="11" fill="#767672">5.8e-1</text>
+<line x1="66.0" y1="252.0" x2="614.0" y2="252.0" stroke="#808080" stroke-opacity="0.55" stroke-width="1"/>
+<text x="340.0" y="292.0" text-anchor="middle" font-size="12" fill="#767672">run</text>
+<text transform="translate(14 152.0) rotate(-90)" text-anchor="middle" font-size="12" fill="#767672">final val loss (nats/token)</text>
+<circle cx="119.0" cy="228.9" r="4.5" fill="#8f8f8a"/>
+<text x="119.0" y="268.0" text-anchor="middle" font-size="10" fill="#767672">s0 lr 3e-3</text>
+<text x="119.0" y="217.9" text-anchor="middle" font-size="11" font-weight="normal" fill="#767672">0.5822</text>
+<circle cx="561.0" cy="75.1" r="6.0" fill="#eb6834"/>
+<text x="561.0" y="268.0" text-anchor="middle" font-size="10" fill="#767672">s1 lr 3e-3</text>
+<text x="561.0" y="64.1" text-anchor="middle" font-size="11" font-weight="600" fill="#767672">0.5854 (this)</text>
+</svg>

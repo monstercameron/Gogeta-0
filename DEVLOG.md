@@ -17,6 +17,30 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.56: Run report forms (final): every finished run has a form, filled by an agent through the cockpit MCP
+*2026-11-22*
+
+### Run report forms (final hand-back; snapshot was v0.4.45)
+**What** (the human: "I want to see the agent use the cockpit and fill out a form for each run... explains the experiment and its metadata and shows any useful graph"):
+- `cockpit/runform.py` gives the cockpit draft, submit, render and list for forms.
+- MCP tools: `gogeta_run_form_draft`, `gogeta_run_form_submit` (state-changing; refuses empty narratives and claims cited without evidence pointers) and `gogeta_run_forms`. The MCP server now has 31 tools.
+- The TUI's Runs tab has a forms view, and `brief()` lists finished runs that have no form.
+- **Each form** has machine-filled metadata (experiment and prediction, architecture, params and FLOPs, hyperparameters, commit, environment, metrics, the K9 data caveat, linked claims) and agent-written narrative fields. **Charts** are static SVGs, transparent so they work in dark mode, at most 9 KB each: loss vs tokens with val points, LR, grad norm, throughput, a sibling comparison (val vs LR for K7), and L(r) for E2.
+- **README:** a "Run report forms" section explains how to view and fill forms.
+
+**Results**:
+- **15 of 15 finished runs have a form,** filled **by a subagent calling the cockpit's MCP server** (82 MCP tool calls logged in the cockpit's SQLite, 0 failed). One refusal demo (empty purpose, claim evidence "see above") was refused and wrote nothing.
+- Cockpit tests: 35 + 22 unit tests OK, and the headless TUI check is FAILED: 0 twice. A flaky TUI wait was hardened, and tab keys stopping after a button click was fixed.
+
+**Flagged by the form-filling agent** (from the run data; **not a verdict**: contaminated val, and the registered parity and C5 analyses wait for the 3-seed means on clean val):
+- **E10 seed 0 (0.5822) is about 4% better than our E0 (0.6063)** at identical shapes, which is outside the registered E0-parity tolerance;
+- **E10 at 3e-3 also edges out E1 at 3e-3 (0.5846)** by 0.4%.
+
+Both bear directly on C5.
+**Discrepancies noted on the forms**: max grad-norm after step 300 from Trackio is 0.485/0.490, vs 0.38 in the micro devlogs; E1 reaches E0's final val at 172M tokens (form) vs 169M (devlog interpolation).
+
+---
+
 ## v0.4.55: A1 data integrity (final): clean-val lists, frozen test split, families, strict benchmark contamination
 *2026-11-22*
 

@@ -13,7 +13,7 @@ from textual.widgets import DataTable, RichLog, Static, TabbedContent  # noqa: E
 SHOTS = Path(__file__).resolve().parent / "screenshots"
 
 
-async def wait_for(pilot, cond, tries=60):
+async def wait_for(pilot, cond, tries=160):
     for _ in range(tries):
         await pilot.pause(0.25)
         if cond():
@@ -41,13 +41,15 @@ async def run(size, shots):
             if shots and size[0] >= 100 and tab in ("queue", "errors", "experiments"):
                 app.save_screenshot("%s_%dx%d.svg" % (tab, *size), path=str(SHOTS))
         app.query_one("#tabs", TabbedContent).active = "runs"
+        await wait_for(pilot, lambda: app.query_one("#runs-table", DataTable).row_count >= 1)
         await pilot.pause(1.0)
         await pilot.click("#runs-forms")
         ft = app.query_one("#forms-table", DataTable)
         results.append(("runs: run forms table rows=%d" % ft.row_count, await wait_for(pilot, lambda: ft.row_count >= 1)))
         results.append(("runs: form detail shows machine/agent fields", await wait_for(pilot, lambda: "[agent]" in "".join(str(l.text) for l in app.query_one("#form-detail", RichLog).lines))))
         await pilot.click("#runs-forms")
-        app.query_one("#tabs", TabbedContent).active = "logs"
+        await pilot.press("l")  # key binding must still switch tabs after a Button had focus
+        await pilot.pause(0.3)
         good = await wait_for(pilot, lambda: len(app.query_one("#log-view", RichLog).lines) > 0)
         results.append(("tab logs tail lines>0", good))
         await pilot.press("r")

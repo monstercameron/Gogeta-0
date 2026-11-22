@@ -17,6 +17,34 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.25: K7 stage 1: E10 tuned at 3e-3, E1 wants a higher LR; hf.py fixed
+*2026-11-22*
+
+### K7 (stage 1 of 2): LR sweep, 8 runs × 20M tokens, seed 0
+**What**: the pre-registered sweep {1e-3, 2e-3, 3e-3, 6e-3} for the control E10 and the hybrid E1. Campaigns `phase2a-k7-lr` (item 1) and `phase2a-k7-lr-resume` (items 2–8; see v0.4.16 for the interruption); code paths identical across all 8 runs. `experiments/checks/k7_lr_sweep.py` applied the decision rule → `experiments/checks/results/K7.json`.
+
+**Results** (final val loss, packed protocol):
+
+| LR | 1e-3 | 2e-3 | 3e-3 | 6e-3 |
+|---|---|---|---|---|
+| E10 | 1.2385 | 1.0650 | **1.0286** | 1.0889 |
+| E1 | 1.1625 | 1.0367 | 1.0071 | **0.9925** |
+
+- **E10: tuned LR = 3e-3** (bracketed).
+- **E1: best at the top edge (6e-3)**, so rule step 2 extends the grid to 1.2e-2. That one run is next (`phase2a-k7-lr-ext.campaign`).
+- E1 beats E10 at every LR tested.
+- **Prediction scorecard:** 3 hits (E10's range, no divergence, no low-edge winner) and 3 misses (E1 wanted a higher LR than predicted; the curves are sharper than "flat within 1%"; 1e-3 was +17–20% worse, not +3–8%).
+- **Implication**: the v0.3.0 FusionDance results at 3e-3 probably ran below their best LR while E0/E10 sat near theirs, so C5 (E1 beats E0) may understate the hybrid's edge. The replication at tuned LRs (Phase 2b) will tell.
+
+**Ledger** (AGENTS §5 rule):
+- **C92 → PARTIAL** (3e-3 is right for E10, not for E1);
+- **C80 → VERIFIED** again after the fix below.
+
+### Q30: `gogeta/hf.py` fixed
+`GogetaConfig` gains `gdn_neg_eigval`. `GogetaForCausalLM` builds again and round-trips the neg-eig flag. `post_training/test_hf.py` 10/10 OK, `evals/test_wiring.py` 6/6 OK (CPU). It's a code-path edit, made in the gap between campaigns. `evals/gogeta_lm.py`'s fill-missing-fields shim is now a no-op and can go later.
+
+---
+
 ## v0.4.24: Claims list (claims-status.md); run artifacts out of git again
 *2026-11-22*
 

@@ -1,0 +1,104 @@
+{
+  "check": "K7",
+  "claims": [
+    "E10 control",
+    "C5"
+  ],
+  "prediction": "Written 2026-11-22 before any K7 run. E10 (HF Llama control): best LR 3e-3 or 6e-3 (6e-3 slightly more likely at this short horizon); E1 (hybrid): best 2e-3 or 3e-3. Both curves are flat near the optimum (best vs second best < 1%), and lr 1e-3 is clearly worse (+3% to +8% vs best) at 20M tokens. No run diverges at 6e-3 (grad clip 1.0). Neither winner is at the low edge.",
+  "criterion": "Decision rule in the docstring / PREDICTIONS.md K7: lowest final full-val loss wins; extend the grid by one step if the winner is at an edge.",
+  "verdicts": {
+    "E10": "tuned LR 0.003",
+    "E1": "UNDECIDED: need runs at lr 0.012 (best 0.006 at the high edge: extend up)"
+  },
+  "data": {
+    "E10": {
+      "runs": [
+        {
+          "run": "E10-20261122-172534-s0",
+          "lr": 0.001,
+          "status": "done",
+          "val_loss": 1.2384719216846636,
+          "commit": "e46abd2",
+          "code_dirty": false
+        },
+        {
+          "run": "E10-20261122-173601-s0",
+          "lr": 0.002,
+          "status": "done",
+          "val_loss": 1.0649721440309712,
+          "commit": "48862f9",
+          "code_dirty": false
+        },
+        {
+          "run": "E10-20261122-173914-s0",
+          "lr": 0.003,
+          "status": "done",
+          "val_loss": 1.0286002963839,
+          "commit": "48862f9",
+          "code_dirty": false
+        },
+        {
+          "run": "E10-20261122-174231-s0",
+          "lr": 0.006,
+          "status": "done",
+          "val_loss": 1.0888765524618862,
+          "commit": "48862f9",
+          "code_dirty": false
+        }
+      ],
+      "best_lr": 0.003,
+      "needed": [],
+      "flags": []
+    },
+    "E1": {
+      "runs": [
+        {
+          "run": "E1-20261122-174549-s0",
+          "lr": 0.001,
+          "status": "done",
+          "val_loss": 1.1624575348379995,
+          "commit": "a22ac48",
+          "code_dirty": false
+        },
+        {
+          "run": "E1-20261122-175030-s0",
+          "lr": 0.002,
+          "status": "done",
+          "val_loss": 1.0367168559327116,
+          "commit": "0d5ca31",
+          "code_dirty": false
+        },
+        {
+          "run": "E1-20261122-175440-s0",
+          "lr": 0.003,
+          "status": "done",
+          "val_loss": 1.007079877060202,
+          "commit": "f8d4ed5",
+          "code_dirty": false
+        },
+        {
+          "run": "E1-20261122-175844-s0",
+          "lr": 0.006,
+          "status": "done",
+          "val_loss": 0.9924883136896838,
+          "commit": "2d06d95",
+          "code_dirty": false
+        }
+      ],
+      "best_lr": null,
+      "needed": [
+        0.012
+      ],
+      "flags": [
+        "best 0.006 at the high edge: extend up"
+      ]
+    },
+    "campaign_written": "experiments/launch/campaigns/phase2a-k7-lr-ext.campaign"
+  },
+  "ran_at": "2026-11-22T18:04:17",
+  "runtime_s": 0.1,
+  "git_commit": "97f5cc435faf9a1479ff46307d6c5517221825f0",
+  "git_describe": "v0.4.24-dirty",
+  "torch": "2.14.1+cu130",
+  "device": "cpu"
+}

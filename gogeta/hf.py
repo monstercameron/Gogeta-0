@@ -76,6 +76,7 @@ class GogetaConfig(PreTrainedConfig):
     rope_base: float = 10000.0
     conv_size: int = 4
     ternary: bool = False
+    gdn_neg_eigval: bool = False  # v0.4.7 (E11): beta in (0, 2) via the kernel's 2*sigmoid
     tie_word_embeddings: bool = True
     # HF / generation fields (ids match gogeta/assets/tokenizer-code-py-v1.json)
     eos_token_id: int | None = 0

@@ -1,0 +1,2 @@
+# K7 grid extension, written by experiments/checks/k7_lr_sweep.py (decision rule step 2)
+E1 --seed 0 --lr 0.012 --max-tokens 20000000

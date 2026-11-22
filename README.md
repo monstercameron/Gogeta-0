@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-ffd23f"></a>
-  <a href="https://github.com/monstercameron/Gogeta-0/tags"><img alt="Version" src="https://img.shields.io/badge/version-v0.4.15-ff8a1f"></a>
+  <a href="https://github.com/monstercameron/Gogeta-0/tags"><img alt="Version" src="https://img.shields.io/badge/version-v0.4.16-ff8a1f"></a>
   <a href="https://monstercameron.github.io/Gogeta-0/"><img alt="Project site" src="https://img.shields.io/badge/site-live-3cff9a"></a>
   <img alt="Status: research" src="https://img.shields.io/badge/status-experimental%20research-4a90ff">
   <img alt="Python 3.12" src="https://img.shields.io/badge/python-3.12-3cff9a">
@@ -25,7 +25,7 @@
 
 **Gogeta-0** is a small causal language model for Python code, and the first model built on **FusionDance**: an architecture that fuses three separate answers to the three big costs of modern LLMs. It's an open, laptop-scale research project, and every experiment is written up honestly, failures included.
 
-> **Status: v0.4.15. First models trained.** On 200M tokens of Python, swapping five of six attention layers for linear-time layers **beat the standard transformer by 3.6%**. The looped version **doesn't pay off yet**, and we've measured why. Each result comes from a single seed so far; see [Results](#results-so-far).
+> **Status: v0.4.16. First models trained.** On 200M tokens of Python, swapping five of six attention layers for linear-time layers **beat the standard transformer by 3.6%**. The looped version **doesn't pay off yet**, and we've measured why. Each result comes from a single seed so far; see [Results](#results-so-far).
 
 ## The pitch
 

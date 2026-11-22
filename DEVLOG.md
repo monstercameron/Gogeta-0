@@ -17,6 +17,22 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.16: Q6: replication analysis script
+*2026-11-22*
+
+### Q6: replication analysis (tooling for Phase 2b)
+**What**: `experiments/checks/replication_analysis.py` (stdlib + numpy; written by a subagent, reviewed and self-tested by the main agent). It applies the **already-committed** Phase 2b criteria from `experiments/checks/PREDICTIONS.md` and the registry to run folders: C5 (E1 beats E10: VERIFIED / PARTIAL / REFUTED), seed noise, old-E1 reproducibility, E0 parity, the loop question (E9 vs E2, threshold 2√2·s_E1), E11 (free / helps / hurts), and the E10 prediction scorecard. No new prediction: it only mechanises criteria registered in v0.4.11 and v0.4.13.
+**Run selection**: status done, `max_tokens` = 200M (drops K7's 20M sweep runs), LR equal to the K7-tuned LR (read from `results/K7.json`), code not dirty, latest run per (experiment, seed). Any verdict with missing runs is INCOMPLETE and lists what's missing. Nothing is computed on partial data.
+**Results**: `--selftest` PASS: every verdict branch is exercised on synthetic run folders through the real discovery and filter code, including five excluded run types. On real data (`--no-save`) every verdict is INCOMPLETE, as expected: K7 isn't finished and Phase 2b hasn't run.
+**Caveats**: per-step train-loss jumps (E10 prediction item 5) can't be checked from `summary.json`, so they're reported NOT_CHECKED. The repo save path (`common.save`) is untested until the first real run.
+
+### K7 (in progress): campaign interrupted after item 1/8
+Item 1 finished: E10, lr 1e-3, 20M tokens → val 1.2385, bpc 0.4802, 1.86 min. Item 2's preflight then **refused**, because a subagent had created an untracked file under `tools/` (the 3D page's `tools/viz/export_arch.py`), and the campaign aborted by design (code paths must be committed). No result was affected. Items 2–8 will relaunch once that work is committed. Lesson: subagent briefs must not create files under code paths while a campaign runs.
+
+**Queue**: Q3 done (K8 `--plan` resolved the snapshot), Q6 done.
+
+---
+
 ## v0.4.15: Autonomy rule: never block on the human
 *2026-11-22*
 

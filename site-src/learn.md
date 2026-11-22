@@ -29,13 +29,13 @@
 
 ### 1. Cheaper memory layers (instead of attention everywhere)
 Standard **attention** is like rereading the *entire* document every time you write a word. It's very thorough, but the cost grows with the *square* of the document's length: a 10× longer document costs 100× more.
-**Gated DeltaNet** keeps a fixed-size set of **running notes** instead, updating them as it reads. **Sliding-window attention** only glances at the **last few lines**. Both cost the same per word, however long the document gets.
+**Gated DeltaNet** keeps a fixed-size set of **running notes** instead, updating them as it reads. **Sliding-window attention** only glances at the **last few lines**. In principle both cost the same per word, however long the document gets. (Our current sliding-window code still builds a full-size mask, so it slows down on long documents until we swap in a better kernel.)
 
 ### 2. Loops
 Instead of 14 different layers, keep a block of 3 and **run it several times**, like re-reading your answer before handing it in. You store fewer parameters, and in principle you can "think longer" on hard problems by looping more.
 
 ### 3. Ternary weights
-Store every parameter as just **−1, 0 or +1** instead of a precise 16-bit number. The model becomes ~10× smaller to store, and multiplications become additions. The open question is how much quality that costs.
+Store every parameter as just **−1, 0 or +1** instead of a precise 16-bit number. The model's layers become about **7.8× smaller** to store (the whole model about **3.1×**, because the word table stays 16-bit; computed, not yet measured on a packed file). With special ternary kernels, multiplications could become additions, but our code only simulates the rounding, so it isn't faster yet. The open question is how much quality that costs.
 
 ## What we've found so far
 

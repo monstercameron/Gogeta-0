@@ -17,6 +17,27 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.9: Science gaps: wrong claims corrected everywhere, gap list
+*2026-11-22*
+
+**What** (control + science-cleanup agent, Phase 1; reviewed by the main agent):
+- **Three wrong statements fixed everywhere they appeared**, now matching the ledger and K1/K2:
+  - C12 (sliding window "O(n·w)": our dense-mask kernel is O(n²)): `docs/index.html`, `README.md`, `site-src/learn.md`;
+  - C13 ("~10× smaller" → computed 7.8× for the body, 3.1× for the whole model): `site-src/learn.md`;
+  - C14 ("ternary makes compute cheap" → only with ternary kernels; ours are simulated): `docs/index.html`, `README.md`, writeups E3/E4.
+- **`notes/science-gaps.md`:** every known gap, its fix and its status. The six original gaps are fixed or designed. New ones found:
+  - E1-vs-E0 "matched compute" is ambiguous (+4.4% params, −6% FLOPs; C95);
+  - single-seed claims are stated as fact in the README and primer (left until the replication decides C5);
+  - `val_bits_per_char` bias ~0.05%;
+  - train/val near-duplicate leakage unchecked;
+  - one compute-budget violation (two out-of-launcher GPU jobs at ~17:05);
+  - detached-run survival unverified.
+- No prediction was ever edited after the fact (checked against the registry's git history).
+
+**Results**: n/a (docs). The site HTML is regenerated in v0.4.13.
+
+---
+
 ## v0.4.8: Model architecture visualizer (local server)
 *2026-11-22*
 

@@ -87,8 +87,8 @@
       <article class="card fighter" style="--c: var(--blue)">
         <span class="role">Attacks: context cost</span>
         <h3>Linear-time mixers</h3>
-        <p>Gated DeltaNet / Mamba-style recurrent state plus sliding-window attention. Memory stays fixed-size instead of growing with every token.</p>
-        <div class="stat"><span>Mixing cost</span><b>O(n²) → O(n)</b></div>
+        <p>Gated DeltaNet / Mamba-style recurrent state plus sliding-window attention. By design, memory stays fixed-size instead of growing with every token (our current sliding-window kernel still uses a dense O(n²) mask).</p>
+        <div class="stat"><span>Mixing cost (design)</span><b>O(n²) → O(n)</b></div>
         <div class="bar"><i style="--w: 86%"></i></div>
         <p class="weak"><b>Weak spot:</b> limited multi-step state tracking per layer. <br>Covered by <em>loops</em>, which add depth.</p>
       </article>
@@ -98,12 +98,12 @@
         <p>One shared block applied <i>r</i> times. Depth comes from compute instead of new weights, and harder inputs can get more passes.</p>
         <div class="stat"><span>Depth per weight</span><b>× r</b></div>
         <div class="bar"><i style="--w: 74%"></i></div>
-        <p class="weak"><b>Weak spot:</b> every pass costs compute. <br>Covered by <em>ternary</em>, which makes compute cheap.</p>
+        <p class="weak"><b>Weak spot:</b> every pass costs compute. <br>Covered by <em>ternary</em>, which could make compute cheap with real ternary kernels (ours only simulate it, so no speedup yet).</p>
       </article>
       <article class="card fighter" style="--c: var(--gold)">
         <span class="role">Attacks: bits</span>
         <h3>Ternary weights</h3>
-        <p>BitNet b1.58: every weight is −1, 0 or +1. About 1.58 bits each, and matrix multiplies turn into additions.</p>
+        <p>BitNet b1.58: every weight is −1, 0 or +1. About 1.58 bits each. With dedicated ternary kernels, matrix multiplies could turn into additions; our code only simulates the rounding, so for now it is slower, not faster.</p>
         <div class="stat"><span>Bits per weight</span><b>16 → 1.58</b></div>
         <div class="bar"><i style="--w: 92%"></i></div>
         <p class="weak"><b>Weak spot:</b> rounding error could compound across loops. <br>Countered by <em>per-loop norms and input re-injection</em>. We'll measure it.</p>
@@ -167,11 +167,11 @@
       <div>
         <div class="rule">
           <p class="kicker">The one rule</p>
-          <p>Nothing quadratic lives inside the loop. Anything inside the loop runs <i>r</i> times, so the only full-attention layer sits outside it and runs once.</p>
+          <p>Nothing quadratic lives inside the loop (by design). Anything inside the loop runs <i>r</i> times, so the only full-attention layer sits outside it and runs once. Today's sliding-window kernel still uses a dense mask, so it is O(n²) until a block-sparse kernel replaces it.</p>
         </div>
         <ul class="legend">
           <li style="--c: var(--blue)"><span><b>Gated DeltaNet</b>: linear-time mixing with a fixed-size memory that can <i>overwrite</i>, not just add, which gives better recall than plain linear attention.</span></li>
-          <li style="--c: var(--violet)"><span><b>Sliding-window attention</b>: exact attention over the last ~256 tokens for local precision, at O(n·w) cost.</span></li>
+          <li style="--c: var(--violet)"><span><b>Sliding-window attention</b>: exact attention over the last ~256 tokens for local precision. O(n·w) in principle; our current kernel uses a dense mask, so it is still O(n²).</span></li>
           <li style="--c: var(--gold)"><span><b>The loop</b>: the same weights run <i>r</i> times. Training samples random <i>r</i>; at inference you choose how hard to think.</span></li>
           <li style="--c: var(--green)"><span><b>Exit head</b>: a cheap readout after every pass. It drives per-loop training, the critic, early stopping and self-speculative drafts.</span></li>
           <li style="--c: var(--red)"><span><b>Coda</b>: a single full-attention layer for exact long-range recall. It's the only part whose memory grows with context.</span></li>
@@ -188,7 +188,7 @@
     <h2>Three budgets, <span class="hl">measured separately</span></h2>
     <p class="section-lede">
       <i>n</i> = context length, <i>L</i> = layers, <i>r</i> = loop count, <i>S</i> = fixed recurrent-state size.
-      At laptop scale the absolute megabytes are tiny, so the result we care about is how each cost <b>scales</b>.
+      At laptop scale the absolute megabytes are tiny, so the result we care about is how each cost <b>scales</b>. The FusionDance column is the design target: our sliding-window layers still use a dense-mask kernel (O(n²)), and ternary weights are simulated in floating point.
     </p>
     <div class="table-wrap">
       <table>

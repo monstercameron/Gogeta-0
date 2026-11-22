@@ -48,7 +48,19 @@ The project stays at `0.y.z` while it's experimental.
 - Add one ingredient at a time: a failed fusion must be attributable to a specific change.
 - Report failures in the devlog too. A skinny Gotenks is a result.
 
-## 6. Documents
+## 6. Tracking runs (scientific hygiene)
+
+- **Environment:** WSL venv at `~/.venvs/gogeta`, installed from `requirements.txt`. Run from the repo via `/mnt/c/Users/mreca/Desktop/Gogeta-0`.
+- **All runs go through `gogeta.tracking.Run`.** Training code never imports `trackio` or `wandb` directly. The backend is `GOGETA_TRACKER=trackio|wandb|none` (default `trackio`, fully local; data in `~/fusiondance-data/trackio`, run folders in `~/fusiondance-data/runs/`).
+- **Write the prediction first.** Fill an experiment's `prediction` field in `experiments.json` *before* its first run starts, and commit it. Don't edit it afterwards; the result gets compared against it.
+- **Provenance:** every run records its git commit, `git describe`, dirty flag, config and seed (done by `Run`). Runs whose results go into a tagged version must use `Run(..., require_clean=True)`, which refuses to start with uncommitted changes.
+- **Seeds:** headline claims need **≥3 seeds**; report the mean and spread.
+- **X-axes:** log `tokens` and `flops` every step and compare variants against those, not steps (looped models do more work per step).
+- **Recording results:** `python tools/record_result.py E<n> --status done --version vX.Y.Z --config <cfg> --summary <run>/summary.json`, then `python tools/build_site_data.py`.
+- **Dashboard:** `~/.venvs/gogeta/bin/python tools/dashboard.py` (in WSL) → http://127.0.0.1:7861. Local only: never enable `share` or a `space_id` without the human's OK.
+- **Smoke check** after env changes: `~/.venvs/gogeta/bin/python tools/smoke_tracking.py` (logs to the separate `gogeta-0-smoke` project).
+
+## 7. Documents
 
 | File | Role |
 |---|---|
@@ -60,6 +72,9 @@ The project stays at `0.y.z` while it's experimental.
 | `docs/` | GitHub Pages site (static, no build). Landing page + devlog page. Don't hand-edit `docs/data/site-data.js`: it's generated. |
 | `experiments/experiments.json` | The experiment registry: source of truth for the site's experiment log |
 | `tools/build_site_data.py` | Builds `docs/data/site-data.js` from `DEVLOG.md` + the experiment registry |
+| `gogeta/` | The Python package: `tracking.py` now; the model code comes later |
+| `tools/record_result.py`, `tools/dashboard.py`, `tools/smoke_tracking.py` | Results → registry; local dashboard; tracking smoke check |
+| `requirements.txt` | Pinned training-environment packages |
 
 Preview the site locally: `python -m http.server 8791 --directory docs`, then open http://127.0.0.1:8791.
 

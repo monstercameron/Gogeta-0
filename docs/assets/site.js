@@ -97,6 +97,7 @@
             ${pill(e.status)}
           </div>
           <p>${esc(e.question)}</p>
+          <p class="prediction"><b>Prediction:</b> ${e.prediction ? esc(e.prediction) : "<i>not written yet. It must be written before the run starts.</i>"}</p>
           <div class="tags">${(e.ingredients || []).map((i) => `<span class="tag">${esc(i)}</span>`).join("")}
             ${(e.metrics || []).map((m) => `<span class="tag metric">${esc(m)}</span>`).join("")}</div>
           ${res.length ? `<div class="table-wrap"><table class="results"><tbody>${res.map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join("")}</tbody></table></div>` : ""}

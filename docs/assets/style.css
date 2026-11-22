@@ -271,6 +271,9 @@ td.good { color: var(--green); font-weight: 700; }
 .hbar { display: grid; grid-template-columns: 120px 1fr 70px; gap: 12px; align-items: center; margin: 10px 0; font-family: var(--font-mono); font-size: .85rem; }
 .hbar .track { height: 16px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; }
 .hbar .fill { height: 100%; background: linear-gradient(90deg, var(--orange), var(--gold)); box-shadow: 0 0 10px var(--orange); border-radius: 99px; }
+.exp .prediction { font-size: .9rem; border-left: 3px solid var(--violet); padding-left: 10px; }
+.exp .prediction b { color: var(--violet); }
+.exp .prediction i { color: var(--dim); }
 
 .timeline { position: relative; display: grid; gap: 22px; padding-left: 28px; }
 .timeline::before { content: ""; position: absolute; left: 8px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(var(--gold), var(--orange), transparent); }

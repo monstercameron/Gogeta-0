@@ -1,0 +1,2 @@
+# Training environment (WSL Ubuntu 24.04, venv at ~/.venvs/gogeta)
+trackio==0.45.1

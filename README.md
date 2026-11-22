@@ -69,7 +69,13 @@ Every experiment here is designed to run locally: small models (10M–50M parame
 | [`refs/`](refs/) | Reading list (~55 papers) with an index; `python refs/fetch_refs.py` downloads the PDFs |
 | [`AGENTS.md`](AGENTS.md) | Working rules for humans and AI agents in this repo |
 | [`docs/`](docs/) | The project site (GitHub Pages): goals, the architecture, and a live experiment log |
-| [`experiments/`](experiments/) | Experiment registry: every training arc, its status and results |
+| [`experiments/`](experiments/) | Experiment registry: every training arc, its prediction, status and results |
+| [`gogeta/`](gogeta/) | Python package. So far: `tracking.py`, local experiment tracking (Trackio) with git provenance |
+| [`tools/`](tools/) | Site-data builder, result recorder, local dashboard, smoke checks |
+
+## Research hygiene
+
+Every run is tracked **locally** with [Trackio](https://huggingface.co/docs/trackio). Each run records its git commit, config and seed. Predictions are written down *before* runs start. Headline claims use 3+ seeds, and variants are compared against tokens and FLOPs, not training steps. Full rules are in [`AGENTS.md`](AGENTS.md).
 
 ## Standing on the shoulders of
 

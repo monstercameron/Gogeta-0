@@ -17,6 +17,24 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.7: E11 registered: negative-eigenvalue GDN for language modelling
+*2026-11-22*
+
+**What**: registers **E11**: E1's layout with GDN's write strength β ∈ (0, 2) (negative eigenvalues). It's one change vs E1, with the same params and FLOPs. **Not run yet.**
+- `gogeta/model.py`: new `ModelConfig.gdn_neg_eigval` (default False; the default path is unchanged). When it's on, raw β logits go to fla with `use_beta_sigmoid_in_kernel=True, allow_neg_eigval=True`.
+- `tests/test_model.py`: 12/12 pass, including two new tests: causality, and that the computation differs from the default with identical weights (max logit diff 0.25). The config loop now skips non-FusionDance configs.
+- `configs/e11_negeig.json`, `experiments/launch/E11.sh`, card, plain-English page; the registry entry with its **prediction** (committed here, before any run).
+- `experiments/INDEX.md` generated (from committed sources only); `pyproject.toml` / README badge → 0.4.7.
+
+### E11: Negative-eigenvalue Gated DeltaNet for language modelling
+- **Question:** does β ∈ (0, 2) cost or help LM, given that SQ6 shows it solves state tracking in one pass?
+- **Result:** not run. It runs at E1's tuned LR from K7, with 3 seeds, in the cleanup campaign right after E1's seeds.
+- **Verdict vs prediction:** the prediction is no LM cost, within ±1% of E1's 3-seed mean. Criteria: free / helps / hurts by max(1%, 2× pooled seed std).
+- **What it means:** if it's free or helps, neg-eig GDN becomes the default mixer and the loop question is re-asked with it.
+- **Card:** experiments/cards/E11.md
+
+---
+
 ## v0.4.6: SQ6 (+SQ2): rotation vs loops vs negative eigenvalues on parity
 *2026-11-22*
 

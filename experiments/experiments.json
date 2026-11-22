@@ -243,5 +243,27 @@
     "config": "configs/e9_unlooped.json",
     "results": {},
     "notes": "Added 2026-11-22 after E2. First attempt (run E9-20261122-152151-s0, commit eecdaeb) was interrupted at step 600/6104 when the agent session ended: no result. On hold while training is paused."
+  },
+  {
+    "id": "E11",
+    "arc": "Reverse Kamehameha",
+    "title": "Negative-eigenvalue Gated DeltaNet for language modelling",
+    "question": "Does letting GDN's write strength go negative (beta in (0, 2), i.e. negative eigenvalues) cost or help language modelling? E1's exact layout and recipe with one change (gdn_neg_eigval). Motivated by SQ6 arm (e): 100% parity in one pass and length generalisation, vs 97.9%/61.2% for looping (ledger C43).",
+    "prediction": "Written 2026-11-22, before any run. Runs at E1's tuned LR (from K7), 3 seeds, same as E1's replication. Prediction: no language-modelling cost: mean full-val loss within +-1.0% of E1's mean, most likely within +-0.5%; training stable (no loss spikes > 0.5 after warmup; max grad-norm <= 1.5x E1's). Basis: the negative-eigenvalue paper (Grazzi et al., reported, not verified here) finds LM perplexity roughly unchanged while state tracking improves; our SQ6 shows the state-tracking gain at our scale. Criteria: 'free for LM' if |mean(E11) - mean(E1)| <= max(1%, 2x pooled seed std); 'helps LM' if mean(E11) < mean(E1) by more than 2x pooled std; 'hurts LM' if worse by more than 2x pooled std. If it is free or helps, the next step is neg-eig GDN inside the looped core (does it fix or replace what the loop was for?).",
+    "ingredients": [
+      "E1 layout",
+      "GDN beta in (0,2)",
+      "allow_neg_eigval (fla)"
+    ],
+    "metrics": [
+      "val loss vs E1 (3 seeds)",
+      "loss spikes / grad-norm",
+      "parity probe (optional)"
+    ],
+    "status": "planned",
+    "version": null,
+    "config": "configs/e11_negeig.json",
+    "results": {},
+    "notes": "Registered 2026-11-22 after SQ6/SQ2. Depends on K7 (E1's tuned LR) so both run with the same recipe."
   }
 ]

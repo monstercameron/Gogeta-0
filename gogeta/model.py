@@ -52,6 +52,7 @@ class ModelConfig:
     max_seq_len: int = 1024
     rope_base: float = 10000.0
     conv_size: int = 4            # GDN short conv
+    gdn_neg_eigval: bool = False  # GDN write strength beta in (0, 2) instead of (0, 1): negative eigenvalues (SQ2/E11)
     ternary: bool = False
     tie_embeddings: bool = True
 
@@ -175,6 +176,9 @@ class GatedDeltaNet(nn.Module):
         dt = torch.exp(torch.rand(H) * (math.log(0.1) - math.log(0.001)) + math.log(0.001)).clamp(min=1e-4)
         self.dt_bias = nn.Parameter(dt + torch.log(-torch.expm1(-dt)))  # inverse softplus
         self.out_norm = nn.RMSNorm(hd)
+        # Negative eigenvalues (Grazzi et al.; verified locally by SQ6 arm (e)): beta = 2*sigmoid(b(x)) in (0, 2),
+        # so (I - beta k k^T) can flip sign. fla only allows this with the sigmoid applied inside the kernel.
+        self.neg_eigval = cfg.gdn_neg_eigval
 
     def forward(self, x):
         B, T, _ = x.shape
@@ -182,10 +186,15 @@ class GatedDeltaNet(nn.Module):
         q = F.normalize(self.conv_q(self.q(x)).view(B, T, H, hd), dim=-1)
         k = F.normalize(self.conv_k(self.k(x)).view(B, T, H, hd), dim=-1)
         v = self.conv_v(self.v(x)).view(B, T, H, hd)
-        beta = torch.sigmoid(self.b(x).float())
         g = -self.A_log.float().exp() * F.softplus(self.a(x).float() + self.dt_bias.float())
         dtype = torch.bfloat16 if x.is_cuda else x.dtype
-        o, _ = self._kernel(q.to(dtype), k.to(dtype), v.to(dtype), g, beta.to(dtype), scale=hd ** -0.5)
+        if self.neg_eigval:
+            raw = self.b(x).float()  # logits; the kernel applies 2*sigmoid
+            o, _ = self._kernel(q.to(dtype), k.to(dtype), v.to(dtype), g, raw.to(dtype), scale=hd ** -0.5,
+                                use_beta_sigmoid_in_kernel=True, allow_neg_eigval=True)
+        else:
+            beta = torch.sigmoid(self.b(x).float())
+            o, _ = self._kernel(q.to(dtype), k.to(dtype), v.to(dtype), g, beta.to(dtype), scale=hd ** -0.5)
         o = self.out_norm(o.to(x.dtype)) * F.silu(self.gate(x).view(B, T, H, hd))
         return self.o(o.reshape(B, T, H * hd))
 

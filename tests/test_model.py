@@ -91,9 +91,25 @@ loss.backward()
 check("ternary looped backward finite", torch.isfinite(loss).item()
       and all(torch.isfinite(p.grad).all() for p in mt.parameters() if p.grad is not None), f"loss {loss.item():.3f}")
 
-# 6. parameter / FLOP accounting for the experiment configs
+# 6. negative-eigenvalue GDN (E11 / SQ2): causal, and actually different from the default beta range
+past, future = causality(model(prelude=["gdn"], core=[], coda=[], gdn_neg_eigval=True))
+check("causal[gdn neg-eig]", past < 1e-4 and future > 1e-4, f"past diff {past:.1e}, future diff {future:.1e}")
+torch.manual_seed(0)
+m_std = FusionDance(ModelConfig(**{**SMALL, "prelude": ["gdn"], "core": [], "coda": []})).to(DEV).eval()
+m_neg = FusionDance(ModelConfig(**{**SMALL, "prelude": ["gdn"], "core": [], "coda": [], "gdn_neg_eigval": True})).to(DEV).eval()
+m_neg.load_state_dict(m_std.state_dict())  # identical weights: only the beta range differs
+idx = torch.randint(0, 512, (2, 64), device=DEV)
+with torch.no_grad():
+    d = (m_std(idx)[0] - m_neg(idx)[0]).abs().max().item()
+check("neg-eig changes the computation (same weights)", d > 1e-3, f"max logit diff {d:.2e}")
+
+# 7. parameter / FLOP accounting for the FusionDance experiment configs (other archs, e.g. hf_llama, are skipped)
 for cfg_path in sorted((pathlib.Path(__file__).resolve().parent.parent / "configs").glob("e*.json")):
-    mc = json.loads(cfg_path.read_text())["model"]
+    full = json.loads(cfg_path.read_text())
+    if full.get("arch", full.get("model", {}).get("arch", "fusiondance")) != "fusiondance":
+        print(f"      {cfg_path.name:22s} (arch {full.get('arch', full['model'].get('arch'))}: skipped)")
+        continue
+    mc = {k: v for k, v in full["model"].items() if k != "arch"}
     mm = FusionDance(ModelConfig(**mc))
     pc = mm.param_counts()
     print(f"      {cfg_path.name:22s} total {pc['total']/1e6:6.2f}M  non-emb {pc['non_embedding']/1e6:6.2f}M  "

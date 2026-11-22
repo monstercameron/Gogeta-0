@@ -17,6 +17,28 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.33: K9 FAILS: 41.7% of val is near-duplicated train text
+*2026-11-22*
+
+### K9: train/val near-duplicate leakage (FAIL)
+**What**: `experiments/checks/k9_leakage.py`, registered in v0.4.30 and run as CPU job `k9-20261122-181814` (200 s). It hashes every 13-gram of the 4,000 val docs (the same docs as K8) against 262.4M train tokens, with a pseudo-val of 4,000 held-out train docs and a shuffled control as baselines.
+**Results** (`experiments/checks/results/K9.json`, card `experiments/cards/K9.md`, micro devlog `experiments/devlogs/K9.md`):
+- **1,667 of 4,000 val docs (41.7%) are near-duplicates of train** (≥ 80% of their 13-grams in train); 70.7% are ≥ 50%. The gate was < 1%: **FAIL**.
+- E0 scores **0.101 bits/char on the near-duplicates**. Without them, its full-val figure goes **0.2209 → 0.2779 (+25.8%)**. The gate was < 2%: **FAIL**.
+- **The pseudo-val overlaps exactly as much** (per-doc mean 0.663 vs 0.665; ≥ 50%: 69.5% vs 70.7%), the shuffled control is 0%, and excluding boilerplate barely changes anything. So the corpus itself is self-duplicated: many LeetCode/MBPP-style problems recur in near-identical variants. It's not a split bug.
+- Prediction: 1 hit (val ≈ pseudo-val), 2 misses.
+
+**What it means**: every training-time val number so far (E0, E1, E2, E3, E9, E10, K7) is inflated by near-memorisable docs, and comparisons may be confounded by how well each architecture memorises repeats. K8's "beats SmolLM2 by more than 2×" is explained in part.
+**Actions**:
+- Re-score every checkpoint doc-level on a **clean val** (near-dups removed; A1 builds the list and manifest).
+- The Phase 2b primary metric becomes clean-val bits/char plus a memorisation gap. A2 is registering this deviation, dated, before any Phase 2b result.
+- A deduplicated `code-py-v2` is being sized (A1), and the factorial will use deduplicated data (A3).
+- Phase 2b keeps running; its checkpoints get re-scored.
+
+**Ledger**: **C94 → REFUTED**; C107 → VERIFIED (val is exact-dedup only); **C131 new, VERIFIED** (the corpus is self-duplicated); C5 and C92 stay PARTIAL, pending the clean-val re-score. The README status line now carries the caveat.
+
+---
+
 ## v0.4.32: Outside review 18:07 triaged; README claims match the ledger
 *2026-11-22*
 

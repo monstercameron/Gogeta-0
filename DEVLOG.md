@@ -17,6 +17,18 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.44: Activation-function research: snapshot (in progress)
+*2026-11-22*
+
+**Work-in-progress snapshot** committed on the human's instruction to reduce uncommitted changes; the subagent's final hand-back will be its own version.
+
+- Included: `notes/research-activations.md`, `notes/research-activations/` (act_stats.py, proposed claims / queue / side-quests, results/act_stats.json), `notes/patches/activation-mlp-act.patch`, and the new activation section in `refs/README.md` plus `refs/fetch_refs.py` changes.
+- Checks: `python -m py_compile` on act_stats.py and fetch_refs.py passed. Nothing was run on the GPU.
+- Any numbers in the notes and act_stats.json are reported by the subagent, not yet verified by the main agent.
+- The patch is not applied to `gogeta/`; the proposed claims and queue are proposals only, not ledger entries.
+
+---
+
 ## v0.4.43: Outside review 19:07 + quick reviews triaged (out-of-corpus check is top pick)
 *2026-11-22*
 

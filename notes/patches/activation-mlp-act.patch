@@ -1,0 +1,87 @@
+activation-mlp-act.patch  (notes/research-activations.md; side quests SQ160-SQ162; claims C200-C209)
+
+Opt-in MLP activation: ModelConfig.mlp_act (default "swiglu" = bit-identical to today, same parameter names so existing
+checkpoints load). Adds three candidates, all parameter- and FLOP-matched to the SwiGLU at the same mlp_hidden:
+  relu2            ungated ReLU^2 (BitNet b1.58 2B4T / Primer / Nemotron-4), one up-projection of width 1.5*mlp_hidden
+  xielu            ungated xIELU (arXiv 2411.13010), width 1.5*mlp_hidden, +2 scalars per MLP (alpha_p, alpha_n)
+  swiglu_relu2mix  SwiGLU whose gate activation is a learnable per-channel blend of SiLU and ReLU^2 (+h params) [speculation]
+Not included (follow-ups): gogeta/hf.py GogetaConfig needs the mlp_act field for HF export. (train.py already puts every
+p.dim() < 2 parameter, i.e. the 0-d xIELU alphas and the 1-d mix vector, in the no-decay group: nothing to change there.)
+Apply: git apply notes/patches/activation-mlp-act.patch   (verified with git apply --check against main at 2026-11-22 18:4x)
+
+--- a/gogeta/model.py	2026-11-22 18:41:25.917157500 -0500
++++ b/gogeta/model.py	2026-11-22 18:41:40.126370800 -0500
+@@ -53,6 +53,7 @@
+     rope_base: float = 10000.0
+     conv_size: int = 4            # GDN short conv
+     gdn_neg_eigval: bool = False  # GDN write strength beta in (0, 2) instead of (0, 1): negative eigenvalues (SQ2/E11)
++    mlp_act: str = "swiglu"       # MLP activation: swiglu (default, unchanged) | relu2 | xielu | swiglu_relu2mix (SQ160-SQ162)
+     ternary: bool = False
+     tie_embeddings: bool = True
+ 
+@@ -100,16 +101,61 @@
+         return torch.stack((x1 * c - x2 * s, x1 * s + x2 * c), dim=-1).flatten(-2)
+ 
+ 
++UNGATED_ACTS = ("relu2", "xielu")  # one up-projection (width 1.5x so params match SwiGLU's 3*d*h)
++MLP_ACTS = ("swiglu", "swiglu_relu2mix") + UNGATED_ACTS
++
++
++class XIELU(nn.Module):
++    """xIELU (Huang & Schlag, arXiv 2411.13010) with trainable alpha_p, alpha_n (softplus-constrained, init 0.8, per layer).
++    x>0: alpha_p*x^2 + beta*x ; x<=0: alpha_n*expm1(x) - alpha_n*x + beta*x, with beta = 0.5 fixed (alpha_n offset by beta)."""
++
++    def __init__(self, alpha_p: float = 0.8, alpha_n: float = 0.8, beta: float = 0.5):
++        super().__init__()
++        inv = lambda v: math.log(math.expm1(v))  # inverse softplus
++        self.alpha_p = nn.Parameter(torch.tensor(inv(alpha_p)))
++        self.alpha_n = nn.Parameter(torch.tensor(inv(alpha_n - beta)))
++        self.beta = beta
++
++    def forward(self, x):
++        xf = x.float()  # expm1 near 0 loses precision in bf16
++        p = F.softplus(self.alpha_p.float())
++        n = F.softplus(self.alpha_n.float()) + self.beta
++        y = torch.where(xf > 0, p * xf * xf + self.beta * xf, n * torch.expm1(xf.clamp(max=0)) - n * xf + self.beta * xf)
++        return y.to(x.dtype)
++
++
+ class SwiGLU(nn.Module):
++    """The MLP. Class name kept for checkpoint/import compatibility; cfg.mlp_act selects the activation.
++    swiglu (default): down(silu(a) * b), up -> 2h.   relu2: down(relu(a)^2) (BitNet b1.58 2B4T / Primer / Nemotron-4 style),
++    xielu: down(xIELU(a)).  Ungated variants use hidden 1.5*mlp_hidden so params and FLOPs equal the SwiGLU's 3*d*h.
++    swiglu_relu2mix: down(act(a) * b), act = (1-s)*silu + s*relu^2 with a learnable per-channel s = sigmoid(m), m init -4."""
++
+     def __init__(self, cfg: ModelConfig):
+         super().__init__()
+-        self.up = make_linear(cfg, cfg.d_model, 2 * cfg.mlp_hidden)
+-        self.down = make_linear(cfg, cfg.mlp_hidden, cfg.d_model)
++        self.act = cfg.mlp_act
++        if self.act not in MLP_ACTS:
++            raise ValueError(f"unknown mlp_act {self.act!r}; choose from {MLP_ACTS}")
++        ungated = self.act in UNGATED_ACTS
++        h = cfg.mlp_hidden * 3 // 2 if ungated else cfg.mlp_hidden
++        self.up = make_linear(cfg, cfg.d_model, h if ungated else 2 * h)
++        self.down = make_linear(cfg, h, cfg.d_model)
+         self.down.is_residual_out = True
++        if self.act == "xielu":
++            self.xielu = XIELU()
++        elif self.act == "swiglu_relu2mix":
++            self.mix = nn.Parameter(torch.full((h,), -4.0))
+ 
+     def forward(self, x):
+-        a, b = self.up(x).chunk(2, dim=-1)
+-        return self.down(F.silu(a) * b)
++        if self.act == "swiglu":
++            a, b = self.up(x).chunk(2, dim=-1)
++            return self.down(F.silu(a) * b)
++        if self.act == "relu2":
++            return self.down(F.relu(self.up(x)).square())
++        if self.act == "xielu":
++            return self.down(self.xielu(self.up(x)))
++        a, b = self.up(x).chunk(2, dim=-1)  # swiglu_relu2mix
++        s = torch.sigmoid(self.mix).to(a.dtype)
++        return self.down(((1 - s) * F.silu(a) + s * F.relu(a).square()) * b)
+ 
+ 
+ class Attention(nn.Module):

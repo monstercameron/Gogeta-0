@@ -1,0 +1,165 @@
+{
+ "note": "Proposed items for experiments/queue.json items[] (tools/queue.py schema); all ready=false until the prediction is committed.",
+ "items": [
+  {
+   "id": "SQ160",
+   "kind": "side-quest",
+   "title": "SQ160: MLP activation A/B at TINY, fp (swiglu vs relu2 vs xielu vs swiglu_relu2mix; matched params/tokens, 3 seeds)",
+   "why": "Decides whether any activation beats SwiGLU at our size; top pick of the activation research.",
+   "depends_on": [],
+   "resources": {
+    "type": "gpu",
+    "est_minutes": 60
+   },
+   "ready": false,
+   "missing": [
+    "apply notes/patches/activation-mlp-act.patch",
+    "TINY configs (4 arms x 3 seeds)",
+    "prediction committed in PREDICTIONS.md"
+   ],
+   "needs_human": false,
+   "launch": null,
+   "status": "queued",
+   "source": "notes/research-activations.md; experiments/side-quests.md SQ160",
+   "added": "2026-11-22T18:50:00-05:00"
+  },
+  {
+   "id": "SQ161",
+   "kind": "side-quest",
+   "title": "SQ161: same 4 arms with ternary=true, plus down-input sparsity / kurtosis / int8 error readout",
+   "why": "The interaction with ternary weights and int8 activations is the case that matters for FusionDance.",
+   "depends_on": [
+    "SQ160"
+   ],
+   "resources": {
+    "type": "gpu",
+    "est_minutes": 60
+   },
+   "ready": false,
+   "missing": [
+    "apply notes/patches/activation-mlp-act.patch",
+    "TINY configs",
+    "readout script (adapt notes/research-activations/act_stats.py)",
+    "prediction committed"
+   ],
+   "needs_human": false,
+   "launch": null,
+   "status": "queued",
+   "source": "notes/research-activations.md; experiments/side-quests.md SQ161",
+   "added": "2026-11-22T18:50:00-05:00"
+  },
+  {
+   "id": "SQ162",
+   "kind": "side-quest",
+   "title": "SQ162: read learned SiLU/ReLU^2 blend s per layer from SQ160's swiglu_relu2mix runs",
+   "why": "Diagnostic; zero extra training.",
+   "depends_on": [
+    "SQ160"
+   ],
+   "resources": {
+    "type": "cpu",
+    "est_minutes": 5
+   },
+   "ready": false,
+   "missing": [
+    "SQ160 checkpoints",
+    "prediction committed"
+   ],
+   "needs_human": false,
+   "launch": null,
+   "status": "queued",
+   "source": "notes/research-activations.md; experiments/side-quests.md SQ162",
+   "added": "2026-11-22T18:50:00-05:00"
+  },
+  {
+   "id": "SQ163",
+   "kind": "side-quest",
+   "title": "SQ163: GDN output gate SiLU vs sigmoid; ShortConv SiLU vs identity (extends SQ8)",
+   "why": "Gated Attention 2505.06708 reports sigmoid > SiLU gates.",
+   "depends_on": [],
+   "resources": {
+    "type": "gpu",
+    "est_minutes": 30
+   },
+   "ready": false,
+   "missing": [
+    "gate/conv config flags (not in the patch)",
+    "prediction committed"
+   ],
+   "needs_human": false,
+   "launch": null,
+   "status": "queued",
+   "source": "notes/research-activations.md; experiments/side-quests.md SQ163",
+   "added": "2026-11-22T18:50:00-05:00"
+  },
+  {
+   "id": "SQ164",
+   "kind": "side-quest",
+   "title": "SQ164: fused MLP fwd+bwd microbenchmark, SwiGLU vs ReLU^2 vs xIELU (B=32, T=1024, d=384, bf16)",
+   "why": "Elementwise ops are a large share of step time on this bandwidth-bound GPU.",
+   "depends_on": [],
+   "resources": {
+    "type": "gpu",
+    "est_minutes": 2
+   },
+   "ready": false,
+   "missing": [
+    "apply patch",
+    "script based on experiments/checks/sq_hw_step_profile.py",
+    "prediction committed"
+   ],
+   "needs_human": false,
+   "launch": null,
+   "status": "queued",
+   "source": "notes/research-activations.md; experiments/side-quests.md SQ164",
+   "added": "2026-11-22T18:50:00-05:00"
+  },
+  {
+   "id": "SQ165",
+   "kind": "side-quest",
+   "title": "SQ165: K6 loop-growth probe on SQ161 checkpoints (swiglu vs relu2), inference only",
+   "why": "Checks that the activation is not the lever for loop norm growth.",
+   "depends_on": [
+    "SQ161"
+   ],
+   "resources": {
+    "type": "gpu",
+    "est_minutes": 4
+   },
+   "ready": false,
+   "missing": [
+    "SQ161 checkpoints",
+    "prediction committed"
+   ],
+   "needs_human": false,
+   "launch": null,
+   "status": "queued",
+   "source": "notes/research-activations.md; experiments/side-quests.md SQ165",
+   "added": "2026-11-22T18:50:00-05:00"
+  },
+  {
+   "id": "SQ166",
+   "kind": "side-quest",
+   "title": "SQ166: per-region activations (relu2 only in prelude/coda vs only in the core)",
+   "why": "Speculative; only if SQ160 finds a winner.",
+   "depends_on": [
+    "SQ160"
+   ],
+   "resources": {
+    "type": "gpu",
+    "est_minutes": 30
+   },
+   "ready": false,
+   "missing": [
+    "SQ160 winner",
+    "region flags (not in the patch)",
+    "prediction committed"
+   ],
+   "needs_human": false,
+   "launch": null,
+   "status": "queued",
+   "source": "notes/research-activations.md; experiments/side-quests.md SQ166",
+   "added": "2026-11-22T18:50:00-05:00"
+  }
+ ]
+}

@@ -1,6 +1,6 @@
 """Download the Gogeta-0 / FusionDance reading list from arXiv and rebuild refs/README.md.
 
-Usage:  python refs/fetch_refs.py
+Usage:  python refs/fetch_refs.py [section-folder ...]   (no argument = all sections)
 Add a paper: append (arxiv_id, short_name, why) to the right section in PAPERS, re-run.
 Already-downloaded PDFs are skipped. Waits 3 s between requests (arXiv etiquette).
 """
@@ -119,6 +119,38 @@ PAPERS = {
         ("2603.08391", "Adaptive Loops and Memory",
          "Per-layer PonderNet-style halting + learnable loop scales (init ~identity) + memory banks; ~200M, 14B tokens"),
     ]),
+    "13-activations": ("Activation functions (notes: notes/research-activations.md)", [
+        ("2002.05202", "GLU Variants Improve Transformer",
+         "Shazeer: GEGLU/SwiGLU/ReGLU/Bilinear; hidden width scaled to 2/3 to match params (T5-base, 524k steps)"),
+        ("2109.08668", "Primer (squared ReLU)",
+         "Squared ReLU + depthwise conv after QKV found by search; 4x training-cost cut at 500M; origin of ReLU^2"),
+        ("2411.13010", "xIELU",
+         "Trainable piecewise activation (quadratic positive side, ELU-like negative side); beats SwiGLU/ReLU^2 at 1.1B/3B, 125B tokens"),
+        ("2411.03884", "PolyCom (PolyReLU / PolyNorm)",
+         "Order-3 polynomial composition activations, trainable coefficients; 1.3B dense / OLMoE; PolyNorm designed for bf16 stability"),
+        ("2603.13347", "PolyGLU",
+         "Per-neuron routed choice among ReLU/Tanh/SiLU/GELU in a GLU; 597M, 10B tokens, no SwiGLU control; deep layers pick Tanh"),
+        ("2605.26647", "Mixture of Activations (MoA)",
+         "Token-adaptive mixing of activations (+ input-independent learnable-activation baseline), 0.12B-2B dense/MoE"),
+        ("2310.04564", "ReLU Strikes Back",
+         "ReLU in place of GELU/SiLU costs ~nothing in quality and gives exploitable activation sparsity"),
+        ("2406.05955", "TurboSparse (dReLU)",
+         "dReLU (ReLU on both gate and up branches) for high GLU sparsity; Mistral/Mixtral sparsified"),
+        ("2402.13516", "ProSparse",
+         "Progressive sparsity regularisation + ReLU for ~89% FFN sparsity without quality loss"),
+        ("2411.04965", "BitNet a4.8",
+         "Ternary model with 4-bit inputs to attention/FFN, sparsified 8-bit intermediate states; squared-ReLU GLU sparsity"),
+        ("2504.18415", "BitNet v2",
+         "Hadamard transform before activation quantisation tames outliers in down-proj/o-proj inputs (4-bit activations)"),
+        ("2402.16819", "Nemotron-4 15B",
+         "Squared ReLU (ungated) in a 15B production LM, 8T tokens"),
+        ("2402.17762", "Massive Activations",
+         "A few huge fixed-position activations in LLM residual streams; outlier source relevant to int8 activations"),
+        ("2505.06708", "Gated Attention (Qwen)",
+         "Sigmoid output gate after SDPA: non-linearity + sparsity, fewer loss spikes, no attention sink; gate-activation ablation"),
+        ("2404.19756", "KAN",
+         "Learnable univariate edge functions (splines); the 'learnable activation' extreme; parameter/compute heavy"),
+    ]),
 }
 # Note (2026-11-22): no Qwen4 paper exists on arXiv (title search "Qwen4" returned nothing); Qwen3.8-Flash-Next is
 # Alibaba's announced Qwen4 architecture preview. Re-check and add Qwen4 here when an official report appears.
@@ -128,9 +160,12 @@ def safe(name):
     return "".join(c if c.isalnum() or c in " .-+()" else "_" for c in name).strip()
 
 
-def main():
+def main(only=None):
+    """only: optional set of section folder names (e.g. {"13-activations"}); default is all sections."""
     ok, skipped, failed = 0, 0, []
     for folder, (_, papers) in PAPERS.items():
+        if only and folder not in only:
+            continue
         d = ROOT / folder
         d.mkdir(exist_ok=True)
         for aid, name, _ in papers:
@@ -170,4 +205,5 @@ def write_readme():
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    main(set(sys.argv[1:]) or None)

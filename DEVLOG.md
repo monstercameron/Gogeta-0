@@ -17,6 +17,21 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.1.2: Project site (GitHub Pages) and experiment registry
+*2026-11-22*
+
+**What**
+- `docs/`: a static GitHub Pages site, DBZ-flavoured but scientific. The landing page covers the goals, the three fighters, the FusionDance diagram, the three budgets, the big ideas and the training-arc roadmap. The devlog page has the experiment log with status filters, a val-loss "power level" chart, and the version timeline.
+- `experiments/experiments.json`: a registry of the nine planned arcs (E0–E8), from the baseline to self-speculative decoding.
+- `tools/build_site_data.py`: generates `docs/data/site-data.js` from `DEVLOG.md` plus the registry, so the site can't drift from the devlog.
+- `.gitignore`: `data/` → `/data/` (root only), because it was also hiding `docs/data/`.
+
+**Results**: n/a. Site checked in the browser at desktop and phone widths: no console errors, no horizontal scroll.
+**Decisions**: The site reads generated JS data (not fetched JSON), so it also works when opened from disk. Experiment status is tracked in the registry, not in prose.
+**Next**: push to GitHub and enable Pages (main, `/docs`) when ready; then WSL setup and E0.
+
+---
+
 ## v0.1.1: Naming: repo Gogeta-0, architecture FusionDance
 *2026-11-22*
 

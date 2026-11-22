@@ -10,6 +10,7 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
 - The entry is committed **in the same commit** as the work it describes. Then the commit is tagged.
 - A commit can't contain its own hash, so entries reference their **version tag**, not a hash.
 - Not every commit needs an entry: small WIP commits between entries are fine. A version is cut when there is something worth recording (a result, a decision, a new capability, a failed experiment).
+- Before committing a version, run `python tools/build_site_data.py` so the site (`docs/`) matches `DEVLOG.md` and `experiments/experiments.json`. The generated `docs/data/site-data.js` is part of the same commit.
 - Tags are **annotated**: `git tag -a vX.Y.Z -m "vX.Y.Z: <entry title>"`.
 - Never move, delete, or reuse a tag. If something was wrong, cut a new patch version.
 
@@ -42,6 +43,7 @@ The project stays at `0.y.z` while it's experimental.
 - Training runs in **WSL Ubuntu 24.04** (native Windows ARM64 has no CUDA PyTorch). See `sketch.md`, "Local setup".
 - Keep datasets and checkpoints **on the WSL filesystem** (e.g. `~/fusiondance-data/`), not under `/mnt/c/` (slow, and not committed anyway).
 - Every run is reproducible from a **config file plus a seed** committed to the repo. Results that make it into the devlog must name the config.
+- **Every experiment is tracked in `experiments/experiments.json`** (id, arc, question, status, version, config, results). Set `status` to `running` when it starts and `done`/`failed`/`abandoned` when it ends, fill in `results` (use `val_loss` for the site's power-level chart), and set `version` to the tag that records it. New experiments get the next `E<n>` id.
 - Compare variants at **matched compute** (or matched params *and* report compute). State which.
 - Add one ingredient at a time: a failed fusion must be attributable to a specific change.
 - Report failures in the devlog too. A skinny Gotenks is a result.
@@ -55,5 +57,10 @@ The project stays at `0.y.z` while it's experimental.
 | `sketch.md` | Scratchpad: ideas, feasibility, the decisions log. Messy is fine. |
 | `refs/` | Papers. Add new ones via `refs/fetch_refs.py` (PDFs are git-ignored; the script re-downloads them). |
 | `AGENTS.md` | These rules |
+| `docs/` | GitHub Pages site (static, no build). Landing page + devlog page. Don't hand-edit `docs/data/site-data.js`: it's generated. |
+| `experiments/experiments.json` | The experiment registry: source of truth for the site's experiment log |
+| `tools/build_site_data.py` | Builds `docs/data/site-data.js` from `DEVLOG.md` + the experiment registry |
+
+Preview the site locally: `python -m http.server 8791 --directory docs`, then open http://127.0.0.1:8791.
 
 When a decision is made in conversation, record it in the `sketch.md` decisions log, and in the next devlog entry.

@@ -68,6 +68,8 @@ Every experiment here is designed to run locally: small models (10M–50M parame
 | [`sketch.md`](sketch.md) | The design scratchpad: architecture, parts bin, feasibility, decisions log |
 | [`refs/`](refs/) | Reading list (~55 papers) with an index; `python refs/fetch_refs.py` downloads the PDFs |
 | [`AGENTS.md`](AGENTS.md) | Working rules for humans and AI agents in this repo |
+| [`docs/`](docs/) | The project site (GitHub Pages): goals, the architecture, and a live experiment log |
+| [`experiments/`](experiments/) | Experiment registry: every training arc, its status and results |
 
 ## Standing on the shoulders of
 

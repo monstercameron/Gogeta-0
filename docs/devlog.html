@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gogeta-0 Devlog</title>
+  <meta name="description" content="Every Gogeta-0 experiment and tagged version: hypotheses, configs, results and failures.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="./">GOGETA<span>-<span class="zero">0</span></span></a>
+    <div class="nav-links">
+      <a href="./#goals">Goals</a>
+      <a href="./#fusion">Fusion</a>
+      <a href="#experiments-section">Experiments</a>
+      <a href="#versions">Versions</a>
+      <a href="devlog.html" aria-current="page">Devlog</a>
+    </div>
+  </div>
+</nav>
+
+<header class="page-head">
+  <div class="wrap">
+    <span class="eyebrow">Experiment log · <span data-version>v0</span></span>
+    <h1>The Devlog</h1>
+    <p>Every training arc and every tagged version. Hypotheses, configs, results, and the failed fusions too. Each version here matches one commit and one git tag.</p>
+    <div class="stats" id="stats"></div>
+  </div>
+</header>
+
+<section id="power" style="padding-top: 32px">
+  <div class="wrap">
+    <p class="kicker">Power levels</p>
+    <h2>Scouter <span class="hl">readings</span></h2>
+    <div class="card chart-card" id="chart"></div>
+  </div>
+</section>
+
+<section id="experiments-section" class="alt">
+  <div class="wrap">
+    <p class="kicker">Training arcs</p>
+    <h2>Experiments</h2>
+    <p class="section-lede">Each experiment adds one ingredient. Status: <b>Charging</b> = planned, <b>Powering up</b> = running, <b>Fusion stable</b> = done, <b>Fusion failed</b> = it broke, and we say why.</p>
+    <div class="filters" id="filters" role="group" aria-label="Filter experiments by status"></div>
+    <div class="grid c2" id="experiments"></div>
+  </div>
+</section>
+
+<section id="versions">
+  <div class="wrap">
+    <p class="kicker">Version history</p>
+    <h2>Tagged <span class="hl">releases</span></h2>
+    <p class="section-lede">Newest first. Generated from <code>DEVLOG.md</code>.</p>
+    <div class="timeline" id="timeline"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Gogeta-0 · FusionDance architecture · data generated <span data-generated></span></span>
+    <span>An independent research project and fan homage, not affiliated with or endorsed by the Dragon Ball rights holders.</span>
+  </div>
+</footer>
+
+<script src="data/site-data.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>

@@ -2,8 +2,8 @@
 refs/**/*.pdf
 
 # Data, tokenized shards, checkpoints, run outputs
-data/
-datasets/
+/data/
+/datasets/
 *.bin
 *.npy
 *.pt

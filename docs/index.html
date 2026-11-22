@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gogeta-0 · FusionDance</title>
+  <meta name="description" content="Gogeta-0: the first FusionDance language model. Linear-time mixers, looped depth and ternary weights, fused into one tiny LLM.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="./">GOGETA<span>-<span class="zero">0</span></span></a>
+    <div class="nav-links">
+      <a href="#goals">Goals</a>
+      <a href="#fighters">Fighters</a>
+      <a href="#fusion">Fusion</a>
+      <a href="#ideas">Ideas</a>
+      <a href="devlog.html">Devlog</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">FusionDance architecture · <span data-version>v0</span></span>
+      <h1 class="title">GOGETA-<span class="zero">0</span></h1>
+      <p class="subtitle">The first <b>FusionDance</b> language model</p>
+      <p class="lede">
+        Three efficiency techniques that each beat one cost of modern LLMs: <strong>context</strong>,
+        <strong>parameters</strong> and <strong>bits</strong>. Fused into one tiny causal model and trained on a laptop.
+        If the dance is in sync, they stack. If not, we'll write down exactly what broke.
+      </p>
+      <div class="cta">
+        <a class="btn primary" href="#fusion">See the fusion ⚡</a>
+        <a class="btn" href="devlog.html">Experiment log →</a>
+      </div>
+    </div>
+
+    <aside class="scouter" aria-label="Model readout">
+      <h3>◉ SCOUTER READOUT</h3>
+      <dl>
+        <dt>target</dt><dd>causal LM</dd>
+        <dt>unique params</dt><dd>~13M</dd>
+        <dt>effective depth</dt><dd>×4 loops</dd>
+        <dt>bits / weight</dt><dd>1.58</dd>
+        <dt>quadratic layers in loop</dt><dd>0</dd>
+        <dt>layers growing with context</dt><dd>1</dd>
+      </dl>
+      <div class="reading">
+        <span>POWER LEVEL</span><span class="blink">MEASURING…</span>
+      </div>
+    </aside>
+  </div>
+</header>
+
+<!-- ============ GOALS ============ -->
+<section id="goals">
+  <div class="wrap">
+    <p class="kicker">Mission</p>
+    <h2>Five goals, <span class="hl">one fusion</span></h2>
+    <p class="section-lede">An experimental research repo. Small models, one-ingredient-at-a-time ablations, and honest write-ups, including the failures.</p>
+    <div class="grid c5">
+      <div class="card goal"><div class="num">01</div><h3>Fuse the three</h3><p>Linear-time mixing, looped depth and ternary weights in one causal LLM, and show they stack rather than fight.</p></div>
+      <div class="card goal"><div class="num">02</div><h3>Think in loops</h3><p>Replace part of chain-of-thought with silent latent loops: spend compute instead of tokens and memory.</p></div>
+      <div class="card goal"><div class="num">03</div><h3>The Rival Loop</h3><p>Build critique → fix into the recurrence, with a grounded critic and adversarial damage-and-repair.</p></div>
+      <div class="card goal"><div class="num">04</div><h3>Loops pay at inference</h3><p>Self-speculative decoding: draft with a few loops, verify with all of them. No extra model.</p></div>
+      <div class="card goal"><div class="num">05</div><h3>On a laptop</h3><p>Everything trains and runs locally. The headline is quality per bit, per FLOP, and how cost scales with context.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FIGHTERS ============ -->
+<section id="fighters" class="alt">
+  <div class="wrap">
+    <p class="kicker">The fighters</p>
+    <h2>Three techniques, <span class="hl">three different costs</span></h2>
+    <p class="section-lede">Each one is strong on its own and has a known weak spot. The bet is that each weak spot is covered by one of the other two.</p>
+    <div class="grid c3">
+      <article class="card fighter" style="--c: var(--blue)">
+        <span class="role">Attacks: context cost</span>
+        <h3>Linear-time mixers</h3>
+        <p>Gated DeltaNet / Mamba-style recurrent state plus sliding-window attention. Memory stays fixed-size instead of growing with every token.</p>
+        <div class="stat"><span>Mixing cost</span><b>O(n²) → O(n)</b></div>
+        <div class="bar"><i style="--w: 86%"></i></div>
+        <p class="weak"><b>Weak spot:</b> limited multi-step state tracking per layer. <br>Covered by <em>loops</em>, which add depth.</p>
+      </article>
+      <article class="card fighter" style="--c: var(--orange)">
+        <span class="role">Attacks: parameters</span>
+        <h3>Looped depth</h3>
+        <p>One shared block applied <i>r</i> times. Depth comes from compute instead of new weights, and harder inputs can get more passes.</p>
+        <div class="stat"><span>Depth per weight</span><b>× r</b></div>
+        <div class="bar"><i style="--w: 74%"></i></div>
+        <p class="weak"><b>Weak spot:</b> every pass costs compute. <br>Covered by <em>ternary</em>, which makes compute cheap.</p>
+      </article>
+      <article class="card fighter" style="--c: var(--gold)">
+        <span class="role">Attacks: bits</span>
+        <h3>Ternary weights</h3>
+        <p>BitNet b1.58: every weight is −1, 0 or +1. About 1.58 bits each, and matrix multiplies turn into additions.</p>
+        <div class="stat"><span>Bits per weight</span><b>16 → 1.58</b></div>
+        <div class="bar"><i style="--w: 92%"></i></div>
+        <p class="weak"><b>Weak spot:</b> rounding error could compound across loops. <br>Countered by <em>per-loop norms and input re-injection</em>. We'll measure it.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FUSION ============ -->
+<section id="fusion">
+  <div class="wrap">
+    <p class="kicker">The fusion</p>
+    <h2>The <span class="hl">FusionDance</span> architecture</h2>
+    <p class="section-lede">A small, unshared prelude and coda around one shared core block that loops. v0 layout:</p>
+
+    <div class="fusion">
+      <svg class="diagram" viewBox="0 0 520 620" role="img" aria-label="FusionDance architecture diagram: embed, prelude, looped core of Gated DeltaNet and sliding-window attention with an exit head, then a coda with one full attention layer.">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7a84b8"/></marker>
+          <marker id="ahg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ffd23f"/></marker>
+        </defs>
+        <text x="260" y="22" text-anchor="middle" class="sm">tokens</text>
+        <path class="arrow" d="M260,30 L260,48"/>
+        <rect class="box" x="150" y="52" width="220" height="40" rx="10"/>
+        <text x="260" y="77" text-anchor="middle">Embed · 8k vocab</text>
+        <path class="arrow" d="M260,92 L260,112"/>
+        <rect class="swa" x="110" y="116" width="300" height="48" rx="10"/>
+        <text x="260" y="137" text-anchor="middle">Prelude</text>
+        <text x="260" y="155" text-anchor="middle" class="sm">sliding-window attn + MLP</text>
+        <path class="arrow" d="M260,164 L260,184"/>
+
+        <rect class="core" x="50" y="188" width="410" height="292" rx="18"/>
+        <text x="72" y="217" class="lbl">CORE × r</text>
+        <text x="440" y="214" text-anchor="end" class="sm">input re-injected each pass</text>
+
+        <rect class="gdn" x="90" y="232" width="340" height="44" rx="9"/>
+        <text x="260" y="259" text-anchor="middle">Gated DeltaNet + MLP</text>
+        <path class="arrow" d="M260,276 L260,288"/>
+        <rect class="gdn" x="90" y="290" width="340" height="44" rx="9"/>
+        <text x="260" y="317" text-anchor="middle">Gated DeltaNet + MLP</text>
+        <path class="arrow" d="M260,334 L260,346"/>
+        <rect class="swa" x="90" y="348" width="340" height="44" rx="9"/>
+        <text x="260" y="375" text-anchor="middle">Sliding-window attn + MLP</text>
+
+        <path class="dash" d="M170,392 L170,416"/>
+        <rect class="exit" x="80" y="416" width="180" height="48" rx="9"/>
+        <text x="170" y="436" text-anchor="middle">exit head</text>
+        <text x="170" y="454" text-anchor="middle" class="sm">per-loop loss · critic</text>
+
+        <path class="loop" d="M430,372 C 505,372 505,254 434,254"/>
+        <text x="488" y="320" class="lbl" text-anchor="middle">×r</text>
+
+        <path class="arrow" d="M350,392 L350,500"/>
+        <rect class="full" x="110" y="504" width="300" height="52" rx="10"/>
+        <text x="260" y="526" text-anchor="middle">Coda · full attention + MLP</text>
+        <text x="260" y="545" text-anchor="middle" class="sm">the only O(n²) layer · runs once</text>
+        <path class="arrow" d="M260,556 L260,584"/>
+        <text x="260" y="606" text-anchor="middle" class="sm">next token</text>
+      </svg>
+
+      <div>
+        <div class="rule">
+          <p class="kicker">The one rule</p>
+          <p>Nothing quadratic lives inside the loop. Anything inside the loop runs <i>r</i> times, so the only full-attention layer sits outside it and runs once.</p>
+        </div>
+        <ul class="legend">
+          <li style="--c: var(--blue)"><span><b>Gated DeltaNet</b>: linear-time mixing with a fixed-size memory that can <i>overwrite</i>, not just add, which gives better recall than plain linear attention.</span></li>
+          <li style="--c: var(--violet)"><span><b>Sliding-window attention</b>: exact attention over the last ~256 tokens for local precision, at O(n·w) cost.</span></li>
+          <li style="--c: var(--gold)"><span><b>The loop</b>: the same weights run <i>r</i> times. Training samples random <i>r</i>; at inference you choose how hard to think.</span></li>
+          <li style="--c: var(--green)"><span><b>Exit head</b>: a cheap readout after every pass. It drives per-loop training, the critic, early stopping and self-speculative drafts.</span></li>
+          <li style="--c: var(--red)"><span><b>Coda</b>: a single full-attention layer for exact long-range recall. It's the only part whose memory grows with context.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BUDGETS ============ -->
+<section id="budgets" class="alt">
+  <div class="wrap">
+    <p class="kicker">The science</p>
+    <h2>Three budgets, <span class="hl">measured separately</span></h2>
+    <p class="section-lede">
+      <i>n</i> = context length, <i>L</i> = layers, <i>r</i> = loop count, <i>S</i> = fixed recurrent-state size.
+      At laptop scale the absolute megabytes are tiny, so the result we care about is how each cost <b>scales</b>.
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Budget</th><th>Standard transformer</th><th>FusionDance</th><th>What we measure</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Weight memory</strong></td><td><span class="math">L · p · 16 bits</span></td><td class="good"><span class="math">(P<sub>pre</sub> + P<sub>core</sub> + P<sub>coda</sub>) · 1.58 bits</span><br>depth from loops, not layers</td><td>quality per bit</td></tr>
+          <tr><td><strong>Sequence memory</strong></td><td><span class="math">O(L · n)</span> KV cache</td><td class="good"><span class="math">O(r · S)</span> fixed + <span class="math">O(n)</span> for one layer</td><td>memory vs context length</td></tr>
+          <tr><td><strong>Mixing compute</strong></td><td><span class="math">O(L · n²)</span></td><td class="good"><span class="math">O(r · n)</span> + <span class="math">O(n²)</span> once</td><td>quality per FLOP</td></tr>
+          <tr><td><strong>Reasoning depth</strong></td><td>fixed <span class="math">L</span></td><td class="good"><span class="math">r</span> passes, adaptive per token (later)</td><td>accuracy vs <i>r</i></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ IDEAS ============ -->
+<section id="ideas">
+  <div class="wrap">
+    <p class="kicker">Big ideas</p>
+    <h2>What we're <span class="hl">actually testing</span></h2>
+    <p class="section-lede">These are the claims, stated so they can be shown wrong.</p>
+    <div class="grid c2">
+      <article class="card idea"><div class="icon">🌀</div><h3>Think in loops, not out loud</h3>
+        <p>Chain-of-thought reasons by writing tokens, and every token grows memory and attention cost. Latent loops reason silently. How much written reasoning can loops replace at matched compute?</p></article>
+      <article class="card idea"><div class="icon">⚔️</div><h3>The Rival Loop</h3>
+        <p>Agents improve code with a critique → fix cycle. We build that rivalry into the recurrence: every pass is scored, a critic head trained on the real loss decides when to stop, and adversarial damage-and-repair teaches loops to fix their own mistakes.</p></article>
+      <article class="card idea"><div class="icon">⚡</div><h3>Instant transmission</h3>
+        <p>A looped model can draft for itself: 1–2 passes guess the next few tokens, and the full loop count verifies them. Self-speculative decoding with no separate drafter.</p></article>
+      <article class="card idea"><div class="icon">📈</div><h3>Scaling shape over raw numbers</h3>
+        <p>Only one layer's memory grows with context, and nothing inside the loop is quadratic. We report curves (cost vs context, quality vs bits, quality vs loops), not single numbers.</p></article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ROADMAP ============ -->
+<section id="roadmap" class="alt">
+  <div class="wrap">
+    <p class="kicker">Training arcs</p>
+    <h2>The road to <span class="hl">v1.0.0</span></h2>
+    <p class="section-lede">One ingredient at a time, so that if the fusion fails we know which ingredient broke it. Statuses update live from the <a href="devlog.html">experiment log</a>.</p>
+    <div class="arcs" id="arcs"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Gogeta-0 · FusionDance architecture · <span data-version>v0</span> · data generated <span data-generated></span></span>
+    <span>An independent research project and fan homage, not affiliated with or endorsed by the Dragon Ball rights holders.</span>
+  </div>
+</footer>
+
+<script src="data/site-data.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>

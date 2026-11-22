@@ -1,0 +1,58 @@
+{
+  "check": "K2",
+  "claims": [
+    "C14"
+  ],
+  "prediction": "BitLinear is 1.5-5x slower (it simulates rounding in floating point).",
+  "criterion": "C14 'ternary makes compute cheaper' holds for our code only if BitLinear forward time <= Linear forward time for both shapes. Otherwise it's WRONG FOR OUR CODE (confirmed).",
+  "verdicts": {
+    "C14": "WRONG FOR OUR CODE (confirmed): BitLinear forward is slower than nn.Linear",
+    "criterion_pass": false
+  },
+  "data": {
+    "input_shape": [
+      16,
+      1024,
+      384
+    ],
+    "dtype": "bf16 autocast, fp32 params",
+    "rows": [
+      {
+        "shape": "384->1024",
+        "linear_fwd_ms": 0.3834,
+        "linear_fwdbwd_ms": 1.867,
+        "linear_fwd_peak_mb": 44.75,
+        "linear_fwdbwd_peak_mb": 108.75,
+        "bitlinear_fwd_ms": 2.1408,
+        "bitlinear_fwdbwd_ms": 3.5763,
+        "bitlinear_fwd_peak_mb": 95.81,
+        "bitlinear_fwdbwd_peak_mb": 170.94,
+        "fwd_slowdown_x": 5.584,
+        "fwdbwd_slowdown_x": 1.916,
+        "fwd_mem_ratio": 2.141,
+        "fwdbwd_mem_ratio": 1.572
+      },
+      {
+        "shape": "384->2048",
+        "linear_fwd_ms": 0.5777,
+        "linear_fwdbwd_ms": 3.0842,
+        "linear_fwd_peak_mb": 77.5,
+        "linear_fwdbwd_peak_mb": 205.5,
+        "bitlinear_fwd_ms": 2.3427,
+        "bitlinear_fwdbwd_ms": 4.9182,
+        "bitlinear_fwd_peak_mb": 132.06,
+        "bitlinear_fwdbwd_peak_mb": 210.19,
+        "fwd_slowdown_x": 4.055,
+        "fwdbwd_slowdown_x": 1.595,
+        "fwd_mem_ratio": 1.704,
+        "fwdbwd_mem_ratio": 1.023
+      }
+    ]
+  },
+  "ran_at": "2026-11-22T16:24:09",
+  "runtime_s": 3.4,
+  "git_commit": "f1b4ebdc6c83820f20b5da9704a6f0164cc6a8c8",
+  "git_describe": "v0.3.5-1-gf1b4ebd",
+  "torch": "2.14.1+cu130",
+  "device": "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU)"
+}

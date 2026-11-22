@@ -17,6 +17,20 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.1: K2: BitLinear speed vs nn.Linear
+*2026-11-22*
+
+**What**: check K2 (BitLinear speed vs nn.Linear): script, results JSON and card. Prediction committed in `f1b4ebd` before it ran.
+
+### K2: BitLinear speed vs nn.Linear
+- **Question:** Does ternary make compute cheaper in our code? (C14)
+- **Result:** BitLinear forward is **5.58× / 4.06× slower** (384→1024 / 384→2048); fwd+bwd 1.92× / 1.59× (`results/K2.json`).
+- **Verdict vs prediction:** Hit on direction; the slowdown slightly exceeds the predicted 1.5–5×. C14 confirmed WRONG FOR OUR CODE.
+- **What it means:** Ternary is a memory win only until we have real ternary kernels; never claim speed from it.
+- **Card:** experiments/cards/K2.md
+
+---
+
 ## v0.4.0: K1: Memory and time vs context length
 *2026-11-22*
 

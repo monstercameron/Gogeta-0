@@ -5,7 +5,7 @@ Run (WSL):  ~/.venvs/gogeta-cockpit/bin/python cockpit/mcp_server.py
 Every tool call is recorded in the SQLite store (tool_calls) with redacted args, duration and ok/error;
 uncaught exceptions also go to `errors` with the full traceback.
 Tools that CHANGE STATE are marked "STATE-CHANGING" in their description:
-  gogeta_start_server, gogeta_stop_server, gogeta_launch_queue_item (confirm=true), gogeta_resolve_error, gogeta_incident_update, gogeta_resume_campaign (confirm=true), gogeta_watchdog (start/stop).
+  gogeta_start_server, gogeta_stop_server, gogeta_launch_queue_item (confirm=true), gogeta_resolve_error, gogeta_incident_update, gogeta_resume_campaign (confirm=true), gogeta_watchdog (start/stop), gogeta_run_form_submit (writes experiments/run-forms/ only).
 There are no delete operations.
 """
 from __future__ import annotations
@@ -19,6 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import core  # noqa: E402
 import logdb  # noqa: E402
+import runform  # noqa: E402
 import watchdog  # noqa: E402
 from mcp.server.fastmcp import FastMCP  # noqa: E402
 from mcp.types import ToolAnnotations  # noqa: E402
@@ -247,6 +248,10 @@ def gogeta_watchdog(action: str = "status") -> dict:
 
 
 expose(core.backlog, "gogeta_backlog")  # cockpit backlog: read before adding features (AGENTS 0g)
+# Run report forms (cockpit/runform.py): one form per finished run. draft = read-only; submit writes experiments/run-forms/ only.
+expose(runform.run_form_draft, "gogeta_run_form_draft")
+expose(runform.run_form_submit, "gogeta_run_form_submit", readonly=False)
+expose(runform.run_forms_list, "gogeta_run_forms")
 
 
 @mcp.resource("gogeta://agents", name="AGENTS.md", description="Binding repo rules for agents", mime_type="text/markdown")

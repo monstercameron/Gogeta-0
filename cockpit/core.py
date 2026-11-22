@@ -986,6 +986,28 @@ def brief(max_chars: int = 4000) -> dict:
     return {"text": _cap(text, max_chars), "bytes": len(text.encode())}
 
 
+_brief_prev = brief
+
+
+def brief(max_chars: int = 4000) -> dict:
+    """One-call overview, now also listing finished runs that have no filled run report form (every finished run gets one)."""
+    line = ""
+    try:
+        try:
+            from . import runform as _rf
+        except ImportError:
+            import runform as _rf  # type: ignore
+        miss = _rf.missing_forms()
+        if miss:
+            line = "\nRUN FORMS missing for %d finished run(s): %s. Fill with gogeta_run_form_draft -> write narrative -> gogeta_run_form_submit." % (
+                len(miss), ", ".join(m[:28] for m in miss[:8]) + (" ..." if len(miss) > 8 else ""))
+    except Exception as ex:  # noqa: BLE001
+        line = "\nRUN FORMS: unavailable (%r)" % ex
+    b = _brief_prev(max_chars=max_chars - len(line) - 5)
+    text = redact(b["text"] + line)
+    return {"text": _cap(text, max_chars), "bytes": len(text.encode())}
+
+
 def backlog_top(n: int = 5) -> list:
     """Top open items from cockpit/BACKLOG.md (lines starting with '- [ ]')."""
     items = [l[5:].strip() for l in _read(REPO / "cockpit/BACKLOG.md").splitlines() if l.startswith("- [ ]")]

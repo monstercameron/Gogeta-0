@@ -40,6 +40,13 @@ async def run(size, shots):
             results.append(("tab %s rows=%d" % (tab, t.row_count), good))
             if shots and size[0] >= 100 and tab in ("queue", "errors", "experiments"):
                 app.save_screenshot("%s_%dx%d.svg" % (tab, *size), path=str(SHOTS))
+        app.query_one("#tabs", TabbedContent).active = "runs"
+        await pilot.pause(1.0)
+        await pilot.click("#runs-forms")
+        ft = app.query_one("#forms-table", DataTable)
+        results.append(("runs: run forms table rows=%d" % ft.row_count, await wait_for(pilot, lambda: ft.row_count >= 1)))
+        results.append(("runs: form detail shows machine/agent fields", await wait_for(pilot, lambda: "[agent]" in "".join(str(l.text) for l in app.query_one("#form-detail", RichLog).lines))))
+        await pilot.click("#runs-forms")
         app.query_one("#tabs", TabbedContent).active = "logs"
         good = await wait_for(pilot, lambda: len(app.query_one("#log-view", RichLog).lines) > 0)
         results.append(("tab logs tail lines>0", good))

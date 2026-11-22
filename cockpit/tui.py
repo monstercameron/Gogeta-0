@@ -15,6 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import core  # noqa: E402
 import logdb  # noqa: E402
+import runform  # noqa: E402
 import watchdog  # noqa: E402
 from rich.markup import escape  # noqa: E402
 from rich.text import Text  # noqa: E402
@@ -40,6 +41,7 @@ HELP = """[b #f5a623]Gogeta-0 cockpit: key bindings[/]
   Queue: [b]L[/] launch selected (asks first), [b]D[/] dry run, [b]g[/] next GPU, [b]n[/] next CPU.
   Errors: [b]R[/] resolve selected (note required).
   Logs: [b]f[/] toggle follow.
+  Runs: [b]Run forms[/] button lists every finished run with its form status (NONE / DRAFT / filled); [b]Draft form[/] drafts the selected run.
 
 State-changing buttons: server Start/Stop and queue Launch. Launch only calls the project launchers and is refused
 while the GPU slot is held. Everything shown is token-redacted. Nothing here deletes data."""
@@ -123,7 +125,7 @@ class CockpitApp(App):
     .card-title { color: $gold; text-style: bold; }
     #dash { height: 1fr; padding: 0 1; }
     DataTable { height: auto; max-height: 14; }
-    #queue-table, #exp-table, #claims-table, #errors-table, #runs-table, #search-table, #dev-table { height: 1fr; max-height: 100%; }
+    #queue-table, #exp-table, #claims-table, #errors-table, #runs-table, #forms-table, #search-table, #dev-table { height: 1fr; max-height: 100%; }
     .detail { height: 1fr; border: round $gold; padding: 0 1; }
     RichLog { border: round $gold; height: 1fr; }
     .srv { height: 3; }
@@ -224,7 +226,12 @@ class CockpitApp(App):
                 yield DataTable(id="incidents-table", cursor_type="row", zebra_stripes=True)
                 yield RichLog(id="inc-detail", wrap=True, markup=False)
             with TabPane("Runs", id="runs"):
+                with Horizontal(classes="toolbar"):
+                    yield Button("Run forms: off", id="runs-forms")
+                    yield Button("Draft form", id="form-draft", variant="primary")
                 yield DataTable(id="runs-table", cursor_type="row", zebra_stripes=True)
+                yield DataTable(id="forms-table", cursor_type="row", zebra_stripes=True)
+                yield RichLog(id="form-detail", wrap=True, markup=False)
             with TabPane("Search", id="search"):
                 yield Input(placeholder="search devlog, claims, cards, notes... (enter)", id="search-input")
                 yield DataTable(id="search-table", cursor_type="row", zebra_stripes=True)
@@ -242,10 +249,13 @@ class CockpitApp(App):
             "errors-table": ["id", "state", "ts", "source", "type", "message"],
             "incidents-table": ["id", "status", "sev", "kind", "category", "subject", "summary"],
             "runs-table": ["run", "exp", "seed", "lr", "status", "val_loss", "bpc", "tok/s", "start"],
+            "forms-table": ["run", "exp", "seed", "lr", "val_loss", "form"],
             "search-table": ["file:line", "text"],
         }.items():
             t = self.query_one("#" + tid, DataTable)
             t.add_columns(*cols)
+        self.query_one("#forms-table").display = False
+        self.query_one("#form-detail").display = False
         self.refresh_dashboard()
         self.set_interval(5, self.refresh_dashboard)
         self.set_interval(2, self.tail_log)
@@ -370,6 +380,15 @@ class CockpitApp(App):
             self.bg("%s_server" % act, fn, lambda r: (self.notify(
                 "%s %s: %s" % (act, name, "ok" if (r.get("up") if act == "start" else not r.get("up")) else str(r)[:120]),
                 severity="information" if "error" not in r else "error"), self.refresh_dashboard()), name)
+        elif bid == "runs-forms":
+            self.show_forms = not getattr(self, "show_forms", False)
+            self.query_one("#runs-forms", Button).label = "Run forms: %s" % ("on" if self.show_forms else "off")
+            self.query_one("#runs-table").display = not self.show_forms
+            self.query_one("#forms-table").display = self.show_forms
+            self.query_one("#form-detail").display = self.show_forms
+            self.load_runs()
+        elif bid == "form-draft":
+            self.draft_form()
         elif bid == "q-next-gpu":
             self.action_next("gpu")
         elif bid == "q-next-cpu":
@@ -696,7 +715,61 @@ class CockpitApp(App):
             self.push_screen(Prompt("Set %s to %s. Note (required for fixed/verified):" % (iid, st)), got)
 
     def load_runs(self) -> None:
+        if getattr(self, "show_forms", False):
+            self.bg("run_forms", runform.run_forms_list, self.apply_forms)
+            return
         self.bg("run_history", lambda: (logdb.ingest(max_seconds=6), logdb.run_history(limit=150))[1], self.apply_runs)
+
+    # ---- run report forms (cockpit/runform.py): none / draft / filled
+    def draft_form(self) -> None:
+        rid = getattr(self, "_form_sel", None)
+        if not getattr(self, "show_forms", False) or not rid:
+            self.notify("Turn on 'Run forms' and select a run first.", severity="warning")
+            return
+        self.bg("run_form_draft_save", lambda r: runform.run_form_draft(r, True), lambda d: (
+            self.notify(d["error"] if d.get("error") else "Drafted %s (status %s). An agent fills the narrative via gogeta_run_form_submit." % (rid, d.get("form_status")),
+                        severity="error" if d.get("error") else "information"), self.load_runs()), rid)
+
+    def apply_forms(self, d: dict) -> None:
+        t = self.query_one("#forms-table", DataTable)
+        t.clear()
+        for r in d.get("runs", []):
+            t.add_row(r["run"][:30], r["experiment"] or "", str(r["seed"]), str(r["lr"] or ""), "%.4f" % r["val_loss"] if r["val_loss"] is not None else "-",
+                      r["form"].upper() if r["form"] != "filled" else "filled", key=r["run"])
+        log = self.query_one("#form-detail", RichLog)
+        if not d.get("runs"):
+            log.clear()
+            log.write("No finished runs.")
+
+    @on(DataTable.RowHighlighted, "#forms-table")
+    def form_row(self, ev: DataTable.RowHighlighted) -> None:
+        if ev.row_key is None or ev.row_key.value is None:
+            return
+        rid = ev.row_key.value
+        self._form_sel = rid
+
+        def show(d: dict) -> None:
+            if getattr(self, "_form_sel", None) != rid:
+                return  # stale response
+            log = self.query_one("#form-detail", RichLog)
+            log.clear()
+            if d.get("error"):
+                log.write(str(d["error"]))
+                return
+            i, h, r, tm = d["identity"], d["hyperparameters"], d["results"], d["timing"]
+            nar = d.get("existing_narrative") or {}
+            lines = ["%s   form: %s   [machine = cockpit, agent = written by the agent]" % (rid, d["form_status"].upper()),
+                     "[machine] %s %s (%s) seed %s | lr %s | %s tokens | status %s, exit %s | %s min" % (
+                         i["experiment"], i.get("experiment_title") or "", i.get("arc") or "-", i["seed"], h["lr_peak"], h["tokens_trained"], tm["status"], tm["exit_code"],
+                         tm["wall_min"] and round(tm["wall_min"], 1)),
+                     "[machine] val loss %s | bits/char %s | train loss last %s | best periodic val %s" % (r["val_loss"], r["val_bits_per_char"], r["train_loss_last"], r["best_val_loss"]),
+                     "[machine] DATA CAVEAT: " + d["data_caveat"]["text"],
+                     "[machine] charts: %s | skipped: %s" % (", ".join(d["charts"]["available"]) or "none", "; ".join(d["charts"]["skipped"]) or "none"),
+                     "[machine] related claims: " + ", ".join("%s %s" % (c["id"], c["status"][:14]) for c in d["related_claims"][:8]), ""]
+            for k in runform.NARRATIVE:
+                lines.append("[agent] %s: %s" % (k, nar.get(k) or "(not written yet)"))
+            log.write("\n".join(lines))
+        self.bg("run_form_view", runform.run_form_draft, show, rid)
 
     def apply_runs(self, d: dict) -> None:
         t = self.query_one("#runs-table", DataTable)

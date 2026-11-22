@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" width="640" height="300" role="img" font-family="system-ui,-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
+<title>Throughput: E1-20261122-174549-s0</title><desc>Throughput against optimiser step.</desc>
+<text x="66" y="20" font-size="14" font-weight="600" fill="#767672">Throughput: E1-20261122-174549-s0</text>
+<line x1="66.0" y1="252.0" x2="614.0" y2="252.0" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="256.0" text-anchor="end" font-size="11" fill="#767672">0</text>
+<line x1="66.0" y1="196.4" x2="614.0" y2="196.4" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="200.4" text-anchor="end" font-size="11" fill="#767672">50K</text>
+<line x1="66.0" y1="140.8" x2="614.0" y2="140.8" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="144.8" text-anchor="end" font-size="11" fill="#767672">100K</text>
+<line x1="66.0" y1="85.2" x2="614.0" y2="85.2" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="89.2" text-anchor="end" font-size="11" fill="#767672">150K</text>
+<line x1="148.2" y1="52.0" x2="148.2" y2="252.0" stroke="#808080" stroke-opacity="0.12" stroke-width="1"/>
+<text x="148.2" y="268.0" text-anchor="middle" font-size="11" fill="#767672">100</text>
+<line x1="239.5" y1="52.0" x2="239.5" y2="252.0" stroke="#808080" stroke-opacity="0.12" stroke-width="1"/>
+<text x="239.5" y="268.0" text-anchor="middle" font-size="11" fill="#767672">200</text>
+<line x1="330.9" y1="52.0" x2="330.9" y2="252.0" stroke="#808080" stroke-opacity="0.12" stroke-width="1"/>
+<text x="330.9" y="268.0" text-anchor="middle" font-size="11" fill="#767672">300</text>
+<line x1="422.2" y1="52.0" x2="422.2" y2="252.0" stroke="#808080" stroke-opacity="0.12" stroke-width="1"/>
+<text x="422.2" y="268.0" text-anchor="middle" font-size="11" fill="#767672">400</text>
+<line x1="513.5" y1="52.0" x2="513.5" y2="252.0" stroke="#808080" stroke-opacity="0.12" stroke-width="1"/>
+<text x="513.5" y="268.0" text-anchor="middle" font-size="11" fill="#767672">500</text>
+<line x1="604.9" y1="52.0" x2="604.9" y2="252.0" stroke="#808080" stroke-opacity="0.12" stroke-width="1"/>
+<text x="604.9" y="268.0" text-anchor="middle" font-size="11" fill="#767672">600</text>
+<line x1="66.0" y1="252.0" x2="614.0" y2="252.0" stroke="#808080" stroke-opacity="0.55" stroke-width="1"/>
+<text x="340.0" y="292.0" text-anchor="middle" font-size="12" fill="#767672">step</text>
+<text transform="translate(14 152.0) rotate(-90)" text-anchor="middle" font-size="12" fill="#767672">tokens per second</text>
+<path d="M66.0 141.9 L75.1 84.0 L84.3 79.9 L93.4 80.1 L102.5 74.5 L111.7 79.8 L120.8 84.7 L129.9 81.6 L139.1 79.2 L148.2 81.0 L157.3 160.3 L166.5 78.5 L175.6 76.8 L184.7 78.1 L193.9 78.9 L203.0 78.8 L212.1 75.2 L221.3 79.9 L230.4 79.8 L239.5 72.6 L248.7 72.9 L257.8 84.7 L266.9 90.0 L276.1 76.5 L285.2 74.0 L294.3 174.4 L303.5 73.3 L312.6 74.0 L321.7 78.8 L330.9 76.6 L340.0 75.8 L349.1 82.4 L358.3 72.8 L367.4 76.0 L376.5 74.0 L385.7 79.5 L394.8 75.6 L403.9 72.8 L413.1 214.6 L422.2 73.1 L431.3 74.5 L440.5 73.5 L449.6 64.0 L458.7 67.2 L467.9 63.3 L477.0 80.0 L486.1 73.3 L495.3 72.9 L504.4 73.2 L513.5 80.6 L522.7 107.5 L531.8 80.7 L540.9 82.6 L550.1 74.9 L559.2 162.5 L568.3 75.8 L577.5 77.0 L586.6 69.9 L595.7 65.3 L604.9 65.1 L614.0 66.4" fill="none" stroke="#008300" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="614.0" y="58.4" text-anchor="end" font-size="11" font-weight="normal" fill="#767672">167K</text>
+</svg>

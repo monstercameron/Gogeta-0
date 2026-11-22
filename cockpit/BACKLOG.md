@@ -10,3 +10,7 @@ Known gaps and limits, and requests agents hit but did not fix (with the reason)
 - [ ] `hung` detection uses a fixed default (15 min); derive it per experiment from the expected step time once step timings are in SQLite.
 - [ ] Tracker (7861) is only restarted by the watchdog if it was seen up while the watchdog ran.
 - [ ] Windows ARM64: not tested natively (wheels not needed; WSL path used).
+- [ ] Run forms: torch, GPU and driver are not recorded per run (`meta.json` has no environment block and Trackio `system_metrics` is empty). Needs the trainer to log them (a `gogeta/` change, so between campaigns).
+- [ ] Run forms: the clean-val re-score is only picked up from a results JSON whose file name contains `clean` and that has a key containing the run id; wire it to the real clean-val output format once A1/A2 define it.
+- [ ] Run forms: `gogeta_run_form_draft` recomputes the charts on every call (about 1 s per run); cache by (run id, series length) if the TUI feels slow.
+- [ ] Run forms: sibling comparison only covers finished runs with the same experiment id and token budget (plus same-budget runs of other experiments as context); no matching on config hash or campaign yet.

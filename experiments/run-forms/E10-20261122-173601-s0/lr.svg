@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" width="640" height="300" role="img" font-family="system-ui,-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
+<title>Learning rate: E10-20261122-173601-s0</title><desc>Learning rate against optimiser step.</desc>
+<text x="66" y="20" font-size="14" font-weight="600" fill="#767672">Learning rate: E10-20261122-173601-s0</text>
+<line x1="66.0" y1="252.0" x2="614.0" y2="252.0" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="256.0" text-anchor="end" font-size="11" fill="#767672">0</text>
+<line x1="66.0" y1="204.8" x2="614.0" y2="204.8" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="208.8" text-anchor="end" font-size="11" fill="#767672">5e-4</text>
+<line x1="66.0" y1="157.7" x2="614.0" y2="157.7" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="161.7" text-anchor="end" font-size="11" fill="#767672">1e-3</text>
+<line x1="66.0" y1="110.5" x2="614.0" y2="110.5" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="114.5" text-anchor="end" font-size="11" fill="#767672">1.5e-3</text>
+<line x1="66.0" y1="63.3" x2="614.0" y2="63.3" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="67.3" text-anchor="end" font-size="11" fill="#767672">2e-3</text>
+<line x1="66.0" y1="52.0" x2="66.0" y2="252.0" stroke="#808080" stroke-opacity="0.12" stroke-width="1"/>
+<text x="66.0" y="268.0" text-anchor="middle" font-size="11" fill="#767672">0</text>
+<line x1="245.7" y1="52.0" x2="245.7" y2="252.0" stroke="#808080" stroke-opacity="0.12" stroke-width="1"/>
+<text x="245.7" y="268.0" text-anchor="middle" font-size="11" fill="#767672">200</text>
+<line x1="425.3" y1="52.0" x2="425.3" y2="252.0" stroke="#808080" stroke-opacity="0.12" stroke-width="1"/>
+<text x="425.3" y="268.0" text-anchor="middle" font-size="11" fill="#767672">400</text>
+<line x1="605.0" y1="52.0" x2="605.0" y2="252.0" stroke="#808080" stroke-opacity="0.12" stroke-width="1"/>
+<text x="605.0" y="268.0" text-anchor="middle" font-size="11" fill="#767672">600</text>
+<line x1="66.0" y1="252.0" x2="614.0" y2="252.0" stroke="#808080" stroke-opacity="0.55" stroke-width="1"/>
+<text x="340.0" y="292.0" text-anchor="middle" font-size="12" fill="#767672">step</text>
+<text transform="translate(14 152.0) rotate(-90)" text-anchor="middle" font-size="12" fill="#767672">learning rate</text>
+<path d="M66.0 251.4 L75.0 245.1 L84.0 238.8 L93.0 232.5 L101.9 226.2 L110.9 219.9 L119.9 213.6 L128.9 207.3 L137.9 201.1 L146.9 194.8 L155.8 188.5 L164.8 182.2 L173.8 175.9 L182.8 169.6 L191.8 163.3 L200.8 157.0 L209.7 150.7 L218.7 144.5 L227.7 138.2 L236.7 131.9 L245.7 125.6 L254.7 119.3 L263.6 113.0 L272.6 106.7 L281.6 100.4 L290.6 94.1 L299.6 87.8 L308.6 81.6 L317.5 75.3 L326.5 69.0 L335.5 63.3 L344.5 63.8 L353.5 65.0 L362.5 67.2 L371.4 70.2 L380.4 73.9 L389.4 78.4 L398.4 83.7 L407.4 89.6 L416.4 96.1 L425.3 103.1 L434.3 110.6 L443.3 118.4 L452.3 126.6 L461.3 135.0 L470.3 143.5 L479.2 152.1 L488.2 160.6 L497.2 169.0 L506.2 177.2 L515.2 185.1 L524.2 192.6 L533.1 199.7 L542.1 206.3 L551.1 212.2 L560.1 217.5 L569.1 222.1 L578.1 226.0 L587.0 229.0 L596.0 231.2 L605.0 232.6 L614.0 233.1" fill="none" stroke="#1baf7a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="614.0" y="225.1" text-anchor="end" font-size="11" font-weight="normal" fill="#767672">0.0002</text>
+</svg>

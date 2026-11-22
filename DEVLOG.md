@@ -17,6 +17,17 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.45: Run-forms cockpit: snapshot (in progress)
+*2026-11-22*
+
+**Work-in-progress snapshot** committed on the human's instruction to reduce uncommitted changes; the subagent's final hand-back will be its own version.
+
+- Included: cockpit changes (`core.py`, `mcp_server.py`, `tui.py`, `tui_check.py`, `test_core.py`, README, BACKLOG), new `cockpit/runform.py` and `cockpit/mcp_forms.py`, the generated run forms and charts under `experiments/run-forms/`, and the README "Run report forms" section.
+- Checks: `python -m py_compile cockpit/*.py` passed. `python cockpit/test_core.py` on Windows: 35 tests, 2 failures, 1 skipped. Failing: `LiveRepoTests.test_search_index_runs` (0 indexed runs, the live DB is absent here) and `LogDbTests.test_writers_never_raise_when_db_unavailable` (got 2, expected None). Not investigated; the cockpit normally runs under WSL.
+- The run forms are reported by the subagent, not yet verified by the main agent. Nothing was run on the GPU.
+
+---
+
 ## v0.4.44: Activation-function research: snapshot (in progress)
 *2026-11-22*
 

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 300" width="640" height="300" role="img" font-family="system-ui,-apple-system,Segoe UI,Helvetica,Arial,sans-serif">
+<title>Gradient norm: E10-20261122-172534-s0</title><desc>Gradient norm against optimiser step.</desc>
+<text x="66" y="20" font-size="14" font-weight="600" fill="#767672">Gradient norm: E10-20261122-172534-s0</text>
+<line x1="66.0" y1="252.0" x2="614.0" y2="252.0" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="256.0" text-anchor="end" font-size="11" fill="#767672">0</text>
+<line x1="66.0" y1="192.4" x2="614.0" y2="192.4" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="196.4" text-anchor="end" font-size="11" fill="#767672">1</text>
+<line x1="66.0" y1="132.7" x2="614.0" y2="132.7" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="136.7" text-anchor="end" font-size="11" fill="#767672">2</text>
+<line x1="66.0" y1="73.1" x2="614.0" y2="73.1" stroke="#808080" stroke-opacity="0.22" stroke-width="1"/>
+<text x="58.0" y="77.1" text-anchor="end" font-size="11" fill="#767672">3</text>
+<line x1="66.0" y1="52.0" x2="66.0" y2="252.0" stroke="#808080" stroke-opacity="0.12" stroke-width="1"/>
+<text x="66.0" y="268.0" text-anchor="middle" font-size="11" fill="#767672">0</text>
+<line x1="245.7" y1="52.0" x2="245.7" y2="252.0" stroke="#808080" stroke-opacity="0.12" stroke-width="1"/>
+<text x="245.7" y="268.0" text-anchor="middle" font-size="11" fill="#767672">200</text>
+<line x1="425.3" y1="52.0" x2="425.3" y2="252.0" stroke="#808080" stroke-opacity="0.12" stroke-width="1"/>
+<text x="425.3" y="268.0" text-anchor="middle" font-size="11" fill="#767672">400</text>
+<line x1="605.0" y1="52.0" x2="605.0" y2="252.0" stroke="#808080" stroke-opacity="0.12" stroke-width="1"/>
+<text x="605.0" y="268.0" text-anchor="middle" font-size="11" fill="#767672">600</text>
+<line x1="66.0" y1="252.0" x2="614.0" y2="252.0" stroke="#808080" stroke-opacity="0.55" stroke-width="1"/>
+<text x="340.0" y="292.0" text-anchor="middle" font-size="12" fill="#767672">step</text>
+<text transform="translate(14 152.0) rotate(-90)" text-anchor="middle" font-size="12" fill="#767672">grad norm (pre-clip)</text>
+<path d="M66.0 63.3 L75.0 97.4 L84.0 142.3 L93.0 148.0 L101.9 156.1 L110.9 174.9 L119.9 178.7 L128.9 123.4 L137.9 153.3 L146.9 142.3 L155.8 161.2 L164.8 181.0 L173.8 126.2 L182.8 151.2 L191.8 157.0 L200.8 166.1 L209.7 182.9 L218.7 161.3 L227.7 160.9 L236.7 156.3 L245.7 185.4 L254.7 145.2 L263.6 175.9 L272.6 179.1 L281.6 174.9 L290.6 159.4 L299.6 191.7 L308.6 190.5 L317.5 182.4 L326.5 194.6 L335.5 186.2 L344.5 201.5 L353.5 199.7 L362.5 196.6 L371.4 207.3 L380.4 201.6 L389.4 210.6 L398.4 209.0 L407.4 209.3 L416.4 199.0 L425.3 213.1 L434.3 213.9 L443.3 214.7 L452.3 213.8 L461.3 217.5 L470.3 216.9 L479.2 218.2 L488.2 219.6 L497.2 218.6 L506.2 218.3 L515.2 208.1 L524.2 218.7 L533.1 219.9 L542.1 217.2 L551.1 219.2 L560.1 218.9 L569.1 222.2 L578.1 219.5 L587.0 220.3 L596.0 221.8 L605.0 221.5 L614.0 220.3" fill="none" stroke="#6250d6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="614.0" y="212.3" text-anchor="end" font-size="11" font-weight="normal" fill="#767672">0.532</text>
+</svg>

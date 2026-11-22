@@ -17,6 +17,7 @@ sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import core  # noqa: E402
 import logdb  # noqa: E402
+import runform  # noqa: E402
 
 FAKE_HF = "hf_" + "A1b2C3d4E5f6G7h8I9j0KlMnOp"
 TB_LOG = """step 100 loss 1.2
@@ -278,6 +279,209 @@ class LogDbTests(TmpDB):
             self.assertIsNone(logdb.event("t", "info", "k", "m"))
             self.assertIsNone(logdb.error("t", "m"))
             self.assertEqual(logdb.main(["event", "--source", "t", "--message", "m"]), 0)
+
+
+def _make_runform_fixture(root: Path) -> tuple:
+    """A fake repo + data dir with one finished experiment run (E5 s0, with a Trackio DB) and a smoke run."""
+    repo, data = root / "repo", root / "data"
+    rid = "E5-20260101-000000-s0"
+    (repo / "experiments/cards").mkdir(parents=True)
+    (repo / "experiments/devlogs").mkdir(parents=True)
+    (repo / "experiments/cards/E5.md").write_text("# E5 card\n")
+    (repo / "experiments/cards/K9.md").write_text("# K9\n")
+    (repo / "experiments/experiments.json").write_text(json.dumps([{"id": "E5", "arc": "Test Arc", "title": "Fixture experiment",
+        "question": "Does the fixture work?", "prediction": "Yes.", "status": "done", "version": "v0.0.1", "config": "configs/e5.json"}]))
+    (repo / "experiments/claims.md").write_text("| ID | Claim | Source | Status | Evidence |\n|---|---|---|---|---|\n"
+        "| C5 | E5 beats E0 in the fixture | test | `UNVERIFIED` | none yet |\n"
+        "| C94 | plausible bits/char | test | `REFUTED` (leak) | experiments/cards/K9.md |\n"
+        "| C107 | val split is exact-dedup only | test | `VERIFIED` | experiments/cards/K9.md |\n"
+        "| C131 | corpus is self-duplicated | test | `VERIFIED` | experiments/cards/K9.md |\n")
+    d = data / "runs" / rid
+    d.mkdir(parents=True)
+    cfg = {"config_file": "configs/e5.json", "arch": "fusiondance", "cli_overrides": {"lr": 0.003, "max_tokens": 100000},
+           "model": {"d_model": 8, "n_heads": 2, "mlp_hidden": 16, "prelude": ["attn", "gdn"], "core": [], "coda": [], "loops": 1, "window": 8, "ternary": False},
+           "train": {"seq_len": 16, "batch_size": 2, "max_tokens": 100000, "lr": 0.003, "min_lr_frac": 0.1, "warmup_steps": 5, "weight_decay": 0.1,
+                     "beta1": 0.9, "beta2": 0.95, "grad_clip": 1.0, "eval_every": 10, "eval_seqs": 4, "dataset": "toy", "seed": 0},
+           "params": {"total": 1000, "embedding": 400, "non_embedding": 600}, "flops_per_token_at_default_loops": 12345.0, "compile": False}
+    meta = {"name": rid, "experiment": "E5", "seed": 0, "config": cfg, "git": {"commit": "abc123", "describe": "v0.0.1", "dirty": False, "code_dirty": False},
+            "tracker": "trackio", "started": "2026-01-01T00:00:00"}
+    (d / "meta.json").write_text(json.dumps(meta))
+    (d / "summary.json").write_text(json.dumps({**meta, "status": "done", "finished": "2026-01-01T00:05:00", "metrics": {
+        "val_loss": 1.5, "val_bits_per_char": 0.5, "tokens": 100352.0, "steps": 3136, "wall_min": 5.0, "tokens_per_s": 1000.0, "params_total": 1000}}))
+    s = data / "runs" / "smoke-20260101-000001-s0"
+    s.mkdir()
+    (s / "summary.json").write_text(json.dumps({"name": s.name, "experiment": "smoke", "seed": 0, "config": {"lr": 0.003}, "git": {}, "status": "done",
+        "started": "2026-01-01T00:10:00", "metrics": {"val_loss": 1.7}}))
+    (data / "runs" / "E5-20260101-000002-s0").mkdir()  # interrupted: no summary.json
+    (data / "runs" / "E5-20260101-000002-s0" / "meta.json").write_text("{}")
+    (data / "trackio").mkdir()
+    con = sqlite3.connect(str(data / "trackio" / "gogeta-0.db"))
+    con.execute("CREATE TABLE metrics (id INTEGER PRIMARY KEY AUTOINCREMENT, run_id TEXT, timestamp TEXT, run_name TEXT, step INTEGER, metrics TEXT, log_id TEXT, space_id TEXT)")
+    for i in range(0, 3136, 20):
+        m = {"train/loss": 9.0 / (1 + i / 50.0) + 1.4, "train/lr": 0.003 * min(1, (i + 1) / 5), "train/grad_norm": 2.0 / (1 + i / 100.0),
+             "tokens": float((i + 1) * 32), "perf/tokens_per_s": 1000.0 + (i % 7)}
+        con.execute("INSERT INTO metrics(run_id,timestamp,run_name,step,metrics) VALUES('x','t',?,?,?)", (rid, i, json.dumps(m)))
+        if i % 400 == 0:
+            con.execute("INSERT INTO metrics(run_id,timestamp,run_name,step,metrics) VALUES('x','t',?,?,?)",
+                        (rid, i, json.dumps({"val/loss": 9.0 / (1 + i / 50.0) + 1.5, "tokens": float((i + 1) * 32)})))
+    con.commit()
+    con.close()
+    return repo, data, rid
+
+
+GOOD = {"purpose": "Check that the fixture run produces a complete form for the tests.",
+        "what_happened": "Nothing unusual: the run finished with exit 0 and no restarts (checked summary.json).",
+        "siblings": "No sibling runs of E5 exist in the fixture, so there is nothing to compare against.",
+        "verdict": "Counts toward C5 as a weak supporting data point; single seed only.",
+        "followups": "None: the fixture has no follow-ups.",
+        "claims": [{"id": "C5", "effect": "informs", "evidence": "experiments/cards/E5.md"}]}
+
+
+class RunFormTests(TmpDB):
+    def setUp(self):
+        super().setUp()
+        self.repo, self.data, self.rid = _make_runform_fixture(Path(self.d))
+        self.patches = [mock.patch.object(core, "REPO", self.repo), mock.patch.object(core, "DATA", self.data),
+                        mock.patch.object(core, "RUNS_DIR", self.data / "runs"), mock.patch.object(core, "LOG_DIR", self.data / "logs"),
+                        mock.patch.object(runform, "_host_gpu", return_value="")]
+        for p in self.patches:
+            p.start()
+        runform._LOG_CACHE.clear()
+
+    def tearDown(self):
+        for p in self.patches:
+            p.stop()
+        super().tearDown()
+
+    def test_draft_fixture(self):
+        d = runform.run_form_draft(self.rid)
+        self.assertNotIn("error", d)
+        self.assertEqual(d["identity"]["experiment_title"], "Fixture experiment")
+        self.assertEqual(d["experiment"]["question"], "Does the fixture work?")
+        self.assertEqual(d["architecture"]["params_non_embedding"], 600)
+        self.assertEqual(d["hyperparameters"]["lr_peak"], 0.003)
+        self.assertEqual(d["provenance"]["commit"], "abc123")
+        self.assertIn("41.7%", d["data_caveat"]["text"])
+        self.assertFalse(d["data_caveat"]["clean_val"]["available"])
+        for c in ("loss", "lr", "grad_norm", "throughput"):
+            self.assertIn(c, d["charts"]["available"])
+        self.assertIn("siblings", d["charts"]["skipped"])  # a single run has no siblings: skipped, not faked
+        self.assertIn("loops", d["charts"]["skipped"])
+        self.assertEqual(set(d["narrative_todo"]), set(runform.NARRATIVE))
+        ids = [c["id"] for c in d["related_claims"]]
+        self.assertIn("C5", ids)
+        self.assertTrue({"C94", "C107", "C131"} <= set(ids))
+        self.assertEqual(d["form_status"], "none")
+        self.assertFalse((self.repo / "experiments/run-forms").exists(), "draft must not write repo files")
+
+    def test_unfinished_and_unknown_runs_refused(self):
+        self.assertIn("error", runform.run_form_draft("E5-20260101-000002-s0"))
+        self.assertIn("error", runform.run_form_draft("nope"))
+        self.assertIn("error", runform.run_form_draft("../etc"))
+        self.assertFalse(runform.run_form_submit("E5-20260101-000002-s0", GOOD)["filed"])
+
+    def test_validation_refusals(self):
+        def refuse(**over):
+            f = dict(GOOD, **over)
+            r = runform.run_form_submit(self.rid, f)
+            self.assertFalse(r["filed"], over)
+            self.assertFalse((self.repo / "experiments/run-forms").exists(), "a refused form writes nothing")
+            return " ".join(r["refused"])
+        self.assertIn("purpose", refuse(purpose=""))
+        self.assertIn("followups", refuse(followups="   "))
+        self.assertIn("too short", refuse(verdict="ok"))
+        self.assertIn("evidence pointer", refuse(claims=[{"id": "C5", "effect": "informs", "evidence": "see above"}]))
+        self.assertIn("evidence pointer", refuse(claims=[{"id": "C5", "effect": "informs", "evidence": ""}]))
+        self.assertIn("C94", refuse(siblings="This leans on the K9 finding behind C94 without listing it among the claims."))
+        self.assertIn("not in experiments/claims.md", refuse(claims=[{"id": "C999", "effect": "informs", "evidence": "experiments/cards/E5.md"}]))
+        self.assertIn("effect", refuse(claims=[{"id": "C5", "effect": "wins", "evidence": "experiments/cards/E5.md"}]))
+        self.assertIn("counts toward no claim", refuse(verdict="This run is informative for the arc as a whole.", claims=[]))
+        ok = dict(GOOD, claims=[{"id": "C5", "effect": "informs", "evidence": "run %s at v0.0.1" % self.rid}])
+        self.assertTrue(runform.run_form_submit(self.rid, ok)["filed"])
+
+    def test_submit_renders_outputs(self):
+        r = runform.run_form_submit(self.rid, GOOD)
+        self.assertTrue(r["filed"], r)
+        out = self.repo / "experiments/run-forms"
+        md = (out / ("%s.md" % self.rid)).read_text()
+        for must in ("Data caveat (K9)", "[machine]", "[agent]", "Purpose", "Verdict", "![", "not yet available"):
+            self.assertIn(must, md)
+        self.assertTrue((out / self.rid / "loss.svg").exists())
+        self.assertIn(self.rid, (out / "INDEX.md").read_text())
+        lst = runform.run_forms_list()
+        self.assertEqual(lst["by_form_status"], {"none": 1, "draft": 0, "filled": 1})
+        self.assertIn("smoke-20260101-000001-s0", lst["missing"])
+        self.assertIn("E5-20260101-000002-s0", lst["unfinished_run_folders"])
+        self.assertEqual(runform.run_forms_list("filled")["count"], 1)
+        # smoke run: minimal narrative is accepted
+        sm = "smoke-20260101-000001-s0"
+        fields = {k: "smoke run: no science" for k in runform.NARRATIVE}
+        fields["claims"] = []
+        fields["verdict"] = "smoke run: no science, counts toward no claim"
+        r2 = runform.run_form_submit(sm, fields)
+        self.assertTrue(r2["filed"], r2)
+        self.assertEqual(runform.run_forms_list()["by_form_status"]["filled"], 2)
+
+    def test_brief_lists_missing_forms(self):
+        self.assertEqual(sorted(runform.missing_forms()), sorted([self.rid, "smoke-20260101-000001-s0"]))
+        runform.run_form_submit(self.rid, GOOD)
+        self.assertNotIn(self.rid, runform.missing_forms())
+
+    def test_tui_draft_saves_state_only(self):
+        d = runform.run_form_draft(self.rid, save=True)
+        self.assertEqual(d["form_status"], "draft")
+        self.assertEqual(runform.run_forms_list()["by_form_status"]["draft"], 1)
+        self.assertFalse((self.repo / "experiments/run-forms").exists())
+
+
+class SvgTests(unittest.TestCase):
+    def check(self, svg):
+        import xml.etree.ElementTree as ET
+        ET.fromstring(svg)
+        self.assertLessEqual(len(svg.encode()), runform.SVG_CAP)
+        self.assertNotRegex(svg, r"(?i)\bnan\b|\binf\b")
+
+    def test_valid_xml_size_and_no_nan(self):
+        n = 6000
+        tr = [(i, (i + 1) * 32768, 9.0 / (1 + i / 30.0) + 1.0, 0.003, 1.0 / (1 + i), 1e5) for i in range(n)]
+        tr[10] = (10, 360448, float("nan"), float("inf"), None, float("nan"))
+        va = [(i, (i + 1) * 32768, 2.0) for i in range(0, n, 500)]
+        series = {"train": tr, "val": va, "source": "test"}
+        s = {"metrics": {"val_loss": 1.234}, "config": {}, "experiment": "T"}
+        sib = {"same_experiment_same_budget": [], "same_experiment_other_budget": [], "other_experiments_same_budget": []}
+        ch = runform._build_charts("T-1", series, sib, s)
+        self.assertEqual(set(ch["made"]), {"loss", "lr", "grad_norm", "throughput"})
+        for svg in ch["made"].values():
+            self.check(svg)
+            self.assertLess(svg.count("L"), 700, "long series must be downsampled")
+
+    def test_sibling_and_loop_charts(self):
+        rows = [{"run": "r%d" % i, "experiment": "T", "seed": 0, "lr": lr, "max_tokens": 1.0, "val_loss": v, "val_bpc": 0.4, "this": i == 1}
+                for i, (lr, v) in enumerate([(1e-3, 1.3), (2e-3, 1.1), (3e-3, 1.05), (6e-3, 1.12)])]
+        sib = {"same_experiment_same_budget": rows, "same_experiment_other_budget": [], "other_experiments_same_budget": []}
+        s = {"metrics": {"val_loss": 1.1, "val_loss_r1": 1.3, "val_loss_r2": 1.2, "val_loss_r4": 1.1}, "config": {"train": {"max_tokens": 1.0}}, "experiment": "T"}
+        ch = runform._build_charts("r1", {"train": [], "val": [], "source": None}, sib, s)
+        self.assertEqual(set(ch["made"]), {"siblings", "loops"})
+        self.assertEqual(set(ch["skipped"]), {"loss", "lr", "grad_norm", "throughput"})
+        for svg in ch["made"].values():
+            self.check(svg)
+
+
+@unittest.skipUnless(core.RUNS_DIR.exists() and any(core.RUNS_DIR.glob("*/summary.json")), "no finished runs on this machine")
+class RunFormLiveTests(TmpDB):
+    def test_real_runs_draft_and_charts(self):
+        finished = runform._finished()
+        self.assertTrue(finished)
+        for rid in finished:
+            d = runform.run_form_draft(rid)
+            self.assertNotIn("error", d, rid)
+            self.assertIn("41.7%", d["data_caveat"]["text"])
+            self.assertTrue(d["identity"]["experiment"])
+            self.assertIsInstance(d["charts"]["skipped"], dict)
+        e = [r for r in finished if not r.startswith("smoke")][0]
+        r = runform.run_form_submit(e, {k: "" for k in runform.NARRATIVE})  # refusal path on real data writes nothing
+        self.assertFalse(r["filed"])
+        print("\nLIVE RUN FORMS: %d finished runs drafted OK" % len(finished))
 
 
 if __name__ == "__main__":

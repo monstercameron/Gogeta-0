@@ -17,6 +17,19 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.15: Autonomy rule: never block on the human
+*2026-11-22*
+
+**What** (from the human: "don't ask me what to do, I want you to be autonomous; if you ask me while I'm sleeping we waste time"):
+- **AGENTS.md §0a, "Be autonomous":** decide and proceed; thesis-direction calls are made by the agent with a written decision memo; never end a turn with a question while work remains; failures are diagnosed and fixed, not escalated.
+- **The only actions not taken alone** are the safety list: downloads/installs, push/publish, deleting data, spending money. Even these **never block**: they're parked under "For the human" in `experiments/QUEUE.md` while other work continues.
+- **§5b updated to match:** `needs_human` now covers the safety list only. Multi-hour GPU items and thesis decisions are autonomous.
+- **Queue:** `needs_human` cleared on Q23 (loop-purpose decision memo) and E4 (full fusion, multi-hour); still parked: Q14 (eval-suite downloads/installs) and SQ7 (Mamba-3 package build). K7 and Q3 are marked running (launched from the queue at 17:25).
+
+**Results**: `tools/queue.py validate`: ok (45 items).
+
+---
+
 ## v0.4.14: Experiment queue + autonomous-queue rule
 *2026-11-22*
 

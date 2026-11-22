@@ -23,6 +23,26 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
 - **Never present something as run or measured unless the evidence exists on disk:** a run folder, log, or check output. Computed-from-code numbers (parameter counts, analytic FLOPs) are labelled "computed"; predictions "predicted"; paper figures "reported by <paper>". If asked "did you run it?", answer with on-disk evidence (run folders, logs, tracker entries, git), not from memory.
 - **Before a version is cut:** any new claim in the devlog, write-ups or site has a ledger row. Any change of status updates the ledger, the wording everywhere the claim appears, and the notebook.
 
+## 0a. Be autonomous: never block on the human
+
+**The human wants this project to run autonomously. Don't ask them what to do next. They may be asleep, and every question that waits for an answer is wasted GPU and research time.**
+
+- **Decide and proceed.**
+  - Pick the next work from the queue (§5b).
+  - Choose between reasonable options yourself, using the evidence, the predictions and these rules.
+  - Record the reasoning (notebook `DEC:` entry plus the devlog), and keep going.
+  - Prefer reversible choices; if a choice turns out wrong, the next version fixes it.
+- **Thesis-direction calls are yours too.** For example, if a result changes what the loop is for, write a short decision memo in `notes/` (evidence, options, choice, what would change your mind), register the follow-up experiments, and continue.
+- **Never stop to ask.** Don't end a turn with a question while work remains. Status updates (§0c) are reports, not requests.
+- **The only actions you may not take on your own** (safety rules, not preferences):
+  - downloading files or installing packages;
+  - pushing to GitHub or publishing anything;
+  - deleting data or checkpoints;
+  - spending money.
+
+  **Don't wait on these either.** Add each to the "For the human" list at the top of `experiments/QUEUE.md` (via `tools/queue.py`: mark the item `needs_human` with its reason), keep it out of the way, and continue with everything else. The human clears that list when they're back.
+- If something breaks (a crash, a failed check, a refused launch): diagnose it, fix it, record it, and continue with the next queue item. Only park it for the human if the fix needs one of the actions above.
+
 ## 0b. Side quests: explore the space
 
 **Don't only execute the plan. Also look around for things that aren't obvious but could help us or give us an edge.**
@@ -152,7 +172,7 @@ The project stays at `0.y.z` while it's experimental.
 2. **Run within the budget (§5):** use the item's `launch` command only (`experiments/launch/E<n>.sh`, `tools/launch_campaign.sh`, or `tools/launch_cpu_job.sh`). Dry-run first. Then `python tools/queue.py set <id> running` (it refuses a 2nd GPU job or a 9th CPU job). Items with `launch: null` are agent tasks (write a script, a prediction or an analysis).
 3. **Predictions first:** if an item isn't `ready` because a prediction or script is missing, do that authoring work and register it as a tagged version (§1, §6) before anything launches.
 4. **Finish:** set `done`, `dropped` or `blocked` with `--note` pointing to the evidence (run id or result file). Record it per §1 and §6: card, ledger, notebook, results registry (`tools/record_result.py`), and its own devlog entry and tag. Run `python tools/queue.py render` and commit `queue.json` + `QUEUE.md` in the same version. A conditional item whose condition turns out false is `dropped` with the reason.
-5. **Ask the human only for `needs_human` items:** any download or install, > 3 GPU-hours in one item, deleting data, pushing to GitHub, or a thesis-direction change. `next` never returns these. Also stop and ask when a result contradicts an item's premise.
+5. **`needs_human` is only for the §0a safety list:** downloads or installs, pushing or publishing, deleting data, spending money. `next` never returns these. They're parked under "For the human" in `QUEUE.md` and **never block other work**. Long GPU items (multi-hour runs) and thesis-direction calls are **not** `needs_human`: run them within the compute budget, and decide with a written memo (§0a). When a result contradicts an item's premise, re-plan: update the queue and record why. Don't stop to ask.
 6. **New ideas enter only via `python tools/queue.py add`**, from side quests, research notes or surprising results. They carry `why`, `source`, `depends_on`, `resources`, `ready` and `missing`, and are appended at the end. Moving one up needs `move --after <id> --reason "…"`, which is logged.
 7. **Every status update (§0c)** shows the running queue items and the next GPU/CPU picks.
 

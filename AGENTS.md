@@ -103,7 +103,13 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
 
 **Every 5 minutes, a cheap reviewer from a different model family critiques the project from one randomly chosen perspective.** The goal is to inject outside ideas cheaply. This complements the 30-minute deep review (§0d).
 
-- **Reviewer:** the **Codex CLI with OpenAI's GPT-6 Luna (high reasoning)** when `codex` is installed and logged in, i.e. `codex exec` run non-interactively, **read-only, without network-changing or write permissions**. If Codex is unavailable, fall back to a Claude **Haiku** subagent, and log that in the review file. A different model family is the point, so prefer Codex whenever it works.
+- **Reviewer:** **Codex with OpenAI's GPT-6 Luna, high reasoning,** via the ChatGPT/Codex desktop app's CLI **on Windows**. It isn't in WSL or on PATH. Resolve the newest binary under `%LOCALAPPDATA%\OpenAI\Codex\bin\*\codex.exe`, then run:
+
+  ```powershell
+  & $codex exec -m gpt-6-luna -c model_reasoning_effort=high -s read-only -C C:\Users\mreca\Desktop\Gogeta-0 --ephemeral -o notes\reviews\quick\<TS>-<slug>.md "<brief>"
+  ```
+
+  It runs in a **read-only sandbox**: Codex can't write, and `-o` saves its final message as the review file. A smoke test (v0.4.35) took 16 s and about 32k tokens. If Codex errors (auth, rate limit, empty output), fall back to a Claude **Haiku** subagent and say so in the file. A different model family is the point.
 - **Schedule:** a session cron job every 5 minutes (minutes `2-59/5`). Skip a tick if the previous quick reviewer is still running.
 - **One perspective per tick,** drawn at random so consecutive ticks differ:
   - skeptical peer reviewer;

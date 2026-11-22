@@ -17,6 +17,17 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.35: Quick reviews run on Codex GPT-6 Luna (Windows desktop CLI)
+*2026-11-22*
+
+**What** (the human: "chatgpt desktop app/codex is already installed... not in wsl, in windows"):
+- Found the desktop app's CLI under `%LOCALAPPDATA%/OpenAI/Codex/bin/<hash>/codex.exe` (codex-cli 0.167.0-alpha.3.2), already logged in. The auth file wasn't opened. The model id is `gpt-6-luna`.
+- **Smoke test:** `codex exec -m gpt-6-luna -c model_reasoning_effort=high -s read-only -C <repo> --ephemeral -o <file>` read `experiments/claims-status.md` and answered correctly, in 16 s and 32,032 tokens.
+- **AGENTS §0d-bis** now names the exact Windows command. The 5-minute quick-review cron job was replaced so that it calls Codex first and falls back to Haiku only on error. The review file is written via `-o`, so Codex itself stays read-only.
+- **Cost note:** about 32k tokens per review, roughly 380k tokens an hour, from the human's OpenAI plan.
+
+---
+
 ## v0.4.34: Quick perspective reviews every 5 minutes
 *2026-11-22*
 

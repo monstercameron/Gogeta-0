@@ -17,6 +17,19 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.52: Tokenizer research: final hand-back
+*2026-11-22*
+
+The tokenizer research subagent has finished. Its files were committed earlier as the in-progress snapshot v0.4.49 (tags are never moved); this entry records the final status and changes no files. No tokenizer model or vocab files are committed (results JSON only; nothing over 2 MB).
+
+- Reported by the subagent (CPU-measured, not yet re-verified by the main agent): the shipped 8k BPE gets 3.733 chars/token (3.811 on clean val), better than SmolLM2's 49k tokenizer (3.461).
+- 9% of tokens are whitespace (newline + indent); 19% of the vocab is duplicated `word` / ` word` pairs.
+- Vocab size is a weak lever (4k: -3.1%, 16k: +1.2%).
+- Line-level superwords give +67%, but that is likely inflated by corpus duplication.
+- Recommendation: keep the 8k BPE for now.
+
+---
+
 ## v0.4.51: A6 numerics: final hand-back
 *2026-11-22*
 

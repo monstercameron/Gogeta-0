@@ -23,6 +23,28 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
 - **Never present something as run or measured unless the evidence exists on disk:** a run folder, log, or check output. Computed-from-code numbers (parameter counts, analytic FLOPs) are labelled "computed"; predictions "predicted"; paper figures "reported by <paper>". If asked "did you run it?", answer with on-disk evidence (run folders, logs, tracker entries, git), not from memory.
 - **Before a version is cut:** any new claim in the devlog, write-ups or site has a ledger row. Any change of status updates the ledger, the wording everywhere the claim appears, and the notebook.
 
+## 0b. Side quests: explore the space
+
+**Don't only execute the plan. Also look around for things that aren't obvious but could help us or give us an edge.**
+
+- **Run side quests regularly:** small exploratory experiments and research detours beyond the experiment ladder. Examples:
+  - a trick from a paper we haven't used;
+  - an odd result worth poking at;
+  - a cheaper way to measure something;
+  - a hardware quirk of this laptop we could exploit;
+  - a related idea from another field.
+  Aim for at least one side quest per experiment arc, or whenever something surprises us.
+- **Research side quests:** literature or code searches into the space around the project (new papers, libraries, kernels, datasets, evals). Subagents are a good fit (§4). Record what was searched, what was found, and why it matters or doesn't. Add useful papers to `refs/` via `refs/fetch_refs.py`.
+- **Same discipline as everything else (§0):**
+  - Small: about 15 minutes or less, tiny models.
+  - Expectation written first.
+  - A seeded script in `experiments/checks/` (prefix `sq_`).
+  - Numbers in the lab notebook under a **SIDE QUEST** heading.
+  - Any claim it produces goes in the claims ledger.
+- **Track them** in `experiments/side-quests.md`: idea, why it might help, status (`idea` / `running` / `done` / `dropped`), outcome, and what we did with it. Ideas are cheap: log them even if they aren't run yet.
+- **Promote winners:** if a side quest shows a real advantage, register it as a proper experiment (`E<n>`) with a prediction, or fold it into the design (`notes/sketch.md` decisions log). Report dead ends too.
+- Side quests must not stall the main ladder or start heavy training. If one needs more than a small run, propose it to the human instead.
+
 ## 1. Devlog = commits = versions
 
 - **Every devlog entry is exactly one commit and exactly one git tag.** No entry without a commit, and no tagged commit without an entry.
@@ -107,7 +129,8 @@ The project stays at `0.y.z` while it's experimental.
 | `site-src/learn.md` | Newcomer primer ("Start here") → `docs/learn.html` |
 | `notes/LABNOTEBOOK.md` | Timestamped, append-only evidence (see §6) |
 | `experiments/claims.md` | **Claims ledger** (§0): every claim we rely on, with source, status and evidence |
-| `experiments/checks/` | One small, seeded verification script per claim (§0), each ≤ ~15 min |
+| `experiments/checks/` | One small, seeded verification script per claim (§0), each ≤ ~15 min; side-quest scripts are prefixed `sq_` |
+| `experiments/side-quests.md` | Side-quest log (§0b): ideas, status, outcomes |
 | `LICENSE` | MIT (code + docs). The dataset keeps its own licence (ODC-By); don't commit data or paper PDFs. |
 | `pyproject.toml` | Package metadata + pinned deps (`pip install -e .`; torch is installed separately from the CUDA index) |
 | `.gitignore` | Keeps data, checkpoints, logs, tracker DBs, PDFs and local tool settings out of git. Check it before adding a new output type. |

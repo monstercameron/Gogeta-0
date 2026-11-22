@@ -68,14 +68,34 @@
     <div class="ctl btns">
       <button type="button" class="btn small" id="btnReset">Reset camera</button>
       <button type="button" class="btn small" id="btnMotion" aria-pressed="true">Motion: on</button>
+      <button type="button" class="btn small" id="btnShot" title="Save the 3D canvas as a PNG (labels are HTML and not included)">Save PNG</button>
     </div>
+  </div>
+
+  <div class="playbar" id="playbar" role="group" aria-label="Play: animate the real tokens of the prompt through the model">
+    <div class="pb-btns">
+      <button type="button" class="btn small primary" id="btnPlay" aria-pressed="false">&#9654; Play</button>
+      <button type="button" class="btn small" id="btnBack" title="Step back (Left arrow)">&#9664; Back</button>
+      <button type="button" class="btn small" id="btnStep" title="Step forward (Right arrow)">Step &#9654;</button>
+      <button type="button" class="btn small" id="btnRestart" title="Restart (R)">&#8634; Restart</button>
+      <label class="pb-speed chk"><input type="checkbox" id="chkFollow" checked><span>Follow tokens</span></label>
+      <label class="pb-speed"><span>Speed <b id="speedVal" class="val">1&times;</b></span><input type="range" id="rngSpeed" min="0.5" max="4" step="0.25" value="1" aria-label="Play speed"></label>
+    </div>
+    <div class="pb-stage" id="playStage" aria-live="polite"></div>
+    <div class="pb-detail" id="playDetail" role="status">Loading the token trace&hellip;</div>
+    <details class="keys" id="keysPanel"><summary>Keyboard shortcuts</summary>
+      <p><kbd>Space</kbd> play / pause &nbsp; <kbd>&rarr;</kbd> step &nbsp; <kbd>&larr;</kbd> step back &nbsp; <kbd>R</kbd> restart + reset camera &nbsp; <kbd>1</kbd>&ndash;<kbd>7</kbd> pick model &nbsp; <kbd>Esc</kbd> leave focus &nbsp; <kbd>?</kbd> this list. Click a block to zoom to it.</p></details>
   </div>
 
   <div class="stage-grid">
     <div class="stage" id="stage">
       <canvas id="gl" aria-label="Interactive 3D view of the model architecture" role="img"></canvas>
       <div class="tip" id="tip" role="status" hidden></div>
-      <div class="hint" id="hint">Hover or tap a shape for exact numbers</div>
+      <div class="hint" id="hint">Hover or tap a shape for numbers &middot; click to focus &middot; zoom in for block labels</div>
+      <div class="outrow" id="outRow" hidden><span class="lab">OUTPUT</span><div class="strip" id="outStrip"></div></div>
+      <div class="tip" id="ptip" role="status" hidden></div>
+      <div class="focusnote" id="focusNote" hidden>Focused &middot; press Esc or &ldquo;Reset camera&rdquo; to go back</div>
+      <div class="flash" id="flash" aria-hidden="true"></div>
       <div class="nogl" id="nogl" hidden>
         <h2>3D view unavailable</h2>
         <p id="noglMsg">This page needs WebGL and a recent browser. The numbers are still on the site:</p>
@@ -84,6 +104,7 @@
     </div>
 
     <aside class="side">
+      <div class="scouter playinfo" id="playInfo"></div>
       <div class="scouter" id="scouter" aria-live="polite">
         <h3>SCOUTER · POWER LEVEL</h3>
         <div id="power"></div>
@@ -92,20 +113,12 @@
   </div>
 
   <section class="legend3d" aria-labelledby="legend-h">
-    <h2 id="legend-h">How to read the shapes</h2>
-    <p class="section-lede">Nothing here is decoration. Each shape's size is a number from the code, and the legend says which.</p>
-    <div class="lgrid">
-      <div class="lcard" style="--c:#3987e5"><i class="sw tri"></i><div><b>Full attention: a triangular wedge</b><p>Every token looks at every earlier token: <i>n</i>&sup2;/2 scores. Its footprint's side is proportional to the context, so the <b>area grows with the square</b>. Slide the context to 32k and watch it balloon.</p></div></div>
-      <div class="lcard" style="--c:#199e70"><i class="sw band"></i><div><b>Sliding window: a thin diagonal band</b><p>Each token looks back only <i>w</i> = 256 tokens. The band has a <b>fixed width</b> and only gets longer: cost grows linearly.</p></div></div>
-      <div class="lcard" style="--c:#d95926"><i class="sw cube"></i><div><b>Gated DeltaNet: a fixed cube</b><p>A small memory (heads &times; head_dim &times; head_dim) rewritten token by token. Tokens stream in, but the <b>cube never grows</b> with context.</p></div></div>
-      <div class="lcard" style="--c:#c98500"><i class="sw hex"></i><div><b>MLP: a hexagonal bicone</b><p>Narrow, then wide, then narrow again: d &rarr; hidden &rarr; d. <b>Height = its parameters.</b> It works on one token at a time, with no look-back.</p></div></div>
-      <div class="lcard" style="--c:#6f7bb8"><i class="sw plinth"></i><div><b>Plinth under each mixer: its weights</b><p><b>Height = parameters</b> of the attention or DeltaNet layer. Scale: <span id="scaleParam">1M params = 1.0 unit</span>.</p></div></div>
-      <div class="lcard" style="--c:#ffd23f"><i class="sw ring"></i><div><b>The Time Chamber: the looped core</b><p>One set of blocks stored once on a glowing ring, labelled <b>&times; r</b>. The loops slider unrolls it into a helix of translucent ghost copies: <b>same weights, extra compute</b>, so depth grows and parameters don't.</p></div></div>
-      <div class="lcard" style="--c:#9a8fc8"><i class="sw disc"></i><div><b>Re-inject disc</b><p>At the start of every loop the original input <i>e</i> is mixed back in (2d &rarr; d). The violet dashed beam carries it from the embedding.</p></div></div>
-      <div class="lcard" style="--c:#4a90ff"><i class="sw tern"></i><div><b>Speckles: ternary weights</b><p>A &minus;1 / 0 / +1 texture marks BitLinear layers (about 1.58 bits per weight). Embeddings and norms stay full precision, so they have no speckles.</p></div></div>
-      <div class="lcard" style="--c:#ffd23f"><i class="sw ki"></i><div><b>Gold ki particles: data flow</b><p>Tokens rise through the prelude, orbit the core <i>r</i> times, then leave through the coda. Orange particles feed each memory cube.</p></div></div>
-    </div>
-    <p class="fine" id="scaleNote"></p>
+    <details class="legendpanel" id="legendPanel" open>
+      <summary><h2 id="legend-h">Legend: every component</h2><span class="lsub">Hover or focus a row to highlight it in the scene; click to fly to it.</span></summary>
+      <p class="section-lede">Nothing here is decoration unless it says so. Each icon repeats the 3D shape and colour, and the line says what its size encodes. Rows for parts the selected model lacks are dimmed.</p>
+      <div class="lgrid" id="legendList"></div>
+      <p class="fine" id="scaleNote"></p>
+    </details>
   </section>
 
   <ol class="sr-only" id="a11y-summary" aria-label="Text summary of the displayed architecture"></ol>

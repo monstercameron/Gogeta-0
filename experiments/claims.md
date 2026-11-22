@@ -187,3 +187,9 @@ Source: `notes/benchmark-suite.md` (survey, predictions written before running, 
 | C107 | E0 writes working solutions for in-distribution held-out problems (val docs with asserts), so a functional metric does not floor for us | our measurement | `PARTIAL` (first 8 of 2,555 problems: 7/8 greedy; inspected) | `evals/results/check-E0-s0-exec-limit8-*.json`. Full run on the GPU slot pending; near-duplicate val/train docs not ruled out (the val split is exact-dedup only) |
 | C108 | A 14M all-attention model trained on our corpus does in-context key-value recall from Python assignments (`gogeta_recall_d*`) | our expectation (P4) | `REFUTED` (E0, this probe design) | E0 exact recall 0.5/0/0/0% at 64/256/512/960 tokens; value bpb 2.60 at d=64 ≈ uniform chance 2.63 (computed), rising to 3.41 at d=960. The probe needs a redesign (SQ63) before it can rank architectures |
 | C109 | lm-eval's `mbpp_plus` task scores only MBPP's 3 base asserts (`test_list`), not EvalPlus's extra tests | lm-eval 0.4.13 source (`tasks/mbpp/mbpp.yaml` `doc_to_target`, inherited by `mbpp_plus.yaml`) | `VERIFIED` (source read) | Our `gogeta_mbpp_plus_exec` runs the EvalPlus `test` program instead |
+
+## Proposed by the 3D page work (main agent reviewed)
+
+| ID | Claim | Source | Status | Evidence / notes |
+|---|---|---|---|---|
+| C130 | The 3D page Play trace for E2 (r=4, checkpoint E2-20261122-132340-s0 step 6104) is the model's real computation: real tokenizer pieces, real softmax attention weights, per-loop Δh, top-5 and greedy continuation | `experiments/viz/export_trace.py` (subagent) | `PARTIAL` | Traced forward = `model.forward` to max abs dlogit 9.5e-6, but on CPU fp32 with a plain-PyTorch GDN reference instead of the fla bf16 kernels: val loss 0.6423 there vs 0.6186 recorded, so values are close, not identical. Other models/r are labelled ILLUSTRATIVE on the page. Upgrade to VERIFIED by regenerating on the GPU with fla. |

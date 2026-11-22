@@ -17,6 +17,36 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.22: 3D page: FizzBuzz Play trace, legend, polish, label-leak fix
+*2026-11-22*
+
+**What** (the human asked for a Play button tracing "write fizzbuzz in python", a visual pass on every model, fun interactions, a full legend, and a fix for labels that never cleared):
+- **Play mode:** play / pause / step / back / restart, speed 0.5–4×, a stage readout (Embedding → Prelude → Core loop k/r → Coda → Output) and a follow-tokens camera.
+  - The 9 **real** tokenizer pieces of `# write fizzbuzz in python\n` (`#` `␣write` `␣f` `izz` `bu` `zz` `␣in` `␣python` `↵`) rise as chips.
+  - Attention and SWA arcs show the measured top-3 attention weights; GDN tokens stream into the state cube; each re-injection flashes.
+  - Per-loop Δh bars fill as loops finish, and output chips carry top-5 probabilities.
+- **Trace (C130, PARTIAL):** `experiments/viz/export_trace.py` writes `docs/data/token-trace.json` from the E2 checkpoint (r=4) on CPU, using a plain-PyTorch GDN reference.
+  - The traced forward equals `model.forward` to 9.5e-6.
+  - CPU fp32 val loss is 0.6423 vs the recorded 0.6186 (bf16 with fla kernels), so the numbers are close, not identical.
+  - Per-loop ‖Δh‖/‖h‖: 10.82, 0.72, 0.40, 0.28.
+  - Next-token top-5: `↵` 36%, a code fence 34%, `assert` 8%, `#` 8%, `def` 4%.
+  - The greedy continuation is a `find_unique_numbers` function plus an assert. **It's not FizzBuzz**, as you'd expect from a 13M model.
+  - Other models and other r are labelled ILLUSTRATIVE.
+- **Legend:** 23 rows generated from the scene's own style tables. Hovering a row highlights the matching objects, clicking flies the camera to them, rows for parts the model lacks are dimmed, and decorative and Play-mode rows are tagged.
+- **Polish:** fit-to-bounding-box framing with fly-to, wider block spacing, ground grid and glow disc, rim and warm lights, a calmer starfield, level-of-detail labels, ring spinners that speed up with r, hover pulse, click-to-focus with a plain-English line, a fusion flash and burst on model switch, keyboard shortcuts, Save PNG.
+- **Label/memory leak fixed:** removing a model group left its nested CSS2D label divs in the DOM and never disposed geometries, materials or textures. Now one `disposeGroup()` / `clearModels()` path handles every rebuild. `window.__arch3dSelfTest(rounds)` stress-tests it.
+
+**Results**:
+- Subagent stress test, before the fix: label divs 36 → 114 and geometries 41 → 250 over 5 rounds. After the fix, 20 rounds: labels 23 → 23, geometries 33 → 33, textures 1 → 3 (the ternary speckle cache, by design).
+- **The main agent re-ran both checks:** `__arch3dSelfTest(5)` passes, and an independent count of positioned CSS2D elements stays at 23 → 23 across 21 manual model switches plus full sweeps of every slider.
+- Before/after screenshots are in `experiments/viz/screenshots/`.
+
+**Lesson:** the v0.4.18 check (load once, no console errors, one screenshot) missed the leak; the human caught it. UI checks must now drive the page through its states and compare counts afterwards.
+
+**Not verified**: label crowding at r=12 and in compare mode (still there); chips overlapping labels at 375 px; touch; the OS reduced-motion setting; Play combined with compare; the trace on GPU with fla.
+
+---
+
 ## v0.4.21: Outside review every 30 minutes
 *2026-11-22*
 

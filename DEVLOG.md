@@ -17,6 +17,24 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.3.5: Trust but verify: a local check for every claim
+*2026-11-22*
+
+**What**
+- **New AGENTS.md §0 "Trust but verify"**, binding on everything else. Every claim we rely on gets the smallest local experiment that could prove it wrong (≤ ~15 min, tiny models, a seeded script in `experiments/checks/`, its pass criterion written first). Paper results motivate experiments but are never adopted as facts. Nothing is called "measured" without on-disk evidence.
+- **Claims ledger** `experiments/claims.md`: 20 claims from the README, site, primer and write-ups, each with source, status and evidence, plus six proposed checks (K1–K6).
+
+**Results**: no training. Audit outcome: 5 verified (incl. 1 computed), 6 partial (mostly single seed), 6 unverified paper/theory claims, and **3 that are wrong as currently stated**:
+- the "~10× smaller" ternary claim (computed: 7.8× body, 3.1× whole);
+- sliding-window "O(n·w)": our dense-mask kernel is O(n²);
+- "ternary makes compute cheap": it's simulated, so no speedup.
+
+Plus 1 refuted assumption: fla's recurrent kernel NaNs on this GPU.
+**Findings**: on-disk check confirmed **E3 has never been run**; only E0/E1/E2 (seed 0) have results.
+**Next**: run checks K1–K6 (~50 min GPU total, all tiny) and fix the three wrong claims everywhere they appear.
+
+---
+
 ## v0.3.4: E3 designed: ternary weights on the E1 stack
 *2026-11-22*
 

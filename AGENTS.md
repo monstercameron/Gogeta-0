@@ -3,6 +3,26 @@
 These rules are binding for any agent (Claude Code or otherwise) working in this repo.
 If a rule conflicts with a direct instruction from the human in chat, follow the human and propose updating this file.
 
+## 0. Trust but verify (applies to everything below)
+
+**Research papers are hypotheses, not facts. Every claim this project relies on gets its own small, verifiable local experiment. Don't just follow the papers.**
+
+- **One claim → one small local experiment.** For every claim we build on (from a paper, a library's docs, theory, or our own assumption), run the **smallest experiment on this machine that could prove it wrong**:
+  - Tiny models (e.g. d=128, 2–4 layers), synthetic or subsampled data, short runs.
+  - Target **≤ 15 minutes** (CPU-only if possible). If it can't run that fast, shrink it until it can.
+  - Many tiny checks beat one big run.
+- **Verifiable means reproducible:** one script per check in `experiments/checks/` (seeded, runnable from the repo root, printing the measured numbers and a PASS/FAIL against the stated criterion). Commit it. Write the expected result and the pass criterion **before** running. Log the run in `notes/LABNOTEBOOK.md` with the exact numbers.
+- **The claims ledger is the source of truth:** `experiments/claims.md` lists every claim with its source, status and evidence. The statuses:
+  - `VERIFIED`: a local check passed; cite the script, numbers and commit.
+  - `REFUTED`: a local check failed. Keep it: a refuted claim is a result.
+  - `PARTIAL`: verified only in a narrower form; say which.
+  - `UNVERIFIED`: not checked here yet.
+  - `WRONG FOR OUR CODE`: true in theory, but our implementation doesn't do it.
+- **Wording follows status.** In `README.md`, the site, write-ups and the devlog, a claim may be stated as fact **only if** it's `VERIFIED` in the ledger. Anything else must say so in the text ("the BitNet paper reports…", "in theory…", "not yet verified here"). When a check refutes a claim, fix every place it appears in the same version.
+- **Paper numbers are quoted, never adopted.** A paper's result (e.g. "ternary matches full precision at 3B") can motivate an experiment, but our design decisions and predictions must rest on our own checks, or say explicitly that they rest on an unverified source.
+- **Never present something as run or measured unless the evidence exists on disk:** a run folder, log, or check output. Computed-from-code numbers (parameter counts, analytic FLOPs) are labelled "computed"; predictions "predicted"; paper figures "reported by <paper>". If asked "did you run it?", answer with on-disk evidence (run folders, logs, tracker entries, git), not from memory.
+- **Before a version is cut:** any new claim in the devlog, write-ups or site has a ledger row. Any change of status updates the ledger, the wording everywhere the claim appears, and the notebook.
+
 ## 1. Devlog = commits = versions
 
 - **Every devlog entry is exactly one commit and exactly one git tag.** No entry without a commit, and no tagged commit without an entry.
@@ -86,6 +106,8 @@ The project stays at `0.y.z` while it's experimental.
 | `experiments/curves/E<n>.json` | Eval-loss curve points used by the experiment-page charts |
 | `site-src/learn.md` | Newcomer primer ("Start here") → `docs/learn.html` |
 | `notes/LABNOTEBOOK.md` | Timestamped, append-only evidence (see §6) |
+| `experiments/claims.md` | **Claims ledger** (§0): every claim we rely on, with source, status and evidence |
+| `experiments/checks/` | One small, seeded verification script per claim (§0), each ≤ ~15 min |
 | `LICENSE` | MIT (code + docs). The dataset keeps its own licence (ODC-By); don't commit data or paper PDFs. |
 | `pyproject.toml` | Package metadata + pinned deps (`pip install -e .`; torch is installed separately from the CUDA index) |
 | `.gitignore` | Keeps data, checkpoints, logs, tracker DBs, PDFs and local tool settings out of git. Check it before adding a new output type. |

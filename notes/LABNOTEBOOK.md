@@ -199,3 +199,11 @@ All three from commit `0dc7491` (code clean), seed 0, 200,015,872 tokens each (6
 - **DEC: E3 = E1 layout + recipe, only `ternary: true`** (`configs/e3_ternary.json`), so the change is purely the weight precision. Ternary × loops is left to E4. BitNet's SubLN / ReLU² / two-stage schedule are deliberately **not** used (one ingredient); they're a follow-up if the gap is > 10%.
 - **Prediction (registry, committed before any run):** val loss 0.605–0.645 (+3.5–10% vs E1), most likely ~0.62; stable; 10–25% slower per token than E1 (simulated quantisation). Decision rules: ≤3% nearly free; 3–10% expected; >10% → try the BitNet recipe.
 - **OBS:** the config builds: 14.24M params, 33 BitLinear, 0.091 train GFLOP/token (same arithmetic as E1, since quantisation is simulated).
+
+## 2026-11-22 (later): Rule: trust but verify
+- **Human:** "Did you run the experiment? Trust but verify." Then: "Run an experiment locally for each claim, don't just follow the research papers. Keep it small but verifiable. Add this to AGENTS.md."
+- **OBS (on-disk check, before this change):** no E3 run exists: no run folder, log, checkpoint or Trackio entry; registry E3 = planned. Completed runs: E0/E1/E2 seed 0 only.
+- **DEC:** new AGENTS.md **§0 Trust but verify**: one claim → one small local check (≤ ~15 min, tiny models, seeded script in `experiments/checks/`, pass criterion written first); `experiments/claims.md` ledger with statuses VERIFIED / PARTIAL / REFUTED / WRONG FOR OUR CODE / UNVERIFIED; wording must follow status; paper numbers are quoted, never adopted; "measured" only with on-disk evidence.
+- **Claims audit** (README, site, primer, write-ups) → 20 claims in the ledger: **4 VERIFIED + 1 more computed-verified**, 6 PARTIAL (mostly single-seed results), **1 REFUTED** (fla recurrent kernel), **1 REFUTED wording** ("~10× smaller": computed 7.8× body / 3.1× whole), **2 WRONG FOR OUR CODE** (SWA is O(n²) with our dense mask; ternary is simulated, so not cheaper), 6 UNVERIFIED paper/theory claims.
+- **Proposed checks K1–K6** (none run yet): memory vs length, BitLinear speed, MQAR recall, ternary gap vs size, state tracking with loops, E2 loop convergence. Total ≈ 50 min of GPU, all tiny.
+- **TODO:** fix the wording of C12/C13/C14 on the site/README/primer (or verify them) in the version that runs the checks.

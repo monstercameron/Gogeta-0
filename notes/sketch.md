@@ -30,6 +30,7 @@ The nice part is that looping costs extra compute and BitNet makes compute cheap
 - **2026-11-22:** Naming: the **repo/project is Gogeta-0**, and the **architecture is FusionDance**. Gogeta-0 is the first FusionDance model.
 - **2026-11-22 (v0.3.0):** First results: the E1 hybrid mixer stack beats dense by 3.6%. Looping (E2) does not pay yet and is non-convergent (best at the mean training r). Next comes the unlooped control E9 and per-loop supervision. See DEVLOG v0.3.0 and notes/LABNOTEBOOK.md.
 - **2026-11-22 (v0.3.1):** Every finished experiment gets a site page with a plain-English explainer (now an AGENTS.md rule). Training is paused by request; E9 and the seed replications are pending and must run detached.
+- **2026-11-22 (v0.3.5):** Trust but verify: every claim we rely on needs its own small local check (AGENTS.md §0, ledger in experiments/claims.md). Paper results motivate experiments but are never adopted as facts.
 
 ---
 

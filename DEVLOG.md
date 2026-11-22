@@ -17,6 +17,27 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.8: Model architecture visualizer (local server)
+*2026-11-22*
+
+**What**: a local web app that **reads the real model code** and draws each config's architecture. `tools/viz/server.py` (stdlib, 127.0.0.1 only, CPU-only) builds `FusionDance` from `configs/*.json` via `gogeta/model.py` on every request, so new configs and code changes show up automatically. Start it with `bash tools/launch_viz.sh start` (WSL) or `tools\launch_viz.ps1 start -Open` (Windows) → http://127.0.0.1:7870. Guide: `tools/viz/README.md`.
+- **Shapes carry meaning:**
+  - full attention = a filled triangle (n² scores);
+  - sliding window = a diagonal band;
+  - Gated DeltaNet = a fixed-size square memory tile;
+  - MLP = an expand/contract trapezoid;
+  - block height ∝ params;
+  - the core is drawn once with a "× r" loop arrow, plus an unroll toggle with shared-weight chips;
+  - ternary = a −1/0/+1 texture with a 1.58-bit badge.
+- **Controls:** a context slider 1k → 32k with live memory/compute growth, a loops slider 1–12, side-by-side compare, tooltips, a plain-English legend, and a DBZ scouter "power level" panel.
+
+**Results**: no training. API numbers match the model code: E0 13,767,552 total; E1 14,237,796 / 91.0 MFLOPs per token; E2 non-embedding 9,460,760, depth 14 at r=4. The page structure was checked in the browser (7 configs, sliders, 21 diagrams, no console errors, no overflow at 1,156 px and 375 px).
+**Findings**: the palette check (dataviz validator, dark surface) passes for blue/orange/aqua; yellow vs orange fails all-pairs, but that pair (MLP vs GDN) is always separated by shape, label and position. E10 (`hf_llama`) is drawn as the equivalent 6 × (attention + SwiGLU) stack, with a note.
+**Not verified**: the visual look (the browser pane was too small to screenshot); touch tooltips on a real phone.
+**Next**: unchanged (cleanup Phase 1 → E10/K7/K8 registered → Phase 2 campaign incl. E11).
+
+---
+
 ## v0.4.7: E11 registered: negative-eigenvalue GDN for language modelling
 *2026-11-22*
 

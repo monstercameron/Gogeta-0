@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gogeta-0 Architecture Viz</title>
+  <meta name="description" content="Interactive view of every Gogeta-0 model architecture, built live from the repo's model code and configs.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Scouter online · architecture viz</span>
+    <h1 class="title">GOGETA-<span class="zero">0</span></h1>
+    <p class="subtitle">FusionDance, drawn from the <b>actual code</b>: every shape is built from <code>gogeta/model.py</code> + <code>configs/*.json</code> on each request.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="controls" aria-label="Controls">
+    <div class="ctl"><label for="selA">Model</label><select id="selA"></select></div>
+    <div class="ctl">
+      <span class="lbl">Compare</span>
+      <div class="toggles"><label class="toggle"><input type="checkbox" id="cmp"> side by side with</label></div>
+    </div>
+    <div class="ctl" id="ctlB"><label for="selB">Second model</label><select id="selB"></select></div>
+    <div class="ctl">
+      <label for="ctx">Context length <span class="val" id="ctxv">1k</span> tokens</label>
+      <input type="range" id="ctx" min="0" max="5" step="1" value="0">
+      <div class="ticks"><span>1k</span><span>2k</span><span>4k</span><span>8k</span><span>16k</span><span>32k</span></div>
+    </div>
+    <div class="ctl" id="ctlLoops">
+      <label for="loops">Loops r <span class="val" id="loopsv">4</span></label>
+      <input type="range" id="loops" min="1" max="12" step="1" value="4">
+      <div class="ticks"><span>1</span><span>12</span></div>
+    </div>
+    <div class="ctl" id="ctlUnroll">
+      <span class="lbl">Looped core</span>
+      <div class="toggles"><label class="toggle"><input type="checkbox" id="unroll"> unroll the loop</label></div>
+    </div>
+  </section>
+
+  <div id="panels" class="panels" aria-live="polite"></div>
+
+  <section class="legend" aria-label="Legend">
+    <h2>How to read the shapes</h2>
+    <div class="lgrid" id="legend"></div>
+  </section>
+</main>
+<footer class="wrap">Reads <code>gogeta/model.py</code> and <code>configs/*.json</code> live. Colours are never the only cue: each block kind also has its own glyph shape and a text label. Hover or tap any block for exact numbers.</footer>
+<div id="tip" role="tooltip"></div>
+<script src="app.js"></script>
+</body>
+</html>

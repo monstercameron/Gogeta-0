@@ -17,6 +17,17 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.49: Tokenizer research: snapshot (in progress)
+*2026-11-22*
+
+**Work-in-progress snapshot** committed on the human's instruction to reduce uncommitted changes; the subagent's final hand-back will be its own version.
+
+- Included: `experiments/tokenizer/` (audit.py, train_variants.py, run.sh, probe_env.sh, results/audit.json, results/variants.json) and `notes/research-tokenizer.md`.
+- Checks: `python -m py_compile` on the .py files passed. The scripts were not executed. No secrets and no files over 2 MB.
+- The audit and variants results and the notes are reported by the subagent, not yet verified by the main agent. Nothing was run on the GPU.
+
+---
+
 ## v0.4.48: A6 numerics: snapshot (in progress)
 *2026-11-22*
 

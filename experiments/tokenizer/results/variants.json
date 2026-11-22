@@ -1,0 +1,123 @@
+{
+ "bpe-regex-8192-full": {
+  "vocab": 8192,
+  "chars_per_token_val": 3.7267390041423107,
+  "chars_per_token_clean": 3.803155105595409,
+  "val_tokens": 1056898,
+  "emb_params_tied_d384": 3145728,
+  "frac_entries_lt10_uses_in_val": 0.525146484375,
+  "entries_unused_in_val": 1430,
+  "unk_in_500_docs": 0,
+  "train_cpu_s": 16.5
+ },
+ "bpe-regex-4096-full": {
+  "vocab": 4096,
+  "chars_per_token_val": 3.610246920030321,
+  "chars_per_token_clean": 3.671566644375277,
+  "val_tokens": 1091001,
+  "emb_params_tied_d384": 1572864,
+  "frac_entries_lt10_uses_in_val": 0.176025390625,
+  "entries_unused_in_val": 285,
+  "unk_in_500_docs": 0,
+  "train_cpu_s": 22.0
+ },
+ "bpe-regex-16384-full": {
+  "vocab": 16384,
+  "chars_per_token_val": 3.7713104182564843,
+  "chars_per_token_clean": 3.8574714405086494,
+  "val_tokens": 1044407,
+  "emb_params_tied_d384": 6291456,
+  "frac_entries_lt10_uses_in_val": 0.78277587890625,
+  "entries_unused_in_val": 7178,
+  "unk_in_500_docs": 0,
+  "train_cpu_s": 29.3
+ },
+ "bpe-regex-32768-full": {
+  "vocab": 24152,
+  "chars_per_token_val": 3.7827702082991195,
+  "chars_per_token_clean": 3.872149146993435,
+  "val_tokens": 1041243,
+  "emb_params_tied_d384": 9274368,
+  "frac_entries_lt10_uses_in_val": 0.8560781715799933,
+  "entries_unused_in_val": 14261,
+  "unk_in_500_docs": 0,
+  "train_cpu_s": 31.6
+ },
+ "bpe-digits1-8192-full": {
+  "vocab": 8192,
+  "chars_per_token_val": 3.536041964420377,
+  "chars_per_token_clean": 3.628537742263611,
+  "val_tokens": 1113896,
+  "emb_params_tied_d384": 3145728,
+  "frac_entries_lt10_uses_in_val": 0.5484619140625,
+  "entries_unused_in_val": 1575,
+  "unk_in_500_docs": 0,
+  "train_cpu_s": 39.0
+ },
+ "bpe-indentmerge-8192-full": {
+  "vocab": 8192,
+  "chars_per_token_val": 3.15443318784287,
+  "chars_per_token_clean": 3.0905935129512794,
+  "val_tokens": 1248650,
+  "emb_params_tied_d384": 3145728,
+  "frac_entries_lt10_uses_in_val": 0.2291259765625,
+  "entries_unused_in_val": 546,
+  "unk_in_500_docs": 0,
+  "train_cpu_s": 53.5
+ },
+ "bpe-line-8192-full": {
+  "vocab": 8192,
+  "chars_per_token_val": 6.2478811710941455,
+  "chars_per_token_clean": 6.00201321750397,
+  "val_tokens": 630419,
+  "emb_params_tied_d384": 3145728,
+  "frac_entries_lt10_uses_in_val": 0.097412109375,
+  "entries_unused_in_val": 241,
+  "unk_in_500_docs": 0,
+  "train_cpu_s": 113.6
+ },
+ "bpe-line-16384-full": {
+  "vocab": 16384,
+  "chars_per_token_val": 7.434892500519093,
+  "chars_per_token_clean": 6.996952906408074,
+  "val_tokens": 529770,
+  "emb_params_tied_d384": 6291456,
+  "frac_entries_lt10_uses_in_val": 0.33612060546875,
+  "entries_unused_in_val": 864,
+  "unk_in_500_docs": 0,
+  "train_cpu_s": 116.5
+ },
+ "bpe-regex-8192-small": {
+  "vocab": 8192,
+  "chars_per_token_val": 3.71730240538477,
+  "chars_per_token_clean": 3.79179474061916,
+  "val_tokens": 1059581,
+  "emb_params_tied_d384": 3145728,
+  "frac_entries_lt10_uses_in_val": 0.5272216796875,
+  "entries_unused_in_val": 1591,
+  "unk_in_500_docs": 0,
+  "train_cpu_s": 23.3
+ },
+ "unigram-regex-8192-small": {
+  "vocab": 8192,
+  "chars_per_token_val": 2.860811908141016,
+  "chars_per_token_clean": 2.9141800866084546,
+  "val_tokens": 1376806,
+  "emb_params_tied_d384": 3145728,
+  "frac_entries_lt10_uses_in_val": 0.6666259765625,
+  "entries_unused_in_val": 3126,
+  "unk_in_500_docs": 0,
+  "train_cpu_s": 25.0
+ },
+ "wordpiece-regex-8192-small": {
+  "vocab": 8192,
+  "chars_per_token_val": 3.701689770217565,
+  "chars_per_token_clean": 3.7734928752043535,
+  "val_tokens": 1064050,
+  "emb_params_tied_d384": 3145728,
+  "frac_entries_lt10_uses_in_val": 0.499755859375,
+  "entries_unused_in_val": 1608,
+  "unk_in_500_docs": 1,
+  "train_cpu_s": 29.0
+ }
+}

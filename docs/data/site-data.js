@@ -3,6 +3,12 @@ window.SITE_DATA = {
  "generated": "2026-11-22 18:50",
  "devlog": [
   {
+   "version": "v0.4.49",
+   "title": "Tokenizer research: snapshot (in progress)",
+   "date": "2026-11-22",
+   "html": "<p><strong>Work-in-progress snapshot</strong> committed on the human's instruction to reduce uncommitted changes; the subagent's final hand-back will be its own version.</p><ul><li>Included: <code>experiments/tokenizer/</code> (audit.py, train_variants.py, run.sh, probe_env.sh, results/audit.json, results/variants.json) and <code>notes/research-tokenizer.md</code>.</li><li>Checks: <code>python -m py_compile</code> on the .py files passed. The scripts were not executed. No secrets and no files over 2 MB.</li><li>The audit and variants results and the notes are reported by the subagent, not yet verified by the main agent. Nothing was run on the GPU.</li></ul>"
+  },
+  {
    "version": "v0.4.48",
    "title": "A6 numerics: snapshot (in progress)",
    "date": "2026-11-22",

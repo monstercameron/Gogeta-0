@@ -1,0 +1,4 @@
+# Cockpit (TUI + MCP server). Installed ONLY into ~/.venvs/gogeta-cockpit (WSL); see cockpit/README.md.
+# cockpit/core.py is stdlib-only and needs none of this.
+mcp==1.30.0       # official MCP Python SDK, 1.x line (2.x renamed FastMCP -> MCPServer)
+textual==8.2.8

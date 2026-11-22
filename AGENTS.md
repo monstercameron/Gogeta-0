@@ -99,6 +99,48 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
 - **The review and its triage are committed** as one PATCH version ("Outside review <time>") and pushed (§3).
 - **Ideas never preempt the running campaign or the validity-first queue order (§5b).** They feed the queue; they don't jump it unless the main agent records a `move --reason`.
 
+## 0e. Cockpit first: one interface, SQLite logs
+
+- **One interface for all tooling.** Every new tool or feature for this project is built into, or registered with, the cockpit core (`cockpit/core.py`) and exposed through both the TUI (`cockpit/tui.py`) and the MCP server (`cockpit/mcp_server.py`). No new standalone scripts that bypass it. One-off `sq_` and check scripts must be launchable and discoverable from the cockpit (a queue item with a launcher command, or a core function).
+- **Agents use the cockpit first.** Call `gogeta_brief` before anything else, then the MCP tools (`gogeta_status`, `gogeta_queue`, `gogeta_experiment`, `gogeta_claims`, `gogeta_search`, `gogeta_errors`, ...) instead of running many separate scripts. Launches go through `gogeta_launch_queue_item` (confirm-gated; it only calls the existing launchers).
+- **Everything is logged to SQLite.** Runs, events, errors (with full tracebacks and context), campaigns, server actions and every cockpit tool call go to `~/fusiondance-data/cockpit/gogeta.sqlite` (WSL filesystem; it is data, **never committed**). Tokens are redacted before anything is written or shown (`hf_...`, `token=...`, `write_token`, bearer headers).
+- **A failure is not handled until it is in `errors` with a resolution note.** List with `gogeta_errors`; close with `gogeta_resolve_error` (note required). Read-only SQL: `gogeta_sql`.
+- **Existing launchers log directly via patches.** `tools/launch_*.sh`, `gogeta/train.py` and `gogeta/tracking.py` call `python -m cockpit.logdb ...` (best effort, never fails a run). Patches live in `notes/patches/cockpit-logging-*.patch` and are applied between campaigns (the launcher refuses dirty code paths). Until then `logdb.ingest()` backfills from run folders, PID files and logs.
+
+## 0f. Self-heal: be resilient
+
+- **The watchdog runs whenever work runs.** Start it with `bash cockpit/cockpit.sh --watchdog` (idempotent, one instance; also `gogeta_watchdog start` and the TUI Incidents tab). It polls PID files, campaign logs and status files every ~10 s. Watch the stream with `tail -F ~/fusiondance-data/cockpit/incidents.log`.
+- **Every crash becomes an incident** in the SQLite `incidents` table (plus `~/fusiondance-data/cockpit/incidents/<id>.json`): dead or hung runs, NaN/OOM/Triton errors, tracebacks, aborted campaigns (incl. preflight REFUSED), failed CPU jobs, servers down, GPU >= 85 C, low disk. Each has a **context bundle** (redacted log tail, traceback, git and dirty paths, GPU state, config, CLI args, last metrics), a **category** (code-bug, env, transient, thermal, data, dirty-tree, resource), the auto-actions taken and a ready-to-paste **agent brief**.
+- **The agent's self-heal loop:**
+  1. **Detect:** `gogeta_brief` lists open incidents first; `gogeta_incidents` / `gogeta_incident <id>`.
+  2. **Contain:** stop cleanly, free the GPU slot, let the GPU cool. Never kill a healthy process.
+  3. **Triage:** read the bundle, confirm the category, reproduce on CPU or a tiny config if possible; `gogeta_incident_update status=triaged`.
+  4. **Fix the root cause** (status `fixing`). Code edits only in the gap between campaigns: a dirty tree aborts campaigns (§5b).
+  5. **Test,** then cut a PATCH version with a devlog block (and a claims-ledger row if a claim is affected).
+  6. **Push** (§3).
+  7. **Resume** the unfinished work from the written `experiments/launch/campaigns/<name>-resume-<n>.campaign` (`gogeta_resume_campaign`, confirm-gated; refused while code paths are dirty or the GPU slot is held).
+  8. **Close:** `gogeta_incident_update status=fixed`, then `verified` once the resumed work passes, each with a note.
+- **When to act alone:** transient, thermal and server faults are auto-handled by the watchdog (servers restarted, max 3/h with backoff; one retry after a cool-down; resume campaigns launched automatically only for transient or thermal causes). It never edits code, deletes data, runs `git reset/checkout/clean`, or kills a healthy process.
+- **When to fix without asking:** code bugs, autonomously (§0a). **When to park for the human:** only the §0a safety list.
+- **No silent retries:** every retry is logged (events + incident actions). Never retry a deterministic failure more than once.
+- **Never mask failures:** a crash that changes a result's validity (a partial run, a changed seed or LR, a discarded item) is recorded in the devlog **and** the claims ledger, not just fixed.
+- **Post-mortem:** every incident that cost more than 10 minutes of GPU time gets a 3-line post-mortem (cause, fix, how we stop it recurring) in the devlog entry that fixes it.
+- **Resume support:** campaigns resume at item granularity today (`--resume`, resume campaign files). Mid-run training resume needs `notes/patches/cockpit-resilience-train.patch` (applied between campaigns).
+
+## 0g. Be adaptive: extend the cockpit, don't work around it
+
+- **A gap is a cockpit bug.** If an agent needs something the cockpit can't do (a missing query, view, MCP tool, detector, launcher option) or does too narrowly, **extend the cockpit**. Don't write a one-off script, hand-parse files, or skip the step.
+- **The flow:**
+  1. Add it to `cockpit/core.py` first (one function, stdlib, JSON-able dict).
+  2. Expose it through MCP (`expose(core.fn, "gogeta_name")` in `cockpit/mcp_server.py`) and, if humans need it, the TUI.
+  3. Add a test in `cockpit/test_core.py`.
+  4. Document it in `cockpit/README.md`.
+  5. Cut a PATCH version and push (§1, §3).
+- **Small extensions are made on the spot** by the agent that hit the gap. Larger ones go in the queue as a `cockpit` item, or to a subagent that owns the cockpit files exclusively (§4).
+- **Code-path caution:** if the cockpit is (or becomes) part of the campaign clean-tree check, edit it only between campaigns, like any other code.
+- **No lingering stopgaps:** a one-off script written as a stopgap is folded into the cockpit within the same session, or listed in the backlog.
+- **Backlog:** `cockpit/BACKLOG.md` lists known gaps and limits, plus requests agents hit but did not fix, with the reason. Read it before adding features so work isn't duplicated; `brief()` shows the top items.
+
 ## 1. Devlog = commits = versions
 
 - **Every devlog entry is exactly one commit and exactly one git tag.** No entry without a commit, and no tagged commit without an entry.
@@ -170,6 +212,24 @@ The project stays at `0.y.z` while it's experimental.
     2. if it tested no existing claim, add a new claim stating what it found;
     3. run `python experiments/claims_list.py` to regenerate `claims-status.md`.
   - **An experiment isn't finished, and its version can't be cut, until the ledger and `claims-status.md` are updated in that same commit.**
+- **EVERY SETTLED CLAIM POINTS TO ITS EVIDENCE.** Any ledger row whose status is not `UNVERIFIED` must cite, in its evidence column, at least one concrete pointer a reader can open:
+  - a results file (`experiments/checks/results/<ID>.json`, `evals/results/<file>.json`);
+  - an experiment card or micro devlog (`experiments/cards/<ID>.md`, `experiments/devlogs/<ID>.md`);
+  - a run id with its version tag;
+  - a source file and line, for code or "computed" claims.
+
+  Numbers alone ("−3.6%") or "see above" are not evidence. `experiments/claims_list.py` flags settled claims without a pointer, and a version can't be cut while any are flagged. Fix it by appending a row that adds the pointer; never edit old rows.
+- **EVERY EXPERIMENT HAS ITS OWN MICRO DEVLOG:** `experiments/devlogs/<ID>.md`. This covers E-series runs, checks, side quests, sweeps and evals. It's created **when the experiment is registered**, and appended to (newest last, dated, with the version) at every step:
+  - the plan and prediction (or a link to it);
+  - each launch (command, commit, run id);
+  - what you observed while it ran;
+  - incidents and retries;
+  - deviations from the plan;
+  - the results with pointers;
+  - the ledger rows it changed;
+  - the decision taken.
+
+  It's the experiment's lab notebook: messy is fine, missing is not. The **card** (`experiments/cards/<ID>.md`) stays the clean summary; the **micro devlog** is the full history; the **DEVLOG** block is the versioned summary.
 - **Claims list:** `experiments/claims-status.md` is the readable list of every claim with its **latest** status, generated from the append-only ledger `experiments/claims.md` by `python experiments/claims_list.py`. Regenerate and commit it with every version. Run artifacts (`~/fusiondance-data/runs/`) stay out of git; results are recorded in the ledger, cards, `experiments/checks/results/` and the registry.
 - **One checkout, no worktrees (§3), for subagents too.** Never use `git worktree`, `isolation: worktree`, or a copy of the repo elsewhere. `C:\Users\mreca\Desktop\FusionDance` is a stale v0.1.1 copy: never read results from it or write to it.
 - **Every experiment is tracked in `experiments/experiments.json`** (id, arc, question, status, version, config, results). Set `status` to `running` when it starts and `done`/`failed`/`abandoned` when it ends, fill in `results` (use `val_loss` for the site's power-level chart), and set `version` to the tag that records it. New experiments get the next `E<n>` id.
@@ -266,6 +326,12 @@ The project stays at `0.y.z` while it's experimental.
 | `experiments/cards/<ID>.md` | Agent-facing documentation card per experiment/check/side quest (template: `_TEMPLATE.md`) |
 | `experiments/claims.md` | **Claims ledger** (§0): every claim we rely on, with source, status and evidence |
 | `experiments/checks/` | One small, seeded verification script per claim (§0), each ≤ ~15 min; side-quest scripts are prefixed `sq_` |
+| `cockpit/` | **Cockpit** (§0e): stdlib `core.py`, Textual TUI `tui.py`, MCP server `mcp_server.py`, SQLite log store `logdb.py`; start with `cockpit/README.md` |
+| `~/fusiondance-data/cockpit/gogeta.sqlite` | Run/event/error log store (data, not committed; schema in `cockpit/logdb.py`) |
+| `notes/patches/cockpit-logging-*.patch` | Unapplied patches that make the launchers and trainer log to the cockpit store (apply between campaigns) |
+| `notes/patches/cockpit-resilience-*.patch` | Unapplied patches: per-item campaign status and unfinished-items file; resumable training checkpoints (§0f) |
+| `~/fusiondance-data/cockpit/incidents.log`, `incidents/<id>.json` | Watchdog incident stream and bundles (data, not committed) |
+| `cockpit/BACKLOG.md` | Known cockpit gaps and unfixed agent requests (§0g) |
 | `experiments/side-quests.md` | Side-quest log (§0b): ideas, status, outcomes |
 | `gogeta/hf.py` | Hugging Face wrapper (`GogetaForCausalLM`, tokenizer loader, checkpoint converters) for TRL; no KV cache yet |
 | `post_training/` | TRL setup guide (`SETUP.md`), code-execution reward sandbox, tests, CPU smoke runs for GRPO/SFT/DPO. Prepared, not activated. |

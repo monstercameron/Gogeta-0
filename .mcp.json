@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "gogeta-cockpit": {
+      "command": "wsl",
+      "args": ["-d", "Ubuntu-24.04", "--", "/root/.venvs/gogeta-cockpit/bin/python", "/mnt/c/Users/mreca/Desktop/Gogeta-0/cockpit/mcp_server.py"]
+    }
+  }
+}

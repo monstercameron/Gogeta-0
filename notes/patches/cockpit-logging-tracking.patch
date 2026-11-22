@@ -1,0 +1,17 @@
+--- a/gogeta/tracking.py
++++ b/gogeta/tracking.py
+@@ -131,6 +131,14 @@
+         if error:
+             record["error"] = error
+         self._write("summary.json", record)
++        try:  # cockpit SQLite log store: best effort
++            import sys as _sys
++            _sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
++            from cockpit import logdb as _ld
++            _ld.event("train", "error" if status == "failed" else "info", "run_finish", f"{self.dir.name} {status}",
++                      run_id=self.dir.name, data={"error": error, "metrics": self.summary})
++        except Exception:
++            pass
+         if self._t is not None:
+             self._t.finish()
+             self._t = None

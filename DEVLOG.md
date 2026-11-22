@@ -17,6 +17,34 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.31: Cockpit: TUI + MCP + SQLite logs + self-heal watchdog; evidence and micro-devlog rules
+*2026-11-22*
+
+**What** (the human's requests: a TUI + MCP for the project; SQLite run and error logging; self-healing; "be adaptive"; every settled claim points to evidence; every experiment has a micro devlog). The cockpit was built by a subagent and verified by the main agent.
+- **`cockpit/`** (new top-level folder):
+  - `core.py` (stdlib; one JSON-returning function per question, incl. a ≤ 4 KB `brief()` for agents);
+  - `mcp_server.py`: **28 MCP tools**. Read-only ones: brief, status, queue, experiment, claims, search, runs, results, devlog, log tail, errors, incidents, SQL (SELECT-only). State-changing ones are confirm-gated: start/stop server, launch queue item, resolve error, incident update, resume campaign, watchdog;
+  - `tui.py` (Textual): 10 tabs, from Dashboard with a GPU card, campaign progress, CPU slots and server tiles with Start/Stop/Open, to Queue, Experiments, Claims, Devlog, Logs, Errors, Incidents, Runs and Search;
+  - `logdb.py`: the SQLite store at `~/fusiondance-data/cockpit/gogeta.sqlite` (data, never committed; tokens redacted on every write; incremental ingest of run folders, campaign logs, CPU jobs and tracebacks);
+  - `watchdog.py`: the self-heal daemon. It turns 15 kinds of fault (dead/hung runs, NaN/OOM/Triton errors, tracebacks, aborted campaigns, preflight REFUSED, failed CPU jobs, servers down, GPU ≥ 85 °C, low disk) into **incidents** with a context bundle and an agent brief. It does only safe recovery: server restarts with backoff, one retry for transient faults, a thermal pause, and resume-campaign files with exactly the unfinished items, auto-launched only for transient or thermal causes. It never edits code, deletes data or kills a healthy process.
+- **The venv** `~/.venvs/gogeta-cockpit` (mcp 1.30.0, textual 8.2.8, pinned in `requirements-cockpit.txt`; ~81 MB) was installed under the human's TUI+MCP request. `.mcp.json` registers the server for Claude Code.
+- **Patches, unapplied** (between campaigns): `notes/patches/cockpit-logging-*.patch` (launchers and trainer log straight to SQLite) and `cockpit-resilience-*.patch` (per-item campaign status and unfinished-item files; `--ckpt-every` / `--resume` for mid-run training resume, which is impossible today).
+- **AGENTS.md:**
+  - **§0e** cockpit first: one interface, SQLite logs;
+  - **§0f** self-heal: the detect → contain → triage → fix → test → version → push → resume → verify loop;
+  - **§0g** be adaptive: a gap is a cockpit bug, so extend it (pattern: one `core.py` function plus `expose(...)`), with `cockpit/BACKLOG.md` for known gaps;
+  - **§5, new rules from the human:** every settled ledger claim must cite a concrete evidence pointer, and every experiment keeps a micro devlog `experiments/devlogs/<ID>.md` (plan, launches, observations, incidents, deviations, results, decisions). A subagent is backfilling the devlogs and auditing evidence pointers.
+
+**Results** (re-run by the main agent):
+- `cockpit.sh --test`: **48 tests OK**, plus the TUI's headless check across all tabs with 0 failures;
+- MCP stdio probe: initialize OK, 28 tools listed, and 4 live calls returned without errors;
+- the subagent's live ingest: 14 runs, 42 events, 4 unresolved errors (the K7 preflight REFUSED lines);
+- no tokens or personal data in the committed files.
+
+**Not verified**: the TUI driven by a human; `cockpit.ps1` in Windows Terminal; a long-running watchdog loop (it starts in the next step); the patches (only `git apply --check`).
+
+---
+
 ## v0.4.30: K9 registered: train/val leakage check
 *2026-11-22*
 

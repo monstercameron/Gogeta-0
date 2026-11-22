@@ -1,0 +1,17 @@
+--- a/gogeta/train.py
++++ b/gogeta/train.py
+@@ -304,6 +304,14 @@
+     except BaseException as e:
+         if run and run._t is not None:
+             run.finish("failed", error=f"{type(e).__name__}: {e}")
++        try:  # cockpit SQLite log store: full traceback; best effort, never masks the real error
++            import sys as _sys, traceback as _tb
++            _sys.path.insert(0, str(ROOT))
++            from cockpit import logdb as _ld
++            _ld.error("train", f"{type(e).__name__}: {e}", type(e).__name__, "".join(_tb.format_exception(type(e), e, e.__traceback__)),
++                      run_id=getattr(getattr(run, "dir", None), "name", None), context={"config": args.config, "overrides": overrides})
++        except Exception:
++            pass
+         raise
+ 
+ 

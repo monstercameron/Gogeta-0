@@ -1,0 +1,35 @@
+--- a/tools/launch_experiment.sh
++++ b/tools/launch_experiment.sh
+@@ -47,9 +47,11 @@
+ TEMP_RESUME=75   # --wait-cool waits until below this (C)
+ COOL_POLL=30     # seconds between temperature readings while waiting
+ CODE_PATHS=(gogeta configs tools tests requirements.txt)   # same list as gogeta/tracking.py
++# cockpit SQLite log store (cockpit/logdb.py): best effort, never fails the launcher.
++cockpit_log() { ( PYTHONPATH="$REPO" timeout 10 "$PY" -m cockpit.logdb "$@" >/dev/null 2>&1 || true ); }
+ 
+ usage() { sed -n '2,34p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
+-die() { echo "launch_experiment: $1" >&2; exit "${2:-1}"; }
++die() { echo "launch_experiment: $1" >&2; type cockpit_log >/dev/null 2>&1 && cockpit_log error --source launcher --exc-type die --message "launch_experiment: $1" --run-id "${EID:-}"; exit "${2:-1}"; }
+ 
+ # ----------------------------------------------------------------------------- arguments
+ EID="" SEED="" SEED_GIVEN=0 DRY=0 FG=0 COMPILE=1 MAXTOK="" LR="" WAITCOOL=0
+@@ -335,6 +337,7 @@
+ if (( NFAIL )); then
+   print_plan "REFUSED"
+   echo "result     : not launched: $NFAIL failed preflight check(s)." >&2
++  cockpit_log error --source launcher --exc-type preflight_refused --run-id "${EID:-}" --message "preflight REFUSED: $NFAIL failed check(s)" --context "{\"experiment\":\"${EID:-}\",\"seed\":\"${SEED:-}\"}"
+   exit 3
+ fi
+ 
+@@ -407,9 +410,11 @@
+ if ! kill -0 "$PID" 2>/dev/null; then
+   echo "The run exited right after starting (exit code $(cat "$EXITFILE" 2>/dev/null || echo '?')). Last log lines:" >&2
+   tail -n 25 "$LOG" >&2
++  cockpit_log error --source launcher --exc-type died_at_start --run-id "${EID:-}" --message "run exited right after starting (exit $(cat "$EXITFILE" 2>/dev/null || echo ?))" --traceback "$(tail -n 40 "$LOG" 2>/dev/null)"
+   exit 4
+ fi
+ 
++cockpit_log event --source launcher --level info --kind run_launch --run-id "${EID:-}" --message "launched $EID seed $SEED pid $PID" --data "{\"log\":\"$LOG\"}"
+ echo "Launched $EID seed $SEED (detached)."
+ echo "  pid       : $PID   (wrapper; training runs in its process group)"
+ echo "  log       : $LOG"

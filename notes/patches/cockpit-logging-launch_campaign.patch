@@ -1,0 +1,27 @@
+--- a/tools/launch_campaign.sh
++++ b/tools/launch_campaign.sh
+@@ -235,6 +235,8 @@
+ on_term() { log "received SIGTERM: stopping${CUR:+ (current item: $CUR)}"; echo 143 >"$RUN_DIR/campaign-$NAME.exit"; exit 143; }
+ trap on_term TERM INT
+ log() { echo "[$(ts)] $*"; }
++# cockpit SQLite log store (cockpit/logdb.py): best effort, never fails the runner.
++cockpit_log() { ( PYTHONPATH="$REPO" timeout 10 "${PY:-python3}" -m cockpit.logdb "$@" >/dev/null 2>&1 || true ); }
+ done_ok() { [[ -f "$STATE" ]] && awk -v i="$1" -v a="$2" -F '\t' '$1 == i && $2 == 0 && $5 == a { f = 1 } END { exit !f }' "$STATE"; }
+ 
+ log "campaign $NAME: ${#ITEMS[@]} launch(es), poll ${POLL}s, gap ${GAP}s, git $(git -C "$REPO" describe --tags --always --dirty 2>/dev/null)"
+@@ -265,6 +267,7 @@
+       log "[$i/${#ITEMS[@]}] preflight REFUSED and the GPU is free: a persistent problem. Aborting the campaign. Failed checks:"
+       grep -E '\[FAIL\]|launch_experiment:' "$OUT" | sed 's/^/      /'
+       printf '%s\t%s\t%s\t%s\t%s\n' "$i" "$rc" "$start" "$(date -Is)" "$it" >>"$STATE"
++      cockpit_log error --source campaign --exc-type preflight_abort --message "[$NAME $i/${#ITEMS[@]}] preflight REFUSED, campaign aborted: $it" --traceback "$(grep -E '\[FAIL\]|launch_experiment:' "$OUT" 2>/dev/null)"
+       echo 3 >"$RUN_DIR/campaign-$NAME.exit"; exit 3
+     fi
+     break
+@@ -276,6 +279,7 @@
+   else
+     NFAILED=$((NFAILED + 1))
+     log "[$i/${#ITEMS[@]}] FAILED with exit $rc: $it  (training log ${tlog:-?}). Last lines:"
++    cockpit_log error --source campaign --exc-type item_failed --message "[$NAME $i/${#ITEMS[@]}] FAILED exit $rc: $it" --traceback "$(tail -n 30 "$OUT" 2>/dev/null)"
+     tail -n 6 "$OUT" | sed 's/^/      | /'
+     if (( STOPFAIL )); then log "--stop-on-fail: aborting"; echo 5 >"$RUN_DIR/campaign-$NAME.exit"; exit 5; fi
+   fi

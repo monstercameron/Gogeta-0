@@ -1,0 +1,12 @@
+# Cockpit backlog
+
+Known gaps and limits, and requests agents hit but did not fix (with the reason). Read before adding features (AGENTS.md section 0g). Open items start with `- [ ]`; `brief()` shows the top ones.
+
+- [ ] Launcher logging is ingest-only until `notes/patches/cockpit-logging-*.patch` are applied (needs a gap between campaigns; the launchers live under `tools/`).
+- [ ] Training resume is impossible today (train.py saves only a final checkpoint): needs `notes/patches/cockpit-resilience-train.patch`. Watchdog resume works at campaign-item granularity only.
+- [ ] `brief()` does not yet show K8 verdicts (needs a result-verdict parser for `experiments/checks/results/*.json`); needs_human queue items are listed by id only.
+- [ ] Queue launch does not write `queue.json` status (`queue.py set ... running`); the agent does that by hand after a launch. Candidate: a confirm-gated `gogeta_queue_set`.
+- [ ] No Windows-native core: everything runs in WSL (the PowerShell script only wraps `wsl`). Fine for now.
+- [ ] `hung` detection uses a fixed default (15 min); derive it per experiment from the expected step time once step timings are in SQLite.
+- [ ] Tracker (7861) is only restarted by the watchdog if it was seen up while the watchdog ran.
+- [ ] Windows ARM64: not tested natively (wheels not needed; WSL path used).

@@ -1,0 +1,37 @@
+--- a/tools/launch_campaign.sh
++++ b/tools/launch_campaign.sh
+@@ -235,8 +235,18 @@
+ on_term() { log "received SIGTERM: stopping${CUR:+ (current item: $CUR)}"; echo 143 >"$RUN_DIR/campaign-$NAME.exit"; exit 143; }
+ trap on_term TERM INT
+ log() { echo "[$(ts)] $*"; }
++# Machine-readable per-item status (one JSON object per line) for the cockpit watchdog: $RUN_DIR/campaign-NAME.status.jsonl
++istatus() { printf '{"t":"%s","campaign":"%s","idx":%s,"total":%s,"event":"%s","rc":%s,"args":"%s"}\n' "$(date -Is)" "$NAME" "$1" "${#ITEMS[@]}" "$2" "${3:-null}" "$4" >>"$RUN_DIR/campaign-$NAME.status.jsonl"; }
++# On ANY exit (abort, SIGTERM, preflight refusal, normal end) write exactly the unfinished items, ready to use as a resume campaign:
++# $RUN_DIR/campaign-NAME.unfinished  (same format as a campaign file; items finished with exit 0 are omitted)
++write_unfinished() {
++  local k=0 it
++  { echo "# unfinished items of campaign $NAME at $(date -Is)"
++    for it in "${ITEMS[@]}"; do k=$((k + 1)); done_ok "$k" "$it" || echo "$it"; done; } >"$RUN_DIR/campaign-$NAME.unfinished" 2>/dev/null
++}
+ done_ok() { [[ -f "$STATE" ]] && awk -v i="$1" -v a="$2" -F '\t' '$1 == i && $2 == 0 && $5 == a { f = 1 } END { exit !f }' "$STATE"; }
+ 
++trap write_unfinished EXIT
+ log "campaign $NAME: ${#ITEMS[@]} launch(es), poll ${POLL}s, gap ${GAP}s, git $(git -C "$REPO" describe --tags --always --dirty 2>/dev/null)"
+ NFAILED=0 i=0
+ for it in "${ITEMS[@]}"; do
+@@ -253,6 +263,7 @@
+     OUT=$LOG_DIR/campaign-$NAME-$STAMP-$i.out
+     CUR=$it; start=$(date -Is)
+     log "[$i/${#ITEMS[@]}] launch: $it  (output $OUT)"
++    istatus "$i" started "" "$it"
+     bash "$LAUNCHER" "${a[@]}" --foreground --wait-cool >"$OUT" 2>&1 </dev/null
+     rc=$?
+     tlog=$(sed -n 's/.*in the foreground (log: \(.*\))\..*/\1/p' "$OUT" | head -1)
+@@ -271,6 +282,7 @@
+   done
+   CUR=""
+   printf '%s\t%s\t%s\t%s\t%s\n' "$i" "$rc" "$start" "$(date -Is)" "$it" >>"$STATE"
++  istatus "$i" "$( ((rc == 0)) && echo done || echo failed)" "$rc" "$it"
+   if (( rc == 0 )); then
+     log "[$i/${#ITEMS[@]}] done: $it  (training log ${tlog:-?}); $(grep -m1 '^FINAL ' "$OUT" | cut -c1-160)"
+   else

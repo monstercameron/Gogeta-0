@@ -1,0 +1,21 @@
+--- a/tools/launch_cpu_job.sh
++++ b/tools/launch_cpu_job.sh
+@@ -22,7 +22,9 @@
+ THREADS=2
+ 
+ usage() { sed -n '2,15p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
+-die() { echo "launch_cpu_job: $1" >&2; exit "${2:-1}"; }
++die() { echo "launch_cpu_job: $1" >&2; type cockpit_log >/dev/null 2>&1 && cockpit_log error --source cpu-job --exc-type die --message "launch_cpu_job: $1"; exit "${2:-1}"; }
++# cockpit SQLite log store (cockpit/logdb.py): best effort, never fails the launcher.
++cockpit_log() { ( PYTHONPATH="${REPO:-.}" timeout 10 "${PY:-python3}" -m cockpit.logdb "$@" >/dev/null 2>&1 || true ); }
+ 
+ NAME="" DRY=0
+ while [[ $# -gt 0 ]]; do
+@@ -106,6 +108,7 @@
+ if (( NLIVE >= MAX_JOBS )); then
+   print_plan "REFUSED" >&2
+   echo "result     : not started: $NLIVE/$MAX_JOBS CPU jobs already alive (AGENTS.md 5 compute budget)." >&2
++  cockpit_log error --source cpu-job --exc-type slots_full --message "CPU job ${NAME:-?} refused: $NLIVE/$MAX_JOBS slots alive"
+   exit 3
+ fi
+ 

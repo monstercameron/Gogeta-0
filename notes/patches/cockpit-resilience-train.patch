@@ -1,0 +1,61 @@
+--- a/gogeta/train.py
++++ b/gogeta/train.py
+@@ -170,6 +170,15 @@
+ 
+ 
+ # ----------------------------------------------------------------------------- main
++def _save_resume(path, model, opt, step, tokens, flops, loop_rng, data, run_name):
++    """Atomic resumable checkpoint (model + optimizer + counters + all RNG states)."""
++    tmp = str(path) + ".tmp"
++    torch.save({"model": model.state_dict(), "opt": opt.state_dict(), "step": step, "tokens": tokens, "flops": flops,
++                "loop_rng": loop_rng.getstate(), "data_g": data.g.get_state(), "torch_rng": torch.get_rng_state(),
++                "cuda_rng": torch.cuda.get_rng_state(), "run_name": run_name}, tmp)
++    os.replace(tmp, path)
++
++
+ def main():
+     ap = argparse.ArgumentParser()
+     ap.add_argument("--config", required=True)
+@@ -179,6 +188,8 @@
+     ap.add_argument("--require-clean", action="store_true", help="refuse to run with uncommitted changes")
+     ap.add_argument("--compile", action="store_true", help="torch.compile the model")
+     ap.add_argument("--bench", type=int, default=0, help="only time N steps, no tracking/eval/ckpt")
++    ap.add_argument("--ckpt-every", type=int, default=0, help="save a resumable checkpoint every N steps (0 = off)")
++    ap.add_argument("--resume", type=str, default="", help="resume from a resume.pt written by --ckpt-every (continues in a NEW run dir)")
+     args = ap.parse_args()
+ 
+     cfg_path = (ROOT / args.config).resolve() if not os.path.isabs(args.config) else pathlib.Path(args.config)
+@@ -227,10 +238,21 @@
+ 
+     t_start = time.time()
+     tokens = flops = 0.0
++    start_step = 0
++    if args.resume:
++        st = torch.load(args.resume, map_location="cpu", weights_only=False)
++        model.load_state_dict(st["model"])
++        opt.load_state_dict(st["opt"])
++        start_step, tokens, flops = st["step"] + 1, st["tokens"], st["flops"]
++        loop_rng.setstate(st["loop_rng"])
++        data.g.set_state(st["data_g"])
++        torch.set_rng_state(st["torch_rng"])
++        torch.cuda.set_rng_state(st["cuda_rng"].cpu())
++        print(f"RESUMED from {args.resume} at step {start_step} (previous run {st['run_name']})", flush=True)
+     t_log, tok_log = time.time(), 0
+     torch.cuda.reset_peak_memory_stats()
+     try:
+-        for step in range(total_steps):
++        for step in range(start_step, total_steps):
+             lr = lr_at(step, total_steps, tc)
+             for gp in opt.param_groups:
+                 gp["lr"] = lr
+@@ -264,6 +286,10 @@
+                 vl = evaluate(model, data, tc["eval_seqs"], tc["batch_size"], device)
+                 run.log({"val/loss": vl, "tokens": tokens, "flops": flops}, step=step)
+                 print(f"  eval step {step}: val/loss {vl:.4f}", flush=True)
++            if run and args.ckpt_every and step > 0 and step % args.ckpt_every == 0:
++                rd = DATA / "checkpoints" / run.name
++                rd.mkdir(parents=True, exist_ok=True)
++                _save_resume(rd / "resume.pt", model, opt, step, tokens, flops, loop_rng, data, run.name)
+ 
+         wall = time.time() - t_start
+         peak = torch.cuda.max_memory_allocated() / 2**30

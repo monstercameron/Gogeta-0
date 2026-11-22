@@ -39,8 +39,23 @@ def parse():
         if inline and not c["text"]:
             c["text"] = clean(inline)
         c["history"].append({"status": st.group(1), "qual": st.group(2).strip(" ()"), "section": section,
-                             "line": i, "evidence": clean(evidence, 220)})
+                             "line": i, "evidence": clean(evidence, 220), "raw_evidence": evidence})
     return claims
+
+
+# AGENTS 5: every settled claim (latest status not UNVERIFIED) must cite a concrete pointer a reader can open.
+PTR_RE = re.compile(r"(experiments|evals|notes|repro|gogeta|tools|tests|post_training|refs|docs|cockpit)/\S+"
+                    r"|\b(?:E|K|SQ)\d+[A-Za-z0-9-]*-\d{8}-\d{6}-s\d+\b|v\d+\.\d+\.\d+")
+
+
+def lint(claims):
+    """Settled claims whose latest row has no evidence pointer: [(id, status, ledger line)]."""
+    bad = []
+    for c in sorted(claims.values(), key=lambda c: int(c["id"][1:])):
+        h = c["history"][-1]
+        if h["status"] != "UNVERIFIED" and not PTR_RE.search(h["raw_evidence"]):
+            bad.append((c["id"], h["status"], h["line"]))
+    return bad
 
 
 def render(claims):
@@ -72,10 +87,17 @@ if __name__ == "__main__":
     # generated list over the ledger destroyed it once (2026-11-22, caught before commit). Never again.
     if OUT.exists() and OUT.samefile(SRC) or str(OUT).lower() == str(SRC).lower():
         sys.exit(f"refusing: output {OUT} is the ledger itself")
-    text = render(parse())
+    claims = parse()
+    text = render(claims)
     if not text.count("\n| C"):
         sys.exit("refusing: parsed 0 claims from the ledger (is experiments/claims.md intact?)")
+    bad = lint(claims)
+    for cid, st, ln in bad:
+        print(f"no evidence pointer: {cid} ({st}) claims.md:L{ln}")
     if "--check" in sys.argv:
-        sys.exit(0 if OUT.exists() and OUT.read_text(encoding="utf-8") == text else 1)
+        stale = not (OUT.exists() and OUT.read_text(encoding="utf-8") == text)
+        sys.exit(1 if bad or stale else 0)
     OUT.write_text(text, encoding="utf-8", newline="\n")
-    print(f"wrote {OUT}")
+    print(f"wrote {OUT} ({len(bad)} settled claim(s) without an evidence pointer)")
+    if bad:
+        sys.exit(2)  # AGENTS 5: no version while any settled claim lacks a pointer

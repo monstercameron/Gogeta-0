@@ -17,6 +17,24 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.36: Micro devlogs for every experiment; every settled claim cites evidence
+*2026-11-22*
+
+**What** (the human's rules, AGENTS §5, v0.4.31): every experiment has a micro devlog, and every settled claim points to its evidence.
+- **31 micro devlogs** in `experiments/devlogs/`: E0–E11, K1–K8 (K7 split into stages), K9 (main agent), SQ2, SQ6, SQ50, SQ70 and EVAL-SUITE, plus `README.md` and `_TEMPLATE.md`.
+  - They're reconstructed by a subagent from recorded sources only (DEVLOG, lab notebook, git log, queue history, run `meta`/`summary`, campaign logs). Each entry cites its source, and gaps say "not recorded".
+  - E0/E1/E2/E10/K7/K8/EVAL-SUITE carry the K9 caveat.
+  - The main agent spot-checked E1's log against the recorded numbers.
+- **Evidence-pointer audit:** 44 settled claims; 16 already had valid pointers.
+  - **27 got append-only pointer rows,** and every cited path was checked to exist (C5's row keeps its "pending clean-val re-score" qualifier from K9).
+  - **C28 is downgraded PARTIAL → UNVERIFIED** (no findable evidence: SQ4 never ran).
+  - C106 got a pointer to the main agent's v0.4.19 re-run.
+- **Lint:** `experiments/claims_list.py` now flags any settled claim whose latest row lacks a pointer (a path, a run id or a version tag; it matches the full untruncated cell). It **exits non-zero**, so the release script refuses to cut a version until the list is fixed.
+
+**Results**: lint is at 0 unpointed settled claims. The list has 117 claims: 23 VERIFIED, 14 PARTIAL, 6 REFUTED, 2 WRONG FOR OUR CODE, 72 UNVERIFIED.
+
+---
+
 ## v0.4.35: Quick reviews run on Codex GPT-6 Luna (Windows desktop CLI)
 *2026-11-22*
 

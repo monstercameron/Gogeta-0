@@ -17,6 +17,22 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.28: K8: external reference, plausibility gate fails narrowly; K9 next
+*2026-11-22*
+
+### K8: external bits/char reference (SmolLM2-135M)
+**What**: our 4,000 val docs scored doc-level in bits/char, a tokenizer-independent measure, for SmolLM2-135M (local snapshot, rev 93efa2f) and the v0.3.0 E0 and E1 seed-0 checkpoints, using `experiments/checks/k8_external_reference.py` on the GPU (71 s). **Deviation, logged in advance in the queue:** the registered K8 scores the *tuned* E10/E1 checkpoints. This early run uses the existing ones; Q11 repeats it on the tuned checkpoints after Phase 2b.
+**Results** (`experiments/checks/results/K8.json`):
+- **SmolLM2-135M 0.4490**, E0 0.2209, E1 0.2126 bits/char.
+- **K8a plausibility FAIL:** ours / SmolLM2 = 0.49 / 0.47 against a ≥ 0.5 gate. A 14M model beating a 135M general model by about 2.1× may just be in-distribution training on this synthetic corpus. **The registered rule still requires ruling out train/val near-duplicate leakage before trusting absolute loss numbers.** That's **K9**: a 13-gram overlap check of val vs train with a pseudo-val baseline, being written by a subagent, with its prediction committed before it runs.
+- **K8b arithmetic FAIL:** doc-level vs training-time differ by 6.0% / 6.2% against a ≤ 5% gate. It's the packed-vs-per-document protocol gap already explained in C101, which the gate didn't allow for. It's recorded as FAIL; the gate isn't moved after the fact.
+- **Prediction:** 2 hits (SmolLM2 range, our range), 1 narrow miss (margin 51–53% vs the predicted 20–50%), 1 miss (K8b).
+
+**Ledger**: C94 stays **UNVERIFIED** (pending K9). Absolute loss numbers are provisional; same-split model comparisons are less affected.
+**Decision**: Phase 2b (the replication) was launched at 18:13 anyway. Leakage would affect every model on the same val split, so the runs are still needed. Their verdicts (Q12) wait for K9.
+
+---
+
 ## v0.4.27: Hardware research registered; the C2 'NaN' was our call
 *2026-11-22*
 

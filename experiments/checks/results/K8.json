@@ -1,0 +1,62 @@
+{
+  "check": "K8",
+  "claims": [
+    "K8 external reference"
+  ],
+  "prediction": "Written 2026-11-22 before any K8 run. (1) SmolLM2-135M scores 0.28-0.45 bits/char on our val docs (most likely ~0.33): a strong general model, but out of distribution on this synthetic corpus. (2) Our 200M-token checkpoints (E10 and E1 at their tuned LRs, seed 0) score 0.21-0.26 bits/char with this doc-level protocol, i.e. BETTER than SmolLM2 by 20-50%, because they are trained in distribution. (3) Our doc-level bits/char agrees with the training-time val_bits_per_char within 5%.",
+  "criterion": "K8a plausibility: PASS if every one of our checkpoints scores >= 0.5x SmolLM2's bits/char (a 14M model beating a 135M model trained on ~10,000x more tokens by more than 2x would be suspicious; on FAIL, check train/val near-duplicate leakage before trusting any loss number). K8b arithmetic: PASS if each checkpoint's doc-level bits/char is within 5% of its run's val_bits_per_char (summary.json); otherwise our bits/char conversion is suspect. SmolLM2's number is reported as an external yardstick only, never as a control.",
+  "verdicts": {
+    "K8a_plausibility": "FAIL: ours / SmolLM2 bits-per-char = E0-20261122-122059-s0 0.492, E1-20261122-124440-s0 0.473 (need >= 0.5)",
+    "K8b_arithmetic_E0-20261122-122059-s0": "FAIL: doc-level 0.2209 vs training 0.2351 (6.0%)",
+    "K8b_arithmetic_E1-20261122-124440-s0": "FAIL: doc-level 0.2126 vs training 0.2267 (6.2%)"
+  },
+  "data": {
+    "external": {
+      "bits_per_char": 0.4490264513543111,
+      "nats_per_token": 1.075827954464922,
+      "tokens": 1139506,
+      "chars": 3938783,
+      "chars_per_token": 3.4565706543010744,
+      "window": 2048,
+      "model": "HuggingFaceTB/SmolLM2-135M",
+      "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+      "params": 134515008,
+      "vocab": 49152,
+      "bos_id": 0
+    },
+    "ours": [
+      {
+        "bits_per_char": 0.2208671600463581,
+        "nats_per_token": 0.5714790888339603,
+        "tokens": 1055160,
+        "chars": 3938783,
+        "chars_per_token": 3.73287747829713,
+        "window": 1024,
+        "checkpoint": "/root/fusiondance-data/checkpoints/E0-20261122-122059-s0/model.pt",
+        "run": "E0-20261122-122059-s0",
+        "params": 13767552,
+        "train_val_bits_per_char": 0.23508890573839852
+      },
+      {
+        "bits_per_char": 0.2125998685949009,
+        "nats_per_token": 0.5500880219826824,
+        "tokens": 1055160,
+        "chars": 3938783,
+        "chars_per_token": 3.73287747829713,
+        "window": 1024,
+        "checkpoint": "/root/fusiondance-data/checkpoints/E1-20261122-124440-s0/model.pt",
+        "run": "E1-20261122-124440-s0",
+        "params": 14237796,
+        "train_val_bits_per_char": 0.22666229103540905
+      }
+    ],
+    "caveats": "SmolLM2-135M: ~10x our params, ~2T tokens of different data, possible contamination with this corpus (not checked), different tokenizer (49,152 vocab). A sanity ceiling, not a control.",
+    "n_docs": 4000
+  },
+  "ran_at": "2026-11-22T18:11:14",
+  "runtime_s": 70.9,
+  "git_commit": "51d853e658087c4cdcd077dc47c0cfe54d1b9a53",
+  "git_describe": "v0.4.26-dirty",
+  "torch": "2.14.1+cu130",
+  "device": "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU)"
+}

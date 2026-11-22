@@ -1,0 +1,187 @@
+{
+ "created": "2026-11-22T18:30:51",
+ "prediction": "Written 2026-11-22 before the first real-data run of corpus_families.py (after K9 FAILED). (1) At estimated 8-gram Jaccard >= 0.5 more than 40% of train docs sit in a family of size >= 2 (K9 saw >= 50% 13-gram containment for 70% of docs; Jaccard is stricter). (2) The largest family has > 1,000 docs (LeetCode-style problems recurring in many variants). (3) A keep-one-per-family train set keeps between 25% and 70% of the documents. (4) More than 50% of val docs belong to a family that also has a train member. (5) The val docs K9 scored < 50% overlap are mostly (> 80%) also free of train family members.",
+ "criterion": "Descriptive measurement, no pass/fail gate. It is CONFIRMED if (1)-(5) all hold; each failed clause is reported as a miss. The signature sd (0.09) makes +-5 points of any share uncertain; the verdict on near-dup removal for the test split does not depend on it (the builder uses exact 13-gram presence as well).",
+ "num_perm": 64,
+ "ngram": 8,
+ "max_docs_train": null,
+ "groups": [
+  "train",
+  "val"
+ ],
+ "by_threshold": {
+  "0.5": {
+   "n_docs": 991154,
+   "n_families": 741056,
+   "singleton_families": 722521,
+   "largest_family": 5095,
+   "top10_family_sizes": [
+    5095,
+    4960,
+    4169,
+    3333,
+    3254,
+    3008,
+    2811,
+    2726,
+    2632,
+    2595
+   ],
+   "size_histogram": {
+    "1-1": {
+     "families": 722521,
+     "docs": 722521
+    },
+    "2-2": {
+     "families": 11167,
+     "docs": 22334
+    },
+    "3-4": {
+     "families": 3920,
+     "docs": 12900
+    },
+    "5-9": {
+     "families": 1689,
+     "docs": 10667
+    },
+    "10-29": {
+     "families": 956,
+     "docs": 15420
+    },
+    "30-99": {
+     "families": 423,
+     "docs": 23584
+    },
+    "100-299": {
+     "families": 209,
+     "docs": 36021
+    },
+    "300-999": {
+     "families": 133,
+     "docs": 69475
+    },
+    ">=1000": {
+     "families": 38,
+     "docs": 78232
+    }
+   },
+   "docs_in_duplicate_families": 268633,
+   "frac_docs_in_duplicate_families": 0.27103053612253997,
+   "frac_tokens_in_duplicate_families": 0.19617511701660542,
+   "effective_unique_docs": 741056,
+   "median_family_size_of_a_doc": 1.0,
+   "mean_family_size_of_a_doc": 252.7680098148219,
+   "keep_one_per_family_docs": 741056,
+   "keep_one_per_family_tokens": 215621455,
+   "keep_one_per_family_token_frac": 0.8183846801668586,
+   "families_with_members_in": {
+    "train": 738140,
+    "val": 3471
+   },
+   "families_spanning_more_than_one_group": 555,
+   "n_candidates": 6510217,
+   "n_edges": 2699551,
+   "lsh": [
+    16,
+    4
+   ],
+   "val_docs_with_train_family_member": 1084,
+   "val_frac_with_train_family_member": 0.271,
+   "train_docs_in_families_with_val_member": 165732,
+   "v2_estimate": {
+    "train_docs_kept": 737585,
+    "train_tokens_kept": 214662942,
+    "frac_docs": 0.747183316888753,
+    "frac_tokens": 0.8180351824846624,
+    "rule": "one doc per family (first in file order), dropping every family that has a val/test member"
+   }
+  },
+  "0.7": {
+   "n_docs": 991154,
+   "n_families": 894809,
+   "singleton_families": 878649,
+   "largest_family": 2644,
+   "top10_family_sizes": [
+    2644,
+    1563,
+    1271,
+    1057,
+    884,
+    802,
+    771,
+    731,
+    717,
+    677
+   ],
+   "size_histogram": {
+    "1-1": {
+     "families": 878649,
+     "docs": 878649
+    },
+    "2-2": {
+     "families": 9708,
+     "docs": 19416
+    },
+    "3-4": {
+     "families": 3484,
+     "docs": 11527
+    },
+    "5-9": {
+     "families": 1641,
+     "docs": 10423
+    },
+    "10-29": {
+     "families": 859,
+     "docs": 13826
+    },
+    "30-99": {
+     "families": 315,
+     "docs": 16433
+    },
+    "100-299": {
+     "families": 119,
+     "docs": 19743
+    },
+    "300-999": {
+     "families": 30,
+     "docs": 14602
+    },
+    ">=1000": {
+     "families": 4,
+     "docs": 6535
+    }
+   },
+   "docs_in_duplicate_families": 112505,
+   "frac_docs_in_duplicate_families": 0.11350910151197494,
+   "frac_tokens_in_duplicate_families": 0.0771927999273456,
+   "effective_unique_docs": 894809,
+   "median_family_size_of_a_doc": 1.0,
+   "mean_family_size_of_a_doc": 26.1225541136897,
+   "keep_one_per_family_docs": 894809,
+   "keep_one_per_family_tokens": 246060075,
+   "keep_one_per_family_token_frac": 0.933913537410775,
+   "families_with_members_in": {
+    "train": 891281,
+    "val": 3900
+   },
+   "families_spanning_more_than_one_group": 372,
+   "n_candidates": 1707848,
+   "n_edges": 461760,
+   "lsh": [
+    10,
+    6
+   ],
+   "val_docs_with_train_family_member": 472,
+   "val_frac_with_train_family_member": 0.118,
+   "train_docs_in_families_with_val_member": 33746,
+   "v2_estimate": {
+    "train_docs_kept": 890909,
+    "train_tokens_kept": 245020458,
+    "frac_docs": 0.9025025477281153,
+    "frac_tokens": 0.9337212711475164,
+    "rule": "one doc per family (first in file order), dropping every family that has a val/test member"
+   }
+  }
+ },
+ "seconds": 267.4
+}

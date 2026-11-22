@@ -1,0 +1,72 @@
+{
+ "created": "2026-11-22T18:37:46",
+ "dataset": "code-py-v1",
+ "source": "OpenCoder-LLM/opc-annealing-corpus",
+ "license": "ODC-By",
+ "tokenizer": {
+  "file": "code-py-v1/tokenizer.json",
+  "sha256": "0e75f39f9a6b3d743cf75bb48189cfb567ed498ed62c5237e6db9f59884a4d72",
+  "vocab_size": 8192,
+  "eos_id": 0
+ },
+ "prepare_seed": 1234,
+ "filter": {
+  "rows": 8404155,
+  "python": 997044,
+  "empty": 1,
+  "too_long": 0,
+  "dupes": 5889,
+  "kept": 991154,
+  "train_docs": 987154,
+  "val_docs": 4000,
+  "train_chars": 976520477,
+  "val_chars": 3938783
+ },
+ "splits": {
+  "train": {
+   "docs": 987154,
+   "tokens": 262412848,
+   "chars": 976520477,
+   "files": {
+    "docs_train.jsonl": {
+     "sha256": "fb2bb23fccfa8cea8abcde98b7649be639b5402e5bff06795d77559147d96917",
+     "bytes": 1053376166
+    },
+    "train.bin": {
+     "sha256": "db61140a667350e3030fe2a7467fbb92bdba1b24a1b8f19836953748d3316d20",
+     "bytes": 524825696,
+     "block_tokens": 67108864,
+     "block_sha256": [
+      "25bfc470a48c3be7ebc8053b05c143dd92955d3ac298b9c3511effde36d87860",
+      "6b92f5af22fcfb18314ce30cc137761a81f728cc8c890456a429bd112d3520b0",
+      "1a45ae5f6af0e4470c6d2ce67ad8e77463fee9bec23f57ba8c0735147951077a",
+      "8e360e0ca021a8a185756ab7a325d81b766f37c05478a856fff05a930a9f97c5"
+     ]
+    }
+   }
+  },
+  "val": {
+   "docs": 4000,
+   "tokens": 1059160,
+   "chars": 3938783,
+   "files": {
+    "docs_val.jsonl": {
+     "sha256": "f821d119e552fd94e69414f35849f323cd6d3e9744c771b68da7b563e7e377a9",
+     "bytes": 4249988
+    },
+    "val.bin": {
+     "sha256": "32e4b0ede9211f61d7aa7aea28aa7ecf406e04f02948b0ad0250ddbd41c385d4",
+     "bytes": 2118320,
+     "block_tokens": 67108864,
+     "block_sha256": [
+      "32e4b0ede9211f61d7aa7aea28aa7ecf406e04f02948b0ad0250ddbd41c385d4"
+     ]
+    }
+   }
+  }
+ },
+ "known_issues": [
+  "K9 (v0.4.32 era): 41.7% of val docs have >= 80% of their 13-grams in train; val is not held out in any useful sense. Use clean-val.manifest.json subsets and the frozen test split.",
+  "Train is massively self-duplicated (see results/families.json)."
+ ]
+}

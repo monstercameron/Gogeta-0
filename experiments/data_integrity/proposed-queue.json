@@ -1,0 +1,96 @@
+[
+ {
+  "id": "SQ100",
+  "kind": "side-quest",
+  "title": "SQ100: rescore every checkpoint on clean val (val_clean80 / val_clean50) and on the frozen test split's in-repo manifest only after lock policy",
+  "why": "K9 FAILED: val is 70% near-dup of train; every loss number so far is inflated. Registered K9 consequence: re-score on clean val.",
+  "depends_on": [],
+  "resources": {
+   "type": "cpu",
+   "est_minutes": 15
+  },
+  "ready": false,
+  "missing": [],
+  "needs_human": true,
+  "launch": null,
+  "status": "queued",
+  "source": "notes/data-integrity.md",
+  "added": "2026-11-22T18:40:00-05:00",
+  "reason": "Needs a GPU/CPU scoring script (evals/ or gogeta/ edit, outside A1's paths) that reads clean-val.manifest.json ids; do after Phase 2b."
+ },
+ {
+  "id": "SQ101",
+  "kind": "side-quest",
+  "title": "SQ101: apply benchmark_contamination labels to the *_clean eval twins (evals/tasks/contaminated_ids.json <- proposed-contaminated_ids.json)",
+  "why": "C103 screen found 32/164 + 43/500; the n-gram+substring labels are broader and cover HumanEval+, MBPP+, CRUXEval.",
+  "depends_on": [],
+  "resources": {
+   "type": "cpu",
+   "est_minutes": 20
+  },
+  "ready": false,
+  "missing": [],
+  "needs_human": true,
+  "launch": null,
+  "status": "queued",
+  "source": "notes/data-integrity.md",
+  "added": "2026-11-22T18:40:00-05:00",
+  "reason": "Edits evals/ (not A1's paths); main agent merges after the campaign."
+ },
+ {
+  "id": "SQ102",
+  "kind": "side-quest",
+  "title": "SQ102: build code-py-v2 (deduplicated train: one doc per family, drop families touching val/test) and retokenize",
+  "why": "Train has ~27% of docs in near-dup families; K9 shows val overlap is mostly boilerplate-family reuse. Cleaner data for the next replication.",
+  "depends_on": [],
+  "resources": {
+   "type": "cpu",
+   "est_minutes": 60
+  },
+  "ready": false,
+  "missing": [],
+  "needs_human": true,
+  "launch": null,
+  "status": "queued",
+  "source": "notes/data-integrity.md",
+  "added": "2026-11-22T18:40:00-05:00",
+  "reason": "Writes a new dataset and touches tools/prepare_data.py (code path); decide after reading notes/data-integrity.md sizes."
+ },
+ {
+  "id": "SQ103",
+  "kind": "side-quest",
+  "title": "SQ103: re-run corpus_families.py with 128 permutations and an exact-Jaccard verification pass on borderline edges (0.4-0.6)",
+  "why": "The 64-permutation estimate has sd 0.06 at J=0.5; borderline edges decide family boundaries.",
+  "depends_on": [],
+  "resources": {
+   "type": "cpu",
+   "est_minutes": 25
+  },
+  "ready": true,
+  "missing": [],
+  "needs_human": false,
+  "launch": "bash tools/launch_cpu_job.sh --name di-families -- ~/.venvs/gogeta-eval/bin/python experiments/data_integrity/corpus_families.py --run",
+  "status": "queued",
+  "source": "notes/data-integrity.md",
+  "added": "2026-11-22T18:40:00-05:00"
+ },
+ {
+  "id": "SQ104",
+  "kind": "side-quest",
+  "title": "SQ104: fetch more UncheatableEval months (github_python) to reach the 1M-token test target; rebuild code-py-v1-test",
+  "why": "The 2026-10 slice yields < 1M tokens after filtering.",
+  "depends_on": [],
+  "resources": {
+   "type": "cpu",
+   "est_minutes": 10
+  },
+  "ready": false,
+  "missing": [],
+  "needs_human": true,
+  "launch": null,
+  "status": "queued",
+  "source": "notes/data-integrity.md",
+  "added": "2026-11-22T18:40:00-05:00",
+  "reason": "Download needed (evals/fetch_data.py); small public file."
+ }
+]

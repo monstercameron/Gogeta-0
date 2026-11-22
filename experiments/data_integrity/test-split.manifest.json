@@ -1,0 +1,128 @@
+{
+ "splits": {
+  "code-py-v1-test": {
+   "created": "2026-11-22T18:46:08",
+   "mode": "external",
+   "seed": 20261122,
+   "docs": 462,
+   "tokens": 1000269,
+   "tokenizer_sha256": "0e75f39f9a6b3d743cf75bb48189cfb567ed498ed62c5237e6db9f59884a4d72",
+   "files": {
+    "docs_test.jsonl": {
+     "sha256": "b4eef46c5fa274555976483d3c77490281435e2a82c9f4ca17c87af515956bf1",
+     "bytes": 2700075
+    },
+    "test.bin": {
+     "sha256": "e8645de444c9e59487026fef0fbb1abb918f0742b2c8c848431c079f5ca88cf9",
+     "bytes": 2000538
+    },
+    "meta.json": {
+     "sha256": "666d4cb0286b50291c5860e34d28ddadb91de856e1726adab1ec478b50fba190",
+     "bytes": 384
+    },
+    "extra.json": {
+     "sha256": "9c26782b65b23ef59c41ac3461c69fc7392716daf46198cbc922243d4b08cbfa",
+     "bytes": 11767
+    }
+   },
+   "builder": "experiments/data_integrity/build_test_split.py",
+   "builder_git": {
+    "commit": "3fbf4d5dfe4ee43177c57d278f041056a8ae45ac",
+    "describe": "v0.4.43-dirty",
+    "dirty_paths": [
+     "?? experiments/data_integrity/"
+    ]
+   },
+   "thresholds": {
+    "overlap13_max": 0.3,
+    "family_min_jaccard": 0.4,
+    "min_tokens": 48
+   },
+   "build_report": {
+    "mode": "external",
+    "pool": "/root/fusiondance-data/eval-cache/uncheatable/2026-10/github_python.jsonl",
+    "seed": 20261122,
+    "pool_docs": 500,
+    "dropped_empty_or_long": 0,
+    "dropped_exact_dup": 0,
+    "dropped_pool_near_dup": 0,
+    "dropped_too_short": 0,
+    "overlap13_pool": {
+     "mean": 0.0021131879071032617,
+     "median": 0.0006525755068717905,
+     "frac_ge_0.30": 0.0,
+     "frac_ge_0.50": 0.0,
+     "frac_ge_0.80": 0.0,
+     "n": 500
+    },
+    "family_link_checked": true,
+    "frac_family_link": 0.0,
+    "dropped_overlap13": 0,
+    "dropped_family_link": 0,
+    "candidates_after_filters": 500,
+    "kept_docs": 462,
+    "kept_tokens": 1000269,
+    "reached_target_tokens": true
+   },
+   "prediction": "Written 2026-11-22 before the first real-data build. (1) Of the 500 UncheatableEval files, 90-100% survive near-dup removal against train/val (fresh Oct-2026 GitHub code vs a synthetic-leaning 2024 corpus), leaving 400-500 docs and 0.5-0.9M tokens. (2) Fewer than 5% of pool docs have >= 30% of their 13-grams in train (K9: 70% of val docs do, because val is from the corpus itself). (3) Mean 13-gram overlap of pool docs with train is < 0.10.",
+   "criterion": "Descriptive; no pass/fail on the data. If (2) is false (>= 5% of fresh GitHub files overlap train at >= 30%), the pool is itself contaminated by the training corpus: the report says so and the removal rule still applies. The build is accepted when the manifest's disjointness checks (13-gram overlap < 0.30 for every kept doc, no family link to train/val at est. Jaccard >= 0.4, no exact copies) are re-verified by --verify.",
+   "location_note": "files live under ~/fusiondance-data/datasets/<name>/ (WSL), not in the repo"
+  },
+  "code-py-v1-test-indist": {
+   "created": "2026-11-22T18:47:51",
+   "mode": "carve",
+   "seed": 20261122,
+   "docs": 1101,
+   "tokens": 360576,
+   "tokenizer_sha256": "0e75f39f9a6b3d743cf75bb48189cfb567ed498ed62c5237e6db9f59884a4d72",
+   "files": {
+    "docs_test.jsonl": {
+     "sha256": "cd7c19f9b3e193684a38440d3846e19a967c736e6134a1b7d1d6de33e9e9c7e6",
+     "bytes": 1471007
+    },
+    "test.bin": {
+     "sha256": "eb306678485c7f9e0531e34fa43d6c2534fd44d4ea290cfc36460f2bc056226c",
+     "bytes": 721152
+    },
+    "meta.json": {
+     "sha256": "5859da0b4b9ed2b2f339e0fc72417c986a290c395c044105ed22b2fca979054d",
+     "bytes": 388
+    },
+    "extra.json": {
+     "sha256": "49def5774546902aebe6a386714f496103f13c7f66893df5c13b4dce84835da8",
+     "bytes": 8778
+    }
+   },
+   "builder": "experiments/data_integrity/build_test_split.py",
+   "builder_git": {
+    "commit": "d8eb9b67c75580fe67061594f6676d8e9c4a050c",
+    "describe": "v0.4.44-dirty",
+    "dirty_paths": [
+     "?? experiments/data_integrity/"
+    ]
+   },
+   "thresholds": {
+    "overlap13_max": 0.3,
+    "family_min_jaccard": 0.4,
+    "min_tokens": 48
+   },
+   "build_report": {
+    "mode": "carve",
+    "seed": 20261122,
+    "train_docs": 987154,
+    "singleton_family_docs": 719605,
+    "overlap13_elsewhere": {
+     "mean": 0.5664264033635827,
+     "frac_ge_0.30": 0.8141772151898734,
+     "n": 5925
+    },
+    "kept_docs": 1101,
+    "kept_tokens": 360576
+   },
+   "prediction": "Written 2026-11-22 before the first real-data build. (1) Of the 500 UncheatableEval files, 90-100% survive near-dup removal against train/val (fresh Oct-2026 GitHub code vs a synthetic-leaning 2024 corpus), leaving 400-500 docs and 0.5-0.9M tokens. (2) Fewer than 5% of pool docs have >= 30% of their 13-grams in train (K9: 70% of val docs do, because val is from the corpus itself). (3) Mean 13-gram overlap of pool docs with train is < 0.10.",
+   "criterion": "Descriptive; no pass/fail on the data. If (2) is false (>= 5% of fresh GitHub files overlap train at >= 30%), the pool is itself contaminated by the training corpus: the report says so and the removal rule still applies. The build is accepted when the manifest's disjointness checks (13-gram overlap < 0.30 for every kept doc, no family link to train/val at est. Jaccard >= 0.4, no exact copies) are re-verified by --verify.",
+   "location_note": "files live under ~/fusiondance-data/datasets/<name>/ (WSL), not in the repo"
+  }
+ },
+ "note": "builder_git.commit is the repo HEAD when the builder ran; dirty_paths lists uncommitted data_integrity files."
+}

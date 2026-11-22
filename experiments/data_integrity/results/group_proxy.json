@@ -1,0 +1,57 @@
+{
+ "raw_columns": [
+  "type",
+  "lang",
+  "text"
+ ],
+ "source_id_available": false,
+ "src_counts_train": {
+  "algorithmic_corpus": 620949,
+  "synthetic_code_snippet": 366205
+ },
+ "src_counts_val": {
+  "algorithmic_corpus": 2556,
+  "synthetic_code_snippet": 1444
+ },
+ "train_docs_with_def": 987144,
+ "distinct_first_names_train": 96466,
+ "val_docs_with_specific_name": 3998,
+ "val_frac_name_in_train": 0.9352,
+ "val_frac_name_in_train_ge5": 0.8692,
+ "train_top_names": [
+  [
+   "TreeNode",
+   4742
+  ],
+  [
+   "is_prime",
+   4396
+  ],
+  [
+   "ListNode",
+   1867
+  ],
+  [
+   "Node",
+   1456
+  ],
+  [
+   "isPalindrome",
+   1079
+  ],
+  [
+   "is_perfect_square",
+   1073
+  ],
+  [
+   "find_duplicates",
+   1066
+  ],
+  [
+   "rotate_matrix",
+   1062
+  ]
+ ],
+ "train_docs_in_names_with_ge2_docs": 927152,
+ "note": "name groups are a coarse proxy: a shared function name is not proof of a shared source"
+}

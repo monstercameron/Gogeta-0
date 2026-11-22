@@ -17,6 +17,17 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.46: A1 data integrity: snapshot (in progress)
+*2026-11-22*
+
+**Work-in-progress snapshot** committed on the human's instruction to reduce uncommitted changes; the subagent's final hand-back will be its own version.
+
+- Included: `experiments/data_integrity/` (dedup, corpus_families, group_proxy, benchmark_contamination, build_dataset_manifest, build_test_split, test_guard, dataset and test-split manifests, proposed-queue.json, results/*.json). `notes/data-integrity.md` does not exist yet and is not included.
+- Checks: `python -m py_compile` on every .py file passed. `python experiments/data_integrity/test_guard.py` runs on CPU and printed its guard description with no error; it is not an assertion suite. No secrets and no files over 2 MB.
+- Any figures in the manifests and results JSON are reported by the subagent, not yet verified by the main agent. Nothing was run on the GPU.
+
+---
+
 ## v0.4.45: Run-forms cockpit: snapshot (in progress)
 *2026-11-22*
 

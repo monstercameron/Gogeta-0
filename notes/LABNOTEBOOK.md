@@ -246,3 +246,11 @@ Predictions and criteria were committed before running (`f1b4ebd`, SQ6 `4a3e361`
   C22 refuted at our scale (84 < 90); rotation does not beat looping in-length but generalises better; **SQ2 is the standout result**.
 - **⚠ Variance:** SQ6 (a) did not reproduce K5 (i) (73.3% / 50.1% vs 81.5%) despite identical init and data. Single-pass GDN parity is unstable, so ≥ 2 seeds are needed. SQ6's first output (all arms ~50%) was superseded by this run; the agent re-ran after fixing its setup.
 - **DEC (proposed, for the human):** C43 suggests the state-tracking job that FusionDance gave to the *loop* may be done better by a one-flag change to GDN (negative eigenvalues), which also length-generalises. Next: test neg-eig GDN for language modelling (E1-style A/B) and inside the looped core, before more loop work.
+
+
+## 2026-11-22 (later): Control + science cleanup Phase 1 (subagent; reviewed by the main agent)
+- **Built:** `train.py` arch `hf_llama` (E10 = unmodified `LlamaForCausalLM` at E0's size) + `--lr`; `tools/launch_campaign.sh`; K7 LR-sweep script and campaign; K8 SmolLM2 bits/char script (local cache, pinned rev); cards E9/E10/K7/K7-PARITY/K8; `notes/science-gaps.md`; C12/C13/C14 wording fixed in site/README/primer/writeups.
+- **OBS (K7-PARITY, CPU):** FusionDance bit-identical for E0/E1/E2/E3/E9; E10 = E0 in params (13,767,552 / 10,621,824) and FLOPs (9.676e7).
+- **⚠ OBS:** E0 GPU replay matched v0.3.0 at step 0 (9.0900) but step 100 read 2.8370 vs 2.8460; possibly GPU nondeterminism, unproven (C91 PARTIAL). First Phase 2 item: old-vs-new replay.
+- **Main agent:** reviewed and applied the `--lr` launcher patch (dry runs: `--lr 2e-3` accepted and recorded; `--lr abc` rejected); verified the train.py arch/--lr lines, the PREDICTIONS sections (K7, replication protocol, K8), the 8-line phase2a campaign, and E10's registry prediction (886 chars).
+- **Phase 2 estimate:** ~6.5–8.5 GPU-hours. **DEC:** it needs the human's go-ahead (> 3 GPU-hours).

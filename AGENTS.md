@@ -132,6 +132,7 @@ The project stays at `0.y.z` while it's experimental.
   - The launchers enforce this (one GPU slot, eight CPU slots, via PID/lock files under `~/fusiondance-data/run/`). Subagents get the same budget: say in each brief whether a subagent may use the GPU slot or is CPU-only.
   - **CPU-only jobs** go through `tools/launch_cpu_job.sh [--name N] -- <command>` (PowerShell: `tools\launch_cpu_job.ps1`). It hides the GPU, caps threads at 2, and refuses a 9th job.
   - **GPU checks and side quests** (`experiments/checks/`) don't go through the experiment launcher yet. Before starting one, run `bash experiments/launch/status.sh` and only proceed if the GPU slot is free **and** no other GPU process is listed. `status.sh` shows anything running on the GPU, including jobs started outside the launchers. *(TODO: a GPU-slot helper for checks.)*
+  - **Multi-run campaigns** go through `tools/launch_campaign.sh <file>` (files in `experiments/launch/campaigns/`). It runs each line via `launch_experiment.sh --foreground --wait-cool`, one at a time, detached, and waits for a free and cool GPU. `--status`, `--resume` and `--stop` control it. Per-run overrides: `--seed`, `--max-tokens`, `--lr` (all recorded in the run config).
   - `tools/run_queue.sh` is **deprecated**: it takes no GPU slot and writes no PID files. Use one `experiments/launch/E<n>.sh` call per run.
   - Never paste tracker logs anywhere public: Trackio prints a dashboard write token at startup (`tracker-<port>.log` is kept mode 600).
 - **Every experiment has its own launch script, and runs are only started through it.**
@@ -173,6 +174,7 @@ The project stays at `0.y.z` while it's experimental.
 - **Post-training (TRL) lives in a separate venv, `~/.venvs/gogeta-rl`**, set up per `post_training/SETUP.md`: torch from the cu130 index first, then `pip install -r requirements-rl.txt`. **Never install trl into `~/.venvs/gogeta`**: transformers/trl can swap the CUDA torch build for a CPU one. Run `pip install --dry-run` first if you must change the main venv. **Run model-generated code only through `post_training/rewards.py`** (or a stronger sandbox: container or nsjail). It isolates network, memory, processes and time, but **not the filesystem**.
 - **Training environment setup** (fresh WSL): `apt-get install python3.12-venv python3.12-dev` (Triton needs `Python.h`), create the venv, `pip install torch --index-url https://download.pytorch.org/whl/cu130`, then `pip install -r requirements.txt`. Verify with `tests/test_gdn_kernels.py` and `tests/test_model.py`.
 - **Seeds:** headline claims need **≥3 seeds**; report the mean and spread.
+- **Controls are tuned before use.** Any control or baseline gets its own LR tune (the K7 protocol) before comparisons are drawn against it. Once E10 (HF Llama reference, 3 seeds, tuned LR) has run, it's **the** control. Every comparison states "matched tokens / params, FLOPs ×k" explicitly.
 - **X-axes:** log `tokens` and `flops` every step and compare variants against those, not steps (looped models do more work per step).
 - **Recording results:** `python tools/record_result.py E<n> --status done --version vX.Y.Z --config <cfg> --summary <run>/summary.json`, then `python tools/build_site_data.py`.
 - **Dashboard:** `tools/launch_tracker.sh start|status|url|stop` (WSL) or `tools\launch_tracker.ps1` (Windows). It wraps `tools/dashboard.py`, runs detached, and serves http://127.0.0.1:7861. Local only: never enable `share` or a `space_id` without the human's OK.
@@ -194,6 +196,8 @@ The project stays at `0.y.z` while it's experimental.
 | `experiments/curves/E<n>.json` | Eval-loss curve points used by the experiment-page charts |
 | `site-src/learn.md` | Newcomer primer ("Start here") → `docs/learn.html` |
 | `notes/LABNOTEBOOK.md` | Timestamped, append-only evidence (see §6) |
+| `notes/science-gaps.md` | Every known methodology gap (untuned LR, single seeds, missing controls…), its fix and status |
+| `experiments/launch/campaigns/` | Campaign files for `tools/launch_campaign.sh` (one launch per line) |
 | `experiments/INDEX.md` | **Generated** lookup table of every experiment, check and side quest (status, headline, reuse, card link). Read it first. |
 | `experiments/cards/<ID>.md` | Agent-facing documentation card per experiment/check/side quest (template: `_TEMPLATE.md`) |
 | `experiments/claims.md` | **Claims ledger** (§0): every claim we rely on, with source, status and evidence |

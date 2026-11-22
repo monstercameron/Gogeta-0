@@ -17,6 +17,39 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.13: K7 and K8 registered: LR sweep and external reference
+*2026-11-22*
+
+**What**: registers the two checks that the Phase 2 campaign runs first and last. Predictions and decision rules are committed here, **before any run**.
+- `experiments/checks/k7_lr_sweep.py` (applies the K7 rule and writes the next campaign; rule logic tested on 8 synthetic cases), `experiments/launch/campaigns/phase2a-k7-lr.campaign` (8 short runs) and `phase2b-replication.template`.
+- `experiments/checks/k8_external_reference.py`: doc-level bits/char for our checkpoints and SmolLM2-135M. It loads only from the local cache, at the pinned revision `93efa2f`, and refuses on a mismatch.
+- `experiments/checks/PREDICTIONS.md`: K7, K8, and the **replication protocol** with its comparison criteria. Cards K7 and K8.
+- AGENTS.md: campaign runner and `--lr` (§5); controls are LR-tuned before use and E10 becomes the control (§6); docs table rows.
+- Site regenerated (`docs/`) and `experiments/INDEX.md` regenerated from committed sources; version 0.4.13.
+
+### K7: LR tuning for E10 (control) and E1 (best hybrid)
+- **Question:** what's each model's best peak LR? Every earlier run used an untuned 3e-3.
+- **Result:** not run. Phase 2a: lr ∈ {1e-3, 2e-3, 3e-3, 6e-3} × {E10, E1}, seed 0, 20M tokens, ~43 min GPU.
+- **Verdict vs prediction:**
+  - Prediction: E10's best is 3e-3 or 6e-3, E1's is 2e-3 or 3e-3, both curves flat near the optimum, and 1e-3 is 3–8% worse.
+  - Rule: the lowest full-val loss wins (ties go to the smaller LR). If the winner is at the grid edge, extend one step (at most twice per side).
+- **What it means:** the replication (E10 / E1 / E11 × 3 seeds, E9, conditional E0 and E2) then runs at the tuned LRs.
+- **Card:** experiments/cards/K7.md
+
+### K8: External sanity reference (SmolLM2-135M, bits/char)
+- **Question:** are our loss numbers in a sane range against a well-known public model?
+- **Result:** not run (runs after Phase 2b, ~5 min).
+- **Verdict vs prediction:**
+  - Prediction: SmolLM2 0.28–0.45 bits/char, ours 0.21–0.26.
+  - K8a: ours ≥ 0.5 × SmolLM2, else suspect train/val leakage.
+  - K8b: doc-level bits/char within 5% of the training-time value.
+- **What it means:** a sanity ceiling only (10× larger, different data, possible contamination), not a control.
+- **Card:** experiments/cards/K8.md
+
+**Phase 2 GPU budget** (estimated from v0.3.0 wall times): ~6.5 h if both tuned LRs are 3e-3, up to ~8.5 h with conditional runs and grid extensions.
+
+---
+
 ## v0.4.12: K7-PARITY: E10 construction matches E0; FusionDance unchanged
 *2026-11-22*
 

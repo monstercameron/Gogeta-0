@@ -1,0 +1,13 @@
+# Phase 2a: K7 learning-rate sweep (pre-registered in experiments/checks/PREDICTIONS.md, K7).
+# 20M tokens, seed 0, every other setting = the registered config (batch 32 x 1024, warmup 300,
+# cosine to 10%, AdamW 0.9/0.95, wd 0.1, clip 1.0). Analyse with experiments/checks/k7_lr_sweep.py.
+# Estimated GPU time (v0.3.0 throughputs, compiled): E10 ~1.6 min train + ~2 min overhead per run,
+# E1 ~3.3 min + ~2 min; plus the runner's 60 s gaps: ~43 min in total.
+E10 --seed 0 --lr 1e-3 --max-tokens 20000000
+E10 --seed 0 --lr 2e-3 --max-tokens 20000000
+E10 --seed 0 --lr 3e-3 --max-tokens 20000000
+E10 --seed 0 --lr 6e-3 --max-tokens 20000000
+E1  --seed 0 --lr 1e-3 --max-tokens 20000000
+E1  --seed 0 --lr 2e-3 --max-tokens 20000000
+E1  --seed 0 --lr 3e-3 --max-tokens 20000000
+E1  --seed 0 --lr 6e-3 --max-tokens 20000000

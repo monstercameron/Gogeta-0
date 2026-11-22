@@ -27,7 +27,7 @@
 <section class="article"><div class="wrap prose">
   <h2 id="what-it-will-test-in-plain-english">What it will test, in plain English</h2>
 <aside class="callout"><p><strong>The full fusion: all three ideas together in one model.</strong> Cheap memory layers instead of most attention (<a href="E1.html">E1</a>), a looped core (<a href="E2.html">E2</a>), and ternary −1/0/+1 weights (<a href="E3.html">E3</a>).</p>
-<p>The bet is that each idea covers another's weakness: loops add thinking depth that the cheap layers lack, and ternary weights make the extra loop passes cheap. If it works, that's version 1.0.0 of the project.</p></aside>
+<p>The bet is that each idea covers another's weakness: loops add thinking depth that the cheap layers lack, and ternary weights could make the extra loop passes cheap (only with real ternary kernels: ours are simulated and slower, check K2). If it works, that's version 1.0.0 of the project.</p></aside>
 <aside class="prediction-box"><b>Prediction (written before the run)</b><p>Not written yet. It must be written before the run starts.</p></aside><h2 id="status">Status</h2>
 <p>Not run yet. It comes after each ingredient works on its own, so that if the fusion fails, we know which ingredient broke it.</p>
   
@@ -35,7 +35,7 @@
   <div class="pager"><a class="btn" href="E3.html">← E3</a><a class="btn" href="../devlog.html#experiments-section">All experiments</a><a class="btn" href="E5.html">E5 →</a></div>
 </div></section>
 <footer><div class="wrap">
-  <span>Gogeta-0 · FusionDance architecture · v0.3.5</span>
+  <span>Gogeta-0 · FusionDance architecture · v0.4.13</span>
   <span>An independent research project and fan homage, not affiliated with or endorsed by the Dragon Ball rights holders.</span>
 </div></footer>
 <script src="../assets/charts.js"></script>

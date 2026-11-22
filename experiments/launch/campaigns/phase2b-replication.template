@@ -1,0 +1,25 @@
+# Phase 2b: replication at the K7-tuned LRs (pre-registered in experiments/checks/PREDICTIONS.md,
+# "Replication protocol"). NOT a campaign file: experiments/checks/k7_lr_sweep.py --write-campaign
+# fills {LR_E10} / {LR_E1} and resolves the #IF_ lines into phase2b-replication.campaign.
+# Full 200M-token runs (the registered max_tokens). Estimated wall time per run, from the v0.3.0
+# runs incl. compile and evals: E10 ~23 min (assumed = E0), E1 ~39 min, E11 ~39 min (assumed = E1),
+# E9 ~33 min, E0 ~23 min,
+# E2 ~80 min; plus 60 s gaps.
+E10 --seed 0 --lr {LR_E10}
+E10 --seed 1 --lr {LR_E10}
+E10 --seed 2 --lr {LR_E10}
+E1  --seed 0 --lr {LR_E1}
+E1  --seed 1 --lr {LR_E1}
+E1  --seed 2 --lr {LR_E1}
+# E11 (negative-eigenvalue GDN on the E1 stack): compared with E1's 3-seed mean at the same LR
+# (its own registry prediction; criterion max(1%, 2x pooled seed std)).
+E11 --seed 0 --lr {LR_E1}
+E11 --seed 1 --lr {LR_E1}
+E11 --seed 2 --lr {LR_E1}
+# E9: the unlooped control for E2, at E1's tuned LR (its committed prediction assumed 3e-3).
+E9  --seed 0 --lr {LR_E1}
+# Implementation parity: our dense E0 at the control's tuned LR (skipped when that is 3e-3,
+# because the v0.3.0 E0 seed-0 run is already at 3e-3).
+#IF_E10_NOT_3e-3 E0  --seed 0 --lr {LR_E10}
+# E2 at the same LR as E9, so the loop-vs-no-loop comparison is at one LR (skipped when 3e-3).
+#IF_E1_NOT_3e-3 E2  --seed 0 --lr {LR_E1}

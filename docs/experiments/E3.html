@@ -29,7 +29,7 @@
 <aside class="callout"><p><strong>Can the model still learn well if every one of its numbers is only allowed to be −1, 0 or +1?</strong></p>
 <p>A model's "knowledge" lives in millions of numbers (its <em>parameters</em>). Normally each one is stored precisely, using 16 bits, like <code>0.0213</code> or <code>−1.7754</code>. <strong>Ternary</strong> weights (the "BitNet b1.58" idea) allow just three values: <strong>−1, 0 or +1</strong>. Each number then needs only about 1.6 bits instead of 16.</p>
 <p><strong>Why bother?</strong></p>
-<ul><li><strong>Much smaller:</strong> the main body of our best model shrinks from <strong>22 MB to under 3 MB</strong>.</li><li><strong>Much simpler maths:</strong> multiplying by −1, 0 or +1 is just subtracting, skipping or adding. Cheap chips, phones and FPGAs love that.</li></ul>
+<ul><li><strong>Much smaller:</strong> the main body of our best model shrinks from <strong>22 MB to under 3 MB</strong>.</li><li><strong>Simpler maths, in principle:</strong> multiplying by −1, 0 or +1 is just subtracting, skipping or adding, which cheap chips, phones and FPGAs could exploit with dedicated ternary kernels. Our code only simulates the rounding in normal floating-point maths, so it runs <em>slower</em>, not faster (check K2).</li></ul>
 <p><strong>The catch</strong> is quality. Rounding every number to −1/0/+1 throws information away. Researchers found the loss disappears for <strong>big</strong> models (3 billion parameters and up), but ours has 14 <em>million</em>. So the real question is: <strong>how much worse does a tiny model get?</strong></p>
 <p>We'll take our best model so far (<a href="E1.html">E1</a>) and change <strong>only</strong> this one thing, so any difference is down to ternary weights alone.</p></aside>
 <aside class="prediction-box"><b>Prediction (written before the run)</b><p>Written 2026-11-22, before any run. Full-val loss 0.605-0.645, i.e. +3.5% to +10% worse than E1 (0.5846), most likely around +6% (~0.62): roughly E0/E2 territory, so ternary gives back about all of E1&#x27;s gain over dense. Reason: BitNet b1.58&#x27;s own Table 1 shows a perplexity gap of +4.4% (loss +1.7%) at 700M that closes only at 3B; we are ~60x smaller than 700M, so the gap should be bigger. Training stays stable (no loss spikes &gt; 0.5 after warmup) but runs 10-25% slower per token than E1, because the quantization is simulated in floating point (no ternary kernels). Payoff: weights 28.5 MB -&gt; ~9.1 MB (2-bit packed); the non-embedding body 22.2 MB -&gt; 2.8 MB (7.8x).</p></aside><h2 id="the-design-one-change-from-e1">The design: one change from E1</h2>
@@ -61,7 +61,7 @@
   <div class="pager"><a class="btn" href="E2.html">← E2</a><a class="btn" href="../devlog.html#experiments-section">All experiments</a><a class="btn" href="E4.html">E4 →</a></div>
 </div></section>
 <footer><div class="wrap">
-  <span>Gogeta-0 · FusionDance architecture · v0.3.5</span>
+  <span>Gogeta-0 · FusionDance architecture · v0.4.13</span>
   <span>An independent research project and fan homage, not affiliated with or endorsed by the Dragon Ball rights holders.</span>
 </div></footer>
 <script src="../assets/charts.js"></script>

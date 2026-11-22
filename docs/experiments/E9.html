@@ -30,12 +30,13 @@
 <ul><li>If E9 beats E2: looping those layers is genuinely worse than just running them once.</li><li>If E2 beats E9: looping <em>is</em> buying something, it's just expensive.</li></ul></aside>
 <aside class="prediction-box"><b>Prediction (written before the run)</b><p>Written 2026-11-22 before the run. E9 (5 unshared blocks, 9.17M non-emb, 0.079 GFLOP/token) lands at val loss 0.590-0.610: a bit worse than E1 (one fewer block) and about equal to E0. That would mean it BEATS E2 at r=4 (0.619) with 41% of the FLOPs, so at this scale looping the same blocks 4x is worse than running them once, untied. If instead E9 &gt; 0.619, looping is genuinely buying something and E2 just pays for it in compute.</p></aside><h2 id="status">Status</h2>
 <p><strong>On hold.</strong> The first attempt was started (from commit <code>eecdaeb</code>), but it was <strong>interrupted at 10% of training</strong> when the agent session ended, so there are no results. Training is paused for now, and E9 will be re-run when it resumes.</p>
+<p><strong>Planned re-run:</strong> seed 0 in the Phase 2 replication campaign, at the learning rate tuned for <a href="E1.html">E1</a> (E9 is E1's layout minus one block). Its prediction was written for lr 3e-3; it stays unedited and is scored as written, with the learning-rate difference stated. If that tuned rate isn't 3e-3, E2 is re-run at the same rate, so the loop question is answered at one learning rate.</p>
   
   <p class="muted small">New to the jargon? <a href="../learn.html">Start here</a> for plain-English definitions of loss, tokens, parameters and FLOPs.</p>
-  <div class="pager"><a class="btn" href="E8.html">← E8</a><a class="btn" href="../devlog.html#experiments-section">All experiments</a><span></span></div>
+  <div class="pager"><a class="btn" href="E8.html">← E8</a><a class="btn" href="../devlog.html#experiments-section">All experiments</a><a class="btn" href="E10.html">E10 →</a></div>
 </div></section>
 <footer><div class="wrap">
-  <span>Gogeta-0 · FusionDance architecture · v0.3.5</span>
+  <span>Gogeta-0 · FusionDance architecture · v0.4.13</span>
   <span>An independent research project and fan homage, not affiliated with or endorsed by the Dragon Ball rights holders.</span>
 </div></footer>
 <script src="../assets/charts.js"></script>

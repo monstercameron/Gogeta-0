@@ -47,6 +47,9 @@ Only `VERIFIED` claims may be stated as plain fact in the README, the site, the 
 | C18 | Linear-time mixers are weak at multi-step state tracking, and looping adds that depth | theory (expressivity papers) | `UNVERIFIED` | **K5**: parity / running-sum task, tiny GDN model 1 pass vs looped ×4 at equal params |
 | C19 | Speculative decoding gives identical output, just faster (DFlash reports up to ~6×) | DFlash, speculative-decoding papers | `UNVERIFIED` | Blocked by C2 (no working step-by-step kernel). Later: greedy-output equality test + tokens/s |
 | C20 | Each loop pass should refine the answer (a convergent loop) | looped-transformer papers | `UNVERIFIED`, and C7 points the other way | **K6**: measure ‖h_k − h_{k−1}‖ / ‖h_k‖ per pass on the trained E2 checkpoint (inference only, minutes) |
+| C21 | Mamba-3 beats Gated DeltaNet (+0.6 pts avg downstream at 1.5B; MIMO +1.8) | Mamba-3, arXiv 2603.15569 | `UNVERIFIED` | **SQ7**: needs Mamba-3 kernels on this GPU, then a tiny E1-style swap |
+| C22 | A complex-valued (rotary) state update solves state tracking (parity, modular arithmetic) in a single pass where Mamba-2 can't | Mamba-3, arXiv 2603.15569 | `UNVERIFIED` | **SQ6**: the K5 parity task with a data-dependent-RoPE single-pass layer |
+| C23 | MIMO raises decode FLOPs up to 4× at the same decode latency; state 64 matches Mamba-2 at 128 | Mamba-3, arXiv 2603.15569 | `UNVERIFIED` | After a decode path exists: decode tokens/s and memory, SISO vs MIMO |
 
 ## Proposed checks (not run yet)
 

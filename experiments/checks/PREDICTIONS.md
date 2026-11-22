@@ -75,3 +75,33 @@ Common: single GPU (RTX Spark N1X), bf16 autocast, seeds fixed, each check ≤ ~
 **Prediction:** **not** convergent. The relative change stays > 0.1 out to k=12 and the norm keeps growing; the loss is lowest near k=4.
 
 **Criterion:** C20 "each pass refines (convergent loop)" is `VERIFIED` only if the relative change is non-increasing for k ≥ 4 **and** < 0.05 at k=12. Otherwise it's `REFUTED` for E2.
+
+---
+
+## SQ6 (+ SQ2): single-pass state tracking via rotation, vs loops (claims C22, C18)
+*Side quest. Written and committed before running. It runs in the GPU slot after K1–K6 finish.*
+
+**Design**
+- **Task:** identical to K5: running parity over 64 random bits. Accuracy on positions 32–63 of held-out sequences, plus length generalisation on positions 64–127 of 128-bit sequences.
+- **Models:** d=128, 2 heads, MLP 256, one block unless noted.
+  - **(a)** GDN, 1 pass (same as K5 (i)).
+  - **(b)** GDN looped ×4 (same as K5 (ii)).
+  - **(c) RotSSM, 1 pass:** a simplified Mamba-3-style SISO layer written in the script in plain PyTorch with a sequential scan. Per head, a complex diagonal state h ∈ ℂ^{dv×N}, N=32:
+    - λ_t = exp(−softplus(W_a x_t)) · exp(i·π·tanh(W_θ x_t)) (data-dependent decay **and rotation**);
+    - h_t = λ_t ⊙ h_{t−1} + v_t ⊗ B_t;
+    - y_t = Re(h_t C_t), with v, B, C linear in x_t.
+  - **(d) RotSSM without rotation** (θ ≡ 0: real decay only, ≈ Mamba-2-style), as an ablation.
+  - **(e) GDN with negative eigenvalues**, 1 pass (fla `allow_neg_eigval=True`, β ∈ (0, 2)): side quest SQ2.
+- **Training:** identical to K5 (3,000 steps, batch 128, lr 1e-3), 2 seeds. Thread/GPU budget per AGENTS.md §5. ≤ 15 min.
+
+**Prediction**
+- (c) RotSSM ≥ 95% on positions 32–63, and largely holds on 64–127.
+- (d) without rotation ≤ 60%.
+- (a) GDN 1-pass < 75%.
+- (e) GDN with negative eigenvalues ≥ 90%.
+- (b) looped GDN: whatever K5 measured, below (c).
+
+**Criteria**
+- **C22** (local analogue: "a rotating state solves state tracking in one pass") is `VERIFIED` if the mean of (c) ≥ 90% **and** (c) ≥ (d) + 25 points. Otherwise `REFUTED` at our scale.
+- **"Rotation beats looping for state tracking"** is supported if (c) ≥ (b) + 10 points. This bears on FusionDance's core bet (C18), and is reported in the ledger notes.
+- **SQ2** is promising if (e) ≥ (a) + 20 points.

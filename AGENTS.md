@@ -51,7 +51,14 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
 - Entries go at the **top** of `DEVLOG.md` (newest first) and use the template at the bottom of that file.
 - The entry is committed **in the same commit** as the work it describes. Then the commit is tagged.
 - A commit can't contain its own hash, so entries reference their **version tag**, not a hash.
-- Not every commit needs an entry: small WIP commits between entries are fine. A version is cut when there is something worth recording (a result, a decision, a new capability, a failed experiment).
+- **Always add devlog entries.** Every piece of finished work that changes the repo ends with a `DEVLOG.md` entry (and its commit and tag) before it's called done. That includes:
+  - an experiment started, finished, failed or interrupted;
+  - a check (§0) or side quest (§0b) with results;
+  - a new script, tool or rule;
+  - a docs or site change;
+  - a decision made in conversation.
+
+  If a session did several things, one entry can cover them, but nothing is left unrecorded at the end of a session. Small WIP commits *between* entries are fine (e.g. committing predictions before a run); the work isn't finished until the entry is cut.
 - Before committing a version, run `python tools/build_site_data.py` so the site (`docs/`) matches `DEVLOG.md` and `experiments/experiments.json`. The generated `docs/data/site-data.js` is part of the same commit.
 - With each version, also bump `version` in `pyproject.toml` and the version badge (and the status line, if the headline changed) in `README.md`.
 - Tags are **annotated**: `git tag -a vX.Y.Z -m "vX.Y.Z: <entry title>"`.
@@ -91,6 +98,17 @@ The project stays at `0.y.z` while it's experimental.
 - Compare variants at **matched compute** (or matched params *and* report compute). State which.
 - Add one ingredient at a time: a failed fusion must be attributable to a specific change.
 - Report failures in the devlog too. A skinny Gotenks is a result.
+- **Compute budget (to avoid overheating the laptop):**
+  - **At most 1 GPU job at a time**, of any size: a training run, a GPU check, a benchmark or a side quest. Never start a second GPU job while one is running; queue it.
+  - **At most 8 smaller CPU-only jobs** may run alongside it (checks, side quests, data prep, tests, site builds). Each CPU job is thread-capped (`OMP_NUM_THREADS`/`MKL_NUM_THREADS`/`torch.set_num_threads` ≤ 2) so 8 jobs plus the GPU job's dataloader don't saturate the 20 cores.
+  - Before starting a GPU job, check `nvidia-smi --query-gpu=temperature.gpu,utilization.gpu --format=csv`. If the GPU is at **≥ 85 °C**, wait for it to cool below 75 °C first. Long runs should log the GPU temperature.
+  - The launchers enforce this (one GPU slot, eight CPU slots, via PID/lock files under `~/fusiondance-data/run/`). Subagents get the same budget: say in each brief whether a subagent may use the GPU slot or is CPU-only.
+- **Every experiment has its own launch script, and runs are only started through it.**
+  - Each `E<n>` gets `experiments/launch/E<n>.sh` (a thin wrapper around `tools/launch_experiment.sh E<n>`), created when the experiment is registered. Experiments without a config or prediction get a script that refuses to run.
+  - The launcher reads the config from the registry and runs preflight checks: prediction present, code clean, data present, no other run active, tracker reachable.
+  - It starts `gogeta.train` **detached** (it survives the agent session ending) with `--require-clean`, writes a log and a PID file under `~/fusiondance-data/`, and logs to Trackio (`GOGETA_TRACKER=trackio`).
+  - Use `--dry-run` to see exactly what would run. Don't start training with a hand-typed `python -m gogeta.train …` command, except for a throughput `--bench`.
+- **Every run is connected to Trackio.** Start the dashboard with `tools/launch_tracker.sh start` (or `tools\launch_tracker.ps1 start` from Windows) before launching, so the run can be watched live at http://127.0.0.1:7861. Runs still log to the local Trackio database if the dashboard is down, but check the run appears in it. Stop it with `tools/launch_tracker.sh stop`.
 
 ## 6. Tracking runs (scientific hygiene)
 
@@ -109,7 +127,7 @@ The project stays at `0.y.z` while it's experimental.
 - **Seeds:** headline claims need **≥3 seeds**; report the mean and spread.
 - **X-axes:** log `tokens` and `flops` every step and compare variants against those, not steps (looped models do more work per step).
 - **Recording results:** `python tools/record_result.py E<n> --status done --version vX.Y.Z --config <cfg> --summary <run>/summary.json`, then `python tools/build_site_data.py`.
-- **Dashboard:** `~/.venvs/gogeta/bin/python tools/dashboard.py` (in WSL) → http://127.0.0.1:7861. Local only: never enable `share` or a `space_id` without the human's OK.
+- **Dashboard:** `tools/launch_tracker.sh start|status|url|stop` (WSL) or `tools\launch_tracker.ps1` (Windows). It wraps `tools/dashboard.py`, runs detached, and serves http://127.0.0.1:7861. Local only: never enable `share` or a `space_id` without the human's OK.
 - **Smoke check** after env changes: `~/.venvs/gogeta/bin/python tools/smoke_tracking.py` (logs to the separate `gogeta-0-smoke` project).
 
 ## 7. Documents

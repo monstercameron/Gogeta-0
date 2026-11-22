@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>E3 · Ternary weights · Gogeta-0</title>
-  <meta name="description" content="How much quality does BitNet b1.58 ternary cost here, and does looping amplify quantization error across loops?">
+  <title>E3 · Ternary weights on the E1 stack · Gogeta-0</title>
+  <meta name="description" content="How much quality does BitNet b1.58 ternary weights (-1, 0, +1) cost at our tiny scale? E1&#x27;s exact layout and recipe, with only the weights changed, so">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/style.css">
 </head>
@@ -17,28 +17,51 @@
 
 <header class="page-head"><div class="wrap">
   <span class="eyebrow">Experiment E3 · Weighted Clothing</span>
-  <h1 class="exp-title">Ternary weights</h1>
+  <h1 class="exp-title">Ternary weights on the E1 stack</h1>
   <p class="status-line"><span class="pill planned">Charging</span>
      
-     </p>
-  <p class="lead"><b>The question:</b> How much quality does BitNet b1.58 ternary cost here, and does looping amplify quantization error across loops?</p>
+     <span class="muted">config <code>configs/e3_ternary.json</code></span></p>
+  <p class="lead"><b>The question:</b> How much quality does BitNet b1.58 ternary weights (-1, 0, +1) cost at our tiny scale? E1&#x27;s exact layout and recipe, with only the weights changed, so any gap is down to ternary alone. (Ternary + loops, i.e. whether rounding error piles up across passes, is tested in E4.)</p>
   
 </div></header>
 <section class="article"><div class="wrap prose">
   <h2 id="what-it-will-test-in-plain-english">What it will test, in plain English</h2>
-<aside class="callout"><p><strong>Can the model still learn if every one of its numbers can only be −1, 0 or +1?</strong></p>
-<p>Normally each of a model's millions of parameters is stored as a precise 16-bit number. "Ternary" weights (the BitNet b1.58 idea) allow just three values. That makes the model roughly <strong>10× smaller to store</strong>, and much of the maths turns into simple additions, which matters a lot for small devices and for chips like FPGAs.</p>
-<p>The question is the price: how much worse does the model get? And does the rounding error pile up when the same layers are reused in a loop?</p></aside>
-<aside class="prediction-box"><b>Prediction (written before the run)</b><p>Not written yet. It must be written before the run starts.</p></aside><h2 id="why-it-matters">Why it matters</h2>
-<p>Ternary weights are the third FusionDance ingredient: they cut the <strong>bits per parameter</strong>, where looping cuts the <strong>number</strong> of parameters and the linear-time layers cut the <strong>cost of long text</strong>.</p>
+<aside class="callout"><p><strong>Can the model still learn well if every one of its numbers is only allowed to be −1, 0 or +1?</strong></p>
+<p>A model's "knowledge" lives in millions of numbers (its <em>parameters</em>). Normally each one is stored precisely, using 16 bits, like <code>0.0213</code> or <code>−1.7754</code>. <strong>Ternary</strong> weights (the "BitNet b1.58" idea) allow just three values: <strong>−1, 0 or +1</strong>. Each number then needs only about 1.6 bits instead of 16.</p>
+<p><strong>Why bother?</strong></p>
+<ul><li><strong>Much smaller:</strong> the main body of our best model shrinks from <strong>22 MB to under 3 MB</strong>.</li><li><strong>Much simpler maths:</strong> multiplying by −1, 0 or +1 is just subtracting, skipping or adding. Cheap chips, phones and FPGAs love that.</li></ul>
+<p><strong>The catch</strong> is quality. Rounding every number to −1/0/+1 throws information away. Researchers found the loss disappears for <strong>big</strong> models (3 billion parameters and up), but ours has 14 <em>million</em>. So the real question is: <strong>how much worse does a tiny model get?</strong></p>
+<p>We'll take our best model so far (<a href="E1.html">E1</a>) and change <strong>only</strong> this one thing, so any difference is down to ternary weights alone.</p></aside>
+<aside class="prediction-box"><b>Prediction (written before the run)</b><p>Written 2026-11-22, before any run. Full-val loss 0.605-0.645, i.e. +3.5% to +10% worse than E1 (0.5846), most likely around +6% (~0.62): roughly E0/E2 territory, so ternary gives back about all of E1&#x27;s gain over dense. Reason: BitNet b1.58&#x27;s own Table 1 shows a perplexity gap of +4.4% (loss +1.7%) at 700M that closes only at 3B; we are ~60x smaller than 700M, so the gap should be bigger. Training stays stable (no loss spikes &gt; 0.5 after warmup) but runs 10-25% slower per token than E1, because the quantization is simulated in floating point (no ternary kernels). Payoff: weights 28.5 MB -&gt; ~9.1 MB (2-bit packed); the non-embedding body 22.2 MB -&gt; 2.8 MB (7.8x).</p></aside><h2 id="the-design-one-change-from-e1">The design: one change from E1</h2>
+<div class="table-wrap"><table><thead><tr><th></th><th><a href="E1.html">E1</a> (done)</th><th>E3 (planned)</th></tr></thead><tbody><tr><td>Layers</td><td>SWA, GDN, GDN, SWA, GDN, full attention</td><td><strong>identical</strong></td></tr><tr><td>Data, tokens, schedule, seed</td><td>200M Python tokens, cosine LR 3e-3, seed 0</td><td><strong>identical</strong></td></tr><tr><td>Projection weights</td><td>16-bit</td><td><strong>ternary (−1, 0, +1) × one scale per layer</strong></td></tr><tr><td>Activations fed into those layers</td><td>16-bit</td><td><strong>8-bit</strong></td></tr></tbody></table></div>
+<p><strong>What becomes ternary:</strong> all <strong>33</strong> projection layers inside the blocks: the attention and Gated DeltaNet q/k/v/output projections and gates, and both halves of every MLP. That's <strong>11.06M of 11.09M</strong> non-embedding parameters (99.7%).</p>
+<p><strong>What stays full precision</strong> (as in BitNet): the <strong>word table</strong> (embeddings, 3.15M parameters), the normalisation layers, the tiny Gated DeltaNet decay/strength gates, and the short convolutions. That's 33K numbers outside the word table.</p>
+<h2 id="how-ternary-weights-work">How ternary weights work</h2>
+<p>For each layer, every forward pass during training:</p>
+<ol><li><strong>Scale:</strong> take the average size of the layer's weights, <code>s = mean(|W|)</code>.</li><li><strong>Round:</strong> divide every weight by <code>s</code>, round to the nearest whole number, and clip to −1, 0 or +1.</li><li><strong>Rescale:</strong> multiply back by <code>s</code>, so the layer keeps roughly the right overall strength.</li><li><strong>Activations:</strong> the numbers flowing <em>into</em> the layer are rounded to 8-bit integers, per token.</li><li><strong>Learning anyway:</strong> rounding has no useful slope to learn from, so training keeps a hidden full-precision copy of each weight and updates <em>that</em>, pretending the rounding wasn't there (the "straight-through estimator"). After training, only the ternary version is needed.</li></ol>
+<p>This is all implemented in <code>gogeta/model.py</code> (<code>BitLinear</code>) and covered by the tests: weights take exactly the values {−1, 0, +1}, and backward passes stay finite.</p>
+<h2 id="the-memory-payoff">The memory payoff</h2>
+<div class="table-wrap"><table><thead><tr><th>Weights on disk</th><th>16-bit (E1)</th><th>Ternary (E3)</th><th>Smaller by</th></tr></thead><tbody><tr><td>Model body (non-embedding)</td><td>22.2 MB</td><td><strong>2.8 MB</strong> (2-bit packed)</td><td><strong>7.8×</strong></td></tr><tr><td>Whole model</td><td>28.5 MB</td><td><strong>9.1 MB</strong></td><td>3.1×</td></tr></tbody></table></div>
+<p>Notice the second row: once the body is ternary, the <strong>word table (6.3 MB) becomes two-thirds of the whole model</strong>. At our size, shrinking the embeddings (a smaller vocabulary, or quantising them too) would be the next memory win.</p>
+<h2 id="what-the-research-says">What the research says</h2>
+<p>The BitNet b1.58 paper (in our reading list) trained ternary and normal versions of the same models:</p>
+<div class="table-wrap"><table><thead><tr><th>Model size</th><th>Normal perplexity</th><th>Ternary perplexity</th><th>Gap</th></tr></thead><tbody><tr><td>700M</td><td>12.33</td><td>12.87</td><td>+4.4% (≈ +1.7% in loss)</td></tr><tr><td>1.3B</td><td>11.25</td><td>11.29</td><td>+0.4%</td></tr><tr><td>3B</td><td>10.04</td><td>9.91</td><td>ternary slightly <em>better</em></td></tr></tbody></table></div>
+<p>The gap <strong>shrinks as models grow</strong> and closes around 3B. Our model is roughly <strong>60× smaller than their smallest</strong>, so we expect a clearly bigger gap. Measuring how big is the point of E3.</p>
+<p>Their production model (BitNet b1.58 2B4T) also uses tricks we're deliberately <strong>not</strong> using in E3, to keep it a one-change experiment: an extra normalisation inside each layer ("SubLN"), squared-ReLU instead of SwiGLU in the MLP, and a two-stage schedule (a high learning rate, then a sudden cooldown halfway, with weight decay switched off in the second half).</p>
+<h2 id="how-we-ll-judge-it">How we'll judge it</h2>
+<ul><li><strong>Main number:</strong> validation loss vs E1 (0.585), same data and seed.</li><li><strong>Efficiency:</strong> loss <em>per megabyte of weights</em>. A slightly worse model that's 7.8× smaller in its body can still be the better deal.</li><li><strong>Speed:</strong> tokens/second vs E1. We expect E3 to be <em>slower</em> in training, because the rounding is simulated in normal floating-point maths. Real speedups need special ternary kernels, which we don't have yet.</li></ul>
+<p><strong>Decision rules (written before the run):</strong></p>
+<ul><li><strong>Gap ≤ 3%:</strong> ternary is nearly free even at 14M. Great news for the full fusion.</li><li><strong>Gap 3–10%:</strong> the expected zone. Ternary works, at a real but known price.</li><li><strong>Gap &gt; 10%:</strong> try the BitNet recipe (two-stage schedule, SubLN) as a follow-up before blaming ternary itself.</li></ul>
+<h2 id="risks-and-caveats">Risks and caveats</h2>
+<ul><li><strong>One seed</strong>, like E0–E2. A gap of a few percent needs replication to be trusted.</li><li><strong>No real speed or memory savings during training:</strong> it's simulated. The savings are real for a stored or exported model, and need custom kernels to show up as speed.</li><li><strong>Our recipe differs from BitNet's</strong> (see above), on purpose. A poor result might say more about the recipe than about ternary weights.</li><li><strong>Ternary + loops is a separate question.</strong> Whether rounding errors pile up when the same ternary layers run several times is tested in <a href="E4.html">E4</a>, the full fusion.</li></ul>
 <h2 id="status">Status</h2>
-<p>Not run yet. The ternary switch is already built and tested in the model code; it's waiting until the full-precision loop works well (see <a href="E2.html">E2</a>).</p>
+<p><strong>Designed, not run.</strong> The config (<code>configs/e3_ternary.json</code>) and prediction are committed. Training is paused for now; when it resumes, E3 takes about 40–50 minutes on the laptop GPU (estimated from E1's 39 minutes plus quantisation overhead).</p>
   
   <p class="muted small">New to the jargon? <a href="../learn.html">Start here</a> for plain-English definitions of loss, tokens, parameters and FLOPs.</p>
   <div class="pager"><a class="btn" href="E2.html">← E2</a><a class="btn" href="../devlog.html#experiments-section">All experiments</a><a class="btn" href="E4.html">E4 →</a></div>
 </div></section>
 <footer><div class="wrap">
-  <span>Gogeta-0 · FusionDance architecture · v0.3.3</span>
+  <span>Gogeta-0 · FusionDance architecture · v0.3.4</span>
   <span>An independent research project and fan homage, not affiliated with or endorsed by the Dragon Ball rights holders.</span>
 </div></footer>
 <script src="../assets/charts.js"></script>

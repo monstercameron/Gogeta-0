@@ -191,3 +191,11 @@ All three from commit `0dc7491` (code clean), seed 0, 200,015,872 tokens each (6
 - Pushed tags v0.1.0–v0.3.2. Enabled Pages (POST `/pages`, source `main` `/docs`, legacy build): status `built` in ~20 s, HTTPS enforced. Set the repo homepage to the site.
 - **OBS (live check):** 11 key URLs → 200. Browser: badge v0.3.2, 10 roadmap links, E2 charts render, no console errors.
 - **DEC:** `git config push.followTags true` (local repo config) so version tags travel with pushes; documented in AGENTS.md §3.
+
+## 2026-11-22 (later): Session: E3 designed (no training)
+- **Human:** "I don't see any details for E3". The page was a placeholder because E3 had never been designed. **DEC:** design it fully now (config, prediction, write-up), still without training.
+- **OBS (papers in refs/, via pdftotext):** BitNet b1.58 Table 1 perplexity, LLaMA vs b1.58: 700M 12.33 vs 12.87 (+4.4%), 1.3B 11.25 vs 11.29, 3B 10.04 vs 9.91, i.e. parity only from 3B. The 2B4T report's recipe: absmean ternary weights, per-token absmax int8 activations, SubLN, squared ReLU, two-stage LR (high peak → abrupt cooldown about midway) and two-stage weight decay (cosine → 0).
+- **OBS (model built on CPU, ternary=True):** E1 stack → 33 BitLinear, **11.06M of 11.09M non-emb params ternary (99.7%)**, 32.9K other full-precision params + 3.15M embedding. Weights: 28.5 MB bf16 → 8.5 MB (1.58-bit ideal) / **9.1 MB (2-bit packed)**; non-emb body 22.2 → **2.83 MB (7.8×)**. After ternarisation the embedding (6.3 MB bf16) is ~2/3 of the model. (E2 stack: 27 BitLinear, 9.44M ternary.)
+- **DEC: E3 = E1 layout + recipe, only `ternary: true`** (`configs/e3_ternary.json`), so the change is purely the weight precision. Ternary × loops is left to E4. BitNet's SubLN / ReLU² / two-stage schedule are deliberately **not** used (one ingredient); they're a follow-up if the gap is > 10%.
+- **Prediction (registry, committed before any run):** val loss 0.605–0.645 (+3.5–10% vs E1), most likely ~0.62; stable; 10–25% slower per token than E1 (simulated quantisation). Decision rules: ≤3% nearly free; 3–10% expected; >10% → try the BitNet recipe.
+- **OBS:** the config builds: 14.24M params, 33 BitLinear, 0.091 train GFLOP/token (same arithmetic as E1, since quantisation is simulated).

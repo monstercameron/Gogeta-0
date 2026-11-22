@@ -99,23 +99,27 @@
   {
     "id": "E3",
     "arc": "Weighted Clothing",
-    "title": "Ternary weights",
-    "question": "How much quality does BitNet b1.58 ternary cost here, and does looping amplify quantization error across loops?",
-    "prediction": "",
+    "title": "Ternary weights on the E1 stack",
+    "question": "How much quality does BitNet b1.58 ternary weights (-1, 0, +1) cost at our tiny scale? E1's exact layout and recipe, with only the weights changed, so any gap is down to ternary alone. (Ternary + loops, i.e. whether rounding error piles up across passes, is tested in E4.)",
+    "prediction": "Written 2026-11-22, before any run. Full-val loss 0.605-0.645, i.e. +3.5% to +10% worse than E1 (0.5846), most likely around +6% (~0.62): roughly E0/E2 territory, so ternary gives back about all of E1's gain over dense. Reason: BitNet b1.58's own Table 1 shows a perplexity gap of +4.4% (loss +1.7%) at 700M that closes only at 3B; we are ~60x smaller than 700M, so the gap should be bigger. Training stays stable (no loss spikes > 0.5 after warmup) but runs 10-25% slower per token than E1, because the quantization is simulated in floating point (no ternary kernels). Payoff: weights 28.5 MB -> ~9.1 MB (2-bit packed); the non-embedding body 22.2 MB -> 2.8 MB (7.8x).",
     "ingredients": [
-      "BitNet b1.58",
-      "absmean quantization",
+      "E1 layout",
+      "BitNet b1.58 BitLinear",
+      "absmean ternary weights",
+      "8-bit activations",
       "STE"
     ],
     "metrics": [
-      "val loss vs weight bits",
-      "loss drift per loop"
+      "val loss vs E1",
+      "weight memory (MB)",
+      "loss per bit of weight memory",
+      "tokens/sec vs E1"
     ],
     "status": "planned",
     "version": null,
-    "config": null,
+    "config": "configs/e3_ternary.json",
     "results": {},
-    "notes": ""
+    "notes": "Designed 2026-11-22 (v0.3.4). Not run: training paused by the human. 33 BitLinear modules, 11.06M of 11.09M non-embedding params ternary. Deliberate deviations from the BitNet 2B4T recipe (no SubLN, SwiGLU not ReLU^2, single-stage schedule) keep it a one-ingredient change vs E1; the BitNet recipe is a possible follow-up if the gap is large."
   },
   {
     "id": "E4",

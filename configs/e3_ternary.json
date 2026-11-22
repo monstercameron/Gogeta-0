@@ -1,0 +1,17 @@
+{
+  "experiment": "E3",
+  "description": "Ternary weights on the E1 stack: identical layout and training recipe to E1, but every projection inside the blocks is BitNet b1.58 BitLinear (absmean ternary weights, per-token 8-bit absmax activations, straight-through estimator). Embeddings, norms, GDN gate projections (a, b) and short convolutions stay full precision. One ingredient changed vs E1: weight precision.",
+  "model": {
+    "vocab_size": 8192, "d_model": 384, "n_heads": 6, "mlp_hidden": 1024,
+    "prelude": ["swa", "gdn", "gdn", "swa", "gdn", "attn"],
+    "core": [], "coda": [],
+    "window": 256, "max_seq_len": 1024, "ternary": true
+  },
+  "train": {
+    "dataset": "code-py-v1", "seq_len": 1024, "batch_size": 32,
+    "max_tokens": 200000000,
+    "lr": 0.003, "min_lr_frac": 0.1, "warmup_steps": 300,
+    "weight_decay": 0.1, "beta1": 0.9, "beta2": 0.95, "grad_clip": 1.0,
+    "eval_every": 250, "eval_seqs": 128, "seed": 0
+  }
+}

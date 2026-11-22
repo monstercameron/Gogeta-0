@@ -28,7 +28,7 @@
         <div class="id">${esc(e.id)}</div>
         <div>
           <div class="name">${esc(e.arc)}${e.id === "E4" ? " · v1.0.0 milestone" : ""}</div>
-          <h3>${esc(e.title)}</h3>
+          <h3><a href="experiments/${esc(e.id)}.html">${esc(e.title)}</a></h3>
           <p>${esc(e.question)}</p>
         </div>
         ${pill(e.status)}
@@ -109,6 +109,7 @@
             ${(e.metrics || []).map((m) => `<span class="tag metric">${esc(m)}</span>`).join("")}</div>
           ${res.length ? `<div class="table-wrap"><table class="results"><tbody>${res.map(([k, v]) => `<tr><th>${esc(k)}</th><td>${esc(v)}</td></tr>`).join("")}</tbody></table></div>` : ""}
           ${e.notes ? `<p>${esc(e.notes)}</p>` : ""}
+          <a class="more" href="experiments/${esc(e.id)}.html">${e.status === "done" ? "Read the breakdown & plain-English summary →" : "What this will test, in plain English →"}</a>
           <div class="meta">version: ${esc(e.version || "-")} · config: ${esc(e.config || "-")}</div>
         </article>`;
             })

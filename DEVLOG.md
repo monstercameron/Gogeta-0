@@ -17,6 +17,24 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.3.1: Plain-English experiment pages and a newcomer primer
+*2026-11-22*
+
+**What**
+- **One page per experiment** on the site (`docs/experiments/E0–E9.html`), generated from `experiments/writeups/E<n>.md`. Each opens with **"What it means, in plain English"**, then the setup, charts, a breakdown of the findings, the prediction scorecard, caveats and next steps. Planned experiments get a short "what it will test" page.
+- **"Start here" primer** (`docs/learn.html` from `site-src/learn.md`): how a model learns, every number on the site decoded (loss, perplexity, bits/char, FLOPs, seeds), the three tricks as analogies, and what we've found so far.
+- **Charts:** interactive learning curves and loss-vs-loops (hover crosshair/tooltips, legend, direct labels, "show the numbers" tables) from `experiments/curves/E<n>.json`. The palette was validated for colour-blind safety on the site's dark surfaces.
+- **AGENTS.md rule:** every finished experiment gets its write-up, curve file and generated page before its version is cut.
+- Devlog cards and roadmap items link to the experiment pages; "Start here" is in every nav.
+
+**Results**: no training (paused by request). Yardsticks measured on CPU for the explainers: the models compress held-out Python to ~3% of its size vs 15.4% for `xz -9` and 25.1% for `gzip -9`; E1 reached E0's final quality at 84% of the training budget.
+**Findings / surprises**
+- ⚠ **The replication queue was killed** when the previous agent session ended (E9 at step 600, E2-s1 at step 200). There are no new results, E9 is back to `planned`, and the replication predictions stay open. Future queues should run detached (`nohup`/`setsid`).
+- **Correction to v0.3.0:** E2's scorecard is **5 of 7** predicted claims, not "5 of 8".
+**Next**: when training resumes: E9, then seeds 1–2 (detached), then the functional-correctness eval.
+
+---
+
 ## v0.3.0: First training arcs: E0 dense, E1 hybrid, E2 looped (initial arch)
 *2026-11-22*
 

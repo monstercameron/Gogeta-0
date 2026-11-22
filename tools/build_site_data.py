@@ -1,4 +1,6 @@
-"""Build docs/data/site-data.js from DEVLOG.md and experiments/experiments.json.
+"""Build the site: docs/data/site-data.js (from DEVLOG.md + experiments/experiments.json), plus the
+generated pages docs/experiments/E<n>.html (from experiments/writeups/) and docs/learn.html
+(from site-src/learn.md). See tools/site_pages.py.
 
 Usage:  python tools/build_site_data.py
 Run it before cutting a version, so the GitHub Pages site matches the devlog.
@@ -85,6 +87,15 @@ def main():
     OUT.write_text(js, encoding="utf-8", newline="\n")
     print(f"wrote {OUT.relative_to(ROOT)}: {len(data['devlog'])} versions, "
           f"{len(data['experiments'])} experiments")
+
+    # Static pages: one per experiment (from experiments/writeups/) + the newcomer primer.
+    import sys
+    sys.path.insert(0, str(ROOT / "tools"))
+    from site_pages import build_pages
+
+    version = data["devlog"][0]["version"] if data["devlog"] else "v0"
+    pages = build_pages(data["experiments"], version)
+    print(f"wrote {len(pages)} pages: {', '.join(pathlib.Path(p).name for p in pages)}")
 
 
 if __name__ == "__main__":

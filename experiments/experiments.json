@@ -238,6 +238,6 @@
     "version": null,
     "config": "configs/e9_unlooped.json",
     "results": {},
-    "notes": "Added 2026-11-22 after E2 (see LABNOTEBOOK 14:46)."
+    "notes": "Added 2026-11-22 after E2. First attempt (run E9-20261122-152151-s0, commit eecdaeb) was interrupted at step 600/6104 when the agent session ended: no result. On hold while training is paused."
   }
 ]

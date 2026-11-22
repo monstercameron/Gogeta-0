@@ -55,6 +55,12 @@ The project stays at `0.y.z` while it's experimental.
 - **Write the prediction first.** Fill an experiment's `prediction` field in `experiments.json` *before* its first run starts, and commit it. Don't edit it afterwards; the result gets compared against it.
 - **Provenance:** every run records its git commit, `git describe`, dirty flag, config and seed (done by `Run`). Runs whose results go into a tagged version must use `--require-clean`, which refuses to start if **code paths** (`gogeta/ configs/ tools/ tests/ requirements.txt`) have uncommitted changes. Don't edit code paths while a queue (`tools/run_queue.sh`) is waiting to start runs.
 - **Lab notebook:** `notes/LABNOTEBOOK.md` is append-only and timestamped. Record every setup step, observation (with numbers), decision (with reason), bug and dead end as it happens, using the OBS / DEC / TODO / ⚠ markers. After each experiment, add a results table, a **prediction scorecard** (hit/miss per predicted claim), and the interpretation. The devlog summarises; the notebook is the evidence.
+- **Experiment page with a plain-English explainer (required at the end of every experiment).** Before the version that records an experiment's results is cut:
+  1. Write `experiments/writeups/E<n>.md` with these sections, in order: **What it means, in plain English** (a `>` callout at the top that someone with no ML background can understand on its own: what was tried, what happened, why it matters; real numbers, everyday analogies, no hype), **What we tested**, **Results** (charts via `{{chart:curves …}}` / `{{chart:loops …}}`), **Breakdown of the findings** (every claim tied to a measured number), **Prediction scorecard**, **Caveats**, **What's next**.
+  2. Save the run's eval curve as `experiments/curves/E<n>.json` (`[step, tokens, val_loss]` points from the training log) so the page can chart it.
+  3. Run `python tools/build_site_data.py`, which generates `docs/experiments/E<n>.html` (never hand-edit generated pages), and check the page in the browser at desktop and phone width.
+  4. If the headline understanding changed, update "What we've found so far" in `site-src/learn.md` (the newcomer primer, which generates `docs/learn.html`).
+  - Planned experiments keep a short page with "What it will test, in plain English" and a status line; interrupted or failed runs say so plainly.
 - **Training environment setup** (fresh WSL): `apt-get install python3.12-venv python3.12-dev` (Triton needs `Python.h`), create the venv, `pip install torch --index-url https://download.pytorch.org/whl/cu130`, then `pip install -r requirements.txt`. Verify with `tests/test_gdn_kernels.py` and `tests/test_model.py`.
 - **Seeds:** headline claims need **≥3 seeds**; report the mean and spread.
 - **X-axes:** log `tokens` and `flops` every step and compare variants against those, not steps (looped models do more work per step).
@@ -73,7 +79,10 @@ The project stays at `0.y.z` while it's experimental.
 | `AGENTS.md` | These rules |
 | `docs/` | GitHub Pages site (static, no build). Landing page + devlog page. Don't hand-edit `docs/data/site-data.js`: it's generated. |
 | `experiments/experiments.json` | The experiment registry: source of truth for the site's experiment log |
-| `tools/build_site_data.py` | Builds `docs/data/site-data.js` from `DEVLOG.md` + the experiment registry |
+| `tools/build_site_data.py` | Builds `docs/data/site-data.js` from `DEVLOG.md` + the experiment registry, and generates the static pages via `tools/site_pages.py` |
+| `experiments/writeups/E<n>.md` | Per-experiment write-up (plain-English summary + breakdown) → `docs/experiments/E<n>.html` |
+| `experiments/curves/E<n>.json` | Eval-loss curve points used by the experiment-page charts |
+| `site-src/learn.md` | Newcomer primer ("Start here") → `docs/learn.html` |
 | `gogeta/` | The Python package: `tracking.py` now; the model code comes later |
 | `tools/record_result.py`, `tools/dashboard.py`, `tools/smoke_tracking.py` | Results → registry; local dashboard; tracking smoke check |
 | `requirements.txt` | Pinned training-environment packages |

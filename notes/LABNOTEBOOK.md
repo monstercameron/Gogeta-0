@@ -148,3 +148,31 @@ All three from commit `0dc7491` (code clean), seed 0, 200,015,872 tokens each (6
   2. E1 < E0 on **every** seed (the gap of 0.022 is ~5× the expected noise).
   3. E2 (r=4) > E0 on every seed.
   4. E2's loss-vs-r curve has its minimum at r=4 (or r=6) on every seed; r=12 is worse than r=4 on every seed.
+- **15:21 · Launched** from commit **`eecdaeb`**. Lane A started `E9-20261122-152151-s0`; lane B started `E2-20261122-152151-s1`. **OBS:** with both active, the GPU shows 96% utilisation and 21.8 GB used.
+- **⚠ 15:28 · Both lanes interrupted.** The previous agent session ended and its WSL processes were killed (queue exit code 4). **OBS:** E9 reached step 600/6,104 (train loss 1.215), E2-s1 step 200/6,104 (train loss 2.080, r=1). Neither wrote a summary, so **no results**; E0/E1 seeds 1–2 and E2-s2 never started. The replication predictions above stay **open**.
+- **DEC (human, next session):** don't restart training for now ("too heavy"). E9 goes back to `planned` with a note; seeds stay TODO. Partial run folders are left in `~/fusiondance-data/runs/` for the record and aren't used.
+- **TODO:** when training resumes, launch queues with `nohup`/`setsid` so they survive the agent session ending.
+
+## 2026-11-22 (later): Session: plain-English explainers (no training)
+
+- **Human request:** "I am new to model training. What does the current research mean? Create a page per experiment with a breakdown of the findings and a plain-English section a normie can understand. Make it a rule in AGENTS.md. Don't start training again, it's too heavy."
+- **DEC:** no GPU training this session. Only cheap CPU work: reading logs, a compression measurement, site generation.
+
+### Yardsticks measured for the explainers (no training)
+- **OBS:** on the 4,000 validation docs (3.94 MB of Python): `gzip -9` → 25.1% (2.01 bits/char), `xz -9` → **15.4%** (1.24 bits/char). Models: E0 0.235, E1 0.227, E2 0.240 bits/char ≈ **2.8–3.0%**, about 5× better than xz.
+- **OBS:** perplexity (e^loss): E0 1.834, E1 1.794, E2 1.856.
+- **OBS (from the periodic-eval curves, 25 points each):** E1 < E0 at **25/25** checkpoints; E2 > E0 and E2 > E1 at **25/25**. E1 reaches E0's final periodic loss (0.6288) at **≈169M tokens (84% of E0's budget)**; E2 never does. E0 drops below loss 1.2 at ~25M tokens, E2 at ~33M.
+- Curves saved to `experiments/curves/E{0,1,2}.json` (seed-0 runs).
+
+### Built
+- `tools/site_pages.py` (called by `tools/build_site_data.py`): markdown write-ups → `docs/experiments/E<n>.html`, `site-src/learn.md` → `docs/learn.html`. Charts are generated as inline SVG with a hover layer (`docs/assets/charts.js`), a legend for multi-series charts, direct end labels, and a "Show the numbers" table.
+- Series colours from the dataviz reference palette (dark steps): E0 `#3987e5`, E1 `#d95926`, E2 `#199e70`. **Validated all-pairs** on both card surfaces (#161c3a, #1b2246): worst CVD ΔE 9.4, normal-vision ΔE 20.9, contrast ≥ 3:1. The first try (site orange/blue/violet) **failed**: violet↔blue CVD ΔE 1.6.
+- Write-ups for E0–E2 (plain-English callout, setup, charts, breakdown, prediction scorecard, caveats, next) and short "what it will test" pages for E3–E9. Primer page "New to model training? Start here".
+- **AGENTS.md rule:** every finished experiment needs its write-up, curve file and generated page before its version is cut; the primer's "What we've found so far" is updated when the headline understanding changes.
+
+### Bugs found while checking in the browser
+- Chart y-ticks: a float edge case picked a 0.025 step and dropped the 0.60 tick → tolerance added in `_nice_ticks`.
+- Bold containing italics rendered raw `**` → non-greedy bold regex.
+- The "Fusion" nav item was marked current on every generated page (empty key matched the default) → given its own key.
+- Phone width: SVG text shrank to ~5px → enlarged in SVG units under 640px; margins widened so labels don't collide.
+- **Correction:** DEVLOG v0.3.0 says E2 hit "5 of 8" predicted claims; there are **7** claims, and 5 hit.

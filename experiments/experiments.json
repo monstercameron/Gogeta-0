@@ -242,7 +242,31 @@
     "version": null,
     "config": "configs/e9_unlooped.json",
     "results": {},
-    "notes": "Added 2026-11-22 after E2. First attempt (run E9-20261122-152151-s0, commit eecdaeb) was interrupted at step 600/6104 when the agent session ended: no result. On hold while training is paused."
+    "notes": "Added 2026-11-22 after E2. First attempt (run E9-20261122-152151-s0, commit eecdaeb) was interrupted at step 600/6104 when the agent session ended: no result. On hold while training is paused. Phase 2 plan (2026-11-22): E9 seed 0 runs at E1's K7-tuned LR (campaign phase2b-replication), which may differ from the lr 3e-3 its committed prediction assumed. The prediction is left unedited and is scored as written, with the LR difference stated; E2 is re-run at the same LR if it is not 3e-3."
+  },
+  {
+    "id": "E10",
+    "arc": "Scouter Calibration",
+    "title": "Reference control: Hugging Face Llama at E0's size",
+    "question": "Is our own dense baseline (E0) a fair yardstick? Hugging Face's unmodified LlamaForCausalLM at exactly E0's size (13.77M params, 10.62M non-embedding, same FLOPs), trained with the same data and loop at its own tuned learning rate and 3 seeds, becomes the control every other model is compared to.",
+    "prediction": "Written 2026-11-22, before any E10 run. E10 = transformers 5.24.0 LlamaForCausalLM at E0's shapes: 13,767,552 total / 10,621,824 non-embedding params and 96.76M train FLOPs/token, all identical to E0 (computed, check k7_e10_parity.py). (1) At its K7-tuned LR, 200M tokens, seeds 0/1/2: mean full-val loss 0.595-0.615 (most likely ~0.603), seed std <= 0.004. (2) Implementation parity: E0 at the same LR lands within E10's mean +- max(3 x std, 0.5%), i.e. HF's init (std 0.02 everywhere, no residual-output scaling), half-split RoPE and eps 1e-6 change little. (3) E1 at its own tuned LR still beats E10: mean(E1) < mean(E10) by 1.5-4% (the 3.6% gap vs untuned E0 shrinks but survives tuning). (4) Compiled throughput within +-20% of E0 (about 170-250k tok/s steady). (5) Stable: no train-loss jumps > 0.5 after warmup. Pass criteria: experiments/checks/PREDICTIONS.md (K7, replication).",
+    "ingredients": [
+      "HF LlamaForCausalLM (transformers 5.24.0)",
+      "full attention",
+      "E0 shapes",
+      "tuned LR",
+      "3 seeds"
+    ],
+    "metrics": [
+      "val loss (mean and std over 3 seeds)",
+      "parity with E0",
+      "tokens/sec"
+    ],
+    "status": "planned",
+    "version": null,
+    "config": "configs/e10_llama_ref.json",
+    "results": {},
+    "notes": "Designed 2026-11-22 (science-gaps fix: untuned, single-seed control). The config keeps lr 3e-3 as its default; every Phase 2 run passes its LR with --lr (K7 sweep, then the tuned LR), and the effective LR is recorded in each run's config (train.lr, cli_overrides). Matched params and tokens with E0; analytic FLOPs identical."
   },
   {
     "id": "E11",

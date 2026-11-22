@@ -17,6 +17,22 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.11: E10 registered: Hugging Face Llama reference control
+*2026-11-22*
+
+**What**: registers **E10**: Hugging Face's reference `LlamaForCausalLM` (transformers 5.24.0) at E0's exact size, trained by our own loop, data, eval and tracking. **Not run yet.**
+- `gogeta/train.py`: a `"arch": "hf_llama"` config key (default `fusiondance`), an `HFLlama` adapter with loss computed identically, FLOPs by the same rule as FusionDance, and a `--lr` override. Run configs record `arch` and `cli_overrides`.
+- `configs/e10_llama_ref.json`, `experiments/launch/E10.sh`, card, plain-English page, registry entry with its **prediction**; E9's card, and a note that E9 runs at E1's tuned LR.
+
+### E10: Reference control: Hugging Face Llama at E0's size
+- **Question:** what does a well-known reference implementation reach on our data with a tuned LR? Is our E0 baseline weak?
+- **Result:** not run. It runs in the Phase 2 campaign: K7 LR sweep, then 3 seeds.
+- **Verdict vs prediction:** prediction (registry): 3-seed mean 0.595–0.615, seed sd ≤ 0.004; E0 at the same LR within mean ± max(3 sd, 0.5%); E1 still beats it by 1.5–4%.
+- **What it means:** E10 becomes **the** control for every comparison once it lands.
+- **Card:** experiments/cards/E10.md
+
+---
+
 ## v0.4.10: Campaign runner + launcher --lr
 *2026-11-22*
 

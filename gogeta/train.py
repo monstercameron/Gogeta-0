@@ -5,6 +5,15 @@
 
 Logs through gogeta.tracking (Trackio by default). Per run, in $GOGETA_DATA/runs/<name>/:
   meta.json, summary.json (from tracking), samples.txt, and $GOGETA_DATA/checkpoints/<name>/model.pt
+
+Architectures (top-level config key "arch", default "fusiondance"):
+  fusiondance  gogeta.model.FusionDance, built from cfg["model"] (ModelConfig fields)
+  hf_llama     Hugging Face's reference transformers.LlamaForCausalLM, built from cfg["model"]
+               (LlamaConfig fields; vocab_size comes from the dataset). Wrapped by HFLlama so the
+               loop, data, eval, tracking, FLOP accounting and checkpointing are the same code.
+
+--lr overrides train.lr (used by the K7 LR sweep); the effective value is what the run config
+records under "train", and every CLI override is listed under "cli_overrides".
 """
 from __future__ import annotations
 
@@ -15,6 +24,7 @@ import os
 import pathlib
 import random
 import time
+from types import SimpleNamespace
 
 import numpy as np
 import torch
@@ -56,6 +66,66 @@ class TokenData:
             rows = [self.val[i * self.T:i * self.T + self.T + 1] for i in range(s, min(s + B, n))]
             t = torch.from_numpy(np.stack(rows).astype(np.int64)).to(device)
             yield t[:, :-1].contiguous(), t[:, 1:].contiguous()
+
+
+# ----------------------------------------------------------------------------- reference model
+class HFLlama(torch.nn.Module):
+    """HF `LlamaForCausalLM` behind the small interface this loop uses from FusionDance:
+    forward(idx, targets, loops) -> (logits, loss), cfg.max_seq_len, core (empty: not looped),
+    param_counts(), flops_per_token(). The HF model itself is unmodified (its own init, RoPE,
+    RMSNorm, SDPA attention); the loss is computed here exactly as FusionDance computes it.
+    """
+
+    def __init__(self, model_cfg: dict, vocab_size: int, seq_len: int):
+        super().__init__()
+        from transformers import LlamaConfig, LlamaForCausalLM
+
+        kw = {**model_cfg, "vocab_size": vocab_size, "use_cache": False}
+        self.hf_config = LlamaConfig(**kw)
+        if self.hf_config.max_position_embeddings < seq_len:
+            raise ValueError(f"max_position_embeddings {self.hf_config.max_position_embeddings} < seq_len {seq_len}")
+        self.lm = LlamaForCausalLM(self.hf_config)
+        self.core = torch.nn.ModuleList()   # never looped
+        self.cfg = SimpleNamespace(max_seq_len=seq_len, to_dict=self.config_dict)
+
+    def config_dict(self) -> dict:
+        return {"arch": "hf_llama", **self.hf_config.to_dict()}
+
+    def forward(self, idx: torch.Tensor, targets: torch.Tensor | None = None, loops: int | None = None):
+        logits = self.lm(input_ids=idx, use_cache=False).logits
+        if targets is None:
+            return logits, None
+        loss = torch.nn.functional.cross_entropy(logits.float().reshape(-1, logits.size(-1)), targets.reshape(-1))
+        return logits, loss
+
+    def param_counts(self) -> dict:
+        total = sum(p.numel() for p in self.parameters())   # tied head counted once
+        emb = self.lm.model.embed_tokens.weight.numel()
+        layers = sum(p.numel() for p in self.lm.model.layers.parameters())
+        return {"total": total, "embedding": emb, "layers": layers, "other": total - emb - layers,
+                "non_embedding": total - emb}
+
+    def flops_per_token(self, seq_len: int, loops: int | None = None, training: bool = True) -> float:
+        """Same rule as FusionDance.flops_per_token: forward = 2 x (block params + d x vocab for the
+        head) + 4 x d_attn x (seq_len / 2) per attention layer (QK^T and AV); training = 3x forward.
+        With E0's shapes this gives exactly E0's number."""
+        c = self.hf_config
+        d_attn = c.num_attention_heads * c.head_dim
+        fwd = 2 * (self.param_counts()["layers"] + c.hidden_size * c.vocab_size)
+        fwd += c.num_hidden_layers * 4 * d_attn * (seq_len / 2)
+        return fwd * (3 if training else 1)
+
+
+def build_model(cfg: dict, vocab_size: int, seq_len: int):
+    """Returns (model, model_config_object_with_to_dict). Call after torch.manual_seed."""
+    arch = cfg.get("arch", "fusiondance")
+    if arch == "fusiondance":
+        mc = ModelConfig(**{**cfg["model"], "vocab_size": vocab_size, "max_seq_len": seq_len})
+        return FusionDance(mc), mc
+    if arch == "hf_llama":
+        m = HFLlama(cfg["model"], vocab_size, seq_len)
+        return m, m.cfg
+    raise ValueError(f"unknown arch {arch!r} (fusiondance | hf_llama)")
 
 
 # ----------------------------------------------------------------------------- helpers
@@ -105,6 +175,7 @@ def main():
     ap.add_argument("--config", required=True)
     ap.add_argument("--max-tokens", type=int, help="override train.max_tokens")
     ap.add_argument("--seed", type=int, help="override train.seed")
+    ap.add_argument("--lr", type=float, help="override train.lr (peak LR; recorded in the run config)")
     ap.add_argument("--require-clean", action="store_true", help="refuse to run with uncommitted changes")
     ap.add_argument("--compile", action="store_true", help="torch.compile the model")
     ap.add_argument("--bench", type=int, default=0, help="only time N steps, no tracking/eval/ckpt")
@@ -112,18 +183,23 @@ def main():
 
     cfg_path = (ROOT / args.config).resolve() if not os.path.isabs(args.config) else pathlib.Path(args.config)
     cfg = json.loads(cfg_path.read_text())
+    arch = cfg.get("arch", "fusiondance")
     tc = dict(cfg["train"])
     if args.max_tokens:
         tc["max_tokens"] = args.max_tokens
     if args.seed is not None:
         tc["seed"] = args.seed
+    if args.lr is not None:
+        tc["lr"] = args.lr
+    overrides = {k: v for k, v in (("max_tokens", args.max_tokens or None), ("seed", args.seed),
+                                   ("lr", args.lr)) if v is not None}
     device = "cuda"
     torch.manual_seed(tc["seed"])
     torch.backends.cuda.matmul.allow_tf32 = True
 
     data = TokenData(tc["dataset"], tc["seq_len"], tc["seed"])
-    mc = ModelConfig(**{**cfg["model"], "vocab_size": data.meta["vocab_size"], "max_seq_len": tc["seq_len"]})
-    model = FusionDance(mc).to(device)
+    model, mc = build_model(cfg, data.meta["vocab_size"], tc["seq_len"])
+    model = model.to(device)
     fwd_model = torch.compile(model) if args.compile else model
     pc = model.param_counts()
     looped = len(model.core) > 0
@@ -142,7 +218,8 @@ def main():
 
     run = None
     if not args.bench:
-        run_cfg = {"config_file": str(cfg_path.relative_to(ROOT)), "model": mc.to_dict(), "train": tc,
+        run_cfg = {"config_file": str(cfg_path.relative_to(ROOT)), "arch": arch, "cli_overrides": overrides,
+                   "model": mc.to_dict(), "train": tc,
                    "params": pc, "flops_per_token_at_default_loops": model.flops_per_token(tc["seq_len"]),
                    "compile": args.compile, "dataset_meta": {k: data.meta[k] for k in ("name", "source", "vocab_size")}}
         run = Run(cfg["experiment"], config=run_cfg, seed=tc["seed"], require_clean=args.require_clean)

@@ -17,6 +17,18 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.34: Quick perspective reviews every 5 minutes
+*2026-11-22*
+
+**What** (the human: "every 5 minutes spawn a random codex/chatgpt gpt 6 luna high subagent to review the project from different perspectives and give feedback to the main agent... inject new ideas possibly but for cheap"):
+- **AGENTS §0d-bis.** Every 5 minutes a cheap reviewer from a **different model family** critiques the project from one random perspective out of 11: skeptic, statistician, data engineer, ML theorist, systems engineer, reproducibility auditor, competitor lab, code practitioner, newcomer, safety reviewer, cheapest-experiment hunter.
+- It reads at most ~8 files and writes at most 40 lines to `notes/reviews/quick/`: observations with citations, 1–3 ideas with their cheapest test, and one question.
+- The main agent triages every idea. Quick reviews are committed in batches with the 30-minute review (§0d), not one commit per tick.
+- **Reviewer model:** the Codex CLI (GPT-6 Luna, high reasoning, read-only) when installed and logged in. **It isn't installed on this machine** (checked on Windows and in WSL), and the main agent can only spawn Claude models, so the reviewer **falls back to Claude Haiku** and says so in each file. The install and OpenAI sign-in are parked for the human (they use the human's own account).
+- **Timer:** a session cron job at minutes 2-59/5 (first tick 18:29).
+
+---
+
 ## v0.4.33: K9 FAILS: 41.7% of val is near-duplicated train text
 *2026-11-22*
 

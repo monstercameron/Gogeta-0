@@ -99,6 +99,33 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
 - **The review and its triage are committed** as one PATCH version ("Outside review <time>") and pushed (§3).
 - **Ideas never preempt the running campaign or the validity-first queue order (§5b).** They feed the queue; they don't jump it unless the main agent records a `move --reason`.
 
+## 0d-bis. Quick perspective reviews every 5 minutes: cheap idea injection
+
+**Every 5 minutes, a cheap reviewer from a different model family critiques the project from one randomly chosen perspective.** The goal is to inject outside ideas cheaply. This complements the 30-minute deep review (§0d).
+
+- **Reviewer:** the **Codex CLI with OpenAI's GPT-6 Luna (high reasoning)** when `codex` is installed and logged in, i.e. `codex exec` run non-interactively, **read-only, without network-changing or write permissions**. If Codex is unavailable, fall back to a Claude **Haiku** subagent, and log that in the review file. A different model family is the point, so prefer Codex whenever it works.
+- **Schedule:** a session cron job every 5 minutes (minutes `2-59/5`). Skip a tick if the previous quick reviewer is still running.
+- **One perspective per tick,** drawn at random so consecutive ticks differ:
+  - skeptical peer reviewer;
+  - statistician;
+  - data engineer (contamination, splits);
+  - ML theorist (why should this work?);
+  - systems/hardware engineer;
+  - reproducibility auditor;
+  - competitor lab ("how would we beat this?");
+  - code-model practitioner (does it help real code tasks?);
+  - newcomer (what's confusing?);
+  - safety/sandbox reviewer;
+  - the cheapest-experiment hunter.
+- **Input** (keep it cheap, under about 8 files): `experiments/claims-status.md`, the top 2 DEVLOG entries, `experiments/QUEUE.md` (head), the newest file in `notes/reviews/`, plus at most 3 files relevant to the perspective.
+- **Output:** one file, `notes/reviews/quick/<YYYY-MM-DD-HHMM>-<perspective>.md`, at most 40 lines:
+  - 3 observations, each citing a file or ledger ID;
+  - 1–3 concrete ideas, each with a hypothesis, the cheapest test and what would change our plans;
+  - 1 question for the main agent.
+- **Rules for the reviewer:** no edits elsewhere, no git, no GPU, no installs. Speculation is labelled as speculation.
+- **Triage is batched:** the main agent reads quick reviews as they arrive. It folds good ideas into `experiments/side-quests.md` / the queue, and rejects the rest with a one-line reason, in a footer on each quick-review file. **Quick reviews are committed together with the next 30-minute review version (§0d)**, not one commit per tick, to avoid commit spam.
+- **Privacy:** the reviewer sees only repo files (a public repo). Never pass secrets, tokens, tracker logs or personal data to an external model.
+
 ## 0e. Cockpit first: one interface, SQLite logs
 
 - **One interface for all tooling.** Every new tool or feature for this project is built into, or registered with, the cockpit core (`cockpit/core.py`) and exposed through both the TUI (`cockpit/tui.py`) and the MCP server (`cockpit/mcp_server.py`). No new standalone scripts that bypass it. One-off `sq_` and check scripts must be launchable and discoverable from the cockpit (a queue item with a launcher command, or a core function).

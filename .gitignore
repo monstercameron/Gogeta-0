@@ -1,0 +1,35 @@
+# Papers: re-download with `python refs/fetch_refs.py` (don't redistribute PDFs)
+refs/**/*.pdf
+
+# Data, tokenized shards, checkpoints, run outputs
+data/
+datasets/
+*.bin
+*.npy
+*.pt
+*.pth
+*.safetensors
+*.ckpt
+checkpoints/
+runs/
+outputs/
+wandb/
+lightning_logs/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Secrets / local
+.env
+.env.*
+.claude/settings.local.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

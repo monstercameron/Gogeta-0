@@ -193,3 +193,9 @@ Source: `notes/benchmark-suite.md` (survey, predictions written before running, 
 | ID | Claim | Source | Status | Evidence / notes |
 |---|---|---|---|---|
 | C130 | The 3D page Play trace for E2 (r=4, checkpoint E2-20261122-132340-s0 step 6104) is the model's real computation: real tokenizer pieces, real softmax attention weights, per-loop Δh, top-5 and greedy continuation | `experiments/viz/export_trace.py` (subagent) | `PARTIAL` | Traced forward = `model.forward` to max abs dlogit 9.5e-6, but on CPU fp32 with a plain-PyTorch GDN reference instead of the fla bf16 kernels: val loss 0.6423 there vs 0.6186 recorded, so values are close, not identical. Other models/r are labelled ILLUSTRATIVE on the page. Upgrade to VERIFIED by regenerating on the GPU with fla. |
+
+## Status updates (latest row per ID wins in claims-status.md)
+
+| ID | Claim | Source | Status | Evidence / notes |
+|---|---|---|---|---|
+| C80 | The Hugging Face wrapper (gogeta/hf.py) is numerically identical to FusionDance | v0.4.19 check | `PARTIAL` (true at v0.4.6; broken since v0.4.7) | `GogetaForCausalLM` fails to build: `GogetaConfig` lacks `gdn_neg_eigval`, added to ModelConfig in v0.4.7 (verified 2026-11-22). Re-verify after queue item Q30. |

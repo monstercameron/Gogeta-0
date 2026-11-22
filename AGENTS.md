@@ -163,11 +163,14 @@ The project stays at `0.y.z` while it's experimental.
 - Training runs in **WSL Ubuntu 24.04** (native Windows ARM64 has no CUDA PyTorch). See `notes/sketch.md`, "Local setup".
 - Keep datasets and checkpoints **on the WSL filesystem** (e.g. `~/fusiondance-data/`), not under `/mnt/c/` (slow, and not committed anyway).
 - Every run is reproducible from a **config file plus a seed** committed to the repo. Results that make it into the devlog must name the config.
-- **Every result lives in the repo, not only on the WSL disk.** This covers training runs, sweep items and checks.
-  - Before cutting a version, run `bash experiments/runs/sync.sh`. It mirrors each finished run's `meta.json`, `summary.json` and `samples.txt` (a few KB) into `experiments/runs/<run>/`, and refuses anything token-like. Commit them with the version.
-  - Check results go to `experiments/checks/results/<ID>.json`, and eval results to `evals/results/`.
-  - Only checkpoints, datasets, caches and raw logs stay outside git, on the WSL disk.
-  - A number in the devlog must be traceable to a committed file.
+- **EVERY EXPERIMENT ENDS BY UPDATING THE CLAIMS LEDGER. No exceptions.**
+  - The ledger lives at the root of `experiments/`: `experiments/claims.md` is the append-only source of truth, and `experiments/claims-status.md` is the generated current list.
+  - This applies when any experiment, check, side quest, sweep or eval finishes, whether it passed, failed or was inconclusive:
+    1. append a ledger row for **every claim it tested** (an existing ID or a new one), with its status (`VERIFIED` / `PARTIAL` / `REFUTED` / `WRONG FOR OUR CODE` / `UNVERIFIED`) and the evidence: the numbers, the results file or run, and the version;
+    2. if it tested no existing claim, add a new claim stating what it found;
+    3. run `python experiments/claims_list.py` to regenerate `claims-status.md`.
+  - **An experiment isn't finished, and its version can't be cut, until the ledger and `claims-status.md` are updated in that same commit.**
+- **Claims list:** `experiments/claims-status.md` is the readable list of every claim with its **latest** status, generated from the append-only ledger `experiments/claims.md` by `python experiments/claims_list.py`. Regenerate and commit it with every version. Run artifacts (`~/fusiondance-data/runs/`) stay out of git; results are recorded in the ledger, cards, `experiments/checks/results/` and the registry.
 - **One checkout, no worktrees (§3), for subagents too.** Never use `git worktree`, `isolation: worktree`, or a copy of the repo elsewhere. `C:\Users\mreca\Desktop\FusionDance` is a stale v0.1.1 copy: never read results from it or write to it.
 - **Every experiment is tracked in `experiments/experiments.json`** (id, arc, question, status, version, config, results). Set `status` to `running` when it starts and `done`/`failed`/`abandoned` when it ends, fill in `results` (use `val_loss` for the site's power-level chart), and set `version` to the tag that records it. New experiments get the next `E<n>` id.
 - Compare variants at **matched compute** (or matched params *and* report compute). State which.

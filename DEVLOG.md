@@ -17,6 +17,24 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.24: Claims list (claims-status.md); run artifacts out of git again
+*2026-11-22*
+
+**What** (the human: "i dont want the run artifacts I want the list of claims"):
+- **Reverted v0.4.23's run mirroring:** `experiments/runs/` (33 files: run `meta`/`summary`/`samples` and `sync.sh`) is removed from git, and so are the `.gitignore` exception and the §5 sync rule. The run folders still exist on the WSL disk; nothing was deleted there. The no-worktree rule from v0.4.23 stays.
+- **`experiments/claims-status.md`** is a generated, readable list of **every claim with its latest status**, grouped by status, with the latest evidence and a link to its ledger line. `experiments/claims_list.py` (stdlib) builds it.
+  - **Why it's needed:** the ledger `experiments/claims.md` is append-only, across 12 sections, so a claim's first row can be stale. For example, C15 and C22 still read UNVERIFIED in the main table but were settled in the K1–K6 verdict section. The list keeps the last status per ID and flags changes ("⟵ was UNVERIFIED").
+  - It's regenerated with every version (AGENTS §5).
+- **C80 updated to PARTIAL:** the Hugging Face wrapper was exact at v0.4.6 but has been broken since v0.4.7 (`gdn_neg_eigval` missing; fix queued as Q30). It's recorded in a new ledger section, "Status updates".
+
+- **AGENTS §5 rule** (the human: "each experiment must update it at the end"): every experiment, check, side quest, sweep or eval **ends by appending ledger rows** for each claim it tested (status + evidence + results file + version) and regenerating `claims-status.md`. No version can be cut without it. The ledger stays at the root of `experiments/`.
+
+- **Near-miss, caught before commit:** the list was first named `CLAIMS.md`. On Windows that's the same file as `claims.md`, so generating it overwrote the ledger. Git showed `claims.md` losing ~190 lines; the ledger was restored from HEAD and my C80 row re-added. It's now `claims-status.md`, and the script refuses to write if its output resolves to the ledger or if it parses 0 claims.
+
+**Results**: 96 claims: **17 VERIFIED, 15 PARTIAL, 6 REFUTED, 2 WRONG FOR OUR CODE, 56 UNVERIFIED**. The unverified ones are mostly paper claims proposed by the research subagents and still pending review.
+
+---
+
 ## v0.4.23: Run records in the repo; no-worktree rule restated
 *2026-11-22*
 

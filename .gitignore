@@ -30,8 +30,6 @@ checkpoints/
 
 # Run outputs, trackers, logs
 runs/
-# ...but the committed run records (meta/summary/samples mirrored by experiments/runs/sync.sh) are tracked
-!/experiments/runs/
 outputs/
 logs/
 *.log

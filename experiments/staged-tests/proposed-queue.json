@@ -1,0 +1,39 @@
+{
+  "_comment": "Proposed by rigor workstream A6 (numerical verification). The main agent merges these into experiments/queue.json AFTER the 7-hour campaign. Nothing here has run on a GPU.",
+  "items": [
+    {
+      "id": "SQ150",
+      "kind": "side-quest",
+      "title": "SQ150: GPU numerical suite for the fla kernels (gpu_numerical_suite.py): behavioural API contract, kernel vs fp64 over a T x d grid (fp32/bf16, chunk/recurrent/neg-eig), backward vs fp64 autograd, long-T (8k, 16k) chunked vs streamed vs prefill+decode, real GatedDeltaNet block and whole model vs the fp64 reference, attention/SWA/MLP/BitLinear on GPU vs fp64",
+      "why": "The audit's C2 'textbook example': a kernel was declared broken because of a call-site bug. This item re-validates every kernel contract and confirms (or recalibrates) the CPU-derived mixed-precision budgets (C198). The CPU emulation under-predicts the fp32 chunk kernel's error by 2.8-3.5x; this run measures the real budget utilisation per cell.",
+      "depends_on": [],
+      "resources": {"type": "gpu", "est_minutes": 10},
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": {
+        "cmd": "cd /mnt/c/Users/mreca/Desktop/Gogeta-0 && ~/.venvs/gogeta/bin/python experiments/staged-tests/gpu_numerical_suite.py",
+        "precondition": "experiments/staged-tests/ moved to tests/ (or run in place), GPU slot free, no GPU process (bash experiments/launch/status.sh), no campaign item running",
+        "writes": "experiments/checks/results/a6_gpu_numerics.json",
+        "after": "python experiments/staged-tests/run_numerical_suite.py --gpu --stamp   # records the GPU pass in env_fingerprint.json"
+      },
+      "prediction_file": "experiments/staged-tests/proposed-predictions.md",
+      "status": "queued",
+      "source": "notes/numerical-verification.md; experiments/staged-tests/proposed-side-quests.md SQ150"
+    },
+    {
+      "id": "SQ153",
+      "kind": "side-quest",
+      "title": "SQ153: why is the fp32 chunk kernel 3x less accurate than a TF32-dot emulation? (input_precision / dtype of intermediates), <= 3 GPU-min",
+      "why": "Recorded GPU error of chunk_gated_delta_rule in fp32 is 2.2e-4 (SQ70) vs 7e-5 predicted by rounding every matmul operand to TF32; bf16 and the recurrent kernel are within 0.7-1.3x. If an intermediate is stored in bf16, 'fp32' runs are not fp32 at all, which matters for any fp32-vs-bf16 comparison.",
+      "depends_on": ["SQ150"],
+      "resources": {"type": "gpu", "est_minutes": 3},
+      "ready": false,
+      "missing": ["script (read fla/ops/gated_delta_rule/chunk*.py for tl.dot input_precision and intermediate dtypes; run with each candidate emulation); needs SQ150's per-cell numbers"],
+      "needs_human": false,
+      "launch": null,
+      "status": "queued",
+      "source": "experiments/staged-tests/proposed-side-quests.md SQ153"
+    }
+  ]
+}

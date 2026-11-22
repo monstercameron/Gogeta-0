@@ -17,6 +17,17 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.48: A6 numerics: snapshot (in progress)
+*2026-11-22*
+
+**Work-in-progress snapshot** committed on the human's instruction to reduce uncommitted changes; the subagent's final hand-back will be its own version.
+
+- Included: `experiments/staged-tests/` (numref, tolerances, error_budget, env_fingerprint, gpu_numerical_suite, run_numerical_suite, test_* files, proposed claims / predictions / queue / side-quests, JSON outputs) and `notes/numerical-verification.md`.
+- Checks: `python -m py_compile` on every .py file passed. The test_* files were not executed because they import torch, which is not installed on the Windows side. The GPU suite was not run. No secrets and no files over 2 MB.
+- The error_budget and env_fingerprint JSON and the notes are reported by the subagent, not yet verified by the main agent.
+
+---
+
 ## v0.4.47: A4 eval battery: snapshot (in progress)
 *2026-11-22*
 

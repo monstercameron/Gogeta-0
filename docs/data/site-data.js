@@ -3,6 +3,12 @@ window.SITE_DATA = {
  "generated": "2026-11-22 18:50",
  "devlog": [
   {
+   "version": "v0.4.48",
+   "title": "A6 numerics: snapshot (in progress)",
+   "date": "2026-11-22",
+   "html": "<p><strong>Work-in-progress snapshot</strong> committed on the human's instruction to reduce uncommitted changes; the subagent's final hand-back will be its own version.</p><ul><li>Included: <code>experiments/staged-tests/</code> (numref, tolerances, error_budget, env_fingerprint, gpu_numerical_suite, run_numerical_suite, test_* files, proposed claims / predictions / queue / side-quests, JSON outputs) and <code>notes/numerical-verification.md</code>.</li><li>Checks: <code>python -m py_compile</code> on every .py file passed. The test_* files were not executed because they import torch, which is not installed on the Windows side. The GPU suite was not run. No secrets and no files over 2 MB.</li><li>The error_budget and env_fingerprint JSON and the notes are reported by the subagent, not yet verified by the main agent.</li></ul>"
+  },
+  {
    "version": "v0.4.47",
    "title": "A4 eval battery: snapshot (in progress)",
    "date": "2026-11-22",

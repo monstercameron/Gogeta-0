@@ -184,3 +184,10 @@ All three from commit `0dc7491` (code clean), seed 0, 200,015,872 tokens each (6
 - **OBS:** `pip install --no-deps -e .` in the WSL venv works. `import gogeta` resolves to the repo, the tokenizer asset is found via `importlib.resources`, and `gogeta.egg-info/` is ignored.
 - **OBS:** the README Mermaid diagram rendered with mermaid 11.4.1 in a throwaway page (outside the repo); a long subgraph title was clipped and has been shortened.
 - **⚠ Note for GitHub readers:** files under `experiments/writeups/` render on GitHub, but their chart directives (`{{chart:…}}`) and `.html` links only work on the published site.
+
+## 2026-11-22 (later): Session: GitHub Pages + tags
+- **Human:** "it's already up, get the gh pages and gh tags configured."
+- **OBS:** `github.com/monstercameron/Gogeta-0` is public; its `main` was already at `4eb9f2b` (= local v0.3.2). No tags, Pages off. `origin` was already configured locally.
+- Pushed tags v0.1.0–v0.3.2. Enabled Pages (POST `/pages`, source `main` `/docs`, legacy build): status `built` in ~20 s, HTTPS enforced. Set the repo homepage to the site.
+- **OBS (live check):** 11 key URLs → 200. Browser: badge v0.3.2, 10 roadmap links, E2 charts render, no console errors.
+- **DEC:** `git config push.followTags true` (local repo config) so version tags travel with pushes; documented in AGENTS.md §3.

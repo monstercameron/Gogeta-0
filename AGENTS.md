@@ -30,6 +30,7 @@ The project stays at `0.y.z` while it's experimental.
 - **No worktrees.** Everything happens in this one checkout.
 - Trunk is `main`. Commit directly to `main` unless the human asks for a branch.
 - Commit or tag only as part of a devlog entry or when the human asks. **Never push** unless the human asks.
+- **Remote:** `origin` = `github.com/monstercameron/Gogeta-0` (public). The local repo has `push.followTags = true`, so a plain `git push` also sends the annotated version tags of the pushed commits. On a fresh clone, set it with `git config push.followTags true` (or use `git push --follow-tags`). Never force-push `main` or a tag.
 - Never commit: PDFs, datasets, tokenized shards, checkpoints, wandb/tensorboard dirs, `.env` files (see `.gitignore`).
 
 ## 4. Subagents
@@ -93,5 +94,6 @@ The project stays at `0.y.z` while it's experimental.
 | `requirements.txt` | Pinned training-environment packages |
 
 Preview the site locally: `python -m http.server 8791 --directory docs`, then open http://127.0.0.1:8791.
+**Live site:** https://monstercameron.github.io/Gogeta-0/ (GitHub Pages, legacy build from `main` / `docs`, HTTPS enforced). It redeploys automatically on every push to `main`. After pushing a version, check that the Pages build is `built` (`gh api repos/monstercameron/Gogeta-0/pages/builds/latest`) and that the site's version badge shows the new tag.
 
 When a decision is made in conversation, record it in the `notes/sketch.md` decisions log, and in the next devlog entry.

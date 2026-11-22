@@ -4,7 +4,8 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-ffd23f"></a>
-  <img alt="Version" src="https://img.shields.io/badge/version-v0.3.2-ff8a1f">
+  <a href="https://github.com/monstercameron/Gogeta-0/tags"><img alt="Version" src="https://img.shields.io/badge/version-v0.3.3-ff8a1f"></a>
+  <a href="https://monstercameron.github.io/Gogeta-0/"><img alt="Project site" src="https://img.shields.io/badge/site-live-3cff9a"></a>
   <img alt="Status: research" src="https://img.shields.io/badge/status-experimental%20research-4a90ff">
   <img alt="Python 3.12" src="https://img.shields.io/badge/python-3.12-3cff9a">
   <img alt="PyTorch 2.14" src="https://img.shields.io/badge/pytorch-2.14-b07cff">
@@ -12,7 +13,8 @@
 
 <p align="center">
   <b>Three efficiency tricks. One tiny language model. Fused, or it falls apart.</b><br>
-  <a href="site-src/learn.md">Start here (plain English)</a> ·
+  <a href="https://monstercameron.github.io/Gogeta-0/"><b>Project site</b></a> ·
+  <a href="https://monstercameron.github.io/Gogeta-0/learn.html">Start here (plain English)</a> ·
   <a href="DEVLOG.md">Devlog</a> ·
   <a href="experiments/experiments.json">Experiments</a> ·
   <a href="notes/LABNOTEBOOK.md">Lab notebook</a> ·
@@ -23,7 +25,7 @@
 
 **Gogeta-0** is a small causal language model for Python code, and the first model built on **FusionDance**: an architecture that fuses three separate answers to the three big costs of modern LLMs. It's an open, laptop-scale research project, and every experiment is written up honestly, failures included.
 
-> **Status: v0.3.2. First models trained.** On 200M tokens of Python, swapping five of six attention layers for linear-time layers **beat the standard transformer by 3.6%**. The looped version **doesn't pay off yet**, and we've measured why. Each result comes from a single seed so far; see [Results](#results-so-far).
+> **Status: v0.3.3. First models trained.** On 200M tokens of Python, swapping five of six attention layers for linear-time layers **beat the standard transformer by 3.6%**. The looped version **doesn't pay off yet**, and we've measured why. Each result comes from a single seed so far; see [Results](#results-so-far).
 
 ## The pitch
 
@@ -78,7 +80,7 @@ flowchart LR
 - **We know why.** Tested with 1–12 loops, it does best at exactly 4, the average it was trained with, and gets *worse* with more. It learned a routine, not "more thinking = better", which is what the Rival Loop is designed to fix.
 - **Not confirmed yet:** each result is a single seed, and the unlooped control ([E9](experiments/writeups/E9.md)) is still pending.
 
-Every experiment has a page with charts and a plain-English explainer on the project site (`docs/`). The **[full roadmap](experiments/experiments.json)** runs E0 → E9: ternary weights, the full fusion (→ `v1.0.0`), adaptive loops, the Rival Loop, loops vs chain-of-thought, and self-speculative decoding.
+Every experiment has a page with interactive charts and a plain-English explainer on the **[project site](https://monstercameron.github.io/Gogeta-0/)**, e.g. [E2: why the loop disappoints](https://monstercameron.github.io/Gogeta-0/experiments/E2.html). The **[full roadmap](experiments/experiments.json)** runs E0 → E9: ternary weights, the full fusion (→ `v1.0.0`), adaptive loops, the Rival Loop, loops vs chain-of-thought, and self-speculative decoding.
 
 ## Quick start
 
@@ -136,9 +138,9 @@ AGENTS.md            working rules for humans and AI agents in this repo
 
 Full rules are in [`AGENTS.md`](AGENTS.md).
 
-## Publishing the site
+## Project site
 
-The site in `docs/` is static and needs no build step on GitHub. Enable it under **Settings → Pages → Deploy from a branch → `main` / `docs`**.
+Live at **[https://monstercameron.github.io/Gogeta-0/](https://monstercameron.github.io/Gogeta-0/)**. GitHub Pages deploys it straight from `main` / `docs` on every push; it's static, so there's no build step on GitHub. Regenerate it locally with `python tools/build_site_data.py` before committing. Every version is a git tag ([all tags](https://github.com/monstercameron/Gogeta-0/tags)).
 
 ## Standing on the shoulders of
 

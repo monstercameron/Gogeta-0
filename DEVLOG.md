@@ -17,6 +17,33 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.55: A1 data integrity (final): clean-val lists, frozen test split, families, strict benchmark contamination
+*2026-11-22*
+
+### A1 data integrity (rigor workstream, final hand-back; snapshot was v0.4.46)
+**What**: `experiments/data_integrity/`:
+- MinHash/LSH + substring dedup;
+- corpus family clustering;
+- a frozen test-split builder with an access guard;
+- strict benchmark contamination;
+- dataset, clean-val and test-split manifests.
+
+The method and policy are in `notes/data-integrity.md`. Test data lives only on the WSL disk.
+**Results** (reported by the subagent; the main agent re-checked the manifests):
+- **The dedup tool works:** planted-duplicate precision 1.00; recall 1.00 for exact and reformatted copies, 0.95 for a 60% prefix, 0.85–1.00 for renamed identifiers.
+- **No unused Python docs exist** (all 991,154 are in train or val), and the corpus has **no source/repo id** (columns: type, lang, text). A first-function-name proxy: 93.5% of val docs share a name with a train doc.
+- **Families** (MinHash, Jaccard ≥ 0.5): 27.1% of docs and 19.6% of tokens are in families of size ≥ 2; 741,056 families, the largest with 5,095 docs; 555 families span train and val. Redundancy is mostly templates, not copies.
+- **Clean val** (`clean-val.manifest.json`, built from K9): `val_clean80` = 2,333 docs (the primary set for claims) and `val_clean50` = 1,174 docs (the strict sensitivity set).
+- **Strict benchmark contamination** (vs the old C103 screen): **HumanEval 74/164** (C103 said 32), HumanEval+ 78/164, **MBPP 103/500** (C103 said 43), MBPP+ 65/378, CRUXEval 9/800, fresh GitHub 1/500. **All earlier code-benchmark numbers should be treated as contaminated.**
+- **Frozen test split `code-py-v1-test`:** 462 UncheatableEval 2026-10 files, 1,000,269 tokens, max 13-gram overlap with train/val 0.060, no family link; `--verify` passes. `code-py-v1-test-indist` (3,062 train docs) is valid only for a retrain that excludes them.
+- **A deduplicated v2** (one doc per family) would keep 737.6k docs / 214.7M tokens (74.7% of docs, 81.8% of tokens).
+- The main agent's re-run of `build_dataset_manifest.py --check` gives `all_ok: true`.
+
+**Predictions that missed** (recorded): family share (predicted > 40%, observed 27%), test-split size, HumanEval strict count (predicted ≤ 70, observed 74), and MBPP vs MBPP+ agreement (79% vs a predicted 95%).
+**Next**: re-score every checkpoint on `val_clean80` / `val_clean50` (SQ100); decide on `code-py-v2` before the next big replication (SQ102); swap in the strict contaminated-ids list after the campaign (SQ101). The ledger rows wait for the ledger redesign (C140–C149 proposals in the folder).
+
+---
+
 ## v0.4.54: SQ99 registered (out-of-corpus check); byte-level side quests adopted
 *2026-11-22*
 

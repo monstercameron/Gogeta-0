@@ -1,0 +1,6 @@
+Proposed PREDICTIONS.md entries from A1. The predictions themselves were written into the scripts before each real-data run; outcomes are added here.
+
+- **corpus_families.py**: > 40% of train docs in a family at Jaccard 0.5 [observed 27%: MISS]; largest family > 1,000 docs [HIT, 5,095]; keep-one-per-family keeps 25-70% of docs [observed 74.7%: MISS]; > 50% of val docs have a train family member [observed 27%: MISS]; K9's < 50%-overlap val docs are > 80% free of train family members [HIT, 100%]. Lesson: Jaccard families miss template-level redundancy that K9's containment sees.
+- **build_test_split.py**: 90-100% of the 500 pool docs survive [HIT, 100%]; 0.5-0.9M tokens [MISS: 1.0M after the cap, pool 1.08M]; < 5% of pool docs have >= 30% of 13-grams in train [HIT, 0%]; mean overlap < 0.10 [HIT, 0.002].
+- **benchmark_contamination.py**: HumanEval strict 32-70 of 164 [MISS slightly: 74]; MBPP strict 43-150 of 500 [HIT: 103]; CRUXEval < 10% contaminated [HIT: 1.1%]; HumanEval+/MBPP+ agree with HumanEval/MBPP on > 95% of shared ids [HIT for HumanEval, 97.6% on the exclude label; MISS for MBPP, 79%]; GitHub slice < 5% contaminated and < 10% suspect [HIT: 0.2%, 8.8%].
+- **SQ100** (new, to register before running): E0 bits/char on val_clean80 > 0.26; E1 < E0 on val_clean80.

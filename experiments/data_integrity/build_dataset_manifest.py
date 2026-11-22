@@ -71,9 +71,10 @@ def check() -> dict:
     man = json.loads(OUT.read_text())
     res = {}
     for split, s in man["splits"].items():
-        for fn, v in s["files"].items():
-            d = DS if split in ("train", "val") else DATA / "datasets" / split
-            res[f"{split}/{fn}"] = sha(d / fn) == v["sha256"]
+        groups = {split: (DS, s)} if "files" in s else {k: (DATA / "datasets" / k, v) for k, v in s.items()}
+        for gname, (d, g) in groups.items():
+            for fn, v in g["files"].items():
+                res[f"{gname}/{fn}"] = sha(d / fn) == v["sha256"]
     res["tokenizer"] = sha(DS / "tokenizer.json") == man["tokenizer"]["sha256"]
     res["all_ok"] = all(res.values())
     return res

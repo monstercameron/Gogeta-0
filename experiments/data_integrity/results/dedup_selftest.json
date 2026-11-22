@@ -1,0 +1,101 @@
+{
+ "seed": 0,
+ "per_kind": {
+  "char5": {
+   "recall": {
+    "exact": 1.0,
+    "reformat": 1.0,
+    "rename": 0.85,
+    "partial60": 0.95,
+    "partial30": 0.15,
+    "embedded": 0.9
+   },
+   "reported_pairs": 97,
+   "correct": 97,
+   "precision": 1.0,
+   "negatives_flagged": 0,
+   "negatives": 100,
+   "lsh": [
+    25,
+    5
+   ],
+   "seconds": 1.2
+  },
+  "struct5": {
+   "recall": {
+    "exact": 1.0,
+    "reformat": 1.0,
+    "rename": 1.0,
+    "partial60": 0.95,
+    "partial30": 0.1,
+    "embedded": 0.7
+   },
+   "reported_pairs": 95,
+   "correct": 95,
+   "precision": 1.0,
+   "negatives_flagged": 0,
+   "negatives": 100,
+   "lsh": [
+    25,
+    5
+   ],
+   "seconds": 0.6
+  }
+ },
+ "minhash_abs_error": {
+  "mean": 0.0121,
+  "max": 0.1116,
+  "n": 200,
+  "expected_sd_at_J0.5": 0.0442
+ },
+ "substring": {
+  "found": 54,
+  "expected_at_least": 51,
+  "none_when_short": true
+ },
+ "stream": {
+  "copy": {
+   "containment": 1.0,
+   "best": [
+    "s",
+    17
+   ],
+   "n_candidate_docs": 1
+  },
+  "half": {
+   "containment": 0.3939,
+   "best": [
+    "s",
+    200
+   ],
+   "n_candidate_docs": 1
+  },
+  "none": {
+   "containment": 0.0,
+   "best": null,
+   "n_candidate_docs": 0
+  },
+  "cross_eos": {
+   "containment": 0.0,
+   "best": null,
+   "n_candidate_docs": 0
+  },
+  "ok": true
+ },
+ "families": {
+  "true_pairs": 109,
+  "found_pairs": 105,
+  "recall": 0.963,
+  "precision": 1.0,
+  "lsh": [
+   16,
+   4
+  ],
+  "n_edges": 101
+ },
+ "presence": {
+  "in": 1.0,
+  "out": 0.0
+ },
+ "pass": true
+}

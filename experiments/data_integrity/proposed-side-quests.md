@@ -1,0 +1,9 @@
+Proposed side quests from A1 (SQ100-SQ106). Queue items for SQ100-SQ104 are in `proposed-queue.json`.
+
+- **SQ100** Re-score every checkpoint on `val_clean80` and `val_clean50` (ids in `clean-val.manifest.json`). Registered K9 consequence; needs a small scoring script outside A1's paths (reads doc ids, scores docs, reports bits/char with a doc-bootstrap CI). Prediction: E0 bits/char on val_clean80 is > 0.26 (K9: 0.278 without the 1,667 near-dups), and E1 stays ahead of E0.
+- **SQ101** Replace `evals/tasks/contaminated_ids.json` with strict labels from `results/proposed-contaminated_ids.json` and add `_clean` twins for HumanEval+, MBPP+, CRUXEval. Strict (`contaminated`) is the headline twin; the lenient (`contaminated` + `suspect`) twin is a sensitivity check. Prediction: clean-twin scores fall relative to the full set for every checkpoint, by more than seed noise.
+- **SQ102** Build `code-py-v2`: group-aware split (MinHash family + first-def-name proxy for specific names), one doc per family, big families capped, val/test redrawn at group level, retokenize, check with K9's metric (< 30% of 13-grams for val/test docs). Decide before the next large replication.
+- **SQ103** Tighten the family estimate: 128 permutations and exact-Jaccard verification of borderline edges (0.4-0.6); report how family sizes change.
+- **SQ104** Fetch more UncheatableEval months (github_python) so the frozen test has several independent months; rebuild under a new name (never overwrite a spent test).
+- **SQ105** Run the identifier-blind view of the stream engine on the benchmark items (renamed copies of solutions); expect a few more `contaminated` items.
+- **SQ106** Dedup ablation: train E0 on a 13-gram-deduplicated subset at equal tokens; evaluate on `val_clean80` and the frozen test. Tests whether template redundancy helps or hurts generalisation.

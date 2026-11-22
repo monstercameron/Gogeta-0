@@ -1,5 +1,5 @@
 {
- "created": "2026-11-22T18:37:46",
+ "created": "2026-11-22T18:51:11",
  "dataset": "code-py-v1",
  "source": "OpenCoder-LLM/opc-annealing-corpus",
  "license": "ODC-By",
@@ -61,6 +61,56 @@
      "block_sha256": [
       "32e4b0ede9211f61d7aa7aea28aa7ecf406e04f02948b0ad0250ddbd41c385d4"
      ]
+    }
+   }
+  },
+  "test": {
+   "code-py-v1-test": {
+    "mode": "external",
+    "seed": 20261122,
+    "docs": 462,
+    "tokens": 1000269,
+    "files": {
+     "docs_test.jsonl": {
+      "sha256": "b4eef46c5fa274555976483d3c77490281435e2a82c9f4ca17c87af515956bf1",
+      "bytes": 2700075
+     },
+     "test.bin": {
+      "sha256": "e8645de444c9e59487026fef0fbb1abb918f0742b2c8c848431c079f5ca88cf9",
+      "bytes": 2000538
+     },
+     "meta.json": {
+      "sha256": "666d4cb0286b50291c5860e34d28ddadb91de856e1726adab1ec478b50fba190",
+      "bytes": 384
+     },
+     "extra.json": {
+      "sha256": "9c26782b65b23ef59c41ac3461c69fc7392716daf46198cbc922243d4b08cbfa",
+      "bytes": 11767
+     }
+    }
+   },
+   "code-py-v1-test-indist": {
+    "mode": "carve",
+    "seed": 20261122,
+    "docs": 3062,
+    "tokens": 1000308,
+    "files": {
+     "docs_test.jsonl": {
+      "sha256": "6514a709937210f1f7867c71a78fcff59d5846e89fdeeb1b89a7c00b755f19a0",
+      "bytes": 4079964
+     },
+     "test.bin": {
+      "sha256": "5c168bf4f443c47c3790c7f5eade4760f10ecbe6a642a568702a8bc89584d8ac",
+      "bytes": 2000616
+     },
+     "meta.json": {
+      "sha256": "3ed88bdbed2a44d62f522df765fece19829af0172af37abf6fb3fc1a6eca6ae8",
+      "bytes": 389
+     },
+     "extra.json": {
+      "sha256": "b6e5bd291b906e906ade64c1b7a39650691497bc6d7c0f8cd8e49b12b5acd844",
+      "bytes": 24099
+     }
     }
    }
   }

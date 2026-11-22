@@ -17,6 +17,30 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.6: SQ6 (+SQ2): rotation vs loops vs negative eigenvalues on parity
+*2026-11-22*
+
+**What**: side quest SQ6 (Mamba-3-style rotating state) with SQ2 (negative-eigenvalue GDN) folded in; prediction committed in `4a3e361` before it ran. This version also commits the **ledger** (`claims.md`: verdicts for C12, C14–C18, C20, C22, new C43–C44; the pending-review sections C30–C42, C50–C69 and C80–C84), the **side-quest log** (SQ outcomes; pending-review SQ14–SQ21, SQ30–SQ41, SQ50–SQ59) and the **lab notebook** entries for all checks and reviews.
+
+### SQ6: Rotation vs loops vs negative eigenvalues on parity
+- **Question:** can a single-pass layer track state (parity) as well as or better than looping? (C22; SQ2)
+- **Result** (2 seeds; positions 32–63 / 64–127 at T=128):
+  - GDN 1 pass 61.7 / 50.3;
+  - looped ×4 97.9 / 61.2;
+  - RotSSM 84.0 / 76.5;
+  - RotSSM, θ=0: 50.2 / 50.1;
+  - **GDN with negative eigenvalues: 100.0 / 99.99** (`results/sq_06.json`).
+- **Verdict vs prediction:**
+  - C22 REFUTED at our scale (84 < 90), although rotation beats looping on length generalisation;
+  - rotation does not beat looping in-length;
+  - **SQ2 strongly confirmed (+38 points)**.
+- **What it means:** a one-flag change to GDN (β ∈ (0, 2)) solves state tracking in one pass and length-generalises, where looping doesn't generalise. This challenges what FusionDance's loop is for, and motivates E11.
+- **Card:** experiments/cards/SQ6.md
+
+**Findings**: single-pass GDN parity accuracy has high variance (K5 81.5% vs SQ6 73.3% / 50.1% with identical setup), so ≥ 2 seeds are needed (C44).
+
+---
+
 ## v0.4.5: K6: Does E2's loop converge?
 *2026-11-22*
 

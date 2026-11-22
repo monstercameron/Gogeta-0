@@ -224,3 +224,25 @@ All three from commit `0dc7491` (code clean), seed 0, 200,015,872 tokens each (6
 ## 2026-11-22 (later): Subagent hand-backs: launch scripts, TRL setup
 - **Launch scripts** (subagent): `tools/launch_{tracker,experiment,cpu_job}.{sh,ps1}` and `experiments/launch/` (E0–E9, status, stop). **OBS (re-checked by the main agent):** 15/15 scripts pass `bash -n`; `status.sh` detects the checks agent's K4 job on the GPU (69 °C, 87%) as outside the launcher; the E3 dry run refuses on dirty code and a busy GPU; E5 refuses (not designed). Committed WIP `21fb049`. ⚠ No real launch has run yet; whether detached runs survive WSL stopping is unverified. Trackio prints a dashboard write token into the tracker log.
 - **TRL setup** (subagent): `gogeta/hf.py`, `post_training/` (SETUP.md, rewards sandbox, tests, GRPO/SFT/DPO smoke), `requirements-rl.txt`, separate venv `~/.venvs/gogeta-rl` (trl 1.18.2, transformers 5.24.0, torch 2.14.1+cu130 kept). **OBS (re-run by the main agent, CPU, 2 threads):** 27/27 tests OK; GRPO smoke PASS with identical numbers (losses −2.086e-07 / 5.296e-05 / 7.899e-05; KL 0 / 0.0013 / 0.0020; 29/29 tensors changed); main venv untouched (no trl; torch cu130). Ledger C80–C84. Blockers: no cached decode (~340× sampling work, computed); fla recurrent GDN NaN; vLLM can't serve FusionDance; GDN-through-wrapper on CUDA untested.
+
+## 2026-11-22 (later): Checks K1–K6 + SQ6 (+SQ2) results (checks subagent; numbers re-read from results JSON by the main agent)
+Predictions and criteria were committed before running (`f1b4ebd`, SQ6 `4a3e361`). Scripts are in `experiments/checks/`, results in `experiments/checks/results/`, cards in `experiments/cards/`.
+- **K2 (C14):** BitLinear forward 5.58× / 4.06× slower than nn.Linear (384→1024 / 384→2048); fwd+bwd 1.92× / 1.59×. **WRONG FOR OUR CODE, confirmed.** Prediction 1.5–5×: slightly exceeded.
+- **K1 (C12, C15):** exponents (n = 1k..16k, batch 1): attn time 1.26 / mem 0.98; **SWA 1.74 / 1.95** (dense mask; 2.9 GB at 16k); **GDN 0.66 / 0.98**. GDN streaming split at 2048: max diff 0.0 (without the carried state: 0.11). C12 wrong for our code; **C15 verified (kernel)**. Note: batch-1 timing is launch-bound, so the memory exponents are the cleaner signal.
+- **K6 (C20):** E2 loop: relative change k1 7.20 → k4 0.283 → k8 0.129 → k12 0.085; ‖h_k‖/‖h₀‖ 7.4 → 22.4 → 40.9 → 58.9; loss after coda 0.784 / **0.722 (k=4)** / 0.737 / 0.760. **C20 refuted.** The reviews' reading: constant-size steps aligned with h, so the norm grows linearly and the loop inflates the state.
+- **K3 (C16): INVALID.** attn 8.6%, gdn 3.3%, linattn 4.9%, swa 0.4% (2 seeds). The positive control failed, so the MQAR setup is too hard or undertrained. **TODO: redesign** (fewer pairs, more steps, or Zoology's exact recipe). C16 stays unverified.
+- **K5 (C18):** parity positions 32–63: GDN 1 pass 81.5%, **looped ×4 97.0%**, 4 unshared 99.8%, attn 50.2%. C18 verified; looping ≈ depth here.
+- **K4 (C17):** ternary relative gap 15.32% / 13.76% / 10.55% at d = 64/128/256 (2 seeds; strictly decreasing within each seed too). Larger than predicted (12/8/5%). Local analogue verified.
+- **SQ6 (+SQ2), 2 seeds:** positions 32–63 / 64–127 (T=128):
+
+| Arm | 32–63 | 64–127 |
+|---|---|---|
+| (a) GDN 1 pass | 61.7% | 50.3% |
+| (b) looped ×4 | 97.9% | 61.2% |
+| (c) RotSSM | 84.0% | 76.5% |
+| (d) RotSSM, θ=0 | 50.2% | 50.1% |
+| **(e) GDN with negative eigenvalues** | **100.0%** | **99.99%** |
+
+  C22 refuted at our scale (84 < 90); rotation does not beat looping in-length but generalises better; **SQ2 is the standout result**.
+- **⚠ Variance:** SQ6 (a) did not reproduce K5 (i) (73.3% / 50.1% vs 81.5%) despite identical init and data. Single-pass GDN parity is unstable, so ≥ 2 seeds are needed. SQ6's first output (all arms ~50%) was superseded by this run; the agent re-ran after fixing its setup.
+- **DEC (proposed, for the human):** C43 suggests the state-tracking job that FusionDance gave to the *loop* may be done better by a one-flag change to GDN (negative eigenvalues), which also length-generalises. Next: test neg-eig GDN for language modelling (E1-style A/B) and inside the looped core, before more loop work.

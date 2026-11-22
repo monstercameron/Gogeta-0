@@ -1,88 +1,157 @@
-# Gogeta-0
+<p align="center">
+  <img src="docs/assets/banner.svg" alt="Gogeta-0: the first FusionDance language model" width="100%">
+</p>
 
-**The first model built on FusionDance, an architecture that fuses three efficiency tricks into one tiny language model.** Can they fuse into something stronger than any of them alone?
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-ffd23f"></a>
+  <img alt="Version" src="https://img.shields.io/badge/version-v0.3.2-ff8a1f">
+  <img alt="Status: research" src="https://img.shields.io/badge/status-experimental%20research-4a90ff">
+  <img alt="Python 3.12" src="https://img.shields.io/badge/python-3.12-3cff9a">
+  <img alt="PyTorch 2.14" src="https://img.shields.io/badge/pytorch-2.14-b07cff">
+</p>
 
-> Status: **v0.3.0, first models trained.** On 200M tokens of Python, the hybrid mixer stack (one full-attention layer out of six) beats a dense transformer by 3.6%. The looped version doesn't pay off yet. Details are in [`DEVLOG.md`](DEVLOG.md). Experimental research repo: expect sharp edges, failed runs, and honest write-ups of both.
->
-> **New to model training?** The project site has a plain-English primer (`docs/learn.html`) and a page per experiment explaining what we found and what it means (`docs/experiments/`).
+<p align="center">
+  <b>Three efficiency tricks. One tiny language model. Fused, or it falls apart.</b><br>
+  <a href="site-src/learn.md">Start here (plain English)</a> ·
+  <a href="DEVLOG.md">Devlog</a> ·
+  <a href="experiments/experiments.json">Experiments</a> ·
+  <a href="notes/LABNOTEBOOK.md">Lab notebook</a> ·
+  <a href="refs/README.md">Reading list</a>
+</p>
 
 ---
+
+**Gogeta-0** is a small causal language model for Python code, and the first model built on **FusionDance**: an architecture that fuses three separate answers to the three big costs of modern LLMs. It's an open, laptop-scale research project, and every experiment is written up honestly, failures included.
+
+> **Status: v0.3.2. First models trained.** On 200M tokens of Python, swapping five of six attention layers for linear-time layers **beat the standard transformer by 3.6%**. The looped version **doesn't pay off yet**, and we've measured why. Each result comes from a single seed so far; see [Results](#results-so-far).
 
 ## The pitch
 
-Modern LLMs are expensive along three separate axes:
+Modern LLMs are expensive along three separate axes, and the research community has a strong answer to each one *on its own*:
 
-1. **Context:** attention cost grows *quadratically* with sequence length, and the KV cache grows with every token.
-2. **Parameters:** more reasoning depth usually means more layers, which means more weights.
-3. **Bits:** every one of those weights is stored and moved in 16-bit precision.
+| | The cost | The fighter | The idea |
+|---|---|---|---|
+| ⚡ | **Context**: attention cost grows with the *square* of the text length | **Linear-time mixers** (Gated DeltaNet) + sliding-window attention | A fixed-size running memory instead of re-reading everything: linear time, constant memory |
+| 🌀 | **Parameters**: more reasoning depth means more layers | **Looped depth** | Run one shared block *r* times: depth comes from compute, not weights |
+| 🪶 | **Bits**: every weight stored in 16-bit precision | **Ternary weights** (BitNet b1.58) | Every weight is −1, 0 or +1: ~1.58 bits, and matrix multiplies become additions |
 
-The research community has a strong answer to *each* of these, on its own:
+**FusionDance fuses all three, and Gogeta-0 is the first model to try it.** The bet is that they cover each other's weak spots. Linear-time mixers are weak at multi-step state tracking, and looping adds exactly that depth. Looping costs compute, and ternary weights make compute cheap.
 
-| Fighter | Attacks | Idea |
-|---|---|---|
-| **Linear-time mixers** (Gated DeltaNet, Mamba) + sliding-window attention | Context cost | A fixed-size recurrent state instead of an ever-growing cache. Linear time, constant memory. |
-| **Looped transformers** | Parameter count | Apply one shared block *r* times. Depth comes from compute, not weights, and you can think *longer* on harder inputs. |
-| **BitNet b1.58** | Bits per weight | Ternary weights {-1, 0, +1}: ~1.6 bits each, and matrix multiplies become additions. |
+## The architecture
 
-**FusionDance is the architecture that fuses all three. Gogeta-0 is its first model, small enough to train on a laptop.**
-
-They should stack instead of fighting. Looping costs extra compute, and ternary weights make compute cheap. Linear-time mixers are weak at multi-step state tracking, and looping adds exactly that depth. Each fighter covers another's weak spot.
-
-## The FusionDance architecture (v0 sketch)
-
-```
-tokens → Embed
-       → Prelude    sliding-window attention
-       → Core × r   [Gated DeltaNet → Gated DeltaNet → sliding-window attn]
-                    one shared block, looped; input re-injected every pass
-       → Coda       a single full-attention layer, run once
-       → next token
+```mermaid
+flowchart LR
+    T([tokens]) --> E[Embed<br/>8k vocab]
+    E --> P[Prelude<br/>sliding-window attn]
+    P --> G1
+    subgraph CORE ["Core × r (shared weights)"]
+        G1[Gated DeltaNet] --> G2[Gated DeltaNet] --> S[Sliding-window attn]
+    end
+    S -. loop r times .-> G1
+    S --> D[Coda<br/>full attention · runs once]
+    D --> N([next token])
 ```
 
-The single design rule: **nothing quadratic lives inside the loop.** Anything inside the loop is paid *r* times. So the only quadratic, cache-growing layer sits outside it and runs once.
+**The one rule: nothing quadratic lives inside the loop.** Anything inside the loop is paid *r* times, so the only full-attention layer sits outside it and runs once. It's also the only layer whose memory grows with the length of the input.
 
-## The ideas worth testing
+## Goals
 
-- **Think in loops, not out loud.** Chain-of-thought reasons by emitting tokens, and every token grows memory and attention cost. Latent loops reason *silently*: compute, but no tokens. How much chain-of-thought can loops replace?
-- **The Rival Loop.** Agent workflows improve code with a critique → fix cycle. We build that rivalry *into the recurrence*: every loop is scored, a critic head grounded in the true loss decides when to stop and tells the next pass what's wrong, and adversarial damage-and-repair training teaches loops to fix their own mistakes.
-- **Loops that pay for themselves at inference.** A looped model can draft for itself: run 1–2 loops to guess several tokens, verify with the full loop count. Self-speculative decoding with no extra drafter model.
-- **Scaling shape over raw numbers.** The headline isn't "X MB". It's *how* memory and compute grow with context, and how much quality you get per bit and per FLOP.
+1. **Fuse the three:** show that linear-time mixing, looped depth and ternary weights *stack* in one causal LLM.
+2. **Think in loops, not out loud:** replace part of chain-of-thought with silent latent loops, spending compute instead of tokens and memory.
+3. **The Rival Loop:** build critique → fix into the recurrence, with per-loop scoring, a grounded critic head, and adversarial damage-and-repair.
+4. **Make loops pay at inference:** self-speculative decoding (draft with a few loops, verify with all of them, no extra model).
+5. **Do it on a laptop:** small models, one-ingredient-at-a-time ablations, and results reported as *scaling shapes*: quality per bit, per FLOP, and cost vs context length.
 
-## Why this is a laptop project
+## Results so far
 
-Every experiment here is designed to run locally: small models (10M–50M parameters), clean one-ingredient-at-a-time ablations, synthetic reasoning probes plus small real-text corpora. If the fusion works at small scale, the scaling story is the interesting part. If it fails, we want to know exactly which ingredient broke it.
+200M tokens of Python each, seed 0, full validation split. Lower loss is better.
 
-## Roadmap
+| Experiment | Layout | Params (non-emb) | Val loss | vs E0 | Compute |
+|---|---|---|---|---|---|
+| [E0: dense baseline](experiments/writeups/E0.md) | 6 × full attention | 10.6M | 0.606 | n/a | 1.0× |
+| [**E1: linear-time mixers**](experiments/writeups/E1.md) | 1 attention + 3 Gated DeltaNet + 2 sliding-window | 11.1M | **0.585** | **−3.6%** | 0.94× |
+| [E2: looped core](experiments/writeups/E2.md) | `[SWA] → [GDN, GDN, SWA] × 4 → [attn]` | 9.5M | 0.619 | +2.0% | 2.0× |
 
-0. Baseline: tiny dense transformer
-1. \+ linear-time mixers (hybrid with sliding-window attention)
-2. \+ loops (shared core block, random loop counts in training)
-3. \+ ternary weights
-4. **Full fusion** → `v1.0.0`
-5. Adaptive loop count per token: "thinking longer" on hard tokens
-6. The Rival Loop, self-speculative decoding, loops vs chain-of-thought
+**In plain English:**
+- **The cheaper layers win.** Running notes plus a glance at recent lines beat re-reading everything, at slightly less compute. E1 matched E0's final quality after 84% of the training.
+- **Loops don't pay yet.** The looped model was 2% worse at twice the cost.
+- **We know why.** Tested with 1–12 loops, it does best at exactly 4, the average it was trained with, and gets *worse* with more. It learned a routine, not "more thinking = better", which is what the Rival Loop is designed to fix.
+- **Not confirmed yet:** each result is a single seed, and the unlooped control ([E9](experiments/writeups/E9.md)) is still pending.
 
-## Repo map
+Every experiment has a page with charts and a plain-English explainer on the project site (`docs/`). The **[full roadmap](experiments/experiments.json)** runs E0 → E9: ternary weights, the full fusion (→ `v1.0.0`), adaptive loops, the Rival Loop, loops vs chain-of-thought, and self-speculative decoding.
 
-| Path | What |
-|---|---|
-| [`DEVLOG.md`](DEVLOG.md) | Versioned history: goals, results, decisions. Every entry is a tagged release. |
-| [`sketch.md`](sketch.md) | The design scratchpad: architecture, parts bin, feasibility, decisions log |
-| [`refs/`](refs/) | Reading list (~55 papers) with an index; `python refs/fetch_refs.py` downloads the PDFs |
-| [`AGENTS.md`](AGENTS.md) | Working rules for humans and AI agents in this repo |
-| [`docs/`](docs/) | The project site (GitHub Pages): goals, the architecture, and a live experiment log |
-| [`experiments/`](experiments/) | Experiment registry: every training arc, its prediction, status and results |
-| [`gogeta/`](gogeta/) | Python package. So far: `tracking.py`, local experiment tracking (Trackio) with git provenance |
-| [`tools/`](tools/) | Site-data builder, result recorder, local dashboard, smoke checks |
+## Quick start
 
-## Research hygiene
+Tested on Ubuntu 24.04 under WSL2 with an NVIDIA Blackwell GPU (ARM64). Any recent CUDA GPU that runs Triton should work.
 
-Every run is tracked **locally** with [Trackio](https://huggingface.co/docs/trackio). Each run records its git commit, config and seed. Predictions are written down *before* runs start. Headline claims use 3+ seeds, and variants are compared against tokens and FLOPs, not training steps. Full rules are in [`AGENTS.md`](AGENTS.md).
+```bash
+# 1. Environment (Triton needs the Python headers)
+sudo apt-get install -y python3.12-venv python3.12-dev
+python3 -m venv ~/.venvs/gogeta && source ~/.venvs/gogeta/bin/activate
+pip install torch --index-url https://download.pytorch.org/whl/cu130
+pip install -e .
+
+# 2. Check the GPU kernels and the model
+python tests/test_gdn_kernels.py
+python tests/test_model.py
+
+# 3. Build the dataset (downloads ~2.8 GB; Python-only subset, ~262M tokens)
+python tools/prepare_data.py
+
+# 4. Train (the configs are E0/E1/E2/E9) and watch it in the local dashboard
+python -m gogeta.train --config configs/e1_hybrid.json --compile
+python tools/dashboard.py          # http://127.0.0.1:7861
+
+# 5. Rebuild the project site after recording results
+python tools/build_site_data.py
+python -m http.server 8791 --directory docs
+```
+
+Data, checkpoints and run logs go to `~/fusiondance-data/` (set `GOGETA_DATA` to change it), never into the repo. Tracking is fully local ([Trackio](https://huggingface.co/docs/trackio)); nothing is uploaded.
+
+## Repository layout
+
+```
+gogeta/              the package: model.py (FusionDance), train.py, tracking.py, assets/ (tokenizer)
+configs/             one JSON config per experiment
+tests/               GPU kernel check against a reference + model correctness tests
+tools/               data pipeline, run queue, result recorder, dashboard, site builder
+experiments/         experiments.json (registry: predictions, status, results),
+                     writeups/ (per-experiment explainers), curves/ (eval curves)
+docs/                the GitHub Pages site (landing, devlog, primer, a page per experiment)
+site-src/            source for the "Start here" primer
+notes/               LABNOTEBOOK.md (timestamped evidence) + sketch.md (design scratchpad)
+refs/                55-paper reading list + fetch script (PDFs are not committed)
+DEVLOG.md            versioned history: every entry is a commit and a git tag
+AGENTS.md            working rules for humans and AI agents in this repo
+```
+
+## How the research is run
+
+- **Predictions first.** Every experiment's prediction is committed *before* it runs, then scored hit/miss afterwards.
+- **One ingredient at a time**, so a failed fusion can be traced to a specific change.
+- **Provenance.** Every run records its git commit, config and seed, and runs for a release refuse to start on uncommitted code.
+- **Devlog = commits = versions.** Each entry in [`DEVLOG.md`](DEVLOG.md) is exactly one commit and one semver tag (`0.y.z` until the full fusion works).
+- **Everything explained twice:** a detailed breakdown for researchers, and a plain-English section for everyone else.
+
+Full rules are in [`AGENTS.md`](AGENTS.md).
+
+## Publishing the site
+
+The site in `docs/` is static and needs no build step on GitHub. Enable it under **Settings → Pages → Deploy from a branch → `main` / `docs`**.
 
 ## Standing on the shoulders of
 
-BitNet b1.58, Mamba / Mamba-2, Gated DeltaNet, Samba, Zamba, Universal Transformers, Recurrent Depth (Huginn), Mixture-of-Recursions, TRM / HRM, LayerSkip, DFlash, and more. Full list in [`refs/README.md`](refs/README.md). The closest prior work we know of (a TRM-style recursive Mamba-2/attention hybrid) is flagged there too. FusionDance's bet is the *full* fusion, ternary included, aimed at a general causal LLM.
+BitNet b1.58, Mamba / Mamba-2, Gated DeltaNet, Kimi Linear, Samba, Zamba, Universal Transformers, Recurrent Depth (Huginn), Mixture-of-Recursions, TRM / HRM, LayerSkip, DFlash, and more: 55 papers with notes in [`refs/README.md`](refs/README.md). The closest prior work we know of, a TRM-style recursive Mamba-2/attention hybrid, is flagged there. FusionDance's bet is the *full* fusion, ternary included, aimed at a general causal LLM.
+
+**Credits**
+- **Training data:** [OpenCoder-LLM/opc-annealing-corpus](https://huggingface.co/datasets/OpenCoder-LLM/opc-annealing-corpus) (`algorithmic_corpus` + `synthetic_code_snippet`, Python only), licensed under **ODC-By 1.0**. The tokenizer in `gogeta/assets/` was trained on it. The data itself is not redistributed here.
+- **Kernels:** [flash-linear-attention](https://github.com/fla-org/flash-linear-attention) (Gated DeltaNet chunk kernel). **Tracking:** [Trackio](https://huggingface.co/docs/trackio). **Framework:** PyTorch.
+
+## License
+
+Code and documentation: [MIT](LICENSE). The dataset keeps its own license (ODC-By 1.0); paper PDFs are fetched from arXiv and not redistributed.
 
 ---
 
-*Named for a certain two-person fusion dance. Two fighters become one stronger one, but only if the dance is perfectly in sync. Get it wrong and things go badly. Same with architectures.*
+<sub>*The name is a fan homage to a certain two-person fusion dance: two fighters become one stronger one, but only if the dance is perfectly in sync. This is an independent research project, not affiliated with or endorsed by the Dragon Ball rights holders.*</sub>

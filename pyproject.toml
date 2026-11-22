@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gogeta"
+version = "0.3.2"
+description = "Gogeta-0: a tiny causal LM built on the FusionDance architecture (linear-time mixers + looped depth + ternary weights)."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+authors = [{ name = "earl cameron" }]
+keywords = ["language-model", "gated-deltanet", "looped-transformer", "bitnet", "ternary", "research"]
+# PyTorch is deliberately not listed: install the CUDA build from the PyTorch index first, e.g.
+#   pip install torch --index-url https://download.pytorch.org/whl/cu130
+dependencies = [
+  "flash-linear-attention==0.6.0",
+  "trackio==0.45.1",
+  "tokenizers",
+  "numpy",
+  "pyarrow",
+]
+
+[project.urls]
+Homepage = "https://github.com/monstercameron/Gogeta-0"
+
+[tool.setuptools]
+packages = ["gogeta"]
+
+[tool.setuptools.package-data]
+gogeta = ["assets/*.json"]

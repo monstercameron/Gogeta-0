@@ -176,3 +176,11 @@ All three from commit `0dc7491` (code clean), seed 0, 200,015,872 tokens each (6
 - The "Fusion" nav item was marked current on every generated page (empty key matched the default) → given its own key.
 - Phone width: SVG text shrank to ~5px → enlarged in SVG units under 640px; margins widened so labels don't collide.
 - **Correction:** DEVLOG v0.3.0 says E2 hit "5 of 8" predicted claims; there are **7** claims, and 5 hit.
+
+## 2026-11-22 (later): Session: repo cleanup for GitHub (no training)
+- **Human request:** clean up and organise the repo, add the right gitignores, get it ready to push, and write a branded README with the project goals. **License:** human chose **MIT**.
+- **DEC:** keep the layout and only move the root-level scratchpad: `sketch.md` → `notes/sketch.md`. `tools/` stays flat (9 scripts, each documented in AGENTS.md); deeper splits would break documented commands for little gain.
+- **OBS (pre-push audit):** untracked files were only `__pycache__/` and the ignored PDFs. A full-history scan for GitHub/OpenAI/HF/AWS token patterns, private keys and `password=` found **0** hits; no email beyond the GitHub no-reply author; largest blob 536 KB (tokenizer). The Windows username `mreca` appears in 2 historical diff lines (an old AGENTS.md path, fixed now, left in history: rewriting would move tags).
+- **OBS:** `pip install --no-deps -e .` in the WSL venv works. `import gogeta` resolves to the repo, the tokenizer asset is found via `importlib.resources`, and `gogeta.egg-info/` is ignored.
+- **OBS:** the README Mermaid diagram rendered with mermaid 11.4.1 in a throwaway page (outside the repo); a long subgraph title was clipped and has been shortened.
+- **⚠ Note for GitHub readers:** files under `experiments/writeups/` render on GitHub, but their chart directives (`{{chart:…}}`) and `.html` links only work on the published site.

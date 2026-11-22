@@ -11,6 +11,7 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
 - A commit can't contain its own hash, so entries reference their **version tag**, not a hash.
 - Not every commit needs an entry: small WIP commits between entries are fine. A version is cut when there is something worth recording (a result, a decision, a new capability, a failed experiment).
 - Before committing a version, run `python tools/build_site_data.py` so the site (`docs/`) matches `DEVLOG.md` and `experiments/experiments.json`. The generated `docs/data/site-data.js` is part of the same commit.
+- With each version, also bump `version` in `pyproject.toml` and the version badge (and the status line, if the headline changed) in `README.md`.
 - Tags are **annotated**: `git tag -a vX.Y.Z -m "vX.Y.Z: <entry title>"`.
 - Never move, delete, or reuse a tag. If something was wrong, cut a new patch version.
 
@@ -40,7 +41,7 @@ The project stays at `0.y.z` while it's experimental.
 
 ## 5. Experiments
 
-- Training runs in **WSL Ubuntu 24.04** (native Windows ARM64 has no CUDA PyTorch). See `sketch.md`, "Local setup".
+- Training runs in **WSL Ubuntu 24.04** (native Windows ARM64 has no CUDA PyTorch). See `notes/sketch.md`, "Local setup".
 - Keep datasets and checkpoints **on the WSL filesystem** (e.g. `~/fusiondance-data/`), not under `/mnt/c/` (slow, and not committed anyway).
 - Every run is reproducible from a **config file plus a seed** committed to the repo. Results that make it into the devlog must name the config.
 - **Every experiment is tracked in `experiments/experiments.json`** (id, arc, question, status, version, config, results). Set `status` to `running` when it starts and `done`/`failed`/`abandoned` when it ends, fill in `results` (use `val_loss` for the site's power-level chart), and set `version` to the tag that records it. New experiments get the next `E<n>` id.
@@ -50,7 +51,7 @@ The project stays at `0.y.z` while it's experimental.
 
 ## 6. Tracking runs (scientific hygiene)
 
-- **Environment:** WSL venv at `~/.venvs/gogeta`, installed from `requirements.txt`. Run from the repo via `/mnt/c/Users/mreca/Desktop/Gogeta-0`.
+- **Environment:** WSL venv at `~/.venvs/gogeta`, installed from `requirements.txt`. Run everything from the repo root (inside WSL, the Windows checkout is under `/mnt/c/...`).
 - **All runs go through `gogeta.tracking.Run`.** Training code never imports `trackio` or `wandb` directly. The backend is `GOGETA_TRACKER=trackio|wandb|none` (default `trackio`, fully local; data in `~/fusiondance-data/trackio`, run folders in `~/fusiondance-data/runs/`).
 - **Write the prediction first.** Fill an experiment's `prediction` field in `experiments.json` *before* its first run starts, and commit it. Don't edit it afterwards; the result gets compared against it.
 - **Provenance:** every run records its git commit, `git describe`, dirty flag, config and seed (done by `Run`). Runs whose results go into a tagged version must use `--require-clean`, which refuses to start if **code paths** (`gogeta/ configs/ tools/ tests/ requirements.txt`) have uncommitted changes. Don't edit code paths while a queue (`tools/run_queue.sh`) is waiting to start runs.
@@ -74,7 +75,7 @@ The project stays at `0.y.z` while it's experimental.
 |---|---|
 | `README.md` | The pitch: high level, stable, for outsiders |
 | `DEVLOG.md` | Versioned history: goals, entries, results |
-| `sketch.md` | Scratchpad: ideas, feasibility, the decisions log. Messy is fine. |
+| `notes/sketch.md` | Scratchpad: ideas, feasibility, the decisions log. Messy is fine. |
 | `refs/` | Papers. Add new ones via `refs/fetch_refs.py` (PDFs are git-ignored; the script re-downloads them). |
 | `AGENTS.md` | These rules |
 | `docs/` | GitHub Pages site (static, no build). Landing page + devlog page. Don't hand-edit `docs/data/site-data.js`: it's generated. |
@@ -83,10 +84,14 @@ The project stays at `0.y.z` while it's experimental.
 | `experiments/writeups/E<n>.md` | Per-experiment write-up (plain-English summary + breakdown) → `docs/experiments/E<n>.html` |
 | `experiments/curves/E<n>.json` | Eval-loss curve points used by the experiment-page charts |
 | `site-src/learn.md` | Newcomer primer ("Start here") → `docs/learn.html` |
+| `notes/LABNOTEBOOK.md` | Timestamped, append-only evidence (see §6) |
+| `LICENSE` | MIT (code + docs). The dataset keeps its own licence (ODC-By); don't commit data or paper PDFs. |
+| `pyproject.toml` | Package metadata + pinned deps (`pip install -e .`; torch is installed separately from the CUDA index) |
+| `.gitignore` | Keeps data, checkpoints, logs, tracker DBs, PDFs and local tool settings out of git. Check it before adding a new output type. |
 | `gogeta/` | The Python package: `tracking.py` now; the model code comes later |
 | `tools/record_result.py`, `tools/dashboard.py`, `tools/smoke_tracking.py` | Results → registry; local dashboard; tracking smoke check |
 | `requirements.txt` | Pinned training-environment packages |
 
 Preview the site locally: `python -m http.server 8791 --directory docs`, then open http://127.0.0.1:8791.
 
-When a decision is made in conversation, record it in the `sketch.md` decisions log, and in the next devlog entry.
+When a decision is made in conversation, record it in the `notes/sketch.md` decisions log, and in the next devlog entry.

@@ -1,35 +1,80 @@
+# ---------------------------------------------------------------------------
+# Gogeta-0 .gitignore
+# Datasets, checkpoints and run outputs live on the WSL filesystem
+# (~/fusiondance-data/) and are never committed. These rules are a safety
+# net in case any of them ends up inside the checkout.
+# ---------------------------------------------------------------------------
+
 # Papers: re-download with `python refs/fetch_refs.py` (don't redistribute PDFs)
 refs/**/*.pdf
 
-# Data, tokenized shards, checkpoints, run outputs
+# Data: raw downloads, filtered docs, tokenized shards
 /data/
 /datasets/
+/raw/
+*.parquet
+*.arrow
+docs_*.jsonl
 *.bin
 *.npy
+*.npz
+*.part
+
+# Checkpoints and weights
+checkpoints/
 *.pt
 *.pth
-*.safetensors
 *.ckpt
-checkpoints/
+*.safetensors
+*.gguf
+
+# Run outputs, trackers, logs
 runs/
 outputs/
+logs/
+*.log
+trackio/
 wandb/
 lightning_logs/
+mlruns/
+*.db
+*.db-journal
+*.sqlite
 
 # Python
 __pycache__/
 *.py[cod]
 .venv/
 venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
 .ipynb_checkpoints/
 
-# Secrets / local
+# Node (none used today; keep it out if a tool adds it)
+node_modules/
+
+# Secrets / local config
 .env
 .env.*
-.claude/settings.local.json
+!.env.example
+*.pem
+*.key
+
+# Claude Code: keep the shared preview config, ignore personal settings
+.claude/*
+!.claude/launch.json
 
 # OS / editor
 .DS_Store
 Thumbs.db
+desktop.ini
 .vscode/
 .idea/
+*.swp
+*~

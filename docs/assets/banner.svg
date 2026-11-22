@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400" role="img" aria-label="Gogeta-0: the first FusionDance language model">
+  <defs>
+    <radialGradient id="aura" cx="50%" cy="54%" r="55%">
+      <stop offset="0" stop-color="#ffd23f" stop-opacity=".55"/>
+      <stop offset=".35" stop-color="#ff8a1f" stop-opacity=".28"/>
+      <stop offset=".7" stop-color="#4a90ff" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#0a0d1c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="title" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff6c4"/>
+      <stop offset=".45" stop-color="#ffd23f"/>
+      <stop offset="1" stop-color="#ff8a1f"/>
+    </linearGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a0d1c"/>
+      <stop offset="1" stop-color="#121731"/>
+    </linearGradient>
+    <clipPath id="frame"><rect width="1280" height="400" rx="24"/></clipPath>
+  </defs>
+  <g clip-path="url(#frame)">
+    <rect width="1280" height="400" fill="url(#bg)"/>
+    <!-- speed lines radiating from the centre -->
+    <g stroke="#ffd23f" stroke-opacity=".10" stroke-width="3">
+      <line x1="640" y1="216" x2="-40" y2="-60"/><line x1="640" y1="216" x2="120" y2="-80"/>
+      <line x1="640" y1="216" x2="300" y2="-80"/><line x1="640" y1="216" x2="480" y2="-80"/>
+      <line x1="640" y1="216" x2="800" y2="-80"/><line x1="640" y1="216" x2="980" y2="-80"/>
+      <line x1="640" y1="216" x2="1160" y2="-80"/><line x1="640" y1="216" x2="1320" y2="-60"/>
+      <line x1="640" y1="216" x2="1340" y2="140"/><line x1="640" y1="216" x2="1340" y2="320"/>
+      <line x1="640" y1="216" x2="1320" y2="480"/><line x1="640" y1="216" x2="1120" y2="500"/>
+      <line x1="640" y1="216" x2="900" y2="500"/><line x1="640" y1="216" x2="380" y2="500"/>
+      <line x1="640" y1="216" x2="160" y2="500"/><line x1="640" y1="216" x2="-40" y2="480"/>
+      <line x1="640" y1="216" x2="-60" y2="320"/><line x1="640" y1="216" x2="-60" y2="140"/>
+    </g>
+    <ellipse cx="640" cy="216" rx="560" ry="250" fill="url(#aura)"/>
+    <!-- scouter-style corner readouts -->
+    <g font-family="Consolas, 'Courier New', monospace" font-size="17" fill="#3cff9a" fill-opacity=".85">
+      <text x="44" y="56">◉ FUSIONDANCE ARCHITECTURE</text>
+      <text x="1236" y="56" text-anchor="end">LINEAR MIXERS · LOOPS · TERNARY</text>
+      <text x="44" y="362">QUADRATIC LAYERS IN LOOP: 0</text>
+      <text x="1236" y="362" text-anchor="end">TRAINED ON A LAPTOP</text>
+    </g>
+    <!-- title -->
+    <text x="640" y="238" text-anchor="middle" font-family="Impact, 'Arial Black', 'Helvetica Neue', sans-serif"
+          font-size="148" letter-spacing="6" fill="#6a2a00" transform="translate(0 7)">GOGETA-<tspan font-family="Consolas, 'DejaVu Sans Mono', monospace" font-weight="700" font-style="italic" font-size="124">0</tspan></text>
+    <text x="640" y="238" text-anchor="middle" font-family="Impact, 'Arial Black', 'Helvetica Neue', sans-serif"
+          font-size="148" letter-spacing="6" fill="url(#title)">GOGETA-<tspan font-family="Consolas, 'DejaVu Sans Mono', monospace" font-weight="700" font-style="italic" font-size="124">0</tspan></text>
+    <text x="640" y="292" text-anchor="middle" font-family="'Segoe UI', Inter, Helvetica, Arial, sans-serif"
+          font-size="30" fill="#a7b0dc">The first <tspan fill="#4a90ff" font-weight="700">FusionDance</tspan> language model</text>
+  </g>
+</svg>

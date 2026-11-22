@@ -78,6 +78,27 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
 - **Report only what's observed:** read logs, `status.sh`, results files and subagent notifications. Never predict or invent progress. A subagent that hasn't reported is "still running", not "nearly done".
 - **Agents may schedule the recurring check themselves** (e.g. a session cron job every 10 minutes that only reads status and reports; it must not start new work). Cancel it when nothing is running any more.
 
+## 0d. Outside review every 30 minutes: think wider
+
+**Every 30 minutes, spawn a fresh reviewer subagent (model: Haiku) to critique the model and the project and to propose alternatives.** The goal is to widen the search: add variations, question our assumptions, and experiment more.
+
+- **Schedule it** with a session cron job (e.g. minutes `7,37`). Skip a tick if the previous reviewer is still running.
+- **The reviewer reads:**
+  - README, the latest DEVLOG entries, `experiments/INDEX.md`, the queue, the claims ledger and side quests;
+  - `gogeta/model.py`;
+  - the previous review, so it builds on or challenges it rather than repeating it.
+- **It writes only one new file,** `notes/reviews/<YYYY-MM-DD-HHMM>-review.md`, with:
+  1. **State of the project:** 5 bullets, facts only, each citing a version, card or ledger ID.
+  2. **Critique** of the architecture and the method: weak controls, confounds, missing seeds, untested assumptions, over-claimed results.
+  3. **5–8 alternative ideas:** different mixers, loop schemes, recipes, data, evals, or cheaper tests of the same question. Each one gives a hypothesis, the cheapest test at our scale (GPU or CPU minutes), the result that would change our plans, and whether it's new compared with the side quests and the queue.
+  4. **The one experiment it would run next,** and why.
+- **Rules for the reviewer:** no git, GPU, installs or downloads. Speculation is labelled as speculation.
+- **The main agent triages every idea** and treats the reviewer's claims as claims (§0, §4):
+  - promising ideas go into `experiments/side-quests.md` and the queue, with predictions when ready;
+  - rejected ones get a one-line reason in the review file's footer.
+- **The review and its triage are committed** as one PATCH version ("Outside review <time>") and pushed (§3).
+- **Ideas never preempt the running campaign or the validity-first queue order (§5b).** They feed the queue; they don't jump it unless the main agent records a `move --reason`.
+
 ## 1. Devlog = commits = versions
 
 - **Every devlog entry is exactly one commit and exactly one git tag.** No entry without a commit, and no tagged commit without an entry.
@@ -239,6 +260,7 @@ The project stays at `0.y.z` while it's experimental.
 | `experiments/side-quests.md` | Side-quest log (§0b): ideas, status, outcomes |
 | `gogeta/hf.py` | Hugging Face wrapper (`GogetaForCausalLM`, tokenizer loader, checkpoint converters) for TRL; no KV cache yet |
 | `post_training/` | TRL setup guide (`SETUP.md`), code-execution reward sandbox, tests, CPU smoke runs for GRPO/SFT/DPO. Prepared, not activated. |
+| `notes/reviews/` | The 30-minute outside reviews (§0d): state of the project, critique, alternative ideas, each with the main agent's triage footer |
 | `evals/`, `notes/benchmark-suite.md` | Standard benchmark suite: lm-eval-harness model adapter (`gogeta_lm.py`), tiered tasks (`python -m evals.run_suite`), hardened sandbox, contamination screen, result JSONs in `evals/results/`. The note has the survey, tiers and predictions. |
 | `requirements-rl.txt` | Pinned TRL stack for `~/.venvs/gogeta-rl` (also `pip install -e .[rl]`) |
 | `experiments/launch/` | One launch script per experiment (`E<n>.sh`), plus `status.sh`, `stop.sh` and a README |

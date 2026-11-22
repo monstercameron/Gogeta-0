@@ -17,6 +17,21 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.21: Outside review every 30 minutes
+*2026-11-22*
+
+**What** (the human: "every 30 minutes spawn a haiku subagent to review the model and to give alternative ideas and analysis on the state of the project so we can add differences and think wider about the project and experiment more"):
+- **AGENTS §0d, "Outside review every 30 minutes: think wider".** A fresh Haiku reviewer reads the README, the devlog, the index, the queue, the ledgers, `gogeta/model.py` and the previous review. It writes one file, `notes/reviews/<time>-review.md`, containing:
+  - the state of the project (cited facts);
+  - a critique of the architecture and the method;
+  - 5–8 alternative ideas, each with a hypothesis, the cheapest test and the result that would change our plans;
+  - the one experiment it would run next.
+- The main agent triages every idea: promising ones go to the side quests and the queue, rejected ones get a one-line reason. Each review is committed as its own PATCH version and pushed.
+- Ideas feed the queue but never preempt the running campaign or the validity-first order.
+- Scheduled as a session cron job at minutes :07 and :37. The §7 docs table lists `notes/reviews/`.
+
+---
+
 ## v0.4.20: Always push to the remote
 *2026-11-22*
 

@@ -17,6 +17,16 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.41: Research: image and audio inputs (nice-to-have, research only)
+*2026-11-22*
+
+**What** (human: "research subagent about supporting audio and image inputs, ... nice to have for later, keep it research only"): two Sonnet research subagents, no code, no downloads, no GPU.
+- **`notes/research-image-input.md`**: 6 approaches compared (frozen encoder + projector, patch-as-tokens, discrete image tokens, cross-attention adapters, early fusion; tiny VLMs; Mamba/linear-time VLMs; ternary vision encoders; looped multimodal). **Recommendation (medium confidence)**: a narrow synthetic proof of concept, a tiny 1-3M-param conv/patch stem feeding 32-64 prefix tokens, trained on self-rendered matplotlib/turtle images paired with their Python source (no licence issues); fallback: Flamingo-style gated cross-attention from the coda. Key constraints: image tokens inside the looped core cost r times (keep them <= 64); a bidirectional 2D encoder feeding the causal core (VL-Mamba/Cobra pattern); ternary vision exists (ViT-1.58b, BitVLA, TernaryCLIP) with the first layer kept high-precision; the smallest published VLM LM is ~135M (10x ours). Several arXiv ids are marked unverified.
+- **`notes/research-audio-input.md`**: **recommendation (medium confidence, ~60%)**: discrete semantic audio tokens at 12.5-25 Hz added to the vocab (~2k rows; Mimi codebook-0, GLM-4-Voice tokenizer or HuBERT units), interleaved audio/text training: no LM change, fits GDN's streaming state; T=1024 = ~82 s of audio at 12.5 Hz. Fallback: frozen Moonshine-/Whisper-tiny encoder + projector (as big as our LM). Evidence for GDN on ASR is thin (no LibriSpeech GDN result found); Speech Slytherin finds Mamba's ASR advantage minor; no ternary from-scratch audio model found. Cheapest PoC described (LibriSpeech-100 with codec tokens, shuffled-audio control). Licences flagged (EnCodec weights CC-BY-NC; Mimi licence conflicting between sources).
+- **Status**: both are post-v1.0.0 arcs, after the K9 cleanup and the core thesis. Paper lists (~60 ids, some flagged unverified) will be checked before being added to `refs/fetch_refs.py`.
+
+---
+
 ## v0.4.40: Rigor design (A3): fair HPO, matched arms, E1 decomposition, 2x2x2 factorial (registered)
 *2026-11-22*
 

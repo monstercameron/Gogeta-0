@@ -17,6 +17,20 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.4: K5: State tracking: single pass vs looped
+*2026-11-22*
+
+**What**: check K5 (State tracking: single pass vs looped): script, results JSON and card. Prediction committed in `f1b4ebd` before it ran.
+
+### K5: State tracking: single pass vs looped
+- **Question:** Are linear mixers weak at state tracking, and does looping add that depth? (C18)
+- **Result:** Running parity, positions 32–63: GDN 1 pass **81.5%**, looped ×4 **97.0%**, 4 unshared GDN 99.8%, attention 50.2% (`results/K5.json`).
+- **Verdict vs prediction:** Hit: weakness supported (< 90%); C18 VERIFIED (+15.4 points). Looped ≈ unshared depth (−2.9 points).
+- **What it means:** Looping buys state-tracking depth on parity, but so does plain depth. SQ6 then found a cheaper fix.
+- **Card:** experiments/cards/K5.md
+
+---
+
 ## v0.4.3: K4: Ternary gap vs model size
 *2026-11-22*
 

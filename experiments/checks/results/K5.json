@@ -1,0 +1,146 @@
+{
+  "check": "K5",
+  "claims": [
+    "C18"
+  ],
+  "prediction": "(i) < 75%; (ii) better than (i), but by an uncertain amount; (iii) ~ (ii); (iv) < 75%.",
+  "criterion": "'Linear-time mixers are weak at state tracking' is supported if (i) < 90%. 'Looping adds that depth' is VERIFIED if (ii) >= (i) + 10 points, and REFUTED if (ii) < (i) + 3 points. Comparing (ii) with (iii) says whether it's the loop or just depth (reported, no criterion).",
+  "verdicts": {
+    "linear_mixers_weak_at_state_tracking": "SUPPORTED ((i) 81.5% < 90%)",
+    "C18_looping_adds_depth": "VERIFIED ((ii) 97.0% >= (i) 81.5% + 10)",
+    "loop_vs_depth_reported": "(ii) looped 97.0% vs (iii) 4 unshared 99.8% (diff -2.9 pts)",
+    "acc_pct": {
+      "i": 81.52,
+      "ii": 96.96,
+      "iii": 99.82,
+      "iv": 50.16
+    }
+  },
+  "data": {
+    "task": {
+      "seq_len": 64,
+      "input": "uniform random bits",
+      "target": "running XOR (parity so far)",
+      "loss": "all positions",
+      "scored": "positions 32-63 of held-out sequences",
+      "eval": "20 batches x 128, generator seed 10000"
+    },
+    "base_config": {
+      "vocab_size": 2,
+      "d_model": 128,
+      "n_heads": 2,
+      "mlp_hidden": 256,
+      "max_seq_len": 64
+    },
+    "models": {
+      "i_gdn_1pass": {
+        "prelude": [
+          "gdn"
+        ],
+        "core": [],
+        "coda": []
+      },
+      "ii_gdn_looped_x4": {
+        "prelude": [],
+        "core": [
+          "gdn"
+        ],
+        "coda": [],
+        "loops": 4,
+        "loops_min": 4,
+        "loops_max": 4,
+        "bptt_loops": 4
+      },
+      "iii_gdn_4_unshared": {
+        "prelude": [
+          "gdn",
+          "gdn",
+          "gdn",
+          "gdn"
+        ],
+        "core": [],
+        "coda": []
+      },
+      "iv_attn_1": {
+        "prelude": [
+          "attn"
+        ],
+        "core": [],
+        "coda": []
+      }
+    },
+    "train": {
+      "steps": 3000,
+      "batch": 128,
+      "lr": 0.001,
+      "warmup": 100,
+      "schedule": "cosine to 0.1x",
+      "optimizer": "AdamW(0.9,0.95) wd 0.1, clip 1.0, bf16 autocast",
+      "seed": 0
+    },
+    "results": {
+      "i_gdn_1pass": {
+        "acc_pos_32_63": 0.81522216796875,
+        "final_train_loss": 0.14362747967243195,
+        "train_loss_at": {
+          "0": 1.0954174995422363,
+          "500": 0.505816638469696,
+          "1000": 0.3793823719024658,
+          "1500": 0.3299707770347595,
+          "2000": 0.2090393453836441,
+          "2500": 0.19180454313755035
+        },
+        "params": 182980,
+        "train_s": 34.6
+      },
+      "ii_gdn_looped_x4": {
+        "acc_pos_32_63": 0.96964111328125,
+        "final_train_loss": 0.02239352837204933,
+        "train_loss_at": {
+          "0": 0.6961376667022705,
+          "500": 0.31108587980270386,
+          "1000": 0.2232457995414734,
+          "1500": 0.17739158868789673,
+          "2000": 0.11515356600284576,
+          "2500": 0.03810683637857437
+        },
+        "params": 216004,
+        "train_s": 86.3
+      },
+      "iii_gdn_4_unshared": {
+        "acc_pos_32_63": 0.99818115234375,
+        "final_train_loss": 0.0019231350161135197,
+        "train_loss_at": {
+          "0": 1.0826077461242676,
+          "500": 0.11636240035295486,
+          "1000": 0.050595782697200775,
+          "1500": 0.014060162007808685,
+          "2000": 0.03824435546994209,
+          "2500": 0.0014674596022814512
+        },
+        "params": 730768,
+        "train_s": 73.8
+      },
+      "iv_attn_1": {
+        "acc_pos_32_63": 0.501611328125,
+        "final_train_loss": 0.6374906897544861,
+        "train_loss_at": {
+          "0": 0.9463901519775391,
+          "500": 0.6780171394348145,
+          "1000": 0.676893413066864,
+          "1500": 0.6790468692779541,
+          "2000": 0.6733906269073486,
+          "2500": 0.6478124260902405
+        },
+        "params": 164480,
+        "train_s": 15.3
+      }
+    }
+  },
+  "ran_at": "2026-11-22T16:42:26",
+  "runtime_s": 210.0,
+  "git_commit": "4a3e36102d302de6f99f683e19a8e63c99754373",
+  "git_describe": "v0.3.5-2-g4a3e361-dirty",
+  "torch": "2.14.1+cu130",
+  "device": "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU)"
+}

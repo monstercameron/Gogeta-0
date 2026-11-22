@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-ffd23f"></a>
-  <a href="https://github.com/monstercameron/Gogeta-0/tags"><img alt="Version" src="https://img.shields.io/badge/version-v0.4.29-ff8a1f"></a>
+  <a href="https://github.com/monstercameron/Gogeta-0/tags"><img alt="Version" src="https://img.shields.io/badge/version-v0.4.30-ff8a1f"></a>
   <a href="https://monstercameron.github.io/Gogeta-0/"><img alt="Project site" src="https://img.shields.io/badge/site-live-3cff9a"></a>
   <img alt="Status: research" src="https://img.shields.io/badge/status-experimental%20research-4a90ff">
   <img alt="Python 3.12" src="https://img.shields.io/badge/python-3.12-3cff9a">
@@ -38,7 +38,7 @@
 
 **Gogeta-0** is a small causal language model for Python code, and the first model built on **FusionDance**: an architecture that fuses three separate answers to the three big costs of modern LLMs. It's an open, laptop-scale research project, and every experiment is written up honestly, failures included.
 
-> **Status: v0.4.29. First models trained.** On 200M tokens of Python, swapping five of six attention layers for linear-time layers **beat the standard transformer by 3.6%**. The looped version **doesn't pay off yet**, and we've measured why. Each result comes from a single seed so far; see [Results](#results-so-far).
+> **Status: v0.4.30. First models trained.** On 200M tokens of Python, swapping five of six attention layers for linear-time layers gave **3.6% lower loss than the standard transformer**, in **one seed at an untuned learning rate** (ledger C5: partial). The looped version **doesn't pay off yet** (C6/C7: partial). A 3-seed replication at tuned learning rates is running now, and the absolute loss numbers are provisional until a train/val leakage check (K9) passes. See [Results](#results-so-far) and the [claims list](experiments/claims-status.md).
 
 ## The pitch
 
@@ -90,7 +90,7 @@ flowchart LR
 **In plain English:**
 - **The cheaper layers win.** Running notes plus a glance at recent lines beat re-reading everything, at slightly less compute. E1 matched E0's final quality after 84% of the training.
 - **Loops don't pay yet.** The looped model was 2% worse at twice the cost.
-- **We know why.** Tested with 1–12 loops, it does best at exactly 4, the average it was trained with, and gets *worse* with more. It learned a routine, not "more thinking = better", which is what the Rival Loop is designed to fix.
+- **Our best guess at why (not yet settled; C7 partial, one checkpoint).** Tested with 1–12 loops, it does best at 4, the average it was trained with, and gets *worse* beyond the trained range. It learned a routine, not "more thinking = better", which is what the Rival Loop is designed to fix.
 - **Not confirmed yet:** each result is a single seed, and the unlooped control ([E9](experiments/writeups/E9.md)) is still pending.
 
 Every experiment has a page with interactive charts and a plain-English explainer on the **[project site](https://monstercameron.github.io/Gogeta-0/)**, e.g. [E2: why the loop disappoints](https://monstercameron.github.io/Gogeta-0/experiments/E2.html). The **[full roadmap](experiments/experiments.json)** runs E0 → E9: ternary weights, the full fusion (→ `v1.0.0`), adaptive loops, the Rival Loop, loops vs chain-of-thought, and self-speculative decoding.

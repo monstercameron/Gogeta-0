@@ -17,6 +17,23 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.30: K9 registered: train/val leakage check
+*2026-11-22*
+
+### K9 (registered, not run yet): train/val near-duplicate leakage
+**Why**: K8a failed (our models 0.47–0.49× SmolLM2's bits/char, against a 0.5 gate). Its registered consequence is to rule out train/val leakage before trusting absolute loss numbers.
+**What**: `experiments/checks/k9_leakage.py`, written by a subagent and reviewed. It hashes every 13-gram of the 4,000 val docs, the same docs as K8, with a rolling 64-bit hash, and counts hits in train (262.4M tokens, 987,154 docs). Baselines:
+- a **pseudo-val** of 4,000 train docs held out of the reference set;
+- a **shuffled control**;
+- the numbers again **without the 1,000 most common boilerplate 13-grams**.
+
+It flags val docs with ≥ 80% (and ≥ 50%) of their 13-grams in train. If near-duplicates exist, it re-scores E0's bits/char without them (CPU).
+**Prediction (registered here, before the run)**: fewer than 1% of val docs are near-duplicates; val overlap is within ±5 points of the pseudo-val baseline; and dropping near-duplicates moves E0's bits/char by < 2%. In other words, K8's 0.47–0.49 ratio is in-distribution training, not leakage.
+**Criterion**: PASS if near-duplicate val docs are < 1% AND (if computed) excluding them changes E0's bits/char by < 2%. Otherwise FAIL, which means rebuilding the val split with near-duplicate removal and re-scoring. It maps to C94 and C107.
+**Results**: the selftest passes 13/13 (hash vs a pure-python reference, exact planted counts, chunk-boundary invariance, controls). Planned cost: about 2–5 CPU-min, peak ~1 GB of RAM. It runs next as a CPU job, beside Phase 2b.
+
+---
+
 ## v0.4.29: SQ70: GDN recurrent decode kernel works (C2 verified)
 *2026-11-22*
 

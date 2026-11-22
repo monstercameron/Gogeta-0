@@ -22,6 +22,10 @@ dependencies = [
   "pyarrow",
 ]
 
+[project.optional-dependencies]
+# Post-training (TRL). Install into a SEPARATE venv (~/.venvs/gogeta-rl), torch from the cu130 index first. See post_training/SETUP.md.
+rl = ["trl==1.18.2", "transformers==5.24.0", "accelerate==1.16.0", "datasets==5.2.0"]
+
 [project.urls]
 Homepage = "https://monstercameron.github.io/Gogeta-0/"
 Repository = "https://github.com/monstercameron/Gogeta-0"

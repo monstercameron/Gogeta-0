@@ -129,6 +129,7 @@ The project stays at `0.y.z` while it's experimental.
   3. Run `python tools/build_site_data.py`, which generates `docs/experiments/E<n>.html` (never hand-edit generated pages), and check the page in the browser at desktop and phone width.
   4. If the headline understanding changed, update "What we've found so far" in `site-src/learn.md` (the newcomer primer, which generates `docs/learn.html`).
   - Planned experiments keep a short page with "What it will test, in plain English" and a status line; interrupted or failed runs say so plainly.
+- **Post-training (TRL) lives in a separate venv, `~/.venvs/gogeta-rl`**, set up per `post_training/SETUP.md`: torch from the cu130 index first, then `pip install -r requirements-rl.txt`. **Never install trl into `~/.venvs/gogeta`**: transformers/trl can swap the CUDA torch build for a CPU one. Run `pip install --dry-run` first if you must change the main venv. **Run model-generated code only through `post_training/rewards.py`** (or a stronger sandbox: container or nsjail). It isolates network, memory, processes and time, but **not the filesystem**.
 - **Training environment setup** (fresh WSL): `apt-get install python3.12-venv python3.12-dev` (Triton needs `Python.h`), create the venv, `pip install torch --index-url https://download.pytorch.org/whl/cu130`, then `pip install -r requirements.txt`. Verify with `tests/test_gdn_kernels.py` and `tests/test_model.py`.
 - **Seeds:** headline claims need **≥3 seeds**; report the mean and spread.
 - **X-axes:** log `tokens` and `flops` every step and compare variants against those, not steps (looped models do more work per step).
@@ -155,6 +156,9 @@ The project stays at `0.y.z` while it's experimental.
 | `experiments/claims.md` | **Claims ledger** (§0): every claim we rely on, with source, status and evidence |
 | `experiments/checks/` | One small, seeded verification script per claim (§0), each ≤ ~15 min; side-quest scripts are prefixed `sq_` |
 | `experiments/side-quests.md` | Side-quest log (§0b): ideas, status, outcomes |
+| `gogeta/hf.py` | Hugging Face wrapper (`GogetaForCausalLM`, tokenizer loader, checkpoint converters) for TRL; no KV cache yet |
+| `post_training/` | TRL setup guide (`SETUP.md`), code-execution reward sandbox, tests, CPU smoke runs for GRPO/SFT/DPO. Prepared, not activated. |
+| `requirements-rl.txt` | Pinned TRL stack for `~/.venvs/gogeta-rl` (also `pip install -e .[rl]`) |
 | `experiments/launch/` | One launch script per experiment (`E<n>.sh`), plus `status.sh`, `stop.sh` and a README |
 | `tools/launch_tracker.*`, `tools/launch_experiment.*`, `tools/launch_cpu_job.*` | Tracker start/stop; the GPU-slot experiment launcher; the CPU job launcher (`.sh` for WSL, `.ps1` wrappers for Windows) |
 | `LICENSE` | MIT (code + docs). The dataset keeps its own licence (ODC-By); don't commit data or paper PDFs. |

@@ -17,6 +17,23 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.32: Outside review 18:07 triaged; README claims match the ledger
+*2026-11-22*
+
+### Outside review 2026-11-22 18:07 (Haiku reviewer, AGENTS §0d)
+**What**: the first 30-minute outside review, `notes/reviews/2026-11-22-1807-review.md`, with a state-of-project summary, 9 critiques, 6 alternative ideas and a next-experiment pick. The main agent triaged every item; the triage is in the review's footer.
+**Accepted**:
+- SQ90: code state-tracking probe on real Python (in rigor workstream A4);
+- **SQ91: E1 decomposition**, one factor at a time, the reviewer's pick (A3, high priority);
+- SQ92: oracle per-token loop count, an upper bound for E5 (queued after SQ14);
+- SQ93: dense arm at E1's non-embedding params (A3);
+- **SQ19 promoted into the queue** (full vs truncated BPTT).
+
+**Rejected**: "dense at E1's FLOPs". E0 already uses more FLOPs than E1 and still loses, so it can't close the gap. It was replaced by the matched-*params* arm. "Unshared at matched FLOPs" was merged into SQ32 and A3.
+**README overclaim fixed** (critique 1): the status line now says the 3.6% is one seed at an untuned LR (C5: partial), mentions the running replication, and says absolute losses are provisional until K9. "We know why" is now "our best guess, not settled (C7 partial)". This edit went out inside v0.4.30's commit, because the version bump stages README; it's recorded here.
+
+---
+
 ## v0.4.31: Cockpit: TUI + MCP + SQLite logs + self-heal watchdog; evidence and micro-devlog rules
 *2026-11-22*
 

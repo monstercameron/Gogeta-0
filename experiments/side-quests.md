@@ -116,3 +116,14 @@ Source: [`notes/hardware-spark.md`](../notes/hardware-spark.md) (NVIDIA RTX Spar
 | SQ81 | One-ingredient A/Bs for the speed patches on E1 at matched tokens (20M, seed 0, 2 seeds if close): flex SWA, fused CE, GDN fused kernels, each alone vs baseline: val loss within seed noise and tok/s | Kernel swaps change bf16 rounding; a speedup is only usable if the loss is unchanged | `idea` | n/a |
 | SQ82 | Power-mode A/B: re-run SQ71 and SQ74's E0 arm after the human switches Windows to "Best performance" on AC | Observed median 43 W of a 45-80 W envelope: possibly the largest single speedup, at zero code cost | `idea` (needs the human to change the setting) | n/a |
 | SQ83 | torchao float8 training feasibility at d=384 and d=1024 (tok/s and loss at matched steps) | Predicted no gain at d=384 (bandwidth-bound, GEMMs < half the step); possible at larger d | `idea` (needs a package install) | n/a |
+
+## Proposed by outside review 2026-11-22 18:07 (triaged by the main agent)
+
+Source: [`notes/reviews/2026-11-22-1807-review.md`](../notes/reviews/2026-11-22-1807-review.md). IDs SQ90–SQ99 are reserved for outside reviews.
+
+| ID | Idea | Why it might help | Status | Outcome / what we did |
+|---|---|---|---|---|
+| SQ90 | **Code state-tracking probe on real Python**: snippets with k variable reassignments plus distractors; accuracy vs binding distance; inference only on E0/E1/E2 (and E11 once trained) | Tests whether loops (or neg-eig GDN) help the thesis's actual target (tracking state in code), not just synthetic parity (K5/SQ6). ~5 GPU-min | `idea` (accepted) | Folded into rigor workstream A4 (code-native state-tracking probe in the eval battery) |
+| SQ91 | **E1 decomposition** (one factor at a time): GDN→attention; GDN without ShortConv/gate/out-norm; SWA-only; attention placement | E1 changes 5 things vs E0, so "running notes" credit is untested. The reviewer's next-experiment pick | `idea` (accepted, high priority) | Folded into rigor workstream A3 (staged configs + registered predictions) |
+| SQ92 | **Oracle per-token loop count** on E2 (per-token min loss over r=1..12, saving at equal mean r) | Upper bound for adaptive halting (E5): if the oracle saves < 1%, E5 isn't worth building. ~2 GPU-min, reuses the SQ14 harness | `idea` (accepted) | Queued after SQ14 (shares its harness) |
+| SQ93 | **Dense arm at E1's non-embedding params** (+4.4%) | C95: E1 vs E0 is near-matched params, not exact. Modified from the review's "dense at E1's FLOPs" (rejected, see review footer) | `idea` (accepted, modified) | Folded into A3 (matched-param arms) |

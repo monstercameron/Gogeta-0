@@ -1,4 +1,4 @@
-# FusionDance 🕺🕺 → 💥
+# Gogeta-0: FusionDance architecture sketch 🕺🕺 → 💥
 
 > LLM + SSM + looped transformers + BitNet... *fu-sion-HA!*
 
@@ -27,6 +27,7 @@ The nice part is that looping costs extra compute and BitNet makes compute cheap
 - **2026-11-22:** Device is **the laptop** (RTX Spark N1X, via WSL). **No hard memory target.** Memory efficiency is a design value, not a constraint, so we're exploring.
 - **2026-11-22:** Build it as a **configurable sweep harness**, not one fixed model. Each axis gets toggled and measured.
 - **2026-11-22:** Intermediate loops get a **cheap exit head** (norm + tied unembed), not the coda. Decoding every loop through the coda's full attention would bring back r × O(n²).
+- **2026-11-22:** Naming: the **repo/project is Gogeta-0**, and the **architecture is FusionDance**. Gogeta-0 is the first FusionDance model.
 
 ---
 
@@ -43,7 +44,7 @@ The nice part is that looping costs extra compute and BitNet makes compute cheap
 
 ---
 
-## Sketch architecture: "Gogeta-0" (placeholder name)
+## Gogeta-0: the first FusionDance model
 
 ```
 tokens

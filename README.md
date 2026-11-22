@@ -1,6 +1,6 @@
-# FusionDance
+# Gogeta-0
 
-**Three efficiency tricks, one tiny language model. Can they fuse into something stronger than any of them alone?**
+**The first model built on FusionDance, an architecture that fuses three efficiency tricks into one tiny language model.** Can they fuse into something stronger than any of them alone?
 
 > Status: **v0.1.0, design phase.** Experimental research repo. Expect sharp edges, failed runs, and honest write-ups of both.
 
@@ -22,11 +22,11 @@ The research community has a strong answer to *each* of these, on its own:
 | **Looped transformers** | Parameter count | Apply one shared block *r* times. Depth comes from compute, not weights, and you can think *longer* on harder inputs. |
 | **BitNet b1.58** | Bits per weight | Ternary weights {-1, 0, +1}: ~1.6 bits each, and matrix multiplies become additions. |
 
-**FusionDance asks what happens when you fuse all three.**
+**FusionDance is the architecture that fuses all three. Gogeta-0 is its first model, small enough to train on a laptop.**
 
 They should stack instead of fighting. Looping costs extra compute, and ternary weights make compute cheap. Linear-time mixers are weak at multi-step state tracking, and looping adds exactly that depth. Each fighter covers another's weak spot.
 
-## The model (v0 sketch)
+## The FusionDance architecture (v0 sketch)
 
 ```
 tokens → Embed

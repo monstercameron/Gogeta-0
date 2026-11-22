@@ -1,10 +1,10 @@
-# FusionDance devlog
+# Gogeta-0 devlog
 
 Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS.md)). Newest first.
 
 ## High-level goals
 
-1. **Fuse three efficiency ideas into one small causal LLM**, and show they stack rather than fight:
+1. **FusionDance:** fuse three efficiency ideas into one causal LLM architecture, and show with **Gogeta-0** (its first model) that they stack rather than fight:
    - **Linear-time sequence mixing** (Gated DeltaNet / Mamba-style state + sliding-window attention): no quadratic cost inside the network, and only one layer whose memory grows with context.
    - **Looped depth**: one shared block applied r times, so reasoning depth comes from compute, not parameters.
    - **Ternary weights** (BitNet b1.58): ~1.6 bits per weight.
@@ -14,6 +14,16 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 5. **Do it on a laptop.** Everything trains and runs locally (RTX Spark N1X via WSL). Small models, clean ablations, honest results, including failures.
 
 **Headline metric:** quality per bit of weight memory and per FLOP, plus how memory and compute *scale with context length*.
+
+---
+
+## v0.1.1: Naming: repo Gogeta-0, architecture FusionDance
+*2026-11-22*
+
+**What**: renamed the repo/project to **Gogeta-0**. **FusionDance** is now the name of the architecture (linear-time mixers + loops + ternary); Gogeta-0 is its first model. Updated README, DEVLOG, AGENTS, sketch and the refs index.
+**Results**: n/a
+**Decisions**: Repo = Gogeta-0, architecture = FusionDance.
+**Next**: unchanged from v0.1.0.
 
 ---
 

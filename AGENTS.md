@@ -1,4 +1,4 @@
-# AGENTS.md: rules for working in FusionDance
+# AGENTS.md: rules for working in Gogeta-0
 
 These rules are binding for any agent (Claude Code or otherwise) working in this repo.
 If a rule conflicts with a direct instruction from the human in chat, follow the human and propose updating this file.

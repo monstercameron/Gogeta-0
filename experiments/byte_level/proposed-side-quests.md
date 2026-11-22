@@ -1,0 +1,16 @@
+# Proposed side quests SQ180-SQ189 (byte-level models)
+
+Proposals only (not merged into `experiments/side-quests.md`). Evidence base: `notes/research-byte-level.md`. GPU-minute figures are estimates from `notes/hardware-spark.md` throughputs; all are predictions.
+
+| ID | Idea | Why / prediction / criterion | Cost | Status |
+|---|---|---|---|---|
+| SQ180 | **BX1: byte-E1 (vocab 256, T=4,096, window 1,024) vs BPE-E1**, at matched FLOPs (209.6M bytes) and matched bytes (746.9M), scored in K9-clean val bits/char | Predicted ratio byte/BPE 1.10-1.35 (matched FLOPs), 0.97-1.10 (matched bytes). Refuted-as-viable if matched-FLOPs ratio > 1.15 | ~35 + ~125 GPU-min (+10 LR check); **blocked on P3 flex SWA** | idea |
+| SQ181 | **BX2: BLT-lite, fixed patch 4**, local d=192 (1 GDN encoder, GDN+SWA(32) decoder), E1 body on 1,024 patches | Predicted ratio to BPE-E1 1.00-1.12; 1.14x E1 FLOPs (computed), ~2x E1 time. Pays if ratio <= 1.03 and <= byte-E1 + 1% | ~65-75 GPU-min + ~7 LR check; needs a new module and a byte data path | idea |
+| SQ182 | **Patch-size sweep P in {2,4,8}** for BLT-lite | BLT/MegaByte use larger patches for larger models; at 14M the best P is probably 2-4. Criterion: monotone curve with an optimum, report FLOPs/byte | ~3 x 60 GPU-min | idea, after SQ181 |
+| SQ183 | **Looped core on patches** (E2 body on 1,024 patches) vs unlooped BLT-lite | Tests the "loop cost per patch" hypothesis: cost per byte 1/4 of byte-E2. Criterion: looped beats unlooped at <= 1.5x the time | ~120 GPU-min | idea, needs SQ181 pass |
+| SQ184 | **Rule-based dynamic patches (SpaceByte-style: after non-alphanumeric bytes)** vs fixed P=4 | SpaceByte reports fixed-patch loses 6-12% to the rule. Needs fla varlen (`cu_seqlens`) or padding, verify first (SQ185) | ~75 GPU-min | idea |
+| SQ185 | **fla chunk GDN with variable-length rows (`cu_seqlens`) and with padded patch rows**: correctness vs fp32 reference on CPU/small GPU, and chunk-size alignment at T=4,096 | Prerequisite for dynamic patching. Pass: fwd/bwd match C1's tolerances | CPU / <1 GPU-min | idea |
+| SQ186 | **CPU causality + leakage test for BLT-lite wiring** (no information flows from byte i to predictions of bytes <= i, across patch boundaries, in the encoder, the up-projection, and the decoder) | Same style as C3. Pass: past-token diff exactly 0 | CPU, minutes | idea (part of the SQ181 build) |
+| SQ187 | **Robustness eval for byte vs BPE**: perturb val code (identifier typos, swapped chars, rare identifiers, non-ASCII, tab/space changes), score clean and perturbed bits/char for E1, byte-E1, BLT-lite | The robustness advantage (MambaByte, BLT, H-Net: reported) cannot show on clean-val; Predicted: byte models degrade <= 1/3 as much as BPE. Pass: relative degradation ratio | ~10 GPU-min after checkpoints | idea |
+| SQ188 | **Byte-level K7**: LR sweep (3e-3, 6e-3, 1.2e-2 at 20M bytes) for byte-E1 and BLT-lite; MegaByte used init std 0.006, H-Net near-zero residual init | The LR tuned for BPE may not transfer; avoid a confounded comparison | ~3 x 5 GPU-min per arm | idea |
+| SQ189 | **Memory/throughput probe for T=4,096**: byte-E1 B=30 and B=15x2, steps/s, peak memory, with and without flex SWA, 50 steps each | Replaces the 85-115k bytes/s prediction with a measurement; unblocks the GPU-minute estimates in SQ180/181 | ~5 GPU-min | idea, first to run |

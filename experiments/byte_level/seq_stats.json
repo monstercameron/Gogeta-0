@@ -1,0 +1,26 @@
+{
+ "docs": 4000,
+ "chars": 3938783,
+ "bytes": 3940661,
+ "tokens": 1055160,
+ "bytes_per_token": 3.7346573031578147,
+ "chars_per_token": 3.73287747829713,
+ "bytes_per_char": 1.0004767970208057,
+ "docs_with_nonascii": 69,
+ "extra_bytes_from_nonascii": 1878,
+ "tokens_pctl": {
+  "0.5": 221,
+  "0.9": 459,
+  "0.99": 762
+ },
+ "bytes_pctl": {
+  "0.5": 749,
+  "0.9": 1854,
+  "0.99": 3078
+ },
+ "frac_docs_gt_1024_tokens": 0.00225,
+ "frac_docs_gt_3584_bytes": 0.00375,
+ "frac_docs_gt_4096_bytes": 0.00175,
+ "vocab": 8192,
+ "per_doc_ratio_median": 3.5876977100153065
+}

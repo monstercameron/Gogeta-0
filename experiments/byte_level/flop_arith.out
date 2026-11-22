@@ -1,0 +1,7 @@
+E1 body params          11,091,684  (E1 total 14,237,796; embedding 3,145,728 = 22.1%)
+E1 BPE T=1024: train FLOP/token 91.0 M (registry: 91M)
+Byte-E1 T=4096 win=256: params 11,190,372; train FLOP/byte 79.8M; per BPE-token-equiv 298M = 3.27x E1; matched-FLOPs bytes 228M (61M tok-equiv, 31%); matched-bytes FLOPs 5.962e+16 vs E1 1.821e+16
+Byte-E1 T=4096 win=1024: params 11,190,372; train FLOP/byte 86.9M; per BPE-token-equiv 325M = 3.57x E1; matched-FLOPs bytes 210M (56M tok-equiv, 28%); matched-bytes FLOPs 6.491e+16 vs E1 1.821e+16
+BLT-lite local params: emb 49,152 enc 483,142 patch-in 294,912 up 73,728 dec 925,894 = 1,826,828; total 12,918,896 (-9.3% vs E1)
+BLT-lite: core 6.01M + local 3.22M fwd/byte; train 27.7M/byte = 103M per tok-equiv = 1.14x E1
+BLT-lite bandwidth proxy (layer-equiv per patch, width-weighted): core 6 + local 6.0 = 12.0 vs E1 6

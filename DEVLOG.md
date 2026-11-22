@@ -17,6 +17,17 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.50: Byte-level research: snapshot (in progress)
+*2026-11-22*
+
+**Work-in-progress snapshot** committed on the human's instruction to reduce uncommitted changes; the subagent's final hand-back will be its own version.
+
+- Included: `experiments/byte_level/` (flop_arith.py and its output, seq_stats.py and seq_stats.json, proposed claims and side-quests) and `notes/research-byte-level.md`; plus the quick review `notes/reviews/quick/2026-11-22-1844-systems-hardware-engineer.md`.
+- Checks: `python -m py_compile` on the .py files passed. The scripts were not executed. No secrets and no files over 2 MB.
+- The FLOP arithmetic, sequence statistics, notes and the review are reported by the subagent, not yet verified by the main agent. Nothing was run on the GPU.
+
+---
+
 ## v0.4.49: Tokenizer research: snapshot (in progress)
 *2026-11-22*
 

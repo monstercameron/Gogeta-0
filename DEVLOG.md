@@ -17,6 +17,20 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.2: K3: MQAR associative recall (invalid)
+*2026-11-22*
+
+**What**: check K3 (MQAR associative recall (invalid)): script, results JSON and card. Prediction committed in `f1b4ebd` before it ran.
+
+### K3: MQAR associative recall (invalid)
+- **Question:** Does GDN recall better than plain linear attention? (C16)
+- **Result:** attn 8.6%, gdn 3.3%, linear attention 4.9%, swa(32) 0.4% (2 seeds, `results/K3.json`).
+- **Verdict vs prediction:** **Inconclusive**: the positive control (attention ≥ 90%) failed, so the task was too hard or undertrained. C16 stays UNVERIFIED.
+- **What it means:** The check needs a redesign (fewer pairs, more steps, or Zoology's recipe) before any recall claim.
+- **Card:** experiments/cards/K3.md
+
+---
+
 ## v0.4.1: K2: BitLinear speed vs nn.Linear
 *2026-11-22*
 

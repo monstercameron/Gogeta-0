@@ -8,7 +8,7 @@
   "criterion": "Decision rule in the docstring / PREDICTIONS.md K7: lowest final full-val loss wins; extend the grid by one step if the winner is at an edge.",
   "verdicts": {
     "E10": "tuned LR 0.003",
-    "E1": "UNDECIDED: need runs at lr 0.012 (best 0.006 at the high edge: extend up)"
+    "E1": "tuned LR 0.006"
   },
   "data": {
     "E10": {
@@ -83,22 +83,26 @@
           "val_loss": 0.9924883136896838,
           "commit": "2d06d95",
           "code_dirty": false
+        },
+        {
+          "run": "E1-20261122-180627-s0",
+          "lr": 0.012,
+          "status": "done",
+          "val_loss": 1.0656424730843226,
+          "commit": "1290f8a",
+          "code_dirty": false
         }
       ],
-      "best_lr": null,
-      "needed": [
-        0.012
-      ],
-      "flags": [
-        "best 0.006 at the high edge: extend up"
-      ]
+      "best_lr": 0.006,
+      "needed": [],
+      "flags": []
     },
-    "campaign_written": "experiments/launch/campaigns/phase2a-k7-lr-ext.campaign"
+    "campaign_written": "experiments/launch/campaigns/phase2b-replication.campaign"
   },
-  "ran_at": "2026-11-22T18:04:17",
-  "runtime_s": 0.1,
-  "git_commit": "97f5cc435faf9a1479ff46307d6c5517221825f0",
-  "git_describe": "v0.4.24-dirty",
+  "ran_at": "2026-11-22T18:09:10",
+  "runtime_s": 0.2,
+  "git_commit": "1290f8af376e115d4ab2fa26658a63fe066d11b9",
+  "git_describe": "v0.4.25-dirty",
   "torch": "2.14.1+cu130",
   "device": "cpu"
 }

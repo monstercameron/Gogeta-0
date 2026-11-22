@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-22T18:05:29-05:00",
+  "updated": "2026-11-22T18:09:32-05:00",
   "policy": "Order = priority, highest first; `next` walks the list top to bottom and returns the first item that is queued, ready, has all dependencies done and needs no human. Ordering rule: scientific value per GPU-minute, with validity first. (1) Controls, tuning and seeds that make existing claims trustworthy: K8 leakage/arithmetic check, K7 LR sweep, tuned 3-seed E10 and E1, E9, conditional E0/E2 re-runs, replication verdicts. Every later comparison is only as good as these. (2) Cheap inference-only diagnostics on existing checkpoints (SQ50, SQ14, SQ21, SQ37, eval suite) and the K3 redesign. They cost 4-20 GPU-minutes and decide what to build next; because the campaign runner is sequential, use `next --gpu --max-minutes 10` to slot them between campaign items or while a run is cooling. (3) Thesis-critical experiments: E11 (then 3 seeds), looped neg-eig parity, E3 at the tuned LR, the loop fixes (SQ15, SQ16, loop norm) gated on SQ14, neg-eig in the looped core, SQ32. (4) Side quests (gates, KDA, NoPE, decode path, ternary x loop, computed tables, research searches). (5) Long-term: E4 full fusion, E8, Mamba-3. Compute budget (AGENTS 5): one GPU item running at a time; up to 8 CPU items alongside, thread-capped by the launcher. CPU items that can run in parallel with any GPU job: Q3, Q5 (K7 analysis), Q6, Q13, Q15, Q18, Q20 (authoring: write scripts and register predictions), Q12 (verdict writing), SQ1, SQ41. Authoring items edit experiments/checks/PREDICTIONS.md and should be done one at a time by the main agent (or by subagents given disjoint files). Items needing a registered prediction wait for Q1 (the tagged 'registered' version). New items enter via `queue.py add` and are appended at the end; reordering needs an explicit `move --reason`. Estimates come from compiled throughputs (E0 210k tok/s, E1 100k, E2 44k) plus ~2 min launch/compile overhead; they are planning numbers, not measurements. needs_human items are never picked by `next`.",
   "order_log": [
     {
@@ -128,7 +128,7 @@
       "missing": [],
       "needs_human": false,
       "launch": "bash tools/launch_campaign.sh experiments/launch/campaigns/phase2a-k7-lr.campaign",
-      "status": "running",
+      "status": "done",
       "source": "PREDICTIONS.md K7; experiments/launch/campaigns/phase2a-k7-lr.campaign",
       "note": "Do a --dry-run first. Decision rule is pre-registered (best final val loss; extend the grid if the winner is at an edge).",
       "history": [
@@ -137,11 +137,18 @@
           "from": "queued",
           "to": "running",
           "note": "phase2a-k7-lr campaign launched detached via tools/launch_campaign.sh"
+        },
+        {
+          "t": "2026-11-22T18:09:31-05:00",
+          "from": "running",
+          "to": "done",
+          "note": "tuned LRs: E10 3e-3, E1 6e-3 (bracketed); K7.json"
         }
       ],
-      "updated": "2026-11-22T17:25:24-05:00",
+      "updated": "2026-11-22T18:09:31-05:00",
       "started": "2026-11-22T17:25:24-05:00",
-      "last_note": "phase2a-k7-lr campaign launched detached via tools/launch_campaign.sh"
+      "last_note": "tuned LRs: E10 3e-3, E1 6e-3 (bracketed); K7.json",
+      "finished": "2026-11-22T18:09:31-05:00"
     },
     {
       "id": "Q30",
@@ -233,9 +240,20 @@
       "missing": [],
       "needs_human": false,
       "launch": "bash tools/launch_cpu_job.sh --name k7-analysis -- ~/.venvs/gogeta/bin/python experiments/checks/k7_lr_sweep.py --write-campaign",
-      "status": "queued",
+      "status": "done",
       "source": "experiments/checks/k7_lr_sweep.py",
-      "note": "Runs in parallel with the next GPU job. If it asks for a grid extension, do Q4 first."
+      "note": "Runs in parallel with the next GPU job. If it asks for a grid extension, do Q4 first.",
+      "history": [
+        {
+          "t": "2026-11-22T18:09:32-05:00",
+          "from": "queued",
+          "to": "done",
+          "note": "k7_lr_sweep.py applied the rule; phase2b-replication.campaign written"
+        }
+      ],
+      "updated": "2026-11-22T18:09:32-05:00",
+      "finished": "2026-11-22T18:09:32-05:00",
+      "last_note": "k7_lr_sweep.py applied the rule; phase2b-replication.campaign written"
     },
     {
       "id": "K8",
@@ -1109,6 +1127,302 @@
       "status": "queued",
       "source": "experiments/side-quests.md SQ7; claims C21",
       "reason": "Needs a new package install / source build (state-spaces/mamba) in the venv."
+    },
+    {
+      "id": "HW-REG",
+      "kind": "analysis",
+      "title": "Register the hardware side quests SQ70-SQ79: commit the sq_hw_*.py scripts (predictions inside) as a tagged 'registered' version",
+      "why": "AGENTS 0/6: predictions are committed before any run. The scripts exist with PREDICTION/CRITERION constants but are uncommitted; copy the predictions into experiments/checks/PREDICTIONS.md as SQ50 did.",
+      "depends_on": [],
+      "resources": {
+        "type": "cpu",
+        "est_minutes": 10
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": null,
+      "status": "queued",
+      "source": "notes/hardware-spark.md",
+      "note": "Main agent only (subagents never commit). Also review the ledger proposals C110-C129 / SQ70-SQ83 and the patches in notes/patches/ (none applied).",
+      "added": "2026-11-22T18:08:37-05:00"
+    },
+    {
+      "id": "SQ70",
+      "kind": "side-quest",
+      "title": "SQ70: fla fused-recurrent GDN with keyword args (is C2's NaN our call-site bug?), prefill+1-token decode, neg-eig, decode-step speed",
+      "why": "C110/C111: fla 0.6.0's 5th positional parameter is gk, not beta, so our tests pass beta as a per-key decay. If confirmed, GDN decoding works today: unblocks SQ53, C19, C84, E8.",
+      "depends_on": [
+        "HW-REG"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 3
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_hw_fla_recurrent.py",
+      "status": "queued",
+      "source": "notes/hardware-spark.md",
+      "note": "Highest value per GPU-minute of the hardware items. sq_kda_kernel.py (SQ50) repeats the positional GDN call, so read SQ50's C2 verdict with this in mind.",
+      "added": "2026-11-22T18:08:37-05:00"
+    },
+    {
+      "id": "SQ75",
+      "kind": "side-quest",
+      "title": "SQ75: torch.profiler kernel breakdown of compiled E0/E1/E2 training steps (gemm / attention / fla / conv / inductor / optimizer, busy vs wall)",
+      "why": "C119: tests the roofline verdict (bandwidth/elementwise-bound, not compute- or launch-bound) and ranks SQ72/SQ73/SQ77 for the hybrid.",
+      "depends_on": [
+        "HW-REG"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 8
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_hw_step_profile.py",
+      "status": "queued",
+      "source": "notes/hardware-spark.md",
+      "added": "2026-11-22T18:08:37-05:00"
+    },
+    {
+      "id": "SQ71",
+      "kind": "side-quest",
+      "title": "SQ71: N1X roofline: BF16/FP16(acc16, acc32)/TF32/FP8/INT8 peaks per SM clock, DRAM/L2 bandwidth, our layer shapes, H2D, device properties",
+      "why": "C112-C114, C129: full vs GeForce half-rate BF16, the real bandwidth and L2 size; every speed prediction rests on these.",
+      "depends_on": [
+        "HW-REG"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 8
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_hw_roofline.py",
+      "status": "queued",
+      "source": "notes/hardware-spark.md",
+      "added": "2026-11-22T18:08:37-05:00"
+    },
+    {
+      "id": "SQ77",
+      "kind": "side-quest",
+      "title": "SQ77: GDN mixer fusions (fla causal_conv1d, in-kernel q/k L2 norm, whole module compiled), fla autotune cache cold/warm, FLA_USE_TMA=1",
+      "why": "C122/C123: the hybrid is 2.1x slower than E0 at fewer FLOPs; a drop-in fused GDN could give E1/E2 +5-20% (predicted).",
+      "depends_on": [
+        "HW-REG"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 12
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_hw_gdn_fusions.py",
+      "status": "queued",
+      "source": "notes/hardware-spark.md",
+      "added": "2026-11-22T18:08:37-05:00"
+    },
+    {
+      "id": "SQ73",
+      "kind": "side-quest",
+      "title": "SQ73: LM head + loss: our logits.float() CE (eager, compiled) vs fla FusedLinearCrossEntropyLoss (8 / 32 chunks)",
+      "why": "C117: 537 MB of bf16 logits per step on a bandwidth-bound GPU; predicted E0 +4-8% if it passes.",
+      "depends_on": [
+        "HW-REG"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 4
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_hw_loss_head.py",
+      "status": "queued",
+      "source": "notes/hardware-spark.md",
+      "added": "2026-11-22T18:08:37-05:00"
+    },
+    {
+      "id": "SQ72",
+      "kind": "side-quest",
+      "title": "SQ72: SDPA backends on sm_121 + flex_attention block-sparse SWA vs our dense mask (B=32 T=1024, and the K1 scaling protocol)",
+      "why": "C115/C116 and the code fix for C12 (our SWA is O(n^2)) with no new package.",
+      "depends_on": [
+        "HW-REG"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 10
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_hw_sdpa_swa.py",
+      "status": "queued",
+      "source": "notes/hardware-spark.md",
+      "added": "2026-11-22T18:08:37-05:00"
+    },
+    {
+      "id": "SQ78",
+      "kind": "side-quest",
+      "title": "SQ78: batch path: TokenData.batch vs no pin_memory vs GPU-resident gather (time per batch, bit-identity)",
+      "why": "C124: WSL limits pinned memory; checks that the --data-on-gpu patch is bit-identical before anyone uses it.",
+      "depends_on": [
+        "HW-REG"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 2
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_hw_data_path.py",
+      "status": "queued",
+      "source": "notes/hardware-spark.md",
+      "note": "Needs the code-py-v1 dataset in $GOGETA_DATA (present for training).",
+      "added": "2026-11-22T18:08:37-05:00"
+    },
+    {
+      "id": "SQ76",
+      "kind": "side-quest",
+      "title": "SQ76: BitLinear eager vs compiled vs nn.Linear, and an int8 _int_mm ternary inference path",
+      "why": "C120/C121/C14: K2 was eager-only; gives E3's real overhead under compile and whether int8 kernels pay at d=384.",
+      "depends_on": [
+        "HW-REG"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 5
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_hw_bitlinear_paths.py",
+      "status": "queued",
+      "source": "notes/hardware-spark.md",
+      "added": "2026-11-22T18:08:37-05:00"
+    },
+    {
+      "id": "SQ74",
+      "kind": "side-quest",
+      "title": "SQ74: torch.compile modes (eager, default, max-autotune-no-cudagraphs, reduce-overhead) and B=64 for E0/E1, one subprocess per arm",
+      "why": "C118: whether compiler settings or batch size have anything left; also first test of CUDA graphs under WDDM/WSL.",
+      "depends_on": [
+        "HW-REG"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 15
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_hw_compile_modes.py",
+      "status": "queued",
+      "source": "notes/hardware-spark.md",
+      "note": "Each arm has a 7-minute timeout; max-autotune compiles are the slow part.",
+      "added": "2026-11-22T18:08:37-05:00"
+    },
+    {
+      "id": "SQ79",
+      "kind": "side-quest",
+      "title": "SQ79: passive GPU telemetry during a campaign (clocks, power, temperature, throttle reasons, cool-down curves), nvidia-smi only",
+      "why": "C125/C126: power- vs heat-limited, and how much of the fixed 60 s campaign gap is idle time on a cool GPU.",
+      "depends_on": [
+        "HW-REG"
+      ],
+      "resources": {
+        "type": "cpu",
+        "est_minutes": 15
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "bash tools/launch_cpu_job.sh --name sq79 -- python3 experiments/checks/sq_hw_thermal_log.py --minutes 15",
+      "status": "queued",
+      "source": "notes/hardware-spark.md",
+      "note": "Start it while a campaign is running (it needs busy samples and item boundaries). It never touches CUDA.",
+      "added": "2026-11-22T18:08:37-05:00"
+    },
+    {
+      "id": "SQ80",
+      "kind": "check",
+      "title": "SQ80: adopt the fla keyword-argument fix (patch), fix the GDN call in sq_kda_kernel.py, re-run tests/test_gdn_kernels.py, move C2",
+      "why": "Turns SQ70's result into the test suite so the decode path stays checked.",
+      "depends_on": [
+        "SQ70"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 3
+      },
+      "ready": false,
+      "missing": [
+        "SQ70 verdict: C110 VERIFIED",
+        "a tagged version applying notes/patches/fla-recurrent-keyword-args.patch (code path: not while a campaign is queued)"
+      ],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python tests/test_gdn_kernels.py",
+      "status": "queued",
+      "source": "notes/hardware-spark.md",
+      "added": "2026-11-22T18:08:37-05:00"
+    },
+    {
+      "id": "SQ81",
+      "kind": "side-quest",
+      "title": "SQ81: one-ingredient E1 A/Bs at matched tokens for each speed patch (flex SWA, fused CE, GDN fused kernels): val loss and tok/s",
+      "why": "Kernel swaps change bf16 rounding; a speedup is adopted only if the loss matches within seed noise.",
+      "depends_on": [
+        "SQ72",
+        "SQ73",
+        "SQ77"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 15
+      },
+      "ready": false,
+      "missing": [
+        "passing SQ72/SQ73/SQ77 verdicts",
+        "patches applied in a tagged version",
+        "A/B configs, prediction and campaign file"
+      ],
+      "needs_human": false,
+      "launch": null,
+      "status": "queued",
+      "source": "notes/hardware-spark.md",
+      "added": "2026-11-22T18:08:37-05:00"
+    },
+    {
+      "id": "SQ83",
+      "kind": "side-quest",
+      "title": "SQ83: torchao float8 training feasibility at d=384 and d=1024 (tok/s, loss at matched steps)",
+      "why": "Predicted no gain at d=384 (bandwidth-bound; GEMMs under half the step); possible at larger d. Low priority.",
+      "depends_on": [
+        "SQ71"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 15
+      },
+      "ready": false,
+      "missing": [
+        "torchao installed in ~/.venvs/gogeta",
+        "script and prediction"
+      ],
+      "needs_human": true,
+      "reason": "Package install: torchao matching torch 2.14.1+cu130 into ~/.venvs/gogeta (run pip install --dry-run first; it must not replace the CUDA torch).",
+      "launch": null,
+      "status": "queued",
+      "source": "notes/hardware-spark.md",
+      "added": "2026-11-22T18:08:37-05:00"
     }
   ]
 }

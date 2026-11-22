@@ -17,6 +17,24 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.26: K7 done: tuned LRs E10 3e-3, E1 6e-3; Phase 2b campaign written
+*2026-11-22*
+
+### K7 (final): LR tuning
+**What**: the grid extension required by the pre-registered rule: one E1 run at lr 1.2e-2, 20M tokens, seed 0 (`phase2a-k7-lr-ext.campaign`). Then `k7_lr_sweep.py --write-campaign` re-applied the rule.
+**Results**:
+- E1 at 1.2e-2: **1.0656** (+7.4% vs 6e-3), so **E1's tuned LR is 6e-3 (val 0.9925), bracketed**.
+- **E10's tuned LR is 3e-3 (1.0286)**.
+- Over 9 runs, E1 beats E10 at every LR tested; at their own best LRs the gap is −3.5% (single seed, 20M tokens).
+- The rule generated `experiments/launch/campaigns/phase2b-replication.campaign`: 13 runs × 200M tokens, ~7 GPU-hours.
+  - E10 seeds 0–2 at 3e-3; E1 seeds 0–2, E11 seeds 0–2, E9 seed 0 and E2 seed 0 at 6e-3.
+  - E0 is skipped: its v0.3.0 seed-0 run is already at 3e-3.
+
+**Ledger**: C92 final row, PARTIAL (3e-3 is right for E10, too low for E1; the optimum at 200M tokens may shift). The K7 card is done. **Queue**: K7 and Q5 done.
+**Next**: K8 (~6 GPU-min; external reference and leakage gate on all our loss numbers), then launch Phase 2b.
+
+---
+
 ## v0.4.25: K7 stage 1: E10 tuned at 3e-3, E1 wants a higher LR; hf.py fixed
 *2026-11-22*
 

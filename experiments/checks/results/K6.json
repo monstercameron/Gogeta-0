@@ -1,0 +1,152 @@
+{
+  "check": "K6",
+  "claims": [
+    "C20"
+  ],
+  "prediction": "Not convergent. The relative change stays > 0.1 out to k=12 and the norm keeps growing; the loss is lowest near k=4.",
+  "criterion": "C20 'each pass refines (convergent loop)' is VERIFIED only if the relative change is non-increasing for k >= 4 and < 0.05 at k=12. Otherwise it's REFUTED for E2.",
+  "verdicts": {
+    "C20": "REFUTED for E2 (rel change non-increasing for k>=4: True; rel change at k=12 = 0.0848, need < 0.05)",
+    "criterion_pass": false,
+    "rel_change_nonincreasing_k_ge_4": true,
+    "rel_change_k12": 0.08480094373226166,
+    "best_loss_k": 4
+  },
+  "data": {
+    "checkpoint": "/root/fusiondance-data/checkpoints/E2-20261122-132340-s0/model.pt",
+    "model_config": {
+      "vocab_size": 8192,
+      "d_model": 384,
+      "n_heads": 6,
+      "mlp_hidden": 1024,
+      "prelude": [
+        "swa"
+      ],
+      "core": [
+        "gdn",
+        "gdn",
+        "swa"
+      ],
+      "coda": [
+        "attn"
+      ],
+      "loops": 4,
+      "loops_min": 1,
+      "loops_max": 7,
+      "bptt_loops": 4,
+      "window": 256,
+      "max_seq_len": 1024,
+      "rope_base": 10000.0,
+      "conv_size": 4,
+      "ternary": false,
+      "tie_embeddings": true
+    },
+    "n_seq": 16,
+    "seq_len": 1024,
+    "val_sequences": "first 16 non-overlapping 1024-token windows of val.bin (+1 token for targets)",
+    "norms": "Frobenius norm over the whole [16,1024,d] tensor (primary); per-token mean also given",
+    "rows": [
+      {
+        "k": 0,
+        "norm_ratio": 1.0,
+        "rel_change": null,
+        "loss": 9.400827407836914
+      },
+      {
+        "k": 1,
+        "rel_change": 7.196540355682373,
+        "rel_change_per_token_mean": 7.953216552734375,
+        "norm_ratio": 7.4175646448342505,
+        "loss": 0.7838798761367798
+      },
+      {
+        "k": 2,
+        "rel_change": 0.7552081346511841,
+        "rel_change_per_token_mean": 0.7776094675064087,
+        "norm_ratio": 12.660654900763184,
+        "loss": 0.7338637113571167
+      },
+      {
+        "k": 3,
+        "rel_change": 0.4088599383831024,
+        "rel_change_per_token_mean": 0.4155665934085846,
+        "norm_ratio": 17.603471992961904,
+        "loss": 0.723844587802887
+      },
+      {
+        "k": 4,
+        "rel_change": 0.28278082609176636,
+        "rel_change_per_token_mean": 0.28615090250968933,
+        "norm_ratio": 22.39061893381684,
+        "loss": 0.7223765254020691
+      },
+      {
+        "k": 5,
+        "rel_change": 0.21718914806842804,
+        "rel_change_per_token_mean": 0.21929393708705902,
+        "norm_ratio": 27.08378593130577,
+        "loss": 0.7242201566696167
+      },
+      {
+        "k": 6,
+        "rel_change": 0.17679370939731598,
+        "rel_change_per_token_mean": 0.17827536165714264,
+        "norm_ratio": 31.714209732289504,
+        "loss": 0.7278733849525452
+      },
+      {
+        "k": 7,
+        "rel_change": 0.14933577179908752,
+        "rel_change_per_token_mean": 0.1504601687192917,
+        "norm_ratio": 36.30012970480277,
+        "loss": 0.73224937915802
+      },
+      {
+        "k": 8,
+        "rel_change": 0.129410058259964,
+        "rel_change_per_token_mean": 0.13030925393104553,
+        "norm_ratio": 40.85287910411334,
+        "loss": 0.7372690439224243
+      },
+      {
+        "k": 9,
+        "rel_change": 0.11427099257707596,
+        "rel_change_per_token_mean": 0.11501353979110718,
+        "norm_ratio": 45.38023627326702,
+        "loss": 0.7426875233650208
+      },
+      {
+        "k": 10,
+        "rel_change": 0.10236187279224396,
+        "rel_change_per_token_mean": 0.1029932051897049,
+        "norm_ratio": 49.887537884364576,
+        "loss": 0.7483523488044739
+      },
+      {
+        "k": 11,
+        "rel_change": 0.09274180233478546,
+        "rel_change_per_token_mean": 0.09328959882259369,
+        "norm_ratio": 54.378789310660125,
+        "loss": 0.7540614008903503
+      },
+      {
+        "k": 12,
+        "rel_change": 0.08480094373226166,
+        "rel_change_per_token_mean": 0.08528336882591248,
+        "norm_ratio": 58.856865469059585,
+        "loss": 0.759796142578125
+      }
+    ],
+    "sanity_model_forward_loss_at_cfg_loops": {
+      "loops": 4,
+      "loss": 0.7223765254020691,
+      "replica_loss": 0.7223765254020691
+    }
+  },
+  "ran_at": "2026-11-22T16:26:37",
+  "runtime_s": 10.2,
+  "git_commit": "f1b4ebdc6c83820f20b5da9704a6f0164cc6a8c8",
+  "git_describe": "v0.3.5-1-gf1b4ebd",
+  "torch": "2.14.1+cu130",
+  "device": "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU)"
+}

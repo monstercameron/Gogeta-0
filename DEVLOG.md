@@ -17,6 +17,20 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.5: K6: Does E2's loop converge?
+*2026-11-22*
+
+**What**: check K6 (Does E2's loop converge?): script, results JSON and card. Prediction committed in `f1b4ebd` before it ran.
+
+### K6: Does E2's loop converge?
+- **Question:** Does each extra pass refine E2's state? (C20)
+- **Result:** Relative change k1 7.20 → k4 0.283 → k12 **0.085**; ‖h_k‖/‖h₀‖ 7.4 → 58.9; loss after the coda best at k=4 (0.722) (`results/K6.json`, inference on the E2 checkpoint).
+- **Verdict vs prediction:** Hit (not convergent): C20 REFUTED for E2. The reviews read it as constant-size steps aligned with h, so the norm grows linearly.
+- **What it means:** E2's loop inflates its state rather than refining it; loop fixes must bound the state (SQ14–SQ18).
+- **Card:** experiments/cards/K6.md
+
+---
+
 ## v0.4.4: K5: State tracking: single pass vs looped
 *2026-11-22*
 

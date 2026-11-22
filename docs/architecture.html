@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3D Model · Gogeta-0</title>
+  <meta name="description" content="An interactive 3D view of the Gogeta-0 model architectures: every shape is sized by a real number from the code (parameters, context, loops).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/arch3d.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/examples/jsm/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="./">GOGETA<span>-<span class="zero">0</span></span></a>
+    <div class="nav-links">
+      <a href="learn.html">Start here</a>
+      <a href="./#fusion">Fusion</a>
+      <a href="architecture.html" aria-current="page">3D Model</a>
+      <a href="devlog.html">Devlog</a>
+    </div>
+  </div>
+</nav>
+
+<header class="page-head">
+  <div class="wrap">
+    <span class="eyebrow">Interactive · drag to orbit, scroll to zoom</span>
+    <h1>The model, in 3D</h1>
+    <p>Every shape is sized by a real number taken from the model code. Slide the <b>context</b> to watch full attention balloon while the memory cube stays put; slide the <b>loops</b> to see depth appear without new weights.</p>
+  </div>
+</header>
+
+<main class="wrap arch">
+  <div class="controls" id="controls" role="group" aria-label="Model controls">
+    <label class="ctl">
+      <span>Model</span>
+      <select id="selA" aria-label="Model A"></select>
+    </label>
+    <label class="ctl chk">
+      <input type="checkbox" id="chkCompare"> <span>Compare with…</span>
+    </label>
+    <label class="ctl" id="ctlB" hidden>
+      <span>Model B</span>
+      <select id="selB" aria-label="Model B"></select>
+    </label>
+    <label class="ctl range">
+      <span>Context <b id="ctxVal" class="val">4k</b> tokens</span>
+      <input type="range" id="rngCtx" min="0" max="5" step="1" value="2" aria-label="Context length, 1k to 32k tokens">
+    </label>
+    <label class="ctl range">
+      <span>Loops r <b id="loopVal" class="val">4</b></span>
+      <input type="range" id="rngLoops" min="1" max="12" step="1" value="4" aria-label="Loop count r, 1 to 12">
+    </label>
+    <label class="ctl chk">
+      <input type="checkbox" id="chkUnroll" checked> <span>Unroll loops</span>
+    </label>
+    <div class="ctl btns">
+      <button type="button" class="btn small" id="btnReset">Reset camera</button>
+      <button type="button" class="btn small" id="btnMotion" aria-pressed="true">Motion: on</button>
+    </div>
+  </div>
+
+  <div class="stage-grid">
+    <div class="stage" id="stage">
+      <canvas id="gl" aria-label="Interactive 3D view of the model architecture" role="img"></canvas>
+      <div class="tip" id="tip" role="status" hidden></div>
+      <div class="hint" id="hint">Hover or tap a shape for exact numbers</div>
+      <div class="nogl" id="nogl" hidden>
+        <h2>3D view unavailable</h2>
+        <p id="noglMsg">This page needs WebGL and a recent browser. The numbers are still on the site:</p>
+        <p><a class="btn primary" href="./#fusion">The FusionDance diagram</a> <a class="btn" href="learn.html">Start here</a> <a class="btn" href="devlog.html">Devlog</a></p>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="scouter" id="scouter" aria-live="polite">
+        <h3>SCOUTER · POWER LEVEL</h3>
+        <div id="power"></div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="legend3d" aria-labelledby="legend-h">
+    <h2 id="legend-h">How to read the shapes</h2>
+    <p class="section-lede">Nothing here is decoration. Each shape's size is a number from the code, and the legend says which.</p>
+    <div class="lgrid">
+      <div class="lcard" style="--c:#3987e5"><i class="sw tri"></i><div><b>Full attention: a triangular wedge</b><p>Every token looks at every earlier token: <i>n</i>&sup2;/2 scores. Its footprint's side is proportional to the context, so the <b>area grows with the square</b>. Slide the context to 32k and watch it balloon.</p></div></div>
+      <div class="lcard" style="--c:#199e70"><i class="sw band"></i><div><b>Sliding window: a thin diagonal band</b><p>Each token looks back only <i>w</i> = 256 tokens. The band has a <b>fixed width</b> and only gets longer: cost grows linearly.</p></div></div>
+      <div class="lcard" style="--c:#d95926"><i class="sw cube"></i><div><b>Gated DeltaNet: a fixed cube</b><p>A small memory (heads &times; head_dim &times; head_dim) rewritten token by token. Tokens stream in, but the <b>cube never grows</b> with context.</p></div></div>
+      <div class="lcard" style="--c:#c98500"><i class="sw hex"></i><div><b>MLP: a hexagonal bicone</b><p>Narrow, then wide, then narrow again: d &rarr; hidden &rarr; d. <b>Height = its parameters.</b> It works on one token at a time, with no look-back.</p></div></div>
+      <div class="lcard" style="--c:#6f7bb8"><i class="sw plinth"></i><div><b>Plinth under each mixer: its weights</b><p><b>Height = parameters</b> of the attention or DeltaNet layer. Scale: <span id="scaleParam">1M params = 1.0 unit</span>.</p></div></div>
+      <div class="lcard" style="--c:#ffd23f"><i class="sw ring"></i><div><b>The Time Chamber: the looped core</b><p>One set of blocks stored once on a glowing ring, labelled <b>&times; r</b>. The loops slider unrolls it into a helix of translucent ghost copies: <b>same weights, extra compute</b>, so depth grows and parameters don't.</p></div></div>
+      <div class="lcard" style="--c:#9a8fc8"><i class="sw disc"></i><div><b>Re-inject disc</b><p>At the start of every loop the original input <i>e</i> is mixed back in (2d &rarr; d). The violet dashed beam carries it from the embedding.</p></div></div>
+      <div class="lcard" style="--c:#4a90ff"><i class="sw tern"></i><div><b>Speckles: ternary weights</b><p>A &minus;1 / 0 / +1 texture marks BitLinear layers (about 1.58 bits per weight). Embeddings and norms stay full precision, so they have no speckles.</p></div></div>
+      <div class="lcard" style="--c:#ffd23f"><i class="sw ki"></i><div><b>Gold ki particles: data flow</b><p>Tokens rise through the prelude, orbit the core <i>r</i> times, then leave through the coda. Orange particles feed each memory cube.</p></div></div>
+    </div>
+    <p class="fine" id="scaleNote"></p>
+  </section>
+
+  <ol class="sr-only" id="a11y-summary" aria-label="Text summary of the displayed architecture"></ol>
+
+  <p class="fine">Numbers come from <code>data/architectures.json</code>, exported from the real model code by <code>tools/viz/export_arch.py</code>. Snapshot: <span id="stamp">…</span>. FLOPs are per training token at sequence length 1024. Memory assumes bf16 (2 bytes per value); ternary models are shown 2-bit packed.</p>
+</main>
+
+<footer><div class="wrap">
+  <span>Gogeta-0 · FusionDance architecture · <span data-version>v0</span></span>
+  <span>An independent research project and fan homage, not affiliated with or endorsed by the Dragon Ball rights holders.</span>
+</div></footer>
+
+<noscript><p class="wrap">This page needs JavaScript. See the <a href="./#fusion">FusionDance diagram</a> instead.</p></noscript>
+<script src="data/site-data.js"></script>
+<script>
+  // Show the data-version badge, and a fallback if the 3D module never starts (old browser, blocked CDN).
+  (function () {
+    var D = window.SITE_DATA, v = D && D.devlog && D.devlog[0];
+    document.querySelectorAll("[data-version]").forEach(function (e) { e.textContent = v ? v.version : "v0"; });
+    setTimeout(function () {
+      if (!window.__arch3dReady) {
+        var n = document.getElementById("nogl"), m = document.getElementById("noglMsg");
+        if (n) { n.hidden = false; if (m) m.textContent = "The 3D engine did not load (offline, blocked CDN, or a browser without import-map support). The numbers are still on the site:"; }
+      }
+    }, 8000);
+  })();
+</script>
+<script type="module" src="assets/arch3d.js"></script>
+</body>
+</html>

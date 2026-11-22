@@ -1,0 +1,8 @@
+# K7 LR sweep, items 2-8 (resume after the v0.4.16 interruption; item 1 E10 lr1e-3 already done)
+E10 --seed 0 --lr 2e-3 --max-tokens 20000000
+E10 --seed 0 --lr 3e-3 --max-tokens 20000000
+E10 --seed 0 --lr 6e-3 --max-tokens 20000000
+E1  --seed 0 --lr 1e-3 --max-tokens 20000000
+E1  --seed 0 --lr 2e-3 --max-tokens 20000000
+E1  --seed 0 --lr 3e-3 --max-tokens 20000000
+E1  --seed 0 --lr 6e-3 --max-tokens 20000000

@@ -96,3 +96,27 @@ config file appears in the dropdown automatically**, no restart. If a build fail
 3. In `style.css`: add `--c-<cls>` plus a `.part.mixer.k-<cls>` rule. Pick a colour validated against the
    existing set: `node validate_palette.js "<hexes>" --mode dark --surface "#161c3a" --pairs all`.
 4. Add a legend entry in `buildLegend()` and a row to the table above.
+
+## 3D site page
+
+`docs/architecture.html` (+ `docs/assets/arch3d.js`, `arch3d.css`) is an interactive three.js view of every
+config, for the static GitHub Pages site. Pages has no Python, so the page loads a pre-computed snapshot,
+`docs/data/architectures.json`, written by `tools/viz/export_arch.py`. The exporter imports `describe()` from
+`tools/viz/server.py` (nothing is re-counted), so the 3D numbers equal the 2D viz. It also adds per-loop FLOPs
+(r = 1..12), the registry title/status/val_loss, and a `generated_at` + `git describe` stamp.
+
+three.js is pinned to `three@0.160.0` (plus `OrbitControls` and `CSS2DRenderer` from the same version) via an
+import map from jsDelivr. Shapes: plinth height = mixer params; full attention = triangular wedge whose side
+grows with the context slider (area ~ n^2); sliding window = fixed-width diagonal band; Gated DeltaNet = fixed
+cube; MLP = hexagonal bicone (height = params); looped core = blocks on a glowing ring, unrolled by the loops
+slider into ghost copies (same weights); ternary = -1/0/+1 speckles; gold particles = data flow.
+
+**Regenerate after model or config changes** (CPU only, in WSL):
+
+```bash
+bash tools/launch_cpu_job.sh --name arch-export -- ~/.venvs/gogeta/bin/python tools/viz/export_arch.py
+# or directly: CUDA_VISIBLE_DEVICES="" OMP_NUM_THREADS=2 ~/.venvs/gogeta/bin/python tools/viz/export_arch.py
+```
+
+**Preview:** `python -m http.server 8792 --bind 127.0.0.1 --directory docs`, then open
+http://127.0.0.1:8792/architecture.html. `window.__arch3d` exposes scene stats and setters for testing.

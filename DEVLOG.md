@@ -17,6 +17,45 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.18: 3D architecture page; README quick links; repo topics
+*2026-11-22*
+
+**What**:
+- **`docs/architecture.html`** is a three.js (r160, pinned through an import map) 3D model explorer, built by a subagent and verified by the main agent. Every shape encodes a number:
+  - **plinth height** = the block's parameters;
+  - **full attention** = a triangular wedge whose area grows as n² with context;
+  - **SWA** = a fixed-width band that only grows in length;
+  - **GDN** = a fixed cube the size of its state that never grows with context;
+  - **MLP** = a bicone (d → hidden → d);
+  - **the looped core** = a gold "CORE × r" ring with ghost pillars per loop ("same weights, 0 new params");
+  - **ternary parts** carry a −1/0/+1 speckle and a 1.58-bit badge.
+
+  The page also has context and loop sliders, unroll, compare mode, hover tooltips with exact numbers, a scouter power-level panel, reduced-motion support and a WebGL fallback.
+- **`tools/viz/export_arch.py`** builds the model from each committed config on CPU and writes `docs/data/architectures.json` (7 models). Parameter totals match the earlier records (E0 13,767,552; E1 14,237,796; E2 12,606,488). The page adds a nav link from every site page (`tools/site_pages.py`) and a call-to-action on the landing page.
+- **README**: a Quick-links row (site, devlog, learn, 3D model, experiment index, queue, claims ledger, tags). It was added by a Haiku subagent. That edit was saved while v0.4.17 was being cut, so it landed in v0.4.17's commit; it's recorded here. A duplicate Pages badge was removed.
+- **GitHub repo metadata** (the human asked for GitHub tags):
+  - 12 topics: llm, language-model, pytorch, linear-attention, gated-deltanet, state-space-models, looped-transformer, bitnet, ternary-weights, code-generation, python, research;
+  - a description;
+  - homepage = the Pages site.
+
+  Pages was already enabled (main /docs, latest build "built").
+- **Hourly docs refresh** (the human's request): a session cron job spawns a Haiku subagent each hour to refresh README, sketch.md and the setup guides from the repo. The main agent verifies its diff and cuts a PATCH version only when something meaningful changed.
+- **K7 resume**: `experiments/launch/campaigns/phase2a-k7-lr-resume.campaign` holds items 2–8 of the LR sweep.
+
+**Results** (main agent, Browser pane):
+- the page loads with no console errors;
+- the canvas renders (screenshot checked: E2's looped core with r = 4, scouter panel showing 12,606,488 params);
+- all 7 models are in the selector.
+
+The subagent's checks:
+- scene object counts scale with loops (71 / 142 / 230 at r = 1/4/8);
+- the attention wedge goes 0.4 → 12.8 from 1k → 32k context while the SWA band width stays 0.1;
+- no horizontal overflow at 375 px.
+
+**Not verified**: touch gestures, the reduced-motion and no-WebGL paths, clutter at r = 12 with 32k context.
+
+---
+
 ## v0.4.17: Kimi Linear research; SQ50 attempt timed out
 *2026-11-22*
 

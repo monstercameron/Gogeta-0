@@ -17,6 +17,21 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.53: Commit-agent exception in AGENTS §4; quick reviews 18:44/18:50 triaged
+*2026-11-22*
+
+**What**:
+- **AGENTS §4 exception** (the human: "start committing, too many uncommitted changes... let the agent do it"): one designated commit subagent may turn piled-up work into versions using the release rules. Snapshots of still-running work are labelled "in progress", with secrets and size checks, protected paths untouched, and no force-push or tag moves. Its first use was v0.4.44–v0.4.52.
+- **Main-agent check of v0.4.44–v0.4.52**:
+  - all 9 tags are on origin; protected paths are clean;
+  - `cockpit.sh --test` in WSL: 57 unit tests OK;
+  - the TUI/probe phase printed "FAILED: 2" once and nothing on an immediate re-run (flaky). The run-forms subagent is fixing it, and making the 2 tests that fail on Windows-only Python skip off-WSL (the live DB exists only in WSL).
+- **Quick reviews (Codex GPT-6 Luna):**
+  - 18:44, systems engineer: **SQ193**, `torch.compile` recompiles per sampled loop count r. No recompile logging exists today.
+  - 18:50, competitor lab: **SQ194**, formatting robustness of E0/E1 on reformatted clean-val docs (CPU, reuses SQ99's scorer).
+
+---
+
 ## v0.4.52: Tokenizer research: final hand-back
 *2026-11-22*
 

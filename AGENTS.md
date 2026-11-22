@@ -243,6 +243,12 @@ The project stays at `0.y.z` while it's experimental.
 - Agents **may spawn subagents** for independent tasks: reading/summarizing papers in `refs/`, literature searches, writing an isolated module, running or analyzing a sweep, reviewing code.
 - Because there are no worktrees, **subagents share the checkout**. Give each subagent a disjoint set of files to touch, and say so explicitly in its brief.
 - **Subagents never commit, tag, or edit `DEVLOG.md`.** Only the main agent integrates their work and cuts versions.
+  - **One exception: a designated commit agent** (the human, 2026-11-22: "start committing, too many uncommitted changes... let the agent do it"). When uncommitted work piles up, the main agent may spawn ONE commit subagent, briefed with the version rules (§1, §3), to turn it into versions.
+    - It uses the release helper: one version per workstream, a DEVLOG entry, bump, site rebuild, claims-list check, annotated tag, push.
+    - Work from subagents that are still running is titled "<workstream>: snapshot (in progress)". The final hand-back later gets its own version.
+    - It runs a secrets scan and a size check before staging. It never commits code paths during a campaign or files another agent is restructuring, and never amends, force-pushes or moves tags.
+    - The main agent checks its result (tags on origin, protected paths clean) and fixes anything wrong in a new version.
+    - First used for v0.4.44–v0.4.52.
 - Treat subagent reports as claims: check the diff or result before recording it in the devlog.
 
 ## 5. Experiments

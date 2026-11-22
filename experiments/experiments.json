@@ -224,7 +224,7 @@
     "arc": "Shadow Clone",
     "title": "Unlooped control for E2",
     "question": "Same 5 blocks as E2 ([SWA] [GDN, GDN, SWA] [attn]) trained once, without weight sharing or loops. Is weight sharing plus ~4 passes better than one pass of the same blocks? This separates the effect of looping from depth and parameter count.",
-    "prediction": "",
+    "prediction": "Written 2026-11-22 before the run. E9 (5 unshared blocks, 9.17M non-emb, 0.079 GFLOP/token) lands at val loss 0.590-0.610: a bit worse than E1 (one fewer block) and about equal to E0. That would mean it BEATS E2 at r=4 (0.619) with 41% of the FLOPs, so at this scale looping the same blocks 4x is worse than running them once, untied. If instead E9 > 0.619, looping is genuinely buying something and E2 just pays for it in compute.",
     "ingredients": [
       "E2 layout",
       "r=1",
@@ -236,7 +236,7 @@
     ],
     "status": "planned",
     "version": null,
-    "config": null,
+    "config": "configs/e9_unlooped.json",
     "results": {},
     "notes": "Added 2026-11-22 after E2 (see LABNOTEBOOK 14:46)."
   }

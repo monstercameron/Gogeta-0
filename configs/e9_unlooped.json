@@ -1,0 +1,17 @@
+{
+  "experiment": "E9",
+  "description": "Unlooped control for E2: the same blocks in the same order ([SWA] [GDN, GDN, SWA] [attn]) trained once, without weight sharing, loops or the re-injection layer. Separates the effect of looping from depth and parameter count.",
+  "model": {
+    "vocab_size": 8192, "d_model": 384, "n_heads": 6, "mlp_hidden": 1024,
+    "prelude": ["swa", "gdn", "gdn", "swa", "attn"],
+    "core": [], "coda": [],
+    "window": 256, "max_seq_len": 1024, "ternary": false
+  },
+  "train": {
+    "dataset": "code-py-v1", "seq_len": 1024, "batch_size": 32,
+    "max_tokens": 200000000,
+    "lr": 0.003, "min_lr_frac": 0.1, "warmup_steps": 300,
+    "weight_decay": 0.1, "beta1": 0.9, "beta2": 0.95, "grad_clip": 1.0,
+    "eval_every": 250, "eval_seqs": 128, "seed": 0
+  }
+}

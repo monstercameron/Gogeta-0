@@ -135,3 +135,16 @@ All three from commit `0dc7491` (code clean), seed 0, 200,015,872 tokens each (6
 - 2 more seeds for E0/E1/E2 before treating the 3.6% / 2.0% gaps as real.
 - Functional-correctness eval: held-out prompts → generate → execute asserts (sandboxed) → pass@k.
 - Diagnose the r curve: log ‖h‖ and per-loop loss through the exit head; try per-loop supervision (start of E6).
+
+### 15:0x · Replication + E9 control: setup and predictions
+- The human approved: run the E9 unlooped control and 2 more seeds of E0–E2.
+- **E9 config** `configs/e9_unlooped.json`: blocks `[swa, gdn, gdn, swa, attn]`, no sharing, no loop, no re-injection layer. **12.31M total / 9.17M non-emb, 0.079 train GFLOP/token** (E2: 9.46M / 0.193). Its prediction is in the registry.
+- `tools/run_queue.sh` now takes `config@seed` entries. A seed changes init, data order and the loop-count sampler.
+- **DEC:** run **two queues in parallel** on the one GPU to cut ~5.3 h serial to an estimated ~3.5–4 h. **⚠ Consequence:** wall-clock and tok/s from these runs are *not* comparable to v0.3.0's (shared GPU). Throughput claims keep using the v0.3.0 numbers; comparisons here use loss and analytic FLOPs only.
+  - Lane A: E9 s0 → E0 s1 → E0 s2 → E1 s1 → E1 s2
+  - Lane B: E2 s1 → E2 s2
+- **Replication predictions** (written before launch):
+  1. Seed-to-seed std of final val loss ≤ 0.004 (≤ ~0.7%) for each of E0/E1/E2.
+  2. E1 < E0 on **every** seed (the gap of 0.022 is ~5× the expected noise).
+  3. E2 (r=4) > E0 on every seed.
+  4. E2's loss-vs-r curve has its minimum at r=4 (or r=6) on every seed; r=12 is worse than r=4 on every seed.

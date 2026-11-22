@@ -1,0 +1,65 @@
+{
+  "check": "SQ70",
+  "claims": [
+    "C110",
+    "C111",
+    "C2"
+  ],
+  "prediction": "The positional call reproduces the problem (non-finite output, or max|err| > 1 vs the reference) in fp32 and bf16. The keyword call matches the fp32 reference like the chunk kernel does (fp32 max|err| ~1e-5..1e-3, bf16 ~1e-2). The prefill + 1-token-step decode path matches the reference within the same tolerances, and so does the negative-eigenvalue mode. A 1-token fused_recurrent step at B=16, H=6 takes 0.02-0.2 ms (launch-bound), at least 2x faster than calling the chunk kernel with T=1.",
+  "criterion": "C110 (the C2 NaN is a call-site bug in our tests, not a GPU/kernel defect) is VERIFIED if the positional call is non-finite or has max|err| > 1 AND the keyword call is finite with max|err| < 2e-3 (fp32) and < 3e-2 (bf16), the tests/test_gdn_kernels.py tolerances. C111 (fused_recurrent_gated_delta_rule is usable for decoding on this GPU) is VERIFIED if, in fp32 and bf16, both the prefill+step path and the negative-eigenvalue path are finite and within those tolerances. If C110 is VERIFIED, C2 changes from REFUTED to WRONG TEST (re-test passes).",
+  "verdicts": {
+    "C110": "VERIFIED (positional call broken, keyword call correct)",
+    "C111": "VERIFIED (prefill+step and neg-eig decode within tolerance)",
+    "C2": "WRONG TEST: re-test with keyword args passes",
+    "speed_prediction": "hit"
+  },
+  "data": {
+    "fla_version": "0.6.0",
+    "sizes": {
+      "B": 2,
+      "T": 300,
+      "H": 4,
+      "K": 64,
+      "V": 64,
+      "prefill": 100
+    },
+    "rows": [
+      {
+        "dtype": "torch.float32",
+        "positional_err": Infinity,
+        "keyword_err": 2.9802322387695312e-08,
+        "chunk_err": 0.00021669268608093262,
+        "decode_err": 5.971640348434448e-05,
+        "negeig_err": 5.21540641784668e-08,
+        "negeig_chunk_err": 0.00047898292541503906,
+        "tol": 0.002
+      },
+      {
+        "dtype": "torch.bfloat16",
+        "positional_err": Infinity,
+        "keyword_err": 0.00039623677730560303,
+        "chunk_err": 0.0007285997271537781,
+        "decode_err": 0.0004905648529529572,
+        "negeig_err": 0.0007728338241577148,
+        "negeig_chunk_err": 0.0014381632208824158,
+        "tol": 0.03
+      }
+    ],
+    "decode_step_ms": {
+      "fused_recurrent": 0.0364,
+      "chunk_T1": 0.2955,
+      "sizes": {
+        "B": 16,
+        "H": 6,
+        "K": 64,
+        "V": 64
+      }
+    }
+  },
+  "ran_at": "2026-11-22T18:12:58",
+  "runtime_s": 18.3,
+  "git_commit": "43c9215bbabe663fee9712c43a38e24d6efe0d5f",
+  "git_describe": "v0.4.27-dirty",
+  "torch": "2.14.1+cu130",
+  "device": "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU)"
+}

@@ -3,6 +3,12 @@ window.SITE_DATA = {
  "generated": "2026-11-22 18:14",
  "devlog": [
   {
+   "version": "v0.4.29",
+   "title": "SQ70: GDN recurrent decode kernel works (C2 verified)",
+   "date": "2026-11-22",
+   "html": "<p>### SQ70: fla recurrent-kernel re-test (keyword vs positional call)</p><p><strong>What</strong>: <code>experiments/checks/sq_hw_fla_recurrent.py</code> (prediction registered in v0.4.27), 18 s on the GPU. It compares a positional and a keyword call against an fp32 reference, plus prefill + 1-token decode, neg-eig decode, and speed.</p><p><strong>Results</strong> (<code>experiments/checks/results/sq_hw_fla_recurrent.json</code>), max abs error vs reference:</p><p>| | positional (old call) | keyword | chunk | decode | neg-eig decode | |---|---|---|---|---|---| | fp32 | <strong>inf</strong> | 2.98e-08 | 2.17e-04 | 5.97e-05 | 5.22e-08 | | bf16 | <strong>inf</strong> | 3.96e-04 | 7.29e-04 | 4.91e-04 | 7.73e-04 |</p><ul><li>A decode step takes <strong>0.036 ms</strong> (B=16, H=6), vs 0.296 ms for the chunk-kernel fallback: about 8× faster.</li><li>Verdicts: <strong>C110 VERIFIED</strong> (the old NaN was our call), <strong>C111 VERIFIED</strong> (decoding works, including neg-eig), <strong>C2 VERIFIED</strong> (it was REFUTED by a wrong test until v0.4.27). Speed prediction: hit.</li></ul><p><strong>What it unblocks</strong>: a fast decode path for every existing GDN checkpoint: SQ53 (KDA/GDN decode), C19, C84 (RL sampling cost without a cache) and E8. Any earlier result that relied on the positional call is invalid. Only <code>tests/test_gdn_kernels.py</code> and SQ50 used it, and both were reporting-only, already fixed in v0.4.27.</p><p><strong>Note</strong>: the queue's GPU-slot record lagged (K8 still marked running) when SQ70 launched; the device itself was free and status.sh showed no process. Fixed in the queue.</p>"
+  },
+  {
    "version": "v0.4.28",
    "title": "K8: external reference, plausibility gate fails narrowly; K9 next",
    "date": "2026-11-22",

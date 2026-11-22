@@ -17,6 +17,26 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.29: SQ70: GDN recurrent decode kernel works (C2 verified)
+*2026-11-22*
+
+### SQ70: fla recurrent-kernel re-test (keyword vs positional call)
+**What**: `experiments/checks/sq_hw_fla_recurrent.py` (prediction registered in v0.4.27), 18 s on the GPU. It compares a positional and a keyword call against an fp32 reference, plus prefill + 1-token decode, neg-eig decode, and speed.
+**Results** (`experiments/checks/results/sq_hw_fla_recurrent.json`), max abs error vs reference:
+
+| | positional (old call) | keyword | chunk | decode | neg-eig decode |
+|---|---|---|---|---|---|
+| fp32 | **inf** | 2.98e-08 | 2.17e-04 | 5.97e-05 | 5.22e-08 |
+| bf16 | **inf** | 3.96e-04 | 7.29e-04 | 4.91e-04 | 7.73e-04 |
+
+- A decode step takes **0.036 ms** (B=16, H=6), vs 0.296 ms for the chunk-kernel fallback: about 8× faster.
+- Verdicts: **C110 VERIFIED** (the old NaN was our call), **C111 VERIFIED** (decoding works, including neg-eig), **C2 VERIFIED** (it was REFUTED by a wrong test until v0.4.27). Speed prediction: hit.
+
+**What it unblocks**: a fast decode path for every existing GDN checkpoint: SQ53 (KDA/GDN decode), C19, C84 (RL sampling cost without a cache) and E8. Any earlier result that relied on the positional call is invalid. Only `tests/test_gdn_kernels.py` and SQ50 used it, and both were reporting-only, already fixed in v0.4.27.
+**Note**: the queue's GPU-slot record lagged (K8 still marked running) when SQ70 launched; the device itself was free and status.sh showed no process. Fixed in the queue.
+
+---
+
 ## v0.4.28: K8: external reference, plausibility gate fails narrowly; K9 next
 *2026-11-22*
 

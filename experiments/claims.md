@@ -153,3 +153,20 @@ These update the status of earlier rows. Where they differ, this section is the 
 | C22 a rotating state solves parity in one pass | `REFUTED` at our scale | SQ6 (c) RotSSM 84.0% (needs ≥ 90%), though +33.8 points over no rotation; it does generalise better than looping (76.5% vs 61.2% on positions 64–127) |
 | **C43 (new)** GDN with negative eigenvalues (β ∈ (0, 2)) solves state tracking in **one pass** and length-generalises | `VERIFIED` (parity, 2 seeds, our scale) | SQ6 (e): **100.0%** on positions 32–63 and **99.99%** on 64–127, vs looped GDN 97.9% / 61.2%. One fla flag (`allow_neg_eigval`, in-kernel sigmoid). |
 | **C44 (new)** single-pass GDN parity accuracy has high run-to-run variance | `VERIFIED` (observed) | K5 (i) 81.5% vs SQ6 (a) seed 0 73.3% / seed 1 50.1%, with identical init/data; 1-pass GDN numbers need ≥ 2 seeds |
+
+## Proposed by Kimi Linear research (pending review)
+
+Source: Kimi Linear, arXiv 2510.26692v2 (48B-total / 3B-active MoE, 1.4T tokens unless noted), and fla 0.6.0 `fla.ops.kda`. Details in [`notes/research-kimi-linear.md`](../notes/research-kimi-linear.md). All paper numbers are *reported*, at a scale ~3,000× ours.
+
+| ID | Claim | Source | Status | Smallest local check (≤ 15 min) |
+|---|---|---|---|---|
+| C70 | fla's `chunk_kda` (`from fla.ops.kda import chunk_kda`) matches an fp32 reference fwd/bwd on this GPU, and reduces to `chunk_gated_delta_rule` when `g` is tied across channels | fla 0.6.0 (assumed) | `UNVERIFIED` (GPU). Only the *reference* is checked: on CPU our loop matches fla's `naive_recurrent_kda` (2.2e-8) and `naive_chunk_kda` (4.4e-7), and tied-gate = GDN reference exactly (0.0), CPU job `kda-cpu-ref-20261122-165206`. First GPU attempt hit the 300 s timeout with no output while other agents' GPU checks started alongside; no result file | **SQ50** `experiments/checks/sq_kda_kernel.py` |
+| C71 | fla's `fused_recurrent_kda` (decode kernel) is finite and correct on this GPU, unlike GDN's (C2) | fla 0.6.0 (assumed) | `UNVERIFIED` | SQ50 (grad mode, no-grad, chunk prefill → 1-token steps) |
+| C72 | KDA's chunk kernel costs about the same as GDN's (paper: "negligible" model-level prefill overhead vs GDN-H, Fig. 7a; ~2× faster than general DPLR, Fig. 2) | Kimi Linear §3.2, §5.6 | `UNVERIFIED` | SQ50 speed section (B=16, T=1024, H=6, K=V=64) |
+| C73 | Channel-wise (per-key-dim) decay beats GDN's head-wise scalar decay in a hybrid: Kimi Linear vs GDN-H, e.g. MMLU-Pro 51.0 vs 47.9, RULER 84.3 vs 80.5, long-context avg 54.5 vs 51.2; faster MQAR/palindrome convergence (Fig. 4). **No isolated scalar-vs-channel PPL ablation is reported** | Kimi Linear Tables 3–5, Fig. 4 | `UNVERIFIED` | **SQ51** (d=256 E1-style, GDN vs KDA, 20M tokens, 2 seeds) |
+| C74 | NoPE global-attention layers in a KDA hybrid beat RoPE on long context (avg 54.5 vs 51.8; RULER 84.3 vs 78.8) with similar short-context scores | Kimi Linear Table 5, §5.2 | `UNVERIFIED` | **SQ52** (NoPE in our one `attn` layer, train T=512, eval to 2048) |
+| C75 | A 3:1 linear:full ratio is the best trade-off (val PPL 3:1 5.65; 1:1 5.66; 7:1 5.70; 15:1 5.82; full attention only 5.77) | Kimi Linear Table 1 | `UNVERIFIED` | SQ9 / SQ57 |
+| C76 | A sigmoid output gate beats swish/SiLU and no gate (val PPL 5.65 vs 5.81 vs 5.67); a low-rank gate performs comparably to full rank | Kimi Linear Table 1, §4 | `UNVERIFIED` (same direction as C25) | **SQ55** (with SQ8) |
+| C77 | Short convolutions still matter in a hybrid (val PPL 5.70 without vs 5.65 with) | Kimi Linear Table 1 | `UNVERIFIED` | Small E1 ablation (drop `ShortConv`) |
+| C78 | Kimi Linear cuts KV cache by up to 75%, with up to 6× (TPOT 1.84 vs 11.48 ms, 6.3×) decoding at 1M and 2.9× prefill at 1M vs MLA. **The paper is inconsistent:** §6.3 calls 6.3× "theoretical" (larger batches) and reads Fig. 7b as 2.3× at 1M | Kimi Linear Fig. 1b, 7; §6.3 | `UNVERIFIED` (not testable at our context length; K1 checks the fixed-state part, C15) | n/a at our scale |
+| C79 | Kimi Linear has ~1.16× the compute efficiency of MLA in a scaling-law fit (653M–1.7B active, 38.8B–128B tokens) | Kimi Linear Fig. 5 | `UNVERIFIED` | Not cheaply testable |

@@ -17,6 +17,34 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.17: Kimi Linear research; SQ50 attempt timed out
+*2026-11-22*
+
+### Kimi Linear (research)
+**What**: `notes/research-kimi-linear.md` (subagent research, reviewed). It compares Kimi Delta Attention (KDA) with our GDN.
+- **GDN is exactly KDA with the decay tied across channels.** KDA uses per-key-channel decay `Diag(α)` from a low-rank projection, a low-rank sigmoid output gate and head dim 128.
+- Kimi Linear interleaves 3 KDA layers to 1 global layer, and its global layers are MLA with **NoPE**.
+- Reported ablations (validation perplexity, paper numbers, not ours):
+  - ratio: 3:1 5.65, 1:1 5.66, 7:1 5.70, full attention 5.77;
+  - output gate: none 5.81 vs gated 5.67;
+  - no short conv: 5.70.
+- The paper's decode-speed figures are internally inconsistent (6.3× "theoretical" vs 2.3×); this is recorded in C78.
+- **There is no isolated ablation of scalar vs channel decay**, so C73 is only weakly supported.
+
+**Ledger**: C70–C79 appended as UNVERIFIED, pending review. SQ50–SQ59 are already in `experiments/side-quests.md` and the queue (top picks: SQ50 kernel check, SQ51 KDA vs GDN at d=256, SQ52 NoPE vs RoPE in the single full-attention layer).
+
+### SQ50 (attempted, no result)
+**What**: `experiments/checks/sq_kda_kernel.py` checks fla 0.6.0's `chunk_kda` / `fused_recurrent_kda` against an fp32 reference, the tied-decay reduction to GDN, and speed. PREDICTION and CRITERION are fixed at the top of the script before the run.
+**Result**: **none.** The GPU run hit the subagent's 300 s timeout with no output.
+- During it, other GPU jobs (SQ6, K7-parity) were started, so the one-GPU-job rule (AGENTS §5) was broken during that window. The SQ6 and K7-parity results were already checked separately; they are timing-insensitive accuracy checks.
+- On CPU, the subagent confirmed our reference loop matches fla's pure-PyTorch KDA (≤ 4.4e-7) and that tied decay equals the GDN reference exactly. That checks the maths, not the kernel.
+- C70–C72 stay UNVERIFIED.
+
+**Next**: re-run SQ50 alone on an idle GPU with a ≥ 600 s budget (first-run autotune) through `tools/launch_cpu_job.sh`-style detachment, not a subagent's foreground shell.
+**Refs to add (checked before fetching)**: 2505.06708, 2504.08719, 2501.18795, 2506.02475, 2505.16381, 2502.16982.
+
+---
+
 ## v0.4.16: Q6: replication analysis script
 *2026-11-22*
 

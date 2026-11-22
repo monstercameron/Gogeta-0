@@ -17,6 +17,22 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.38: Hourly claim audit: 8 Codex auditors, 6-hour cool-down per claim
+*2026-11-22*
+
+**What** (the human: "every hour spawn 8 gpt 6 luna subagents to review the claims and make sure they are rock solid, the cool down on each claim after review is 6 hours ... may need multiple passes to catch issues"):
+- **AGENTS §0d-ter.** Every hour, 8 read-only Codex GPT-6 Luna (high) auditors run in parallel.
+  - Each audits a batch of up to 6 claims: it reads all ledger rows, **opens every evidence pointer and checks the numbers match**, and judges the status against the statistics policy, K9 and later results.
+  - Verdicts: SOLID / WEAK / WRONG / NEEDS-EVIDENCE / UNCHECKABLE, each with a pointer and a fix.
+  - The main agent verifies every non-SOLID verdict itself before appending a ledger row. Rejected findings get a reason in the audit file.
+  - One PATCH version per hourly audit, pushed.
+- **`experiments/claim_review_batches.py`** (stdlib): `plan` picks due claims (settled first, never-reviewed first, then least recently reviewed) and skips any reviewed in the last **6 h**; `record` logs verdicts in `experiments/claim-reviews.json`; `status` reports due and cooling counts. **Now:** 117 claims due, 0 cooling, 8 batches of 6.
+- **`notes/reviews/codex_run.ps1`** is the shared read-only Codex runner (newest desktop-app binary, `gpt-6-luna`, high reasoning, `-s read-only`, `-o` output). **`notes/reviews/claim-audit-brief.md`** is the auditor brief.
+- **Timers:** the claim audit runs hourly at :47 (first run about 19:03). The 5-minute quick-review timer now uses the in-repo runner. Its first tick at 18:32 failed on a PowerShell quoting bug (`$ts:` parsed as a scoped variable), fixed by passing the brief as a file.
+- **Cost guard:** audits never fall back to 8 Claude agents; failed batches stay due for the next hour.
+
+---
+
 ## v0.4.37: Phase 2b analysis plan registered (statistics layer, clean-val primary metric)
 *2026-11-22*
 

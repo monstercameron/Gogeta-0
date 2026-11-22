@@ -132,6 +132,18 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
 - **Triage is batched:** the main agent reads quick reviews as they arrive. It folds good ideas into `experiments/side-quests.md` / the queue, and rejects the rest with a one-line reason, in a footer on each quick-review file. **Quick reviews are committed together with the next 30-minute review version (§0d)**, not one commit per tick, to avoid commit spam.
 - **Privacy:** the reviewer sees only repo files (a public repo). Never pass secrets, tokens, tracker logs or personal data to an external model.
 
+## 0d-ter. Hourly claim audit: 8 Codex auditors, 6-hour cool-down per claim
+
+**Every hour, 8 Codex GPT-6 Luna (high) auditors review the claims ledger in parallel, to make the claims rock solid.** A single pass by a cheap model misses things, so each claim is re-audited repeatedly, with a **6-hour cool-down after each review**.
+
+- **Batching:** `python experiments/claim_review_batches.py plan --n 8 --per 6 --cooldown-h 6` picks the due claims. Settled claims (VERIFIED / PARTIAL / REFUTED / WRONG FOR OUR CODE) come first, then UNVERIFIED. Within a tier, never-reviewed claims come first, then the least recently reviewed. It splits them into 8 batches of up to 6. Claims reviewed in the last 6 h are skipped. History: `experiments/claim-reviews.json`.
+- **Auditors:** one read-only Codex run per batch, all 8 in parallel. Each runs `notes/reviews/codex_run.ps1` with the brief `notes/reviews/claim-audit-brief.md` (`{IDS}`, `{TS}` and `{K}` filled in), writing `notes/reviews/claims/<TS>-b<K>.md`.
+- **What auditors check:** for each claim, they read every ledger row, **open every evidence pointer and check the numbers match**, and judge the status against `notes/statistics-policy.md`, the K9 contamination caveat and later results. Verdicts: `SOLID`, `WEAK`, `WRONG`, `NEEDS-EVIDENCE` or `UNCHECKABLE`, each with a pointer and a suggested fix.
+- **The main agent verifies every non-SOLID verdict itself** before acting, because an auditor may be wrong. Confirmed problems get an append-only ledger row (downgrade, caveat or new pointer) with the evidence, plus a micro-devlog note. Rejected auditor findings get a one-line reason in the audit file's `## Triage` footer.
+- **Recording:** `python experiments/claim_review_batches.py record <audit_file> C5=WEAK:reason ...` logs each verdict, which starts that claim's 6-hour cool-down.
+- **Commits:** the hourly audit files, the review log and the resulting ledger rows go in as one PATCH version ("Claim audit <TS>"), pushed per §3. Downgrades are listed in the devlog entry.
+- **Cost guard:** if Codex errors or rate-limits, skip the failed batches and don't fall back to 8 Claude agents. Their claims stay due for the next hour.
+
 ## 0e. Cockpit first: one interface, SQLite logs
 
 - **One interface for all tooling.** Every new tool or feature for this project is built into, or registered with, the cockpit core (`cockpit/core.py`) and exposed through both the TUI (`cockpit/tui.py`) and the MCP server (`cockpit/mcp_server.py`). No new standalone scripts that bypass it. One-off `sq_` and check scripts must be launchable and discoverable from the cockpit (a queue item with a launcher command, or a core function).

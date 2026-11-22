@@ -1,0 +1,95 @@
+"""Hourly claim audit batching (AGENTS.md section 0d-ter).
+
+Picks the claims due for an independent review and splits them into N batches (one per Codex GPT-6 Luna auditor),
+honouring a per-claim cool-down (default 6 h after its last review). Review history lives in
+experiments/claim-reviews.json: {"reviews": [{"id", "ts", "batch_file", "verdict", "note"}...]}.
+
+Priority: settled claims (VERIFIED, PARTIAL, REFUTED, WRONG FOR OUR CODE) before UNVERIFIED; within a tier, never
+reviewed first, then least recently reviewed, then claims whose latest ledger row is newest (recently changed).
+
+    python experiments/claim_review_batches.py plan  [--n 8] [--per 6] [--cooldown-h 6]   # JSON: batches to run now
+    python experiments/claim_review_batches.py record <batch_file> <id>=<VERDICT> ...       # log verdicts
+    python experiments/claim_review_batches.py status                                       # due / cooling counts
+Stdlib only. VERDICT is one of SOLID, WEAK, WRONG, NEEDS-EVIDENCE, UNCHECKABLE.
+"""
+import datetime as dt
+import json
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from claims_list import parse  # noqa: E402
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+LOG = ROOT / "experiments/claim-reviews.json"
+VERDICTS = {"SOLID", "WEAK", "WRONG", "NEEDS-EVIDENCE", "UNCHECKABLE"}
+SETTLED = {"VERIFIED", "PARTIAL", "REFUTED", "WRONG FOR OUR CODE", "INCONCLUSIVE"}
+
+
+def now():
+    return dt.datetime.now().astimezone()
+
+
+def load():
+    if LOG.exists():
+        return json.loads(LOG.read_text(encoding="utf-8"))
+    return {"cooldown_hours": 6, "reviews": []}
+
+
+def last_reviewed(log):
+    out = {}
+    for r in log["reviews"]:
+        t = dt.datetime.fromisoformat(r["ts"])
+        if r["id"] not in out or t > out[r["id"]]:
+            out[r["id"]] = t
+    return out
+
+
+def plan(n=8, per=6, cooldown_h=6.0):
+    claims, log, t = parse(), load(), now()
+    last = last_reviewed(log)
+    due, cooling = [], []
+    for c in claims.values():
+        lr = last.get(c["id"])
+        if lr and (t - lr).total_seconds() < cooldown_h * 3600:
+            cooling.append(c["id"])
+            continue
+        h = c["history"][-1]
+        tier = 0 if h["status"] in SETTLED else 1
+        due.append((tier, lr is not None, lr.timestamp() if lr else 0, -h["line"], c["id"], h["status"]))
+    due.sort()
+    picked = due[: n * per]
+    batches = [[] for _ in range(n)]
+    for i, d in enumerate(picked):  # round-robin so every auditor gets a mix
+        batches[i % n].append({"id": d[4], "status": d[5]})
+    return {"ts": t.strftime("%Y-%m-%d-%H%M"), "cooldown_hours": cooldown_h, "n_due": len(due),
+            "n_cooling": len(cooling), "batches": [b for b in batches if b]}
+
+
+def record(batch_file, pairs):
+    log, t = load(), now().isoformat(timespec="seconds")
+    for p in pairs:
+        cid, _, verdict = p.partition("=")
+        verdict, _, note = verdict.partition(":")
+        verdict = verdict.strip().upper()
+        if verdict not in VERDICTS:
+            sys.exit(f"bad verdict {verdict!r} for {cid}; use one of {sorted(VERDICTS)}")
+        log["reviews"].append({"id": cid.strip(), "ts": t, "batch_file": batch_file, "verdict": verdict,
+                               "note": note.strip()})
+    LOG.write_text(json.dumps(log, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+    return len(pairs)
+
+
+if __name__ == "__main__":
+    a = sys.argv[1:] or ["status"]
+    if a[0] == "plan":
+        kw = {"n": 8, "per": 6, "cooldown_h": 6.0}
+        for k, flag, cast in (("n", "--n", int), ("per", "--per", int), ("cooldown_h", "--cooldown-h", float)):
+            if flag in a:
+                kw[k] = cast(a[a.index(flag) + 1])
+        print(json.dumps(plan(**kw), indent=1))
+    elif a[0] == "record":
+        print(f"recorded {record(a[1], a[2:])} verdict(s) in {LOG.name}")
+    else:
+        p = plan()
+        print(f"due {p['n_due']}, cooling {p['n_cooling']}, next batch sizes {[len(b) for b in p['batches']]}")

@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-ffd23f"></a>
-  <a href="https://github.com/monstercameron/Gogeta-0/tags"><img alt="Version" src="https://img.shields.io/badge/version-v0.4.53-ff8a1f"></a>
+  <a href="https://github.com/monstercameron/Gogeta-0/tags"><img alt="Version" src="https://img.shields.io/badge/version-v0.4.54-ff8a1f"></a>
   <a href="https://monstercameron.github.io/Gogeta-0/"><img alt="Project site" src="https://img.shields.io/badge/site-live-3cff9a"></a>
   <img alt="Status: research" src="https://img.shields.io/badge/status-experimental%20research-4a90ff">
   <img alt="Python 3.12" src="https://img.shields.io/badge/python-3.12-3cff9a">
@@ -38,7 +38,7 @@
 
 **Gogeta-0** is a small causal language model for Python code, and the first model built on **FusionDance**: an architecture that fuses three separate answers to the three big costs of modern LLMs. It's an open, laptop-scale research project, and every experiment is written up honestly, failures included.
 
-> **Status: v0.4.53. First models trained.** On 200M tokens of Python, swapping five of six attention layers for linear-time layers gave **3.6% lower loss than the standard transformer**, in **one seed at an untuned learning rate** (ledger C5: partial). The looped version **doesn't pay off yet** (C6/C7: partial). A 3-seed replication at the tuned learning rates (E10 3e-3, E1 6e-3, from the K7 sweep) has started: E10 first, E1 queued. The recurrent decode kernel for Gated DeltaNet now works (C2 verified; the earlier NaN was our call-site bug, C110). **Caveat (K9, v0.4.33):** 41.7% of our validation documents turned out to be near-duplicates of training text, because the corpus repeats many problems, so every loss number so far is inflated. All loss numbers are provisional until the clean-validation re-score; all checkpoints will be re-scored on that cleaned set before any claim is settled. See [Results](#results-so-far) and the [claims list](experiments/claims-status.md).
+> **Status: v0.4.54. First models trained.** On 200M tokens of Python, swapping five of six attention layers for linear-time layers gave **3.6% lower loss than the standard transformer**, in **one seed at an untuned learning rate** (ledger C5: partial). The looped version **doesn't pay off yet** (C6/C7: partial). A 3-seed replication at the tuned learning rates (E10 3e-3, E1 6e-3, from the K7 sweep) has started: E10 first, E1 queued. The recurrent decode kernel for Gated DeltaNet now works (C2 verified; the earlier NaN was our call-site bug, C110). **Caveat (K9, v0.4.33):** 41.7% of our validation documents turned out to be near-duplicates of training text, because the corpus repeats many problems, so every loss number so far is inflated. All loss numbers are provisional until the clean-validation re-score; all checkpoints will be re-scored on that cleaned set before any claim is settled. See [Results](#results-so-far) and the [claims list](experiments/claims-status.md).
 
 ## The pitch
 

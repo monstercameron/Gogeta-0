@@ -17,6 +17,29 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.54: SQ99 registered (out-of-corpus check); byte-level side quests adopted
+*2026-11-22*
+
+### SQ99 (registered, not run yet): out-of-corpus check
+**Why**: K9 showed val is 41.7% near-duplicated, and every planned test scores in-corpus docs. Does E1's advantage over E0 hold on Python the corpus cannot contain? (outside review 19:07, idea I4.)
+**What**: `experiments/checks/sq_99_out_of_corpus.py` (from a subagent; selftest 27/27).
+- **Out-of-corpus set:** 330 local Python files (stdlib plus 30 installed packages; paths and sha256 only, no contents committed) with < 20% 13-gram overlap with train (mean 0.31%). 400k tokens.
+- **In-corpus control:** a token-matched sample of 1,340 K9-clean val docs.
+- Both models are scored through the **same CPU fp32 path** (E1's GDN via the plain-PyTorch reference used by the 3D trace), so the comparison is same-scorer.
+- Estimated 13–37 CPU-min.
+
+**Prediction (registered here)**: out-of-corpus bits/char is > 1.5× in-corpus for both models; E1 still beats E0 out of corpus, but by less than in corpus; the ordering holds per source.
+**Criterion**: "transfers" if gap = bpc(E1)/bpc(E0) − 1 < 0 with a paired BCa 95% CI (B = 10,000) excluding 0; otherwise "does not transfer".
+**Caveats** (stored with the result): exploratory (single-seed v0.3.0 checkpoints, untuned LR); out-of-corpus is confounded with format and doc length; fp32 CPU, not the bf16 fla path.
+
+### Byte-level tokenization side quests (the human's request)
+SQ180–SQ189, from the byte-level research (v0.4.50), are adopted into `experiments/side-quests.md`.
+- **Run order:** SQ189 (memory/throughput probe), SQ186 (causality test), SQ180 (byte-E1 vs BPE-E1 at matched FLOPs and matched bytes) and SQ181 (BLT-lite, patch 4).
+- **Blocker:** dense-masked SWA (C12) needs the flex-attention patch first.
+- A subagent is searching for 2025–2026 byte-level papers to add as `refs` section `14-byte-level`.
+
+---
+
 ## v0.4.53: Commit-agent exception in AGENTS §4; quick reviews 18:44/18:50 triaged
 *2026-11-22*
 

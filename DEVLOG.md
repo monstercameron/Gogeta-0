@@ -17,6 +17,17 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.47: A4 eval battery: snapshot (in progress)
+*2026-11-22*
+
+**Work-in-progress snapshot** committed on the human's instruction to reduce uncommitted changes; the subagent's final hand-back will be its own version.
+
+- Included: `experiments/evalbattery/` (mqar.py, itercomp.py, summarize.py, diag*.sh, results/diag, results/itercomp, state_track results), `evals/battery/`, `evals/tasks/battery/`, `evals/results/battery-smoke-E0-limit150-tier1-20261122-183529.json`, and `notes/eval-battery.md`.
+- Checks: `python -m py_compile` on every .py file passed. No tests were executed (the battery needs torch, which is not installed on the Windows side). No secrets and no files over 2 MB.
+- The diag and itercomp results and the E0 smoke result are reported by the subagent, not yet verified by the main agent. Nothing was run on the GPU.
+
+---
+
 ## v0.4.46: A1 data integrity: snapshot (in progress)
 *2026-11-22*
 

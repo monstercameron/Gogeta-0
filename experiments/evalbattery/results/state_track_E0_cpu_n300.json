@@ -1,0 +1,74 @@
+{
+ "provenance": {
+  "checkpoint": "/root/fusiondance-data/checkpoints/E0-20261122-122059-s0/model.pt",
+  "block_kinds": [
+   "attn"
+  ],
+  "loops": 4,
+  "n_params": 13767552
+ },
+ "n_per_cell": 300,
+ "loops": null,
+ "cells": {
+  "assign_k1_d0": {
+   "acc": 0.31,
+   "ci95": [
+    0.25666666666666665,
+    0.36333333333333334
+   ],
+   "n": 300,
+   "chance": 0.25,
+   "stale_share_of_errors": 0.0,
+   "mean_lines": 6.0,
+   "secs": 5.2
+  },
+  "assign_k1_d16": {
+   "acc": 0.30666666666666664,
+   "ci95": [
+    0.25666666666666665,
+    0.36
+   ],
+   "n": 300,
+   "chance": 0.25,
+   "stale_share_of_errors": 0.0,
+   "mean_lines": 22.0,
+   "secs": 22.7
+  },
+  "assign_k4_d0": {
+   "acc": 0.31333333333333335,
+   "ci95": [
+    0.26325,
+    0.36333333333333334
+   ],
+   "n": 300,
+   "chance": 0.25,
+   "stale_share_of_errors": 0.9902912621359223,
+   "mean_lines": 15.0,
+   "secs": 14.5
+  },
+  "incr_k2_d0": {
+   "acc": 0.15,
+   "ci95": [
+    0.11,
+    0.19
+   ],
+   "n": 300,
+   "chance": 0.25,
+   "stale_share_of_errors": 0.3333333333333333,
+   "mean_lines": 9.0,
+   "secs": 15.4
+  },
+  "incr_k4_d0": {
+   "acc": 0.17333333333333334,
+   "ci95": [
+    0.13,
+    0.22
+   ],
+   "n": 300,
+   "chance": 0.25,
+   "stale_share_of_errors": 1.0,
+   "mean_lines": 15.0,
+   "secs": 37.8
+  }
+ }
+}

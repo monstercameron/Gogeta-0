@@ -1,0 +1,58 @@
+{
+ "args": {
+  "kind": "attn",
+  "pairs": 8,
+  "seq": 32,
+  "key_vocab": 32,
+  "val_vocab": 32,
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "window": 4,
+  "steps": 3000,
+  "batch": 64,
+  "lr": 0.001,
+  "wd": 0.1,
+  "warmup": 200,
+  "curriculum": false,
+  "curriculum_start": 4,
+  "seed": 0,
+  "eval_seq": 1024,
+  "device": "cpu",
+  "threads": 2,
+  "log_every": 1000,
+  "out": "experiments/evalbattery/results/diag/d1_P8_T32.json"
+ },
+ "acc": 0.3802490234375,
+ "ci95": [
+  0.372314453125,
+  0.388427734375
+ ],
+ "eval_loss": 1.317067563533783,
+ "chance_uniform_values": 0.03125,
+ "chance_context_values": 0.125,
+ "loss_hist": [
+  [
+   0,
+   8,
+   4.2123
+  ],
+  [
+   1000,
+   8,
+   1.8673
+  ],
+  [
+   2000,
+   8,
+   1.3851
+  ],
+  [
+   2999,
+   8,
+   1.3076
+  ]
+ ],
+ "train_s": 267.4,
+ "params": 86400
+}

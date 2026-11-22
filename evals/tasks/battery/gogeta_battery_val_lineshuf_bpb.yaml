@@ -1,0 +1,18 @@
+# Battery v1, language-modelling family, NEGATIVE control: first 1,000 val docs with lines shuffled (seed 0).
+# Gate: bpb(lineshuf) - bpb(same 1,000 docs unshuffled) must exceed 0.15 bits/byte for a trained model.
+task: gogeta_battery_val_lineshuf_bpb
+tag: [gogeta_battery, gogeta_battery_lm]
+custom_dataset: !function evals.tasks.battery.lm_controls.load_val_lineshuffled
+dataset_kwargs:
+  n: 1000
+  seed: 0
+test_split: test
+output_type: loglikelihood_rolling
+doc_to_text: ""
+doc_to_target: !function evals.tasks.gogeta_utils.doc_text
+process_results: !function evals.tasks.gogeta_utils.process_bpb_rolling
+metric_list:
+  - {metric: bits_per_byte, aggregation: bits_per_byte, higher_is_better: false}
+  - {metric: bits_per_char, aggregation: bits_per_byte, higher_is_better: false}
+metadata:
+  version: 1.0

@@ -1,0 +1,133 @@
+{
+  "run": "battery-smoke-E0-limit150-tier1-20261122-183529",
+  "created": "2026-11-22T18:38:14",
+  "status": "eval",
+  "args": {
+    "checkpoint": "/root/fusiondance-data/checkpoints/E0-20261122-122059-s0/model.pt",
+    "random_init": null,
+    "tier": "1",
+    "tasks": "gogeta_battery_val_lineshuf_bpb,gogeta_val_bpb,gogeta_battery_recall_d64,gogeta_state_assign_k1_d0",
+    "limit": 150.0,
+    "device": "cpu",
+    "batch_size": 8,
+    "threads": 2,
+    "loops": null,
+    "seed": 0,
+    "no_exec": false,
+    "name": "battery-smoke-E0-limit150",
+    "log_samples": true
+  },
+  "tasks": [
+    "gogeta_battery_val_lineshuf_bpb",
+    "gogeta_val_bpb",
+    "gogeta_battery_recall_d64",
+    "gogeta_state_assign_k1_d0"
+  ],
+  "limit_note": "--limit set: subset only, NOT comparable to full runs",
+  "model": {
+    "kind": "gogeta_checkpoint",
+    "path": "/root/fusiondance-data/checkpoints/E0-20261122-122059-s0/model.pt",
+    "bytes": 55083865,
+    "config_fields_filled_with_defaults": [],
+    "n_params": 13767552,
+    "block_kinds": [
+      "attn"
+    ],
+    "loops": 4,
+    "max_seq_len": 1024
+  },
+  "results": {
+    "gogeta_battery_val_lineshuf_bpb": {
+      "name": "gogeta_battery_val_lineshuf_bpb",
+      "alias": "gogeta_battery_val_lineshuf_bpb",
+      "sample_len": 150,
+      "bits_per_byte,none": 0.7866661719889173,
+      "bits_per_byte_stderr,none": "N/A",
+      "bits_per_char,none": 0.7914452781865902,
+      "bits_per_char_stderr,none": "N/A"
+    },
+    "gogeta_val_bpb": {
+      "name": "gogeta_val_bpb",
+      "alias": "gogeta_val_bpb",
+      "sample_len": 150,
+      "bits_per_byte,none": 0.23976995565809184,
+      "bits_per_byte_stderr,none": "N/A",
+      "bits_per_char,none": 0.24122659142292227,
+      "bits_per_char_stderr,none": "N/A"
+    },
+    "gogeta_battery_recall_d64": {
+      "name": "gogeta_battery_recall_d64",
+      "alias": "gogeta_battery_recall_d64",
+      "sample_len": 150,
+      "acc,none": 0.006666666666666667,
+      "acc_stderr,none": 0.006666666666666666,
+      "bits_per_byte,none": 2.571742395401256,
+      "bits_per_byte_stderr,none": "N/A"
+    },
+    "gogeta_state_assign_k1_d0": {
+      "name": "gogeta_state_assign_k1_d0",
+      "alias": "gogeta_state_assign_k1_d0",
+      "sample_len": 150,
+      "acc,none": 0.32666666666666666,
+      "acc_stderr,none": 0.038421501561652305
+    }
+  },
+  "n_samples": {
+    "gogeta_battery_val_lineshuf_bpb": {
+      "original": 1000,
+      "effective": 150
+    },
+    "gogeta_val_bpb": {
+      "original": 4000,
+      "effective": 150
+    },
+    "gogeta_battery_recall_d64": {
+      "original": 1100,
+      "effective": 150
+    },
+    "gogeta_state_assign_k1_d0": {
+      "original": 1100,
+      "effective": 150
+    }
+  },
+  "versions": {
+    "python": "3.12.3",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-aarch64-with-glibc2.39",
+    "torch": "2.14.1+cu130",
+    "lm_eval": "0.4.13",
+    "transformers": "5.24.0",
+    "datasets": "5.2.0",
+    "tokenizers": "0.23.3",
+    "accelerate": "1.16.0",
+    "numpy": "2.5.5",
+    "torch_runtime": "2.14.1+cu130"
+  },
+  "git": {
+    "commit": "b1b282c256d240dc0e6722cdf8d7e406c4f48dce",
+    "branch": "main",
+    "describe": "v0.4.40-dirty",
+    "dirty": true,
+    "code_dirty": false,
+    "evals_or_model_dirty": true
+  },
+  "task_config_sha256_16": {
+    "gogeta_battery_recall_d64": "d8cdb57fc1c17e22",
+    "gogeta_battery_val_lineshuf_bpb": "05a714524f091cf2",
+    "gogeta_state_assign_k1_d0": "430a76cf89ebef46",
+    "gogeta_val_bpb": "afce5d003b444b5e",
+    "gogeta_utils.py": "f2248093359ab50f"
+  },
+  "datasets": {
+    "code-py-v1": {
+      "docs": 4000,
+      "tokens": 1059160,
+      "chars": 3938783,
+      "chars_per_token": 3.719,
+      "sha256_16": "32e4b0ede9211f61"
+    }
+  },
+  "sandbox": null,
+  "elapsed_s": 164.5,
+  "threads": 2,
+  "device": "cpu"
+}

@@ -1,0 +1,66 @@
+{
+ "provenance": {
+  "kind": "gogeta_checkpoint",
+  "path": "/root/fusiondance-data/checkpoints/E0-20261122-122059-s0/model.pt",
+  "bytes": 55083865,
+  "config_fields_filled_with_defaults": [],
+  "n_params": 13767552,
+  "block_kinds": [
+   "attn"
+  ],
+  "loops": 4,
+  "max_seq_len": 1024
+ },
+ "n_per_cell": 48,
+ "loops": null,
+ "cells": {
+  "assign_k1_d0": {
+   "acc": 0.3125,
+   "ci95": [
+    0.1875,
+    0.4583333333333333
+   ],
+   "n": 48,
+   "chance": 0.25,
+   "stale_share_of_errors": 0.0,
+   "mean_lines": 6.0,
+   "secs": 2.4
+  },
+  "assign_k4_d16": {
+   "acc": 0.20833333333333334,
+   "ci95": [
+    0.10416666666666667,
+    0.3333333333333333
+   ],
+   "n": 48,
+   "chance": 0.25,
+   "stale_share_of_errors": 1.0,
+   "mean_lines": 31.0,
+   "secs": 12.1
+  },
+  "incr_k4_d16": {
+   "acc": 0.10416666666666667,
+   "ci95": [
+    0.020833333333333332,
+    0.20833333333333334
+   ],
+   "n": 48,
+   "chance": 0.25,
+   "stale_share_of_errors": 1.0,
+   "mean_lines": 31.0,
+   "secs": 14.1
+  },
+  "assign_k8_d64": {
+   "acc": 0.3541666666666667,
+   "ci95": [
+    0.22916666666666666,
+    0.5
+   ],
+   "n": 48,
+   "chance": 0.25,
+   "stale_share_of_errors": 1.0,
+   "mean_lines": 91.0,
+   "secs": 45.8
+  }
+ }
+}

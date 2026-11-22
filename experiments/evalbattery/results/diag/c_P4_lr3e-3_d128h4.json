@@ -1,0 +1,58 @@
+{
+ "args": {
+  "kind": "attn",
+  "pairs": 4,
+  "seq": 16,
+  "key_vocab": 16,
+  "val_vocab": 16,
+  "d": 128,
+  "layers": 2,
+  "heads": 4,
+  "window": 4,
+  "steps": 3000,
+  "batch": 64,
+  "lr": 0.003,
+  "wd": 0.1,
+  "warmup": 200,
+  "curriculum": false,
+  "curriculum_start": 4,
+  "seed": 0,
+  "eval_seq": 1024,
+  "device": "cpu",
+  "threads": 2,
+  "log_every": 1000,
+  "out": "experiments/evalbattery/results/diag/c_P4_lr3e-3_d128h4.json"
+ },
+ "acc": 1.0,
+ "ci95": [
+  1.0,
+  1.0
+ ],
+ "eval_loss": 7.130437795765943e-09,
+ "chance_uniform_values": 0.0625,
+ "chance_context_values": 0.25,
+ "loss_hist": [
+  [
+   0,
+   4,
+   3.6793
+  ],
+  [
+   1000,
+   4,
+   0.0548
+  ],
+  [
+   2000,
+   4,
+   0.0
+  ],
+  [
+   2999,
+   4,
+   0.0
+  ]
+ ],
+ "train_s": 282.3,
+ "params": 332544
+}

@@ -21,5 +21,8 @@ is recorded in the run's config (`train`, `cli_overrides`) and in the launcher's
 
 | File | What |
 |---|---|
-| `phase2a-k7-lr.campaign` | K7: 8 runs, 20M tokens each, lr in {1e-3, 2e-3, 3e-3, 6e-3} for E10 and E1. ~43 min GPU. |
+| `phase2a-k7-lr.campaign` | K7: 8 runs, 20M tokens each, lr in {1e-3, 2e-3, 3e-3, 6e-3} for E10 and E1. ~43 min GPU. Done. |
+| `phase2a-k7-lr-resume.campaign` | K7 items 2-8, resumed after an interruption (v0.4.16). Done. |
+| `phase2a-k7-lr-ext.campaign` | K7 grid extension (E1 at lr 0.012), added by the decision rule. Done. |
+| `phase2b-replication.campaign` | Generated from the template with LR_E10=0.003 and LR_E1=0.006 (K7-tuned). Running (Q7: E10 x3 seeds first; E1, E11, E9, then E2 at 6e-3). |
 | `phase2b-replication.template` | Replication at the tuned LRs (3 seeds each of E10, E1 and E11, then E9, conditional E0/E2). `experiments/checks/k7_lr_sweep.py --write-campaign` turns it into `phase2b-replication.campaign`. ~5.8 h GPU, up to ~7.5 h with the conditional runs. |

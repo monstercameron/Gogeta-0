@@ -17,6 +17,19 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.42: Docs refresh (hourly)
+*2026-11-22*
+
+**What**: the hourly Haiku docs refresh (the human's standing request), reviewed by the main agent for accuracy against the repo.
+- **README status paragraph**: the K7-tuned LRs (E10 3e-3, E1 6e-3), the Phase 2b start, the decode kernel working (C2/C110), and a stronger K9 caveat. This edit landed inside v0.4.41's commit (the version bump stages README); it's recorded here.
+- **`notes/sketch.md`**: decisions-log bullets for K9, the Phase 2b registration, the ledger-status rule and claim audits, the K7 LRs, SQ70/C110 and C105, plus a short status section.
+- **`experiments/launch/campaigns/README.md`**: rows for the K7 resume and extension campaigns (done) and Phase 2b (running).
+- **`post_training/SETUP.md` §8.2**: the GDN recurrent kernel is resolved (it was a call-site bug). Decoding is still not wired into `generate` (SQ53), and SWA/attention have no cache.
+
+**Checked**: every statement traced to the ledger, DEVLOG or a results file. Nothing reverted.
+
+---
+
 ## v0.4.41: Research: image and audio inputs (nice-to-have, research only)
 *2026-11-22*
 

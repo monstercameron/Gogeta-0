@@ -3,6 +3,12 @@ window.SITE_DATA = {
  "generated": "2026-11-22 18:40",
  "devlog": [
   {
+   "version": "v0.4.42",
+   "title": "Docs refresh (hourly)",
+   "date": "2026-11-22",
+   "html": "<p><strong>What</strong>: the hourly Haiku docs refresh (the human's standing request), reviewed by the main agent for accuracy against the repo.</p><ul><li><strong>README status paragraph</strong>: the K7-tuned LRs (E10 3e-3, E1 6e-3), the Phase 2b start, the decode kernel working (C2/C110), and a stronger K9 caveat. This edit landed inside v0.4.41's commit (the version bump stages README); it's recorded here.</li><li><strong><code>notes/sketch.md</code></strong>: decisions-log bullets for K9, the Phase 2b registration, the ledger-status rule and claim audits, the K7 LRs, SQ70/C110 and C105, plus a short status section.</li><li><strong><code>experiments/launch/campaigns/README.md</code></strong>: rows for the K7 resume and extension campaigns (done) and Phase 2b (running).</li><li><strong><code>post_training/SETUP.md</code> §8.2</strong>: the GDN recurrent kernel is resolved (it was a call-site bug). Decoding is still not wired into <code>generate</code> (SQ53), and SWA/attention have no cache.</li></ul><p><strong>Checked</strong>: every statement traced to the ledger, DEVLOG or a results file. Nothing reverted.</p>"
+  },
+  {
    "version": "v0.4.41",
    "title": "Research: image and audio inputs (nice-to-have, research only)",
    "date": "2026-11-22",

@@ -202,9 +202,12 @@ read-only root and a tmpfs work dir, and log/inspect high-reward completions. Th
    generation will dominate. Needed: a cached decode path (KV cache for attn/swa, recurrent
    state for GDN, per-loop state for the looped core), exposed either through `generate` or a
    `rollout_func`.
-2. **GDN recurrent kernel.** [reported by the coordinator] fla's
-   `fused_recurrent_gated_delta_rule` returns NaN on this GPU (cc 12.1), so the GDN decode path
-   cannot simply use it yet. The chunk kernel is what training and the current no-cache
+2. **GDN recurrent kernel (resolved for GDN, ledger C2/C110/C111).** The NaN was our call-site
+   bug: fla 0.6.0 takes `gk` as its 5th positional argument, so our positional call passed `beta`
+   as a decay. With keyword args, `fused_recurrent_gated_delta_rule` matches the fp32 reference
+   (chunk prefill + 1-token steps, and the neg-eig mode; `experiments/checks/results/sq_hw_fla_recurrent.json`).
+   Still open: the decode path is not yet wired into `generate` (SQ53), and SWA/attention have no
+   cache yet. The chunk kernel is what training and the current no-cache
    generation would use. Not verified by this work.
 3. **vLLM cannot serve FusionDance** without writing a vLLM model implementation (custom
    architecture, looped core, GDN). Not attempted. Also unknown whether vLLM wheels exist for

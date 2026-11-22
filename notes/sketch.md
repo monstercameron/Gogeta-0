@@ -31,6 +31,18 @@ The nice part is that looping costs extra compute and BitNet makes compute cheap
 - **2026-11-22 (v0.3.0):** First results: the E1 hybrid mixer stack beats dense by 3.6%. Looping (E2) does not pay yet and is non-convergent (best at the mean training r). Next comes the unlooped control E9 and per-loop supervision. See DEVLOG v0.3.0 and notes/LABNOTEBOOK.md.
 - **2026-11-22 (v0.3.1):** Every finished experiment gets a site page with a plain-English explainer (now an AGENTS.md rule). Training is paused by request; E9 and the seed replications are pending and must run detached.
 - **2026-11-22 (v0.3.5):** Trust but verify: every claim we rely on needs its own small local check (AGENTS.md §0, ledger in experiments/claims.md). Paper results motivate experiments but are never adopted as facts.
+- **2026-11-22 (v0.4.33):** K9 found 41.7% of val docs are near-duplicates of train. All absolute loss numbers stay provisional until a clean-val re-score; the primary metric for Phase 2b is doc-level bits/char on clean val (< 80% 13-gram overlap).
+- **2026-11-22 (v0.4.37):** Phase 2b analysis plan registered: H1 E1 vs E10 and H2 E11 vs E1, Holm at 0.05. The memorisation gap is a caveat flag, never a verdict change.
+- **2026-11-22 (v0.4.38-40):** Ledger status is the stricter of the registered verdict and the statistics policy. Hourly claim audits run with a 6-hour cool-down per claim. Rigor design (A3) registered: fair HPO, matched arms, E1 decomposition, and a 2x2x2 factorial with prediction I = +0.5% ± 1.5%.
+- **2026-11-22 (K7):** Tuned LRs: E10 3e-3, E1 6e-3 (20M-token sweep, seed 0). Every earlier run used an untuned 3e-3, so E0 and E1 numbers are not yet at tuned LR.
+- **2026-11-22 (SQ70 / C110):** The "NaN" in the recurrent GDN kernel was a call-site bug (positional args), not a GPU defect. Keyword args work (C2 verified), so a GDN decode path exists. Decode for SWA and attention is still to build (SQ53).
+- **2026-11-22 (C105):** The `post_training/rewards.py` sandbox can write to the repo under WSL, so use `evals/sandbox.py` for untrusted code until SQ61 moves its hardening in.
+
+## Status (2026-11-22, v0.4.40)
+
+- Results so far: E1 beats E0 by 3.6% at an untuned LR, one seed (C5 partial). Looping (E2) does not pay yet (C6/C7 partial).
+- Running: Phase 2b replication at tuned LRs (Q7 E10 x3 seeds, then Q8 E1 x3, E11, E9). Clean-val re-score pending (K9).
+- Next queued: K8 re-check, benchmark tier 1, K3 redesign, looped neg-eig parity, E3 ternary at tuned LR.
 
 ---
 

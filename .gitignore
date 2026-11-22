@@ -78,3 +78,7 @@ desktop.ini
 .idea/
 *.swp
 *~
+
+# Launcher state (lives in ~/fusiondance-data/run; safety net if copied into the repo)
+*.pid
+*.lock

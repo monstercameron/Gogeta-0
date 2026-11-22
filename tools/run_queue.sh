@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# DEPRECATED (2026-11-22): takes no GPU slot and writes no PID files. Use experiments/launch/E<n>.sh (tools/launch_experiment.sh) instead.
 # Run experiment configs one after another (inside WSL), each refusing to start on dirty code.
 #   bash tools/run_queue.sh configs/e0_dense.json configs/e1_hybrid.json@1 ...
 # An optional "@<seed>" suffix overrides train.seed for that entry.

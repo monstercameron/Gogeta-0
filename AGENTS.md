@@ -103,11 +103,17 @@ The project stays at `0.y.z` while it's experimental.
   - **At most 8 smaller CPU-only jobs** may run alongside it (checks, side quests, data prep, tests, site builds). Each CPU job is thread-capped (`OMP_NUM_THREADS`/`MKL_NUM_THREADS`/`torch.set_num_threads` ≤ 2) so 8 jobs plus the GPU job's dataloader don't saturate the 20 cores.
   - Before starting a GPU job, check `nvidia-smi --query-gpu=temperature.gpu,utilization.gpu --format=csv`. If the GPU is at **≥ 85 °C**, wait for it to cool below 75 °C first. Long runs should log the GPU temperature.
   - The launchers enforce this (one GPU slot, eight CPU slots, via PID/lock files under `~/fusiondance-data/run/`). Subagents get the same budget: say in each brief whether a subagent may use the GPU slot or is CPU-only.
+  - **CPU-only jobs** go through `tools/launch_cpu_job.sh [--name N] -- <command>` (PowerShell: `tools\launch_cpu_job.ps1`). It hides the GPU, caps threads at 2, and refuses a 9th job.
+  - **GPU checks and side quests** (`experiments/checks/`) don't go through the experiment launcher yet. Before starting one, run `bash experiments/launch/status.sh` and only proceed if the GPU slot is free **and** no other GPU process is listed. `status.sh` shows anything running on the GPU, including jobs started outside the launchers. *(TODO: a GPU-slot helper for checks.)*
+  - `tools/run_queue.sh` is **deprecated**: it takes no GPU slot and writes no PID files. Use one `experiments/launch/E<n>.sh` call per run.
+  - Never paste tracker logs anywhere public: Trackio prints a dashboard write token at startup (`tracker-<port>.log` is kept mode 600).
 - **Every experiment has its own launch script, and runs are only started through it.**
   - Each `E<n>` gets `experiments/launch/E<n>.sh` (a thin wrapper around `tools/launch_experiment.sh E<n>`), created when the experiment is registered. Experiments without a config or prediction get a script that refuses to run.
   - The launcher reads the config from the registry and runs preflight checks: prediction present, code clean, data present, no other run active, tracker reachable.
   - It starts `gogeta.train` **detached** (it survives the agent session ending) with `--require-clean`, writes a log and a PID file under `~/fusiondance-data/`, and logs to Trackio (`GOGETA_TRACKER=trackio`).
   - Use `--dry-run` to see exactly what would run. Don't start training with a hand-typed `python -m gogeta.train …` command, except for a throughput `--bench`.
+  - Check what's running with `bash experiments/launch/status.sh`; stop a run with `bash experiments/launch/stop.sh E<n>` (or `cpu:<name>` for a CPU job). Full usage: `experiments/launch/README.md`.
+  - The first real launch through the launcher hasn't been tested end to end (only dry runs). Watch it with `status.sh` and `tail -f` on its log.
 - **Every run is connected to Trackio.** Start the dashboard with `tools/launch_tracker.sh start` (or `tools\launch_tracker.ps1 start` from Windows) before launching, so the run can be watched live at http://127.0.0.1:7861. Runs still log to the local Trackio database if the dashboard is down, but check the run appears in it. Stop it with `tools/launch_tracker.sh stop`.
 
 ## 6. Tracking runs (scientific hygiene)
@@ -149,6 +155,8 @@ The project stays at `0.y.z` while it's experimental.
 | `experiments/claims.md` | **Claims ledger** (§0): every claim we rely on, with source, status and evidence |
 | `experiments/checks/` | One small, seeded verification script per claim (§0), each ≤ ~15 min; side-quest scripts are prefixed `sq_` |
 | `experiments/side-quests.md` | Side-quest log (§0b): ideas, status, outcomes |
+| `experiments/launch/` | One launch script per experiment (`E<n>.sh`), plus `status.sh`, `stop.sh` and a README |
+| `tools/launch_tracker.*`, `tools/launch_experiment.*`, `tools/launch_cpu_job.*` | Tracker start/stop; the GPU-slot experiment launcher; the CPU job launcher (`.sh` for WSL, `.ps1` wrappers for Windows) |
 | `LICENSE` | MIT (code + docs). The dataset keeps its own licence (ODC-By); don't commit data or paper PDFs. |
 | `pyproject.toml` | Package metadata + pinned deps (`pip install -e .`; torch is installed separately from the CUDA index) |
 | `.gitignore` | Keeps data, checkpoints, logs, tracker DBs, PDFs and local tool settings out of git. Check it before adding a new output type. |

@@ -1,2 +1,8 @@
 # Training environment (WSL Ubuntu 24.04, venv at ~/.venvs/gogeta)
+# torch is installed separately from the CUDA index:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu130   (tested: 2.14.1+cu130)
 trackio==0.45.1
+flash-linear-attention==0.6.0
+tokenizers
+numpy
+pyarrow

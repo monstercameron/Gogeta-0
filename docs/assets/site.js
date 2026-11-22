@@ -43,7 +43,7 @@
     const count = (s) => D.experiments.filter((e) => e.status === s).length;
     const cards = [
       [latest ? latest.version : "-", "current version"],
-      [D.experiments.length, "experiments planned"],
+      [D.experiments.length, "experiments"],
       [count("running"), "powering up"],
       [count("done") + " / " + count("failed"), "stable / failed"],
     ];
@@ -58,15 +58,22 @@
       chart.innerHTML = `<div class="chart-empty"><div class="big">NO READING</div>
         <p>The scouter has nothing to measure yet. Validation loss for each finished arc shows up here.</p></div>`;
     } else {
-      const max = Math.max(...pts.map((e) => e.results.val_loss));
+      // Bars start just below the best result so small differences are visible (axis is not zero-based).
+      const vals = pts.map((e) => e.results.val_loss);
+      const max = Math.max(...vals);
+      const floor = Math.min(...vals) * 0.95;
+      const best = Math.min(...vals);
       chart.innerHTML =
-        `<p class="kicker">Validation loss · lower is better</p>` +
+        `<p class="kicker">Validation loss · lower is better · axis starts at ${floor.toFixed(3)}</p>` +
         pts
-          .map(
-            (e) => `<div class="hbar"><span>${esc(e.id)} ${esc(e.arc)}</span>
-            <div class="track"><div class="fill" style="width:${((e.results.val_loss / max) * 100).toFixed(1)}%"></div></div>
-            <b>${e.results.val_loss.toFixed(3)}</b></div>`
-          )
+          .map((e) => {
+            const v = e.results.val_loss;
+            const w = 8 + ((v - floor) / (max - floor || 1)) * 92;
+            const delta = v === best ? "best" : `+${(((v - best) / best) * 100).toFixed(1)}%`;
+            return `<div class="hbar"><span>${esc(e.id)} ${esc(e.arc)}</span>
+            <div class="track"><div class="fill" style="width:${w.toFixed(1)}%"></div></div>
+            <b>${v.toFixed(3)} <small style="color:var(--dim)">${delta}</small></b></div>`;
+          })
           .join("");
     }
   }

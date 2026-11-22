@@ -2,7 +2,7 @@
 
 **The first model built on FusionDance, an architecture that fuses three efficiency tricks into one tiny language model.** Can they fuse into something stronger than any of them alone?
 
-> Status: **v0.1.0, design phase.** Experimental research repo. Expect sharp edges, failed runs, and honest write-ups of both.
+> Status: **v0.3.0, first models trained.** On 200M tokens of Python, the hybrid mixer stack (one full-attention layer out of six) beats a dense transformer by 3.6%. The looped version doesn't pay off yet. Details are in [`DEVLOG.md`](DEVLOG.md). Experimental research repo: expect sharp edges, failed runs, and honest write-ups of both.
 
 ---
 

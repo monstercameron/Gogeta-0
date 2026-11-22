@@ -268,7 +268,7 @@ td.good { color: var(--green); font-weight: 700; }
 .chart-card { padding: 22px; }
 .chart-empty { text-align: center; padding: 40px 16px; font-family: var(--font-mono); color: #8fdcb5; }
 .chart-empty .big { font-family: var(--font-display); font-size: 2rem; color: var(--green); letter-spacing: 2px; }
-.hbar { display: grid; grid-template-columns: 120px 1fr 70px; gap: 12px; align-items: center; margin: 10px 0; font-family: var(--font-mono); font-size: .85rem; }
+.hbar { display: grid; grid-template-columns: 140px 1fr 120px; gap: 12px; align-items: center; margin: 10px 0; font-family: var(--font-mono); font-size: .85rem; }
 .hbar .track { height: 16px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; }
 .hbar .fill { height: 100%; background: linear-gradient(90deg, var(--orange), var(--gold)); box-shadow: 0 0 10px var(--orange); border-radius: 99px; }
 .exp .prediction { font-size: .9rem; border-left: 3px solid var(--violet); padding-left: 10px; }
@@ -309,7 +309,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 18px; flex-wr
   .nav-links::-webkit-scrollbar { display: none; }
   .nav-links a { padding: 6px 7px; font-size: .82rem; white-space: nowrap; }
   .brand { font-size: 1.3rem; flex: none; }
-  .hbar { grid-template-columns: 80px 1fr 56px; }
+  .hbar { grid-template-columns: 84px 1fr 104px; font-size: .78rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

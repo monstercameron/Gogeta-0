@@ -84,3 +84,54 @@ Candidates checked via the HF API (gated flag, license, size):
 - **DEC:** `--compile` for all runs. **200M tokens** each (≈ 20 tokens/param for E0, i.e. compute-optimal; < 1 epoch of 262M). Expected wall time ≈ 19 / 33 / 76 min.
 - **DEC:** `require_clean` now checks **code paths only** (`gogeta/ configs/ tools/ tests/ requirements.txt`), so notes can be written while a queue runs. Runs still record the full dirty flag too.
 - **Predictions for E0, E1, E2 are written in `experiments/experiments.json`** before launch (see the registry for the exact text).
+
+### 12:21 · Training queue launched
+- Code commit **`0dc7491`** (WIP, untagged), the exact code every run in this queue records.
+- Queue: `bash tools/run_queue.sh configs/e0_dense.json configs/e1_hybrid.json configs/e2_looped.json` (compile, `--require-clean`). Logs in `~/fusiondance-data/logs/`.
+- **OBS:** E0 run `E0-20261122-122059-s0` started: 6,104 steps × 32,768 tokens. Live throughput in the dashboard **≈ 210k tok/s** (higher than the 173k benchmark, probably because the bench window included compile/autotune tail effects).
+- **⚠ Rule while the queue runs:** do not edit code paths until E2 has started, or the queued runs will (correctly) refuse to start.
+
+### 14:46 · Queue finished: E0, E1, E2 results
+All three from commit `0dc7491` (code clean), seed 0, 200,015,872 tokens each (6,104 steps × 32,768), full validation split (1.06M tokens).
+
+| | Run | Non-emb params | Val loss | Bits/char | Δ vs E0 | Train FLOPs | Wall | Avg tok/s* | Peak mem |
+|---|---|---|---|---|---|---|---|---|---|
+| E0 dense | `E0-20261122-122059-s0` | 10.62M | **0.6063** | 0.2351 | n/a | 1.94e16 | 23.3 min | 143k | 4.75 GB |
+| E1 hybrid | `E1-20261122-124440-s0` | 11.09M | **0.5846** | 0.2267 | **−3.6%** | 1.82e16 | 38.6 min | 86k | 7.10 GB |
+| E2 looped (r=4) | `E2-20261122-132340-s0` | 9.46M | **0.6186** | 0.2398 | +2.0% | 3.87e16 | 80.3 min | 42k | 12.07 GB |
+
+\* averaged over the whole run including periodic evals and compile; train-only steady state is higher (E0 ≈ 210k).
+
+**E2 loss vs loop count at eval** (trained with r ~ U{1..7}):
+
+| r | 1 | 2 | 4 | 6 | 8 | 12 |
+|---|---|---|---|---|---|---|
+| val loss | 0.6694 | 0.6272 | **0.6186** | 0.6239 | 0.6328 | 0.6540 |
+| vs r=4 | +8.2% | +1.4% | n/a | +0.9% | +2.3% | +5.7% |
+
+**Periodic val (first 128 val seqs)**, ordering stable throughout: step 1250: E1 0.944 < E0 1.011 < E2 1.025 · step 3250: 0.731 < 0.762 < 0.778 · final: 0.607 < 0.629 < 0.642.
+
+**Stability:** no train-loss jumps > 0.5 after warmup in any run. Max grad-norm after step 300: E0 0.38, E1 0.38, E2 0.67.
+
+**Prediction scorecard** (predictions committed in `0dc7491` before the runs):
+- E0, loss 0.90–1.30: **✗ MISSED** (0.606). I badly underestimated how predictable this curated/synthetic corpus is (0.235 bits/char). Throughput ✓ roughly; samples ✓ (see below).
+- E1, within ±2% of E0, probably better: **direction ✓, magnitude ✗** (−3.6%). Wall-clock ratio 1.66× ✓ (predicted ~1.7×).
+- E2, r=4 within ±3% of E0: **✓** (+2.0%). r=1 > +10%: **✗** (+8.2%). r=2 < r=1: **✓**. r=4 ≈ r=6: **✓**. r=8 ≤ r=4: **✗** (+2.3%). r=12 no collapse: **✓**, but worse than "slightly". Stable: **✓**.
+
+**Interpretation:**
+1. **The hybrid wins.** Replacing 5 of 6 full-attention layers with GDN + SWA *improved* loss by 3.6% at slightly lower FLOPs. It leads at every checkpoint, so this isn't end-of-run noise (single seed though; see TODO). This is the strongest positive signal so far for the "linear-time mixers" fighter.
+2. **Looping doesn't pay yet.** E2 uses 2.1× E1's FLOPs and is 5.8% worse than E1, and 2.0% worse than E0 with 11% fewer non-embedding params. Per FLOP it's clearly behind: at matched FLOPs (≈ step 3,050 of E2) its periodic val ≈ 0.78 vs E0's final 0.63.
+3. **The loop is not a convergent refinement.** Loss is minimised at r=4, the *mean training r*, and rises on both sides; extrapolating past the trained max (7) hurts (+5.7% at r=12). The model learned "use about 4 passes", not "each pass improves the estimate". This is exactly the failure the Rival Loop's "fixes must fix" penalty and per-loop supervision target, so it's now a measured motivation for E6, not just a nice idea.
+4. **Confound to resolve:** E2 differs from E1 in *both* sharing and depth/params. The clean control is the same 5-block layout trained unlooped (r=1, no sharing), i.e. "is weight-sharing + 4 passes better than one pass of the same blocks?". Registered as **E9**.
+
+**Samples** (temperature 0.8, top-k 40, 160 new tokens; full text in each run's `samples.txt`):
+- All three solve the palindrome prompt with a correct function *and* correct asserts.
+- E0's `fibonacci` collapsed into dozens of repeated `else:` lines (degenerate repetition).
+- E2's `fibonacci` has broken control flow but emits the **correct** asserts `fibonacci(10) == 55`, `(20) == 6765`, `(30) == 832040`, which is memorised Fibonacci facts.
+- E1 produced the least coherent `fibonacci`/`Stack` completions despite the best loss, so loss and sample quality don't line up at this scale. This argues for a **functional eval** (run generated code against held-out asserts), since `algorithmic_corpus` docs come with asserts.
+
+**TODO / next:**
+- E9: unlooped control for E2 (same blocks, r=1, unshared).
+- 2 more seeds for E0/E1/E2 before treating the 3.6% / 2.0% gaps as real.
+- Functional-correctness eval: held-out prompts → generate → execute asserts (sandboxed) → pass@k.
+- Diagnose the r curve: log ‖h‖ and per-loop loss through the exit head; try per-loop supervision (start of E6).

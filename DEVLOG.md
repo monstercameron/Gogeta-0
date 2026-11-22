@@ -17,6 +17,41 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.43: Outside review 19:07 + quick reviews triaged (out-of-corpus check is top pick)
+*2026-11-22*
+
+### Outside review 2026-11-22 19:07 (Haiku, AGENTS §0d)
+`notes/reviews/2026-11-22-1907-review.md`, with the main agent's triage footer.
+**Critiques** that hold:
+- the clean-val cut is one threshold;
+- dedup changes the training regime (epochs) as well as the data;
+- cost is compared in FLOPs, not GPU-minutes;
+- **the ternary factor bundles ternary weights with int8 activations** (model.py:73-78);
+- the loop is the least replicated ingredient;
+- n = 3 can't verify;
+- r = 4 was chosen after looking;
+- **Rotary is capped at max_seq_len** (model.py:52/98/227, verified), so SQ52's 2048-length eval can't run; it's marked not ready;
+- nothing tests transfer beyond the corpus.
+
+**Accepted** (6 new side quests, none rejected):
+- **SQ99 (top pick): an out-of-corpus check** on local Python files with < 20% 13-gram overlap with train. It's CPU-feasible: E1 via the plain-PyTorch GDN reference;
+- SQ96: equal-GPU-time efficiency;
+- SQ97: hybrid gap vs width;
+- SQ98: the E8 draft-agreement premise;
+- SQ190: repetition as an axis;
+- SQ191: no global layer;
+- SQ192: split the ternary factor (full-precision weights + int8 activations arm).
+
+The full L(r), r = 1..7, will be pre-registered before the factorial.
+
+### Quick reviews (Codex GPT-6 Luna, AGENTS §0d-bis)
+- **18:36 statistician** (committed in v0.4.39).
+- **18:41 data engineer:**
+  - **SQ95**: scorer parity. K9's +25.8% mixes a GPU-bf16 full-val number with a CPU-fp32 near-dup number; the all-GPU doc-level re-score will add a parity column.
+  - Source- and group-aware splits were forwarded to A1 for `code-py-v2`.
+
+---
+
 ## v0.4.42: Docs refresh (hourly)
 *2026-11-22*
 

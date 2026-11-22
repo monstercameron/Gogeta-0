@@ -310,7 +310,7 @@ Order = priority, highest first; `next` walks the list top to bottom and returns
 ### SQ52: SQ52: NoPE vs RoPE in the single full-attention layer; per-position loss to T=2048 after training at 512
 
 - status: `queued`, state: NOT-READY, ready: False, needs_human: False
-- missing: script and prediction; rope flag on the attn block
+- missing: script and prediction; rope flag on the attn block; rotary-extension patch: Rotary builds cos/sin only up to max_seq_len and forward slices [:T], so eval at T=2048 fails (outside review 19:07, critique 8)
 - launch: `bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_52_nope.py`
 - source: notes/research-kimi-linear.md SQ52
 

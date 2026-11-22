@@ -1,0 +1,57 @@
+{
+  "note": "Proposed queue items (queue.py schema) from workstream A2. IDs are provisional (A2-n): renumber on merge. All depend on the Phase 2b campaign finishing; none may run while it holds the GPU.",
+  "items": [
+    {
+      "id": "A2-1", "kind": "eval",
+      "title": "Doc-level clean-val scoring of every qualifying Phase 2b checkpoint (primary metric, K9 subsets, memorisation gap)",
+      "why": "Phase 2b addendum A2: the primary metric is bits/char on val docs with < 80% 13-gram overlap (K9). Needs the GPU (K8 scorer).",
+      "depends_on": ["K9", "phase2b-replication"],
+      "resources": {"type": "gpu", "est_minutes": 25},
+      "ready": false, "missing": ["Phase 2b campaign finished"], "needs_human": false,
+      "launch": "~/.venvs/gogeta/bin/python experiments/stats/score_doclevel.py --checkpoint ~/fusiondance-data/checkpoints/<run>/model.pt   # once per qualifying run (REPLICATION.json 'included')",
+      "status": "blocked", "source": "experiments/stats/phase2b-analysis-plan.md",
+      "note": "4 scorer calls per checkpoint (clean80, dup80, clean50, dup50), about 1-2 min each at 14M params. Writes experiments/stats/doclevel/<run>.json."
+    },
+    {
+      "id": "A2-2", "kind": "analysis",
+      "title": "REPLICATION-stats: paired CIs, TOST, Holm, memorisation gap, MDE on the Phase 2b runs",
+      "why": "Pre-registered secondary layer; the registered rules stay the decision rule.",
+      "depends_on": ["A2-1", "Q6"],
+      "resources": {"type": "cpu", "est_minutes": 2},
+      "ready": false, "missing": ["A2-1"], "needs_human": false,
+      "launch": "bash tools/launch_cpu_job.sh --name repl-stats -- ~/.venvs/gogeta/bin/python experiments/stats/replication_stats.py",
+      "status": "blocked", "source": "experiments/stats/replication_stats.py",
+      "note": "Run replication_analysis.py first (same discovery). Output: experiments/checks/results/REPLICATION-stats.json."
+    },
+    {
+      "id": "A2-3", "kind": "side-quest",
+      "title": "SQ111: seed noise at the K7 horizon (E1 3e-3/6e-3 and E10 2e-3/3e-3, seeds 1-2, 20M tokens)",
+      "why": "K7 picked LRs from single runs; E1's 6e-3 vs 3e-3 gap (1.47%) is about 2x the expected seed noise (C156).",
+      "depends_on": ["phase2b-replication"],
+      "resources": {"type": "gpu", "est_minutes": 35, "tokens": 160000000},
+      "ready": false, "missing": ["campaign file (8 runs: --seed 1/2 --lr ... --max-tokens 20000000)"], "needs_human": true,
+      "launch": null, "status": "blocked", "source": "experiments/stats/proposed-side-quests.md SQ111",
+      "note": "Needs a campaign file written by the main agent (A2 does not touch experiments/launch)."
+    },
+    {
+      "id": "A2-4", "kind": "side-quest",
+      "title": "SQ110: init x data-order factorial for E1 (20M tokens, 3x3) after adding --data-seed to gogeta/train.py",
+      "why": "Separates init from data-order variance: decides whether paired-seed analysis beats Welch.",
+      "depends_on": ["phase2b-replication"],
+      "resources": {"type": "gpu", "est_minutes": 40, "tokens": 180000000},
+      "ready": false, "missing": ["--data-seed patch in gogeta/train.py (see experiments/stats/pairing.md)"], "needs_human": true,
+      "launch": null, "status": "blocked", "source": "experiments/stats/proposed-side-quests.md SQ110",
+      "note": "The code change must be committed and tagged first; blocked by the campaign's clean-code rule until Phase 2b ends."
+    },
+    {
+      "id": "A2-5", "kind": "side-quest",
+      "title": "SQ113: at least 5 seeds for the K5/SQ6 parity arms (a), (b), (e) (C18, C43, C44)",
+      "why": "Policy: n = 2 is PARTIAL. These probes cost minutes.",
+      "depends_on": ["K5"],
+      "resources": {"type": "gpu", "est_minutes": 30},
+      "ready": false, "missing": ["seed list in experiments/checks/sq_06_rotation_parity.py (A2 does not edit it)"], "needs_human": true,
+      "launch": null, "status": "blocked", "source": "experiments/stats/proposed-side-quests.md SQ113",
+      "note": "Main agent decides whether to widen the existing script's seed set or add a sibling script."
+    }
+  ]
+}

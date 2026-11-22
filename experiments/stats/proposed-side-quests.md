@@ -1,0 +1,11 @@
+# Proposed side quests SQ110-SQ119 (A2, statistics)
+
+| ID | Idea | Why it might help | Status | Cost / dependencies |
+|---|---|---|---|---|
+| SQ110 | **Init x data-order factorial** for E1 at 20M tokens: 3 init seeds x 3 data-order seeds (9 runs; the 3 diagonal ones equal today's `--seed`), analysed with `core.variance_components` | `train.seed` sets init and data order together, so we cannot say how much seed noise is data order (shared in E10/E1 pairs) vs init. Decides whether paired-seed analysis beats Welch | `idea` | needs a `--data-seed` flag in `gogeta/train.py` (patch in `pairing.md`; blocked while the Phase 2b campaign needs a clean `gogeta/`); ~9 x 4 min GPU, after Phase 2b |
+| SQ111 | **Seed noise at the K7 horizon**: seeds 1, 2 of E1 at 3e-3 and 6e-3 and of E10 at 3e-3 and 2e-3, 20M tokens | K7 chose LRs from n=1 runs; E1's 6e-3 vs 3e-3 gap (1.47%) is ~2 x the expected noise. Makes the K7 choice interpretable (C92 / C156) | `idea` | 8 runs, ~4 min each (~35 min GPU) |
+| SQ112 | **Item-level outputs + paired BCa bootstrap** for every eval: store per-doc NLL and per-problem pass/fail; analyse with `core.paired_bootstrap` | Policy section 5. Needs K8's `score()` to also return `nll_doc` (a 1-line non-breaking change, not made here) | `idea` | CPU analysis; trivial change in `experiments/checks/k8_external_reference.py` |
+| SQ113 | **More seeds for the cheap probe tasks** (K5 / SQ6 parity arms (a), (b), (e)) to >= 5 seeds | C18 and C43 are n = 2 and C44 shows large seed variance for 1-pass GDN | `idea` | minutes each in the GPU slot |
+| SQ114 | **E2 and E9 seeds 1, 2** so the loop question becomes inferential | Phase 2b leaves C6 descriptive (n = 1 per arm) | `idea` | E2 ~80 min/seed, E9 ~33 min/seed: ~3.8 GPU-h; only if the single-seed loop result turns out decision-relevant |
+| SQ115 | **Registry fields for multiplicity**: `family` and `n_planned_comparisons` per experiment in `experiments.json`, plus a CPU tool that lists each arc's family and Holm-adjusts the logged p-values | Makes the per-arc FWER budget (policy section 4) mechanical | `idea` | tools change (outside A2's folders); CPU only |
+| SQ116 | **Does seed sd shrink with tokens?** Compare Phase 2b's n = 3 at 200M with SQ111's n = 3 at 20M | Lets us plan n and the MDE for future arcs from cheap short runs | `idea` | free once SQ111 and Phase 2b finish |

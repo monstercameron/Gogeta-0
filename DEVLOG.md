@@ -17,6 +17,30 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.37: Phase 2b analysis plan registered (statistics layer, clean-val primary metric)
+*2026-11-22*
+
+### A2 statistics: Phase 2b analysis addendum (REGISTERED)
+**What**: rigor workstream A2 (statistics), from a subagent. `experiments/stats/core.py` covers paired/Welch CIs, effect sizes, BCa and paired bootstrap, sign-flip permutation, Holm/BH, TOST, variance components and MDE/power, with selftests including CI-coverage simulations. Also:
+- `replication_stats.py` (the secondary statistical layer over the Q6 discovery);
+- `score_doclevel.py` (GPU: doc-level bits/char per checkpoint on the K9 clean and near-dup subsets);
+- `pairing.md`;
+- the addendum, **appended to `experiments/checks/PREDICTIONS.md`**.
+
+**The registered content**:
+- The original Phase 2b criteria stay the primary decision rule. They're now applied to the **primary metric, doc-level bits/char on clean val** (val docs with < 80% 13-gram overlap with train: 2,333 docs; sensitivity at < 50%). Training-time `val_loss` is secondary (K9).
+- The **confirmatory family is fixed at m=2, Holm at 0.05**: H1 E1 vs E10 (paired by seed; seed s fixes the data order, which is shared across architectures) and H2 E11 vs E1 (TOST with margin max(1%, 2 pooled sd)). Everything else is BH q=0.10 or descriptive. E2 vs E9 is n=1, descriptive.
+- A **memorisation gap** (near-dup minus clean bits/char) is reported per model. It's a caveat flag and never changes a verdict.
+- **Power at n=3:** the MDE is about 2% at sd 0.004, so power for a 1.5% gap is about 0.55. The exact sign-flip test can't go below p=0.25 at n=3.
+
+**Registration timing (honest)**: the addendum file was written at 18:30:17, before the first Phase 2b result (E10 seed 0, finished 18:31:38). It was committed a few minutes after that result existed. The main agent didn't open the result before committing, and an E10-only result can't inform H1 or H2.
+**Open decisions (main agent)**:
+- `score_doclevel.py` needs about 25 GPU-min after the campaign. It's queued, or the primary-metric verdicts stay INCOMPLETE.
+- A2 notes that the registered C5 rule ("gap > 2 pooled sd + separation") is weaker than a 5% test. It's left unchanged, and the CI is reported beside it.
+- The retro-audit downgrades (C8, C18, C43) are pending the main agent's review, in the next version.
+
+---
+
 ## v0.4.36: Micro devlogs for every experiment; every settled claim cites evidence
 *2026-11-22*
 

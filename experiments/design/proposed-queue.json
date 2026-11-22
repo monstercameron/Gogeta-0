@@ -1,0 +1,272 @@
+[
+ {
+  "id": "A3-01",
+  "kind": "train",
+  "title": "HPO: equalise K7 grid (E10@1.2e-2) + second seeds at the top-2 LRs, 20M tokens",
+  "why": "C160/C93: equal tuning budget (5 LR points per model) and a noise estimate for the K7 ranking.",
+  "depends_on": [],
+  "resources": {
+   "type": "gpu",
+   "est_minutes": 15,
+   "tokens": 100000000
+  },
+  "ready": false,
+  "needs_human": false,
+  "launch": "bash tools/launch_campaign.sh experiments/design/proposed-campaigns/a-hpo-grid-20m.campaign",
+  "status": "queued",
+  "source": "A3 design: notes/design-rigor.md; experiments/design/proposed-predictions.md",
+  "missing": [
+   "prediction committed (proposed-predictions.md) and staged configs moved into configs/"
+  ]
+ },
+ {
+  "id": "A3-02",
+  "kind": "train",
+  "title": "HPO: horizon check, E1@3e-3 + E10@6e-3 + E10@2e-3 at 200M (stage A)",
+  "why": "C160: do the 20M K7 optima hold at the claim horizon?",
+  "depends_on": [
+   "Q7",
+   "Q8"
+  ],
+  "resources": {
+   "type": "gpu",
+   "est_minutes": 88,
+   "tokens": 600000000
+  },
+  "ready": false,
+  "needs_human": false,
+  "launch": "bash tools/launch_campaign.sh experiments/design/proposed-campaigns/b-horizon-200m.campaign",
+  "status": "queued",
+  "source": "A3 design: notes/design-rigor.md; experiments/design/proposed-predictions.md",
+  "missing": [
+   "prediction committed (proposed-predictions.md) and staged configs moved into configs/"
+  ]
+ },
+ {
+  "id": "A3-03",
+  "kind": "train",
+  "title": "Matched-param and matched-FLOP arms: E30, E32, E33, E34, E31 at 200M",
+  "why": "C161/C162: params-matched dense (E30), FLOP-matched dense (E31), unshared at E2's FLOPs (E32, E33), wide E9 at E2's FLOPs (E34).",
+  "depends_on": [
+   "Q7",
+   "Q8",
+   "E9"
+  ],
+  "resources": {
+   "type": "gpu",
+   "est_minutes": 292,
+   "tokens": 1000000000
+  },
+  "ready": false,
+  "needs_human": false,
+  "launch": "bash tools/launch_campaign.sh experiments/design/proposed-campaigns/c-matched-200m.campaign",
+  "status": "queued",
+  "source": "A3 design: notes/design-rigor.md; experiments/design/proposed-predictions.md",
+  "missing": [
+   "prediction committed (proposed-predictions.md) and staged configs moved into configs/"
+  ]
+ },
+ {
+  "id": "A3-04",
+  "kind": "train",
+  "title": "Dedup bridge: E10 and E1 seed 0 on code-py-v2 at 200M",
+  "why": "C168: do the Phase 2b conclusions survive deduplication (K9 failed)?",
+  "depends_on": [
+   "Q7",
+   "Q8"
+  ],
+  "resources": {
+   "type": "gpu",
+   "est_minutes": 64,
+   "tokens": 400000000
+  },
+  "ready": false,
+  "needs_human": false,
+  "launch": "bash tools/launch_campaign.sh experiments/design/proposed-campaigns/d-bridge-dedup.campaign",
+  "status": "queued",
+  "source": "A3 design: notes/design-rigor.md; experiments/design/proposed-predictions.md",
+  "missing": [
+   "code-py-v2 built by A1 (tools/prepare_data.py)",
+   "configs moved",
+   "predictions committed"
+  ]
+ },
+ {
+  "id": "A3-05",
+  "kind": "train",
+  "title": "E1 decomposition, minimal tier (9 arms + control, seed 0, 20M, v2)",
+  "why": "C163/C164 (SQ91): which ingredient carries E1's win; the review's top idea.",
+  "depends_on": [
+   "A3-04"
+  ],
+  "resources": {
+   "type": "gpu",
+   "est_minutes": 33,
+   "tokens": 200000000
+  },
+  "ready": false,
+  "needs_human": false,
+  "launch": "bash tools/launch_campaign.sh experiments/design/proposed-campaigns/e-decomp-minimal.campaign",
+  "status": "queued",
+  "source": "A3 design: notes/design-rigor.md; experiments/design/proposed-predictions.md",
+  "missing": [
+   "gdn_ablation_flags patch applied to gogeta/model.py (between campaigns)",
+   "code-py-v2",
+   "predictions committed"
+  ]
+ },
+ {
+  "id": "A3-06",
+  "kind": "train",
+  "title": "E1 decomposition, rigorous tier (equal 2-LR budget, 3 seeds per arm)",
+  "why": "C163/C164: seeds and LR budget so arm differences below 1% are readable.",
+  "depends_on": [
+   "A3-05"
+  ],
+  "resources": {
+   "type": "gpu",
+   "est_minutes": 145,
+   "tokens": 880000000
+  },
+  "ready": false,
+  "needs_human": false,
+  "launch": "bash tools/launch_campaign.sh experiments/design/proposed-campaigns/f-decomp-rigorous.campaign",
+  "status": "queued",
+  "source": "A3 design: notes/design-rigor.md; experiments/design/proposed-predictions.md",
+  "missing": [
+   "A3-05 verdict decides which arms need seeds"
+  ]
+ },
+ {
+  "id": "A3-07",
+  "kind": "train",
+  "title": "Factorial F0: LR grid for the 5 primary cells, seed 0, 20M, v2",
+  "why": "C165: every cell gets its own tuned LR (equal 3-point grid + extension) before any interaction is estimated.",
+  "depends_on": [
+   "A3-04"
+  ],
+  "resources": {
+   "type": "gpu",
+   "est_minutes": 105,
+   "tokens": 350000000
+  },
+  "ready": false,
+  "needs_human": false,
+  "launch": "bash tools/launch_campaign.sh experiments/design/proposed-campaigns/g-factorial-F0-lrtune.campaign",
+  "status": "queued",
+  "source": "A3 design: notes/design-rigor.md; experiments/design/proposed-predictions.md",
+  "missing": [
+   "configs moved",
+   "code-py-v2",
+   "predictions committed"
+  ]
+ },
+ {
+  "id": "A3-08",
+  "kind": "train",
+  "title": "Factorial F1 pilot: 5 cells x seeds 1,2 (estimates sigma and rho)",
+  "why": "C165: sizes F2 from the measured seed sd instead of the assumed 0.004.",
+  "depends_on": [
+   "A3-07"
+  ],
+  "resources": {
+   "type": "gpu",
+   "est_minutes": 60,
+   "tokens": 200000000
+  },
+  "ready": false,
+  "needs_human": false,
+  "launch": null,
+  "status": "queued",
+  "source": "A3 design: notes/design-rigor.md; experiments/design/proposed-predictions.md",
+  "missing": [
+   "campaign file is written after F0 (LRs known)"
+  ]
+ },
+ {
+  "id": "A3-09",
+  "kind": "train",
+  "title": "Factorial F2 confirm: top up to N = 46 (n = 8 per cell, 16 for 000) for 80% power at I = -1%",
+  "why": "C165/C166: the pre-registered interaction-advantage test.",
+  "depends_on": [
+   "A3-08"
+  ],
+  "resources": {
+   "type": "gpu",
+   "est_minutes": 219,
+   "tokens": 900000000
+  },
+  "ready": false,
+  "needs_human": false,
+  "launch": null,
+  "status": "queued",
+  "source": "A3 design: notes/design-rigor.md; experiments/design/proposed-predictions.md",
+  "missing": [
+   "N recomputed from the F1 sigma (power_cost.py)"
+  ]
+ },
+ {
+  "id": "A3-10",
+  "kind": "train",
+  "title": "Factorial F3: the remaining 3 cells (E23, E25, E26) for the full 8-cell table",
+  "why": "C166: pairwise interactions (ternary x loops, GDN x loops) with an honest MDE.",
+  "depends_on": [
+   "A3-09"
+  ],
+  "resources": {
+   "type": "gpu",
+   "est_minutes": 132,
+   "tokens": 500000000
+  },
+  "ready": false,
+  "needs_human": false,
+  "launch": null,
+  "status": "queued",
+  "source": "A3 design: notes/design-rigor.md; experiments/design/proposed-predictions.md",
+  "missing": [
+   "F2 verdict"
+  ]
+ },
+ {
+  "id": "A3-11",
+  "kind": "train",
+  "title": "Warmup sensitivity: E50/E51 at 20M with warmup 30",
+  "why": "C167: is the K7 ranking a warmup artefact (warmup = 49% of a 20M run)?",
+  "depends_on": [],
+  "resources": {
+   "type": "gpu",
+   "est_minutes": 13,
+   "tokens": 80000000
+  },
+  "ready": false,
+  "needs_human": false,
+  "launch": "bash tools/launch_campaign.sh experiments/design/proposed-campaigns/h-warmup-20m.campaign",
+  "status": "queued",
+  "source": "A3 design: notes/design-rigor.md; experiments/design/proposed-predictions.md",
+  "missing": [
+   "prediction committed (proposed-predictions.md) and staged configs moved into configs/"
+  ]
+ },
+ {
+  "id": "A3-12",
+  "kind": "analysis",
+  "title": "Memorisation-gap readout on every Phase 2b / A3 checkpoint (near-dup bpc minus clean bpc), by mixer",
+  "why": "C169: recall-capable mixers may win on memorised repeats; confounds GDN vs attention.",
+  "depends_on": [
+   "Q7",
+   "Q8"
+  ],
+  "resources": {
+   "type": "cpu",
+   "est_minutes": 20
+  },
+  "ready": false,
+  "needs_human": false,
+  "launch": null,
+  "status": "queued",
+  "source": "A3 design: notes/design-rigor.md; experiments/design/proposed-predictions.md",
+  "missing": [
+   "A1 clean/near-dup doc lists"
+  ]
+ }
+]

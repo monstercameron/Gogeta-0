@@ -1,0 +1,12 @@
+# E1 decomposition, minimal tier (the review's 20-30 GPU-min version): 9 arms + control, seed 0, 20M tokens, v2, LR 6e-3.
+# Needs the gdn_ablation_flags patch (E42-E45) and code-py-v2.
+E53 --seed 0 --lr 0.006 --max-tokens 20000000
+E40 --seed 0 --lr 0.006
+E41 --seed 0 --lr 0.006
+E42 --seed 0 --lr 0.006
+E43 --seed 0 --lr 0.006
+E44 --seed 0 --lr 0.006
+E45 --seed 0 --lr 0.006
+E46 --seed 0 --lr 0.006
+E47 --seed 0 --lr 0.006
+E48 --seed 0 --lr 0.006

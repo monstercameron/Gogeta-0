@@ -1,0 +1,41 @@
+{
+  "experiment": "E50",
+  "description": "E10 (HF Llama control) with warmup_steps 30 (about 5% of a 20M-token run) instead of 300 (49%): does the 20M proxy's long warmup distort the K7 LR ranking?",
+  "arch": "hf_llama",
+  "model": {
+    "hidden_size": 384,
+    "num_hidden_layers": 6,
+    "num_attention_heads": 6,
+    "num_key_value_heads": 6,
+    "head_dim": 64,
+    "intermediate_size": 1024,
+    "hidden_act": "silu",
+    "max_position_embeddings": 1024,
+    "rope_parameters": {
+      "rope_type": "default",
+      "rope_theta": 10000.0
+    },
+    "rms_norm_eps": 1e-06,
+    "tie_word_embeddings": true,
+    "attention_bias": false,
+    "mlp_bias": false,
+    "initializer_range": 0.02,
+    "attention_dropout": 0.0
+  },
+  "train": {
+    "dataset": "code-py-v1",
+    "seq_len": 1024,
+    "batch_size": 32,
+    "max_tokens": 20000000,
+    "lr": 0.003,
+    "min_lr_frac": 0.1,
+    "warmup_steps": 30,
+    "weight_decay": 0.1,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "grad_clip": 1.0,
+    "eval_every": 250,
+    "eval_seqs": 128,
+    "seed": 0
+  }
+}

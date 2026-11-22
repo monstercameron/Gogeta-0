@@ -1,0 +1,46 @@
+--- a/gogeta/model.py
++++ b/gogeta/model.py
+@@ -53,6 +53,9 @@
+     rope_base: float = 10000.0
+     conv_size: int = 4            # GDN short conv
+     gdn_neg_eigval: bool = False  # GDN write strength beta in (0, 2) instead of (0, 1): negative eigenvalues (SQ2/E11)
++    gdn_conv: bool = True         # GDN short causal convs on q/k/v (False: identity)   [E1 decomposition]
++    gdn_gate: bool = True         # GDN SiLU output gate (False: no gate projection)    [E1 decomposition]
++    gdn_out_norm: bool = True     # GDN per-head output RMSNorm (False: identity)       [E1 decomposition]
+     ternary: bool = False
+     tie_embeddings: bool = True
+ 
+@@ -164,18 +167,19 @@
+         D, H, hd = cfg.d_model, cfg.n_heads, cfg.head_dim
+         self.H, self.hd = H, hd
+         self.q, self.k, self.v = (make_linear(cfg, D, H * hd) for _ in range(3))
+-        self.gate = make_linear(cfg, D, H * hd)
++        self.gate = make_linear(cfg, D, H * hd) if cfg.gdn_gate else None
+         self.o = make_linear(cfg, H * hd, D)
+         self.o.is_residual_out = True
+         self.a = nn.Linear(D, H, bias=False)       # decay input (full precision)
+         self.b = nn.Linear(D, H, bias=False)       # write strength beta (full precision)
+-        self.conv_q, self.conv_k, self.conv_v = (ShortConv(H * hd, cfg.conv_size) for _ in range(3))
++        self.conv_q, self.conv_k, self.conv_v = (
++            ShortConv(H * hd, cfg.conv_size) if cfg.gdn_conv else nn.Identity() for _ in range(3))
+         # Mamba-2 style decay: g = -exp(A_log) * softplus(a(x) + dt_bias)
+         A = torch.empty(H).uniform_(1, 16)
+         self.A_log = nn.Parameter(torch.log(A))
+         dt = torch.exp(torch.rand(H) * (math.log(0.1) - math.log(0.001)) + math.log(0.001)).clamp(min=1e-4)
+         self.dt_bias = nn.Parameter(dt + torch.log(-torch.expm1(-dt)))  # inverse softplus
+-        self.out_norm = nn.RMSNorm(hd)
++        self.out_norm = nn.RMSNorm(hd) if cfg.gdn_out_norm else nn.Identity()
+         # Negative eigenvalues (Grazzi et al.; verified locally by SQ6 arm (e)): beta = 2*sigmoid(b(x)) in (0, 2),
+         # so (I - beta k k^T) can flip sign. fla only allows this with the sigmoid applied inside the kernel.
+         self.neg_eigval = cfg.gdn_neg_eigval
+@@ -195,7 +199,9 @@
+         else:
+             beta = torch.sigmoid(self.b(x).float())
+             o, _ = self._kernel(q.to(dtype), k.to(dtype), v.to(dtype), g, beta.to(dtype), scale=hd ** -0.5)
+-        o = self.out_norm(o.to(x.dtype)) * F.silu(self.gate(x).view(B, T, H, hd))
++        o = self.out_norm(o.to(x.dtype))
++        if self.gate is not None:
++            o = o * F.silu(self.gate(x).view(B, T, H, hd))
+         return self.o(o.reshape(B, T, H * hd))
+ 
+ 

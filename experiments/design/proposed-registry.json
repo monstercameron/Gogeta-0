@@ -1,0 +1,478 @@
+[
+ {
+  "id": "E20",
+  "arc": "Rigor: Factorial",
+  "title": "Factorial cell 000 (GDN=0, loops=0, ternary=0): all full-attention mixers; unloo",
+  "question": "Factorial cell 000 (GDN=0, loops=0, ternary=0): all full-attention mixers; unlooped, 14 unique blocks; bf16/fp",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. Cell 000 (dense, unlooped, fp), 20M, v2. Clean-val bpc within 3% of E52 run at 20M (same recipe, 14 vs 6 blocks); seed sd 0.3-0.6%. Best LR 3e-3 or 6e-3. Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e20_fact000.json"
+ },
+ {
+  "id": "E21",
+  "arc": "Rigor: Factorial",
+  "title": "Factorial cell 001 (GDN=0, loops=0, ternary=1): all full-attention mixers; unloo",
+  "question": "Factorial cell 001 (GDN=0, loops=0, ternary=1): all full-attention mixers; unlooped, 14 unique blocks; ternary",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. Cell 001 (dense, unlooped, ternary): +4% to +10% vs E20 (K4: gap 10-15% at d<=256 and falling; 20M tokens favour fp). Best LR 6e-3 or 1.2e-2. Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e21_fact001.json"
+ },
+ {
+  "id": "E22",
+  "arc": "Rigor: Factorial",
+  "title": "Factorial cell 010 (GDN=0, loops=1, ternary=0): all full-attention mixers; share",
+  "question": "Factorial cell 010 (GDN=0, loops=1, ternary=0): all full-attention mixers; shared loop (prelude 1, core 3 x r=",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. Cell 010 (dense, looped r=4, fp, 5 unique blocks): +2% to +6% vs E20 (3x fewer unique params at equal FLOPs). Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e22_fact010.json"
+ },
+ {
+  "id": "E23",
+  "arc": "Rigor: Factorial",
+  "title": "Factorial cell 011 (GDN=0, loops=1, ternary=1): all full-attention mixers; share",
+  "question": "Factorial cell 011 (GDN=0, loops=1, ternary=1): all full-attention mixers; shared loop (prelude 1, core 3 x r=",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. Cell 011 (dense, looped, ternary): +6% to +14% vs E20; the ternary x loops term BC is within +-1% (P 55%) else positive = anti-synergy (P 35%). Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e23_fact011.json"
+ },
+ {
+  "id": "E24",
+  "arc": "Rigor: Factorial",
+  "title": "Factorial cell 100 (GDN=1, loops=0, ternary=0): hybrid GDN/SWA/attn mixers; unlo",
+  "question": "Factorial cell 100 (GDN=1, loops=0, ternary=0): hybrid GDN/SWA/attn mixers; unlooped, 14 unique blocks; bf16/f",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. Cell 100 (hybrid, unlooped, fp): -1% to -4% vs E20 (E1's v1 gap was -3.6% at 6 blocks; on dedup data the attention advantage on memorised repeats shrinks, so the gap is smaller). Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e24_fact100.json"
+ },
+ {
+  "id": "E25",
+  "arc": "Rigor: Factorial",
+  "title": "Factorial cell 101 (GDN=1, loops=0, ternary=1): hybrid GDN/SWA/attn mixers; unlo",
+  "question": "Factorial cell 101 (GDN=1, loops=0, ternary=1): hybrid GDN/SWA/attn mixers; unlooped, 14 unique blocks; ternar",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. Cell 101 (hybrid, unlooped, ternary): +4% to +10% vs E24. Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e25_fact101.json"
+ },
+ {
+  "id": "E26",
+  "arc": "Rigor: Factorial",
+  "title": "Factorial cell 110 (GDN=1, loops=1, ternary=0): hybrid GDN/SWA/attn mixers; shar",
+  "question": "Factorial cell 110 (GDN=1, loops=1, ternary=0): hybrid GDN/SWA/attn mixers; shared loop (prelude 1, core 3 x r",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. Cell 110 (hybrid, looped, fp = E2 layout on v2): +1% to +5% vs E24; E2 vs E1 on v1 (+5.8%) is the prior. Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e26_fact110.json"
+ },
+ {
+  "id": "E27",
+  "arc": "Rigor: Factorial",
+  "title": "Factorial cell 111 (GDN=1, loops=1, ternary=1): hybrid GDN/SWA/attn mixers; shar",
+  "question": "Factorial cell 111 (GDN=1, loops=1, ternary=1): hybrid GDN/SWA/attn mixers; shared loop (prelude 1, core 3 x r",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. Cell 111 (full fusion at 20M): worst loss of the eight. Full-model interaction I = y111-y100-y010-y001+2*y000 = +0.5% (+-1.5%): P(I <= -1%) = 10%, P(|I| < 1%) = 55%, P(I >= +1%) = 35%. Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e27_fact111.json"
+ },
+ {
+  "id": "E30",
+  "arc": "Rigor: Matched",
+  "title": "Dense (6 full-attention blocks, FusionDance code) with mlp_hidden 1096 so non-em",
+  "question": "Dense (6 full-attention blocks, FusionDance code) with mlp_hidden 1096 so non-embedding params match E1 (11,09",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. Dense, mlp 1096, params = E1's (+0.24%). vs E10 mean: -0.2% to -1.0% (extra MLP capacity only). E1 still beats E30 by >= 2.5% (P 85%). Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e30_dense_parammatch.json"
+ },
+ {
+  "id": "E31",
+  "arc": "Rigor: Matched",
+  "title": "Dense (6 full-attention blocks) with mlp_hidden 888 so train FLOPs/token match E",
+  "question": "Dense (6 full-attention blocks) with mlp_hidden 888 so train FLOPs/token match E1 (91,027,800). Control for 'E",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. Dense, mlp 888, FLOPs = E1's (+0.1%). vs E10 mean: +0.3% to +1.2%. E1 still beats E31 by >= 3.5% (P 85%). Low priority: a dense model with fewer FLOPs than E10 cannot close the gap by construction. Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e31_dense_flopmatch.json"
+ },
+ {
+  "id": "E32",
+  "arc": "Rigor: Matched",
+  "title": "14 UNSHARED blocks in E2's executed mixer order (swa, 4x[gdn,gdn,swa], attn), no",
+  "question": "14 UNSHARED blocks in E2's executed mixer order (swa, 4x[gdn,gdn,swa], attn), no loop, no re-injection: the un",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. 14 unshared hybrid blocks at E2's FLOPs (-3.7%), 2.75x E2's unique params. Beats E2 at the same LR (6e-3) by 3% to 8% (P 85%) and E1 by 0% to 4%. If so, 'loops improve efficiency' survives only as parameter efficiency. Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e32_unshared14_e2flops.json"
+ },
+ {
+  "id": "E33",
+  "arc": "Rigor: Matched",
+  "title": "12 unshared blocks total (the review's wording), same mixer family, mlp_hidden 1",
+  "question": "12 unshared blocks total (the review's wording), same mixer family, mlp_hidden 1392 so FLOPs match E2's (192,7",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. 12 unshared blocks (review wording), mlp 1392, FLOPs = E2's. Within +-1.5% of E32; beats E2 by >= 2% (P 75%). Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e33_unshared12_e2flops.json"
+ },
+ {
+  "id": "E34",
+  "arc": "Rigor: Matched",
+  "title": "E9's 5-block unlooped layout widened (d=576, 9 heads of 64, mlp_hidden 2168) to ",
+  "question": "E9's 5-block unlooped layout widened (d=576, 9 heads of 64, mlp_hidden 2168) to E2's FLOPs: the width way of g",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. E9 layout widened to d=576 (FLOPs = E2's). Beats E2 by 1% to 6% (P 70%); within +-3% of E32. Not LR-retuned: a shortfall vs E32 larger than 3% is uninformative about width. Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e34_e9_wide_e2flops.json"
+ },
+ {
+  "id": "E35",
+  "arc": "Rigor: Matched",
+  "title": "Factorial matching-rule sensitivity (M2, params-matched): 5 unshared full-attent",
+  "question": "Factorial matching-rule sensitivity (M2, params-matched): 5 unshared full-attention blocks, no loop (the dense",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. Dense 5-block unlooped (params-matched partner of E22): E22 vs E35 within +-1.5% (looping the dense stack 4x at 2.4x the FLOPs buys < 1.5%). Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e35_dense5_unlooped.json"
+ },
+ {
+  "id": "E36",
+  "arc": "Rigor: Matched",
+  "title": "Factorial matching-rule sensitivity (M2, params-matched): E9's layout (5 unshare",
+  "question": "Factorial matching-rule sensitivity (M2, params-matched): E9's layout (5 unshared hybrid blocks), no loop. Com",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. E9 layout on v2 (params-matched partner of E26): E26 vs E36 within +-2.5%; direction unresolved. Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e36_e9layout_v2.json"
+ },
+ {
+  "id": "E40",
+  "arc": "Rigor: Decomposition",
+  "title": "GDN blocks replaced by full attention (mixer-type test); SWA slots kept. Everyth",
+  "question": "GDN blocks replaced by full attention (mixer-type test); SWA slots kept. Everything else identical to E1 (6 bl",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. E1 with GDN -> attention: +0.5% to +3% vs E1 on clean val (P 75% that it loses by >= 2 seed-sd = 0.8%). The review predicted >= 2 sd; v1's -3.6% E1 lead partly came from memorised repeats. Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e40_gdn2attn.json"
+ },
+ {
+  "id": "E41",
+  "arc": "Rigor: Decomposition",
+  "title": "SWA-only stack: GDN blocks replaced by SWA (no recurrent state, window 256, one ",
+  "question": "SWA-only stack: GDN blocks replaced by SWA (no recurrent state, window 256, one full-attention last). Everythi",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. SWA-only stack: +1% to +4% vs E1; worse than E40 (window 256 sees only a quarter of the 1024 context). Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e41_swaonly.json"
+ },
+ {
+  "id": "E42",
+  "arc": "Rigor: Decomposition",
+  "title": "E1 with the GDN short causal convs removed (identity). Everything else identical",
+  "question": "E1 with the GDN short causal convs removed (identity). Everything else identical to E1 (6 blocks, d=384). 20M ",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. No short conv: +0.7% to +2.5% vs E1 (conv supplies local mixing before the delta rule). P(within 1 sd of E1) = 20%. Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e42_gdn_noconv.json"
+ },
+ {
+  "id": "E43",
+  "arc": "Rigor: Decomposition",
+  "title": "E1 with the GDN SiLU output gate removed (no gate projection). Everything else i",
+  "question": "E1 with the GDN SiLU output gate removed (no gate projection). Everything else identical to E1 (6 blocks, d=38",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. No output gate: +0.3% to +1.5% vs E1. P(within 1 sd) = 35%. Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e43_gdn_nogate.json"
+ },
+ {
+  "id": "E44",
+  "arc": "Rigor: Decomposition",
+  "title": "E1 with the GDN per-head output RMSNorm removed. Everything else identical to E1",
+  "question": "E1 with the GDN per-head output RMSNorm removed. Everything else identical to E1 (6 blocks, d=384). 20M tokens",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. No output RMSNorm: within +-0.6% of E1 (P 50%); risk of instability at 6e-3 (P 15% diverges). Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e44_gdn_noonorm.json"
+ },
+ {
+  "id": "E45",
+  "arc": "Rigor: Decomposition",
+  "title": "E1 with conv, gate and output norm all removed (bare delta rule + q/k/v/o). Ever",
+  "question": "E1 with conv, gate and output norm all removed (bare delta rule + q/k/v/o). Everything else identical to E1 (6",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. Bare GDN (no conv, gate, out-norm): +1.5% to +5% vs E1; E45 - E1 >= E42 - E1 (P 80%). Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e45_gdn_bare.json"
+ },
+ {
+  "id": "E46",
+  "arc": "Rigor: Decomposition",
+  "title": "Attention placement: the single full-attention layer first, final slot becomes S",
+  "question": "Attention placement: the single full-attention layer first, final slot becomes SWA. Everything else identical ",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. Attention first (last slot SWA): +0.8% to +3% vs E1 (the global layer sees only embedding-level features and nothing refines its output). Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e46_attnfirst.json"
+ },
+ {
+  "id": "E47",
+  "arc": "Rigor: Decomposition",
+  "title": "Attention placement: full-attention layer in the middle (slot 4), final slot SWA",
+  "question": "Attention placement: full-attention layer in the middle (slot 4), final slot SWA. Everything else identical to",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. Attention in the middle (slot 4): within +-0.7% of E1 (P 55%). Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e47_attnmid.json"
+ },
+ {
+  "id": "E48",
+  "arc": "Rigor: Decomposition",
+  "title": "All SWA replaced by GDN (pure-GDN stack + one full-attention last; Qwen3.8-style",
+  "question": "All SWA replaced by GDN (pure-GDN stack + one full-attention last; Qwen3.8-style, SQ9). Everything else identi",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. All-GDN + last attention (no SWA): within +-0.7% of E1 (P 55%); better than E1 by >= 0.7% (P 25%). Tests the Qwen3.8 report that pure-GDN hybrids beat SWA hybrids (SQ9). Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e48_gdn_noswa.json"
+ },
+ {
+  "id": "E50",
+  "arc": "Rigor: HPO",
+  "title": "E10 (HF Llama control) with warmup_steps 30 (about 5% of a 20M-token run) instea",
+  "question": "E10 (HF Llama control) with warmup_steps 30 (about 5% of a 20M-token run) instead of 300 (49%): does the 20M p",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. E10 with warmup 30 at 20M: K7's LR ranking unchanged (winner 3e-3, P 70%); winner-loss lower than K7's 1.0286 by 1% to 4%. Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e50_e10_warm30.json"
+ },
+ {
+  "id": "E51",
+  "arc": "Rigor: HPO",
+  "title": "E1 with warmup_steps 30 (about 5% of a 20M-token run) instead of 300 (49%).",
+  "question": "E1 with warmup_steps 30 (about 5% of a 20M-token run) instead of 300 (49%).",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. E1 with warmup 30 at 20M: winner stays 6e-3 or moves to 1.2e-2 (P 75% that it does not move down); loss lower than K7's 0.9925 by 1% to 5%. Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e51_e1_warm30.json"
+ },
+ {
+  "id": "E52",
+  "arc": "Rigor: HPO",
+  "title": "Dedup bridge: E10 exactly as configs/e10_llama_ref.json but trained on the dedup",
+  "question": "Dedup bridge: E10 exactly as configs/e10_llama_ref.json but trained on the deduplicated set code-py-v2.",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. E10 on dedup v2, 200M: clean-val bpc higher than the v1-trained E10's clean-val bpc by 0% to 6% (less duplicated data to memorise); the memorisation gap shrinks by >= 30%. Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e52_e10_v2.json"
+ },
+ {
+  "id": "E53",
+  "arc": "Rigor: HPO",
+  "title": "Dedup bridge: E1 exactly as configs/e1_hybrid.json but trained on the deduplicat",
+  "question": "Dedup bridge: E1 exactly as configs/e1_hybrid.json but trained on the deduplicated set code-py-v2.",
+  "prediction": "Written 2026-11-22 before any run (A3 design). Metric: doc-level bits/char on the CLEAN val split, relative differences. E1 on dedup v2, 200M: E1 vs E52 gap on clean val within 2 points of the v1 gap (P 60%); smaller than the v1 gap (P 60%). Full prediction, decision rule and cost: experiments/design/proposed-predictions.md.",
+  "ingredients": [],
+  "metrics": [
+   "clean-val bits/char",
+   "memorisation gap",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e53_e1_v2.json"
+ }
+]

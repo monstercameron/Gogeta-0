@@ -1,0 +1,27 @@
+# E1 decomposition, rigorous tier: every arm and both controls get LR {3e-3, 6e-3} at seed 0 (equal budget);
+# then seeds 1,2 at each arm's better LR are added by hand (they depend on the result). 20M tokens, v2.
+# (E53 seed 0 at 6e-3 is the same run as in the minimal tier: skip it if that already ran.)
+E53 --seed 0 --lr 0.006 --max-tokens 20000000
+E53 --seed 1 --lr 0.006 --max-tokens 20000000
+E53 --seed 2 --lr 0.006 --max-tokens 20000000
+E53 --seed 0 --lr 0.003 --max-tokens 20000000
+E52 --seed 0 --lr 0.003 --max-tokens 20000000
+E52 --seed 0 --lr 0.006 --max-tokens 20000000
+E40 --seed 0 --lr 0.003
+E40 --seed 0 --lr 0.006
+E41 --seed 0 --lr 0.003
+E41 --seed 0 --lr 0.006
+E42 --seed 0 --lr 0.003
+E42 --seed 0 --lr 0.006
+E43 --seed 0 --lr 0.003
+E43 --seed 0 --lr 0.006
+E44 --seed 0 --lr 0.003
+E44 --seed 0 --lr 0.006
+E45 --seed 0 --lr 0.003
+E45 --seed 0 --lr 0.006
+E46 --seed 0 --lr 0.003
+E46 --seed 0 --lr 0.006
+E47 --seed 0 --lr 0.003
+E47 --seed 0 --lr 0.006
+E48 --seed 0 --lr 0.003
+E48 --seed 0 --lr 0.006

@@ -1,0 +1,6 @@
+# Horizon transfer of the K7 optima, stage A (200M tokens, v1, seed 0). Phase 2b supplies E10@3e-3 and E1@6e-3 (3 seeds each).
+# E1@3e-3 and E10@6e-3 test the neighbours the K7 curves suggest; E10@2e-3 tests the direction horizon theory expects (LR optimum falls with tokens).
+E1  --seed 0 --lr 0.003
+E10 --seed 0 --lr 0.006
+E10 --seed 0 --lr 0.002
+# stage B (only if E1@6e-3 beats E1@3e-3 at 200M by > 0.0092 nats): E1 --seed 0 --lr 0.012

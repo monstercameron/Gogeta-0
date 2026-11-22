@@ -1,0 +1,5 @@
+# Warmup sensitivity (20M tokens, v1, warmup 30 steps = 5%): does the 300-step warmup (49% of a 20M run) change the K7 ranking?
+E50 --seed 0 --lr 0.003
+E50 --seed 0 --lr 0.006
+E51 --seed 0 --lr 0.006
+E51 --seed 0 --lr 0.012

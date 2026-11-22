@@ -17,6 +17,38 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.40: Rigor design (A3): fair HPO, matched arms, E1 decomposition, 2x2x2 factorial (registered)
+*2026-11-22*
+
+### A3 experimental design (rigor workstream; predictions REGISTERED)
+**What**: from a subagent, reviewed by the main agent; the main doc is `notes/design-rigor.md`.
+- **28 staged configs** in `experiments/staged-configs/`, to move into `configs/` between campaigns. Each was rebuilt on CPU from its JSON, with params and FLOPs printed.
+- An opt-in GDN ablation-flag patch (`gdn_conv`, `gdn_gate`, `gdn_out_norm`, defaults identical; E1/E2/E3 construct bit-identically under it).
+- Power/cost and factorial-analysis scripts in `experiments/design/`.
+
+**Design**:
+- **Fair HPO:** an equal 5-point LR grid per model; E10 gets 1.2e-2 (3 min). **Horizon check at 200M tokens:** E1@3e-3, E10@6e-3 and E10@2e-3 (88 GPU-min). The optimum transfers if no neighbour beats the Phase 2b mean by more than 0.0092 nats. No schedule sweep; one warmup pair (13 min).
+- **Matched arms** (4.9 GPU-h):
+  - E30 dense at E1's params; E31 dense at E1's FLOPs;
+  - E32/E33 unshared at E2's FLOPs; E34 E9 widened to d=576.
+
+  Measured cost ≠ FLOPs: E1 has 0.94× E0's FLOPs but runs at 0.60× its throughput (dense SWA mask, C12).
+- **E1 decomposition** (E40–E48): GDN→attention, SWA-only, no conv / gate / out-norm, bare GDN, attention placement, all-GDN. 0.55 GPU-h minimal, 2.4 rigorous.
+- **2×2×2 factorial** (GDN × loops × ternary; the cell abc is E(20+4a+2b+c)):
+  - matched at 14 block applications (FLOPs matched, params differ; E35/E36 are params-matched partners);
+  - estimand I = y111 − y100 − y010 − y001 + 2·y000 on log clean-val loss;
+  - synergy if the 95% CI is below 0;
+  - N=46 runs detects 1% at sd 0.004;
+  - the cheapest powered version is 6.4 GPU-h (14.5 if sd = 0.0067);
+  - **registered prediction: I = +0.5% ± 1.5% (no synergy expected)**.
+- **Data:** the factorial and decomposition run on a deduplicated `code-py-v2` (being built by A1). A bridge (E10 + E1 seed 0 on v2, 64 GPU-min) checks whether rankings change.
+- **Roadmap:** about 15 GPU-h for a defensible minimum, about 30 GPU-h for everything.
+
+**Registered**: A3's predictions are appended to `experiments/checks/PREDICTIONS.md` (dated 18:47), before any of these runs exists.
+**Caveats**: the wall-time estimates are model-based; ternary speed (0.75×) is assumed; the v2 configs can't launch until A1 builds `code-py-v2`; the power figures assume a seed sd of 0.004 until Phase 2b measures it.
+
+---
+
 ## v0.4.39: Reproducibility (A5): manifests, reproduce, CPU replay, science lint; ledger-status rule
 *2026-11-22*
 

@@ -1,0 +1,17 @@
+# Factorial stage F0: G3 LR grid {3e-3, 6e-3, 1.2e-2} for the five primary cells, seed 0, 20M tokens, v2. Extension rule (same for every cell):
+# if the winner is at an edge, one more run one step beyond (1.5e-3 or 2.4e-2). The seed-0 runs are NOT used in the interaction estimate (winner's curse).
+E20 --seed 0 --lr 0.003
+E20 --seed 0 --lr 0.006
+E20 --seed 0 --lr 0.012
+E24 --seed 0 --lr 0.003
+E24 --seed 0 --lr 0.006
+E24 --seed 0 --lr 0.012
+E22 --seed 0 --lr 0.003
+E22 --seed 0 --lr 0.006
+E22 --seed 0 --lr 0.012
+E21 --seed 0 --lr 0.003
+E21 --seed 0 --lr 0.006
+E21 --seed 0 --lr 0.012
+E27 --seed 0 --lr 0.003
+E27 --seed 0 --lr 0.006
+E27 --seed 0 --lr 0.012

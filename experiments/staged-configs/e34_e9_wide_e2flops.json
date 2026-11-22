@@ -1,0 +1,38 @@
+{
+  "experiment": "E34",
+  "description": "E9's 5-block unlooped layout widened (d=576, 9 heads of 64, mlp_hidden 2168) to E2's FLOPs: the width way of giving E9 the compute that looping gave E2. LR_E1 (assumption: not retuned at the wider width).",
+  "model": {
+    "vocab_size": 8192,
+    "d_model": 576,
+    "n_heads": 9,
+    "mlp_hidden": 2168,
+    "window": 256,
+    "max_seq_len": 1024,
+    "ternary": false,
+    "prelude": [
+      "swa",
+      "gdn",
+      "gdn",
+      "swa",
+      "attn"
+    ],
+    "core": [],
+    "coda": []
+  },
+  "train": {
+    "dataset": "code-py-v1",
+    "seq_len": 1024,
+    "batch_size": 32,
+    "max_tokens": 200000000,
+    "lr": 0.006,
+    "min_lr_frac": 0.1,
+    "warmup_steps": 300,
+    "weight_decay": 0.1,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "grad_clip": 1.0,
+    "eval_every": 250,
+    "eval_seqs": 128,
+    "seed": 0
+  }
+}

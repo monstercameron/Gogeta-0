@@ -1,0 +1,6 @@
+# Equalise K7's tuning budget to 5 LR points per model (E10 lacked 1.2e-2) and replicate the top LRs (20M tokens, v1, K7 recipe).
+E10 --seed 0 --lr 0.012 --max-tokens 20000000
+E10 --seed 1 --lr 0.003 --max-tokens 20000000
+E10 --seed 1 --lr 0.002 --max-tokens 20000000
+E1  --seed 1 --lr 0.006 --max-tokens 20000000
+E1  --seed 1 --lr 0.003 --max-tokens 20000000

@@ -1,0 +1,6 @@
+# Matched-parameter and matched-FLOP arms, 200M tokens, v1, seed 0, at the LR of the family they are compared with (config LR).
+E30 --seed 0
+E32 --seed 0
+E33 --seed 0
+E34 --seed 0
+E31 --seed 0

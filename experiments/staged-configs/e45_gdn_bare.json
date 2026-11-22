@@ -1,0 +1,43 @@
+{
+  "experiment": "E45",
+  "description": "E1 with conv, gate and output norm all removed (bare delta rule + q/k/v/o). Everything else identical to E1 (6 blocks, d=384). 20M tokens, deduplicated set; LR from its own sweep (--lr).",
+  "model": {
+    "vocab_size": 8192,
+    "d_model": 384,
+    "n_heads": 6,
+    "mlp_hidden": 1024,
+    "window": 256,
+    "max_seq_len": 1024,
+    "ternary": false,
+    "prelude": [
+      "swa",
+      "gdn",
+      "gdn",
+      "swa",
+      "gdn",
+      "attn"
+    ],
+    "core": [],
+    "coda": [],
+    "gdn_conv": false,
+    "gdn_gate": false,
+    "gdn_out_norm": false
+  },
+  "train": {
+    "dataset": "code-py-v2",
+    "seq_len": 1024,
+    "batch_size": 32,
+    "max_tokens": 20000000,
+    "lr": 0.006,
+    "min_lr_frac": 0.1,
+    "warmup_steps": 300,
+    "weight_decay": 0.1,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "grad_clip": 1.0,
+    "eval_every": 250,
+    "eval_seqs": 128,
+    "seed": 0
+  },
+  "requires_patch": "experiments/staged-configs/patches/gdn_ablation_flags.patch (gogeta/model.py flags)"
+}

@@ -79,3 +79,20 @@ Source: [`notes/research-looped.md`](../notes/research-looped.md) §4: exact cha
 |---|---|---|
 | SQ2 | `done` | **Promising, top result so far:** GDN with negative eigenvalues solves running parity in one pass, 100.0% at T=64 and 99.99% at T=128 positions 64–127 (2 seeds). Next: does it help language modelling (an E1-style A/B) and the looped core? See card `experiments/cards/SQ6.md`, ledger C43. |
 | SQ6 | `done` | Rotation (RotSSM) reaches 84.0% (below the 90% bar; C22 refuted at our scale) but beats looping on length generalisation (76.5% vs 61.2%). Looped GDN 97.9% in-length. Card `experiments/cards/SQ6.md`. |
+
+## Proposed by benchmark-suite research (pending review)
+
+Source: `notes/benchmark-suite.md`; scaffold in `evals/`. Top picks: SQ60, SQ61, SQ62.
+
+| ID | Idea | Why it might help | Status | Outcome / what we did |
+|---|---|---|---|---|
+| SQ60 | **(top pick)** **Tier 1 on E0/E1/E2 (GPU slot)**: `run_suite --tier 1 --device cuda` on all three seed-0 checkpoints (needs `flash-linear-attention==0.6.0` in `~/.venvs/gogeta-eval` for GDN); report each metric's spread with bootstrap SE | First test of whether the likelihood probes (HumanEval/MBPP solution bpb, CRUXEval-O, fresh-GitHub bpb) and held-out pass@1 rank variants the way val loss does, or disagree (C28) | `idea` | E0 numbers on CPU in `notes/benchmark-suite.md` §7 |
+| SQ61 | **(top pick)** **Upstream the mount-namespace hardening into `post_training/rewards.py`** (+ a test that a write to the repo path fails) | C105: today GRPO reward code could write the repo and all of C: | `idea` | `evals/sandbox.py` is the working reference (C106) |
+| SQ62 | **(top pick)** **First public anchor on fresh code**: SmolLM2-135M (reuse K8's weights, no new download) through `gogeta_uncheatable_py_bpb` with lm-eval's `hf` model and a character-matched window | Tokenizer-free placement of Gogeta-0 against a public model on code written after our data; K8 covers our val set only | `idea` | n/a |
+| SQ63 | **Recall probe redesign**: no-distractor control, 1–2 in-context demonstrations, multi-query, and a "copied the nearest distractor" rate; then E0 vs E1 (SWA window 256) vs E2 | C108: the probe floors on E0, so tier 3 can't rank architectures yet | `idea` | n/a |
+| SQ64 | **Stronger decontamination**: 10/13-gram overlap (OpenCoder's method) for HumanEval/MBPP/CRUXEval, and MinHash near-duplicate screening of val vs train for `gogeta_heldout_exec` | C103 is a line-match lower bound; C107 may be inflated by near-duplicates | `idea` | n/a |
+| SQ65 | **Faster no-cache generation**: sort generate requests by prompt length (or pad right and slice) so `FusionDanceBackbone`'s per-left-pad-group loop actually batches | Exec tasks run ~5.5 s/problem on CPU for E0; tier 2s needs ~33k samples | `idea` | n/a |
+| SQ66 | **CRUXEval-O probe calibration**: per-output-type baselines; add CRUXEval-I (likelihood of the true input) | E0's 8.9% is above "always False" (3.6%), but on bools it is below the majority baseline | `idea` | n/a |
+| SQ67 | **Metric vs training progress**: tier-1 metrics on intermediate checkpoints (if saved) to see which metric keeps improving after val loss flattens | Picks the eval metric that tracks capability rather than fit | `idea` | n/a |
+| SQ68 | **Zoology MQAR** with our mixers as the replacement for K3 | K3's homemade MQAR is invalid (attn 8.6%); Zoology is the reference harness (active, last commits 2026-03) | `idea` | n/a |
+| SQ69 | **Paloma `dolma_100_programing_languages` Python slice** (gated: the human must accept the AI2 ImpACT licence and set `HF_TOKEN`) | A second, published held-out code corpus with existing baselines | `idea` | n/a |

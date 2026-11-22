@@ -1,0 +1,219 @@
+{
+  "run": "smoke-random-tiny_attn-tier2+2s-20261122-173751",
+  "created": "2026-11-22T17:41:34",
+  "status": "smoke (random weights: wiring only, not a result)",
+  "args": {
+    "checkpoint": null,
+    "random_init": "tiny_attn",
+    "tier": "2,2s",
+    "tasks": null,
+    "limit": 1.0,
+    "device": "cpu",
+    "batch_size": 8,
+    "threads": 2,
+    "loops": null,
+    "seed": 0,
+    "no_exec": false,
+    "name": "smoke-random-tiny_attn",
+    "log_samples": false
+  },
+  "tasks": [
+    "gogeta_humaneval_exec",
+    "gogeta_humaneval_exec_clean",
+    "gogeta_humaneval_plus_exec",
+    "gogeta_mbpp_exec",
+    "gogeta_mbpp_exec_clean",
+    "gogeta_mbpp_plus_exec",
+    "gogeta_humaneval_exec_n20",
+    "gogeta_mbpp_exec_n20"
+  ],
+  "limit_note": "--limit set: subset only, NOT comparable to full runs",
+  "model": {
+    "kind": "random_init",
+    "preset": "tiny_attn",
+    "seed": 0,
+    "config_fields_filled_with_defaults": [
+      "gdn_neg_eigval"
+    ],
+    "n_params": 697024,
+    "block_kinds": [
+      "attn",
+      "swa"
+    ],
+    "loops": 2,
+    "max_seq_len": 1024
+  },
+  "results": {
+    "gogeta_humaneval_exec": {
+      "name": "gogeta_humaneval_exec",
+      "alias": "gogeta_humaneval_exec",
+      "sample_len": 1,
+      "pass@1,none": 0.0,
+      "pass@1_stderr,none": "N/A",
+      "frac_correct,none": 0.0,
+      "frac_correct_stderr,none": "N/A"
+    },
+    "gogeta_humaneval_exec_clean": {
+      "name": "gogeta_humaneval_exec_clean",
+      "alias": "gogeta_humaneval_exec_clean",
+      "sample_len": 1,
+      "pass@1,none": 0.0,
+      "pass@1_stderr,none": "N/A",
+      "frac_correct,none": 0.0,
+      "frac_correct_stderr,none": "N/A"
+    },
+    "gogeta_humaneval_plus_exec": {
+      "name": "gogeta_humaneval_plus_exec",
+      "alias": "gogeta_humaneval_plus_exec",
+      "sample_len": 1,
+      "pass@1,none": 0.0,
+      "pass@1_stderr,none": "N/A",
+      "frac_correct,none": 0.0,
+      "frac_correct_stderr,none": "N/A"
+    },
+    "gogeta_mbpp_exec": {
+      "name": "gogeta_mbpp_exec",
+      "alias": "gogeta_mbpp_exec",
+      "sample_len": 1,
+      "pass@1,none": 0.0,
+      "pass@1_stderr,none": "N/A",
+      "frac_correct,none": 0.0,
+      "frac_correct_stderr,none": "N/A"
+    },
+    "gogeta_mbpp_exec_clean": {
+      "name": "gogeta_mbpp_exec_clean",
+      "alias": "gogeta_mbpp_exec_clean",
+      "sample_len": 1,
+      "pass@1,none": 0.0,
+      "pass@1_stderr,none": "N/A",
+      "frac_correct,none": 0.0,
+      "frac_correct_stderr,none": "N/A"
+    },
+    "gogeta_mbpp_plus_exec": {
+      "name": "gogeta_mbpp_plus_exec",
+      "alias": "gogeta_mbpp_plus_exec",
+      "sample_len": 1,
+      "pass@1,none": 0.0,
+      "pass@1_stderr,none": "N/A",
+      "frac_correct,none": 0.0,
+      "frac_correct_stderr,none": "N/A"
+    },
+    "gogeta_humaneval_exec_n20": {
+      "name": "gogeta_humaneval_exec_n20",
+      "alias": "gogeta_humaneval_exec_n20",
+      "sample_len": 1,
+      "pass@1,all_samples": 0.0,
+      "pass@1_stderr,all_samples": "N/A",
+      "pass@5,all_samples": 0.0,
+      "pass@5_stderr,all_samples": "N/A",
+      "pass@10,all_samples": 0.0,
+      "pass@10_stderr,all_samples": "N/A",
+      "pass@20,all_samples": 0.0,
+      "pass@20_stderr,all_samples": "N/A",
+      "frac_correct,all_samples": 0.0,
+      "frac_correct_stderr,all_samples": "N/A"
+    },
+    "gogeta_mbpp_exec_n20": {
+      "name": "gogeta_mbpp_exec_n20",
+      "alias": "gogeta_mbpp_exec_n20",
+      "sample_len": 1,
+      "pass@1,all_samples": 0.0,
+      "pass@1_stderr,all_samples": "N/A",
+      "pass@5,all_samples": 0.0,
+      "pass@5_stderr,all_samples": "N/A",
+      "pass@10,all_samples": 0.0,
+      "pass@10_stderr,all_samples": "N/A",
+      "pass@20,all_samples": 0.0,
+      "pass@20_stderr,all_samples": "N/A",
+      "frac_correct,all_samples": 0.0,
+      "frac_correct_stderr,all_samples": "N/A"
+    }
+  },
+  "n_samples": {
+    "gogeta_humaneval_exec": {
+      "original": 164,
+      "effective": 1
+    },
+    "gogeta_humaneval_exec_clean": {
+      "original": 132,
+      "effective": 1
+    },
+    "gogeta_humaneval_plus_exec": {
+      "original": 164,
+      "effective": 1
+    },
+    "gogeta_mbpp_exec": {
+      "original": 500,
+      "effective": 1
+    },
+    "gogeta_mbpp_exec_clean": {
+      "original": 457,
+      "effective": 1
+    },
+    "gogeta_mbpp_plus_exec": {
+      "original": 378,
+      "effective": 1
+    },
+    "gogeta_humaneval_exec_n20": {
+      "original": 164,
+      "effective": 1
+    },
+    "gogeta_mbpp_exec_n20": {
+      "original": 500,
+      "effective": 1
+    }
+  },
+  "versions": {
+    "python": "3.12.3",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-aarch64-with-glibc2.39",
+    "torch": "2.14.1+cu130",
+    "lm_eval": "0.4.13",
+    "transformers": "5.24.0",
+    "datasets": "5.2.0",
+    "tokenizers": "0.23.3",
+    "accelerate": "1.16.0",
+    "numpy": "2.5.5",
+    "torch_runtime": "2.14.1+cu130"
+  },
+  "git": {
+    "commit": "48862f946d65ddaa52e946483fa8b85accf828ac",
+    "branch": "main",
+    "describe": "v0.4.18-dirty",
+    "dirty": true,
+    "code_dirty": false,
+    "evals_or_model_dirty": true
+  },
+  "task_config_sha256_16": {
+    "gogeta_humaneval_exec": "8ab22969db801788",
+    "gogeta_humaneval_exec_clean": "cd7a0cd738b8d623",
+    "gogeta_humaneval_exec_n20": "074bcc34eff368fa",
+    "gogeta_humaneval_plus_exec": "af83dc1d12b2b976",
+    "gogeta_mbpp_exec": "38c7166882bda09a",
+    "gogeta_mbpp_exec_clean": "8dcbb2ddc4cf7f91",
+    "gogeta_mbpp_exec_n20": "fc1b6131d306679c",
+    "gogeta_mbpp_plus_exec": "6b9ff690d4fae0af",
+    "gogeta_utils.py": "f2248093359ab50f"
+  },
+  "datasets": {},
+  "sandbox": {
+    "ok": true,
+    "checks": {
+      "linux_and_unshare": true,
+      "pass_and_fail_scored": true,
+      "repo_not_visible": true,
+      "repo_not_writable": true,
+      "windows_drive_hidden": true,
+      "home_not_writable": true,
+      "cannot_unmount_private_view": true,
+      "network_blocked": true,
+      "timeout_kills": true,
+      "memory_capped": true,
+      "runs_as_nobody": true
+    },
+    "child_python": "/usr/bin/python3.12",
+    "platform": "linux"
+  },
+  "elapsed_s": 222.9,
+  "threads": 2,
+  "device": "cpu"
+}

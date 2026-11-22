@@ -1,0 +1,451 @@
+{
+  "created": "2026-11-22T17:18:39",
+  "train_docs_scanned": 987154,
+  "train_docs_with_any_match": 2234,
+  "method": "line-level exact match, whitespace removed; see evals/contamination.py docstring",
+  "mbpp": {
+    "split": "full/test",
+    "problems": 500,
+    "flagged": 43,
+    "flagged_statement": 43,
+    "items": [
+      {
+        "task_id": 32,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 33,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 44,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 57,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 59,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 82,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 90,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 96,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 109,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 135,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 139,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 145,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 147,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 149,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 152,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 163,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 166,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 194,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 195,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 212,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 217,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 225,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 226,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 232,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 247,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 256,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 267,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 276,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 287,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 300,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 312,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 315,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 338,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 342,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 359,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 395,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 460,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 463,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 476,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 477,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 479,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 480,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      },
+      {
+        "task_id": 483,
+        "statement_match": true,
+        "assert_lines_matched": 0
+      }
+    ]
+  },
+  "humaneval": {
+    "problems": 164,
+    "flagged": 43,
+    "items": [
+      {
+        "task_id": "HumanEval/1",
+        "long_lines_matched": 3,
+        "long_lines_total": 4
+      },
+      {
+        "task_id": "HumanEval/6",
+        "long_lines_matched": 2,
+        "long_lines_total": 5
+      },
+      {
+        "task_id": "HumanEval/18",
+        "long_lines_matched": 3,
+        "long_lines_total": 3
+      },
+      {
+        "task_id": "HumanEval/20",
+        "long_lines_matched": 2,
+        "long_lines_total": 6
+      },
+      {
+        "task_id": "HumanEval/33",
+        "long_lines_matched": 3,
+        "long_lines_total": 3
+      },
+      {
+        "task_id": "HumanEval/41",
+        "long_lines_matched": 8,
+        "long_lines_total": 8
+      },
+      {
+        "task_id": "HumanEval/68",
+        "long_lines_matched": 2,
+        "long_lines_total": 12
+      },
+      {
+        "task_id": "HumanEval/71",
+        "long_lines_matched": 2,
+        "long_lines_total": 5
+      },
+      {
+        "task_id": "HumanEval/72",
+        "long_lines_matched": 6,
+        "long_lines_total": 6
+      },
+      {
+        "task_id": "HumanEval/73",
+        "long_lines_matched": 3,
+        "long_lines_total": 4
+      },
+      {
+        "task_id": "HumanEval/74",
+        "long_lines_matched": 7,
+        "long_lines_total": 7
+      },
+      {
+        "task_id": "HumanEval/77",
+        "long_lines_matched": 2,
+        "long_lines_total": 4
+      },
+      {
+        "task_id": "HumanEval/78",
+        "long_lines_matched": 13,
+        "long_lines_total": 13
+      },
+      {
+        "task_id": "HumanEval/79",
+        "long_lines_matched": 3,
+        "long_lines_total": 7
+      },
+      {
+        "task_id": "HumanEval/84",
+        "long_lines_matched": 5,
+        "long_lines_total": 5
+      },
+      {
+        "task_id": "HumanEval/94",
+        "long_lines_matched": 7,
+        "long_lines_total": 8
+      },
+      {
+        "task_id": "HumanEval/102",
+        "long_lines_matched": 3,
+        "long_lines_total": 3
+      },
+      {
+        "task_id": "HumanEval/103",
+        "long_lines_matched": 3,
+        "long_lines_total": 4
+      },
+      {
+        "task_id": "HumanEval/105",
+        "long_lines_matched": 7,
+        "long_lines_total": 7
+      },
+      {
+        "task_id": "HumanEval/107",
+        "long_lines_matched": 5,
+        "long_lines_total": 6
+      },
+      {
+        "task_id": "HumanEval/108",
+        "long_lines_matched": 2,
+        "long_lines_total": 5
+      },
+      {
+        "task_id": "HumanEval/109",
+        "long_lines_matched": 11,
+        "long_lines_total": 14
+      },
+      {
+        "task_id": "HumanEval/112",
+        "long_lines_matched": 7,
+        "long_lines_total": 8
+      },
+      {
+        "task_id": "HumanEval/113",
+        "long_lines_matched": 5,
+        "long_lines_total": 8
+      },
+      {
+        "task_id": "HumanEval/115",
+        "long_lines_matched": 7,
+        "long_lines_total": 8
+      },
+      {
+        "task_id": "HumanEval/117",
+        "long_lines_matched": 3,
+        "long_lines_total": 11
+      },
+      {
+        "task_id": "HumanEval/119",
+        "long_lines_matched": 6,
+        "long_lines_total": 8
+      },
+      {
+        "task_id": "HumanEval/120",
+        "long_lines_matched": 3,
+        "long_lines_total": 5
+      },
+      {
+        "task_id": "HumanEval/122",
+        "long_lines_matched": 2,
+        "long_lines_total": 4
+      },
+      {
+        "task_id": "HumanEval/123",
+        "long_lines_matched": 6,
+        "long_lines_total": 8
+      },
+      {
+        "task_id": "HumanEval/126",
+        "long_lines_matched": 2,
+        "long_lines_total": 7
+      },
+      {
+        "task_id": "HumanEval/127",
+        "long_lines_matched": 3,
+        "long_lines_total": 9
+      },
+      {
+        "task_id": "HumanEval/129",
+        "long_lines_matched": 15,
+        "long_lines_total": 16
+      },
+      {
+        "task_id": "HumanEval/132",
+        "long_lines_matched": 2,
+        "long_lines_total": 4
+      },
+      {
+        "task_id": "HumanEval/135",
+        "long_lines_matched": 3,
+        "long_lines_total": 3
+      },
+      {
+        "task_id": "HumanEval/136",
+        "long_lines_matched": 3,
+        "long_lines_total": 9
+      },
+      {
+        "task_id": "HumanEval/143",
+        "long_lines_matched": 5,
+        "long_lines_total": 5
+      },
+      {
+        "task_id": "HumanEval/144",
+        "long_lines_matched": 3,
+        "long_lines_total": 6
+      },
+      {
+        "task_id": "HumanEval/147",
+        "long_lines_matched": 3,
+        "long_lines_total": 4
+      },
+      {
+        "task_id": "HumanEval/148",
+        "long_lines_matched": 4,
+        "long_lines_total": 14
+      },
+      {
+        "task_id": "HumanEval/149",
+        "long_lines_matched": 11,
+        "long_lines_total": 11
+      },
+      {
+        "task_id": "HumanEval/151",
+        "long_lines_matched": 2,
+        "long_lines_total": 4
+      },
+      {
+        "task_id": "HumanEval/161",
+        "long_lines_matched": 3,
+        "long_lines_total": 3
+      }
+    ]
+  },
+  "elapsed_s": 27.6
+}

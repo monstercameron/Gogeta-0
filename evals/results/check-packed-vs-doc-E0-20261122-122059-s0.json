@@ -1,0 +1,11 @@
+{
+  "checkpoint": "/root/fusiondance-data/checkpoints/E0-20261122-122059-s0/model.pt",
+  "windows": 1034,
+  "T": 1024,
+  "chars_per_token": 3.719,
+  "packed_val_loss": 0.606253893624422,
+  "packed_bpc": 0.2351813621542293,
+  "packed_loss_excl_eos_targets": 0.6072014883577627,
+  "loss_first64_positions": 1.060129556250065,
+  "loss_after_first64": 0.5759955161160457
+}

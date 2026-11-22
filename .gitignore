@@ -82,3 +82,6 @@ desktop.ini
 # Launcher state (lives in ~/fusiondance-data/run; safety net if copied into the repo)
 *.pid
 *.lock
+
+# sandbox self-test probe files
+.sandbox_probe_*

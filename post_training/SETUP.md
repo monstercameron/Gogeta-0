@@ -181,8 +181,13 @@ stdlib only, no venv packages), fresh temp cwd, env reduced to PATH/LANG; networ
 `unshare -rn` (new user + net namespace) when available, else it runs with network and says so
 (`network="require_off"` makes that an error).
 
-NOT isolated: the filesystem (the child can read world-readable files and write to /tmp,
-/dev/shm; as a normal user it can touch all your files), same-uid signalling, and reward
+NOT isolated: the filesystem. The child can read world-readable files and write to /tmp and
+/dev/shm. **Under WSL it can also write to `/mnt/c`, i.e. this repo and all of C:, even as
+`nobody`**, because drvfs shows Windows files as mode 777. A control write through `run_tests`
+succeeded (ledger C105, verified 2026-11-22). As a normal user it can touch all your files. Until
+SQ61 moves the hardening in, use `evals/sandbox.py` for anything untrusted: user/net/mount
+namespaces, private tmpfs over /mnt, /tmp, /dev/shm and /run, nested uid 65534; self-test 11/11.
+Also NOT isolated: same-uid signalling, and reward
 hacking inside the harness process (monkeypatching builtins, digging the nonce out of the
 harness). For real RL, wrap the same harness in a container or bubblewrap/nsjail with a
 read-only root and a tmpfs work dir, and log/inspect high-reward completions. Throughput

@@ -1,0 +1,206 @@
+{
+  "run": "check-E0-s0-tier1ll-tier3-tier1-20261122-172441",
+  "created": "2026-11-22T17:27:47",
+  "status": "eval",
+  "args": {
+    "checkpoint": "/root/fusiondance-data/checkpoints/E0-20261122-122059-s0/model.pt",
+    "random_init": null,
+    "tier": "1",
+    "tasks": "gogeta_humaneval_sol_bpb,gogeta_humaneval_sol_bpb_clean,gogeta_mbpp_sol_bpb,gogeta_mbpp_sol_bpb_clean,gogeta_cruxeval_o_ll,gogeta_recall_d64,gogeta_recall_d256,gogeta_recall_d512,gogeta_recall_d960",
+    "limit": null,
+    "device": "cpu",
+    "batch_size": 8,
+    "threads": 2,
+    "loops": null,
+    "seed": 0,
+    "no_exec": false,
+    "name": "check-E0-s0-tier1ll-tier3",
+    "log_samples": false
+  },
+  "tasks": [
+    "gogeta_humaneval_sol_bpb",
+    "gogeta_humaneval_sol_bpb_clean",
+    "gogeta_mbpp_sol_bpb",
+    "gogeta_mbpp_sol_bpb_clean",
+    "gogeta_cruxeval_o_ll",
+    "gogeta_recall_d64",
+    "gogeta_recall_d256",
+    "gogeta_recall_d512",
+    "gogeta_recall_d960"
+  ],
+  "limit_note": null,
+  "model": {
+    "kind": "gogeta_checkpoint",
+    "path": "/root/fusiondance-data/checkpoints/E0-20261122-122059-s0/model.pt",
+    "bytes": 55083865,
+    "config_fields_filled_with_defaults": [
+      "gdn_neg_eigval"
+    ],
+    "n_params": 13767552,
+    "block_kinds": [
+      "attn"
+    ],
+    "loops": 4,
+    "max_seq_len": 1024
+  },
+  "results": {
+    "gogeta_humaneval_sol_bpb": {
+      "name": "gogeta_humaneval_sol_bpb",
+      "alias": "gogeta_humaneval_sol_bpb",
+      "sample_len": 164,
+      "bits_per_byte,none": 0.5105570340037916,
+      "bits_per_byte_stderr,none": "N/A",
+      "bits_per_char,none": 0.5105570340037916,
+      "bits_per_char_stderr,none": "N/A"
+    },
+    "gogeta_humaneval_sol_bpb_clean": {
+      "name": "gogeta_humaneval_sol_bpb_clean",
+      "alias": "gogeta_humaneval_sol_bpb_clean",
+      "sample_len": 132,
+      "bits_per_byte,none": 0.5173609119306133,
+      "bits_per_byte_stderr,none": "N/A",
+      "bits_per_char,none": 0.5173609119306133,
+      "bits_per_char_stderr,none": "N/A"
+    },
+    "gogeta_mbpp_sol_bpb": {
+      "name": "gogeta_mbpp_sol_bpb",
+      "alias": "gogeta_mbpp_sol_bpb",
+      "sample_len": 500,
+      "bits_per_byte,none": 0.6397718977322967,
+      "bits_per_byte_stderr,none": "N/A",
+      "bits_per_char,none": 0.6397718977322967,
+      "bits_per_char_stderr,none": "N/A"
+    },
+    "gogeta_mbpp_sol_bpb_clean": {
+      "name": "gogeta_mbpp_sol_bpb_clean",
+      "alias": "gogeta_mbpp_sol_bpb_clean",
+      "sample_len": 457,
+      "bits_per_byte,none": 0.6543624739964184,
+      "bits_per_byte_stderr,none": "N/A",
+      "bits_per_char,none": 0.6543624739964184,
+      "bits_per_char_stderr,none": "N/A"
+    },
+    "gogeta_cruxeval_o_ll": {
+      "name": "gogeta_cruxeval_o_ll",
+      "alias": "gogeta_cruxeval_o_ll",
+      "sample_len": 800,
+      "acc,none": 0.08875,
+      "acc_stderr,none": 0.010060731572540756,
+      "bits_per_byte,none": 1.9237387419164926,
+      "bits_per_byte_stderr,none": "N/A",
+      "bits_per_char,none": 1.9248007009238988,
+      "bits_per_char_stderr,none": "N/A"
+    },
+    "gogeta_recall_d64": {
+      "name": "gogeta_recall_d64",
+      "alias": "gogeta_recall_d64",
+      "sample_len": 200,
+      "acc,none": 0.005,
+      "acc_stderr,none": 0.005,
+      "bits_per_byte,none": 2.6042766212992885,
+      "bits_per_byte_stderr,none": "N/A"
+    },
+    "gogeta_recall_d256": {
+      "name": "gogeta_recall_d256",
+      "alias": "gogeta_recall_d256",
+      "sample_len": 200,
+      "acc,none": 0.0,
+      "acc_stderr,none": 0.0,
+      "bits_per_byte,none": 2.789513730160799,
+      "bits_per_byte_stderr,none": "N/A"
+    },
+    "gogeta_recall_d512": {
+      "name": "gogeta_recall_d512",
+      "alias": "gogeta_recall_d512",
+      "sample_len": 200,
+      "acc,none": 0.0,
+      "acc_stderr,none": 0.0,
+      "bits_per_byte,none": 3.2877386029728077,
+      "bits_per_byte_stderr,none": "N/A"
+    },
+    "gogeta_recall_d960": {
+      "name": "gogeta_recall_d960",
+      "alias": "gogeta_recall_d960",
+      "sample_len": 200,
+      "acc,none": 0.0,
+      "acc_stderr,none": 0.0,
+      "bits_per_byte,none": 3.4110635597140826,
+      "bits_per_byte_stderr,none": "N/A"
+    }
+  },
+  "n_samples": {
+    "gogeta_humaneval_sol_bpb": {
+      "original": 164,
+      "effective": 164
+    },
+    "gogeta_humaneval_sol_bpb_clean": {
+      "original": 132,
+      "effective": 132
+    },
+    "gogeta_mbpp_sol_bpb": {
+      "original": 500,
+      "effective": 500
+    },
+    "gogeta_mbpp_sol_bpb_clean": {
+      "original": 457,
+      "effective": 457
+    },
+    "gogeta_cruxeval_o_ll": {
+      "original": 800,
+      "effective": 800
+    },
+    "gogeta_recall_d64": {
+      "original": 200,
+      "effective": 200
+    },
+    "gogeta_recall_d256": {
+      "original": 200,
+      "effective": 200
+    },
+    "gogeta_recall_d512": {
+      "original": 200,
+      "effective": 200
+    },
+    "gogeta_recall_d960": {
+      "original": 200,
+      "effective": 200
+    }
+  },
+  "versions": {
+    "python": "3.12.3",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-aarch64-with-glibc2.39",
+    "torch": "2.14.1+cu130",
+    "lm_eval": "0.4.13",
+    "transformers": "5.24.0",
+    "datasets": "5.2.0",
+    "tokenizers": "0.23.3",
+    "accelerate": "1.16.0",
+    "numpy": "2.5.5",
+    "torch_runtime": "2.14.1+cu130"
+  },
+  "git": {
+    "commit": "af9d2e1d8d09271dd5185c32ce70e30e1e45580c",
+    "branch": "main",
+    "describe": "v0.4.15-dirty",
+    "dirty": true,
+    "code_dirty": true,
+    "evals_or_model_dirty": true
+  },
+  "task_config_sha256_16": {
+    "gogeta_cruxeval_o_ll": "077f1feb850fa680",
+    "gogeta_humaneval_sol_bpb": "691f1e949b10840d",
+    "gogeta_humaneval_sol_bpb_clean": "7276bd0cfadb8390",
+    "gogeta_mbpp_sol_bpb": "5d93ef131b0da1c6",
+    "gogeta_mbpp_sol_bpb_clean": "93e5f826b5a62b47",
+    "gogeta_recall_d256": "82a21a8bc849cd65",
+    "gogeta_recall_d512": "8fd4347ae8d8cffc",
+    "gogeta_recall_d64": "b49cea96fa1fb011",
+    "gogeta_recall_d960": "334c8756e5f23969",
+    "gogeta_utils.py": "f2248093359ab50f"
+  },
+  "datasets": {},
+  "sandbox": null,
+  "elapsed_s": 185.7,
+  "threads": 2,
+  "device": "cpu"
+}

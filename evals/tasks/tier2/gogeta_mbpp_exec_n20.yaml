@@ -1,0 +1,33 @@
+# Tier 2 (execution). MBPP, n=20 samples at T=0.8/top_p=0.95, unbiased pass@1/5/10/20.
+# Programs run ONLY in evals/sandbox.py (run_suite.py refuses unless its self-test passes).
+task: gogeta_mbpp_exec_n20
+tag: [gogeta_tier2_sampled]
+dataset_path: google-research-datasets/mbpp
+dataset_name: full
+test_split: test
+process_docs: !function evals.tasks.gogeta_utils.process_mbpp
+unsafe_code: true
+output_type: generate_until
+doc_to_text: !function evals.tasks.gogeta_utils.doc_prompt
+doc_to_target: !function evals.tasks.gogeta_utils.doc_target
+process_results: !function evals.tasks.gogeta_utils.exec_native_passk
+repeats: 20
+filter_list:
+  - name: all_samples
+    filter:
+      - function: custom
+        filter_fn: !function evals.tasks.gogeta_utils.keep_all
+generation_kwargs:
+  until: ["```"]
+  max_gen_toks: 384
+  do_sample: true
+  temperature: 0.8
+  top_p: 0.95
+metric_list:
+  - {metric: pass@1, aggregation: mean, higher_is_better: true}
+  - {metric: pass@5, aggregation: mean, higher_is_better: true}
+  - {metric: pass@10, aggregation: mean, higher_is_better: true}
+  - {metric: pass@20, aggregation: mean, higher_is_better: true}
+  - {metric: frac_correct, aggregation: mean, higher_is_better: true}
+metadata:
+  version: 1.0

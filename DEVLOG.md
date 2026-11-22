@@ -17,6 +17,44 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.19: Standard benchmark suite (lm-eval) + sandbox gap found
+*2026-11-22*
+
+### Benchmark suite (tooling + first E0 probes)
+**What**: `evals/` adds an lm-evaluation-harness 0.4.13 adapter (`gogeta_lm.py`, registered as `gogeta`) and tiered tasks run by `python -m evals.run_suite`. The venv is `~/.venvs/gogeta-eval`, pinned in `requirements-eval.txt`. A subagent built it; the main agent checked its key claims.
+- **Tier 1, informative at our size:**
+  - per-document bits per byte on our val set and on fresh GitHub Python (UncheatableEval, Oct 2026);
+  - likelihood of the reference solutions for HumanEval and MBPP, each with a `_clean` twin;
+  - CRUXEval-O as a likelihood probe;
+  - functional pass@1 on our own held-out problems.
+- **Tier 2:** HumanEval(+) and MBPP(+) pass@k. Expected to floor near zero: Codex-12M got 2% after 100B tokens.
+- **Tier 3:** a recall probe; it floors and needs a redesign.
+
+The survey, tiers and predictions are in `notes/benchmark-suite.md`.
+
+**Results** (E0 seed 0, CPU, reported by the subagent):
+- wiring tests 6/6;
+- E0 val **0.2208 bits/char per document** vs train.py's 0.2351 packed. The −6.1% missed the ±3% prediction.
+  - Re-running train.py's own method reproduces its loss to 0.014%, so the gap is protocol, not a bug: packed windows start mid-document with no context.
+  - **The two numbers must never be compared directly** (C101).
+- HumanEval reference-solution bpb 0.5106 (clean 0.5174); MBPP 0.6398 (clean 0.6544);
+- CRUXEval-O exact match 8.9% (always answering "False" scores 3.6%);
+- recall at chance.
+- **Contamination:** 32 of 164 HumanEval problems have at least half of their long lines verbatim in our training data; 43 of 500 MBPP statements appear verbatim (C103).
+
+**Verified by the main agent:**
+- `evals/sandbox.self_test()` passes **11/11**.
+- A control write into the repo is **blocked** by `evals/sandbox.py` but **succeeds** through `post_training/rewards.run_tests`.
+- `GogetaForCausalLM` fails to build, because `gogeta/hf.py` lacks the `gdn_neg_eigval` field added in v0.4.7.
+
+### Safety finding: the reward sandbox can write the repo (C105, REFUTED claim)
+Under WSL, `/mnt/c` is mode 777, so model code run by `rewards.run_tests` can write this repo and all of C:, even as `nobody`. `post_training/SETUP.md` and AGENTS §6 are corrected: evals run generated code only through `evals/sandbox.py`, and lm-eval's built-in code tasks are never loaded. The fix is queued as **SQ61** (move the hardening into rewards.py; it must come before any GRPO run). `.sandbox_probe_*` is git-ignored.
+
+**Queue**: Q30 (fix `gogeta/hf.py`, a code-path edit, so it runs in the gap after K7) and SQ61 were added and prioritised. **Ledger**: C100–C109 and SQ60–SQ69 appended.
+**Downloads** (eval data, approved in the eval-suite request): about 14 MB of datasets into `~/fusiondance-data/eval-cache` (outside the repo). No model weights.
+
+---
+
 ## v0.4.18: 3D architecture page; README quick links; repo topics
 *2026-11-22*
 

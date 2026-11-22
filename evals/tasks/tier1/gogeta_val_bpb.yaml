@@ -1,0 +1,20 @@
+# Tier 1. In-distribution compression: the 4,000 held-out docs of code-py-v1.
+# Same docs as train.py's final val loss, but scored per document (each from an <|eos|>
+# prefix, disjoint 1,024-token windows) instead of as one packed token stream.
+task: gogeta_val_bpb
+tag: [gogeta_tier1]
+custom_dataset: !function evals.tasks.gogeta_utils.load_val_docs
+test_split: test
+output_type: loglikelihood_rolling
+doc_to_text: ""
+doc_to_target: !function evals.tasks.gogeta_utils.doc_text
+process_results: !function evals.tasks.gogeta_utils.process_bpb_rolling
+metric_list:
+  - metric: bits_per_byte
+    aggregation: bits_per_byte
+    higher_is_better: false
+  - metric: bits_per_char
+    aggregation: bits_per_byte
+    higher_is_better: false
+metadata:
+  version: 1.0

@@ -1,0 +1,86 @@
+{
+  "run": "check-E0-s0-cruxeval-samples-tier1-20261122-172837",
+  "created": "2026-11-22T17:28:52",
+  "status": "eval",
+  "args": {
+    "checkpoint": "/root/fusiondance-data/checkpoints/E0-20261122-122059-s0/model.pt",
+    "random_init": null,
+    "tier": "1",
+    "tasks": "gogeta_cruxeval_o_ll",
+    "limit": null,
+    "device": "cpu",
+    "batch_size": 8,
+    "threads": 2,
+    "loops": null,
+    "seed": 0,
+    "no_exec": false,
+    "name": "check-E0-s0-cruxeval-samples",
+    "log_samples": true
+  },
+  "tasks": [
+    "gogeta_cruxeval_o_ll"
+  ],
+  "limit_note": null,
+  "model": {
+    "kind": "gogeta_checkpoint",
+    "path": "/root/fusiondance-data/checkpoints/E0-20261122-122059-s0/model.pt",
+    "bytes": 55083865,
+    "config_fields_filled_with_defaults": [
+      "gdn_neg_eigval"
+    ],
+    "n_params": 13767552,
+    "block_kinds": [
+      "attn"
+    ],
+    "loops": 4,
+    "max_seq_len": 1024
+  },
+  "results": {
+    "gogeta_cruxeval_o_ll": {
+      "name": "gogeta_cruxeval_o_ll",
+      "alias": "gogeta_cruxeval_o_ll",
+      "sample_len": 800,
+      "acc,none": 0.08875,
+      "acc_stderr,none": 0.010060731572540756,
+      "bits_per_byte,none": 1.9237387375319233,
+      "bits_per_byte_stderr,none": "N/A",
+      "bits_per_char,none": 1.924800696536909,
+      "bits_per_char_stderr,none": "N/A"
+    }
+  },
+  "n_samples": {
+    "gogeta_cruxeval_o_ll": {
+      "original": 800,
+      "effective": 800
+    }
+  },
+  "versions": {
+    "python": "3.12.3",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-aarch64-with-glibc2.39",
+    "torch": "2.14.1+cu130",
+    "lm_eval": "0.4.13",
+    "transformers": "5.24.0",
+    "datasets": "5.2.0",
+    "tokenizers": "0.23.3",
+    "accelerate": "1.16.0",
+    "numpy": "2.5.5",
+    "torch_runtime": "2.14.1+cu130"
+  },
+  "git": {
+    "commit": "af9d2e1d8d09271dd5185c32ce70e30e1e45580c",
+    "branch": "main",
+    "describe": "v0.4.15-dirty",
+    "dirty": true,
+    "code_dirty": true,
+    "evals_or_model_dirty": true
+  },
+  "task_config_sha256_16": {
+    "gogeta_cruxeval_o_ll": "077f1feb850fa680",
+    "gogeta_utils.py": "f2248093359ab50f"
+  },
+  "datasets": {},
+  "sandbox": null,
+  "elapsed_s": 15.3,
+  "threads": 2,
+  "device": "cpu"
+}

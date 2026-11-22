@@ -1,0 +1,291 @@
+{
+  "run": "smoke-random-tiny_attn-tier1+3-20261122-173426",
+  "created": "2026-11-22T17:35:27",
+  "status": "smoke (random weights: wiring only, not a result)",
+  "args": {
+    "checkpoint": null,
+    "random_init": "tiny_attn",
+    "tier": "1,3",
+    "tasks": null,
+    "limit": 8.0,
+    "device": "cpu",
+    "batch_size": 8,
+    "threads": 2,
+    "loops": null,
+    "seed": 0,
+    "no_exec": false,
+    "name": "smoke-random-tiny_attn",
+    "log_samples": false
+  },
+  "tasks": [
+    "gogeta_val_bpb",
+    "gogeta_uncheatable_py_bpb",
+    "gogeta_humaneval_sol_bpb",
+    "gogeta_humaneval_sol_bpb_clean",
+    "gogeta_mbpp_sol_bpb",
+    "gogeta_mbpp_sol_bpb_clean",
+    "gogeta_cruxeval_o_ll",
+    "gogeta_heldout_exec",
+    "gogeta_recall_d64",
+    "gogeta_recall_d256",
+    "gogeta_recall_d512",
+    "gogeta_recall_d960"
+  ],
+  "limit_note": "--limit set: subset only, NOT comparable to full runs",
+  "model": {
+    "kind": "random_init",
+    "preset": "tiny_attn",
+    "seed": 0,
+    "config_fields_filled_with_defaults": [
+      "gdn_neg_eigval"
+    ],
+    "n_params": 697024,
+    "block_kinds": [
+      "attn",
+      "swa"
+    ],
+    "loops": 2,
+    "max_seq_len": 1024
+  },
+  "results": {
+    "gogeta_val_bpb": {
+      "name": "gogeta_val_bpb",
+      "alias": "gogeta_val_bpb",
+      "sample_len": 8,
+      "bits_per_byte,none": 3.6186432789523875,
+      "bits_per_byte_stderr,none": "N/A",
+      "bits_per_char,none": 3.6186432789523875,
+      "bits_per_char_stderr,none": "N/A"
+    },
+    "gogeta_uncheatable_py_bpb": {
+      "name": "gogeta_uncheatable_py_bpb",
+      "alias": "gogeta_uncheatable_py_bpb",
+      "sample_len": 8,
+      "bits_per_byte,none": 4.763488826741998,
+      "bits_per_byte_stderr,none": "N/A",
+      "bits_per_char,none": 4.771320905299933,
+      "bits_per_char_stderr,none": "N/A"
+    },
+    "gogeta_humaneval_sol_bpb": {
+      "name": "gogeta_humaneval_sol_bpb",
+      "alias": "gogeta_humaneval_sol_bpb",
+      "sample_len": 8,
+      "bits_per_byte,none": 3.1503003154851488,
+      "bits_per_byte_stderr,none": "N/A",
+      "bits_per_char,none": 3.1503003154851488,
+      "bits_per_char_stderr,none": "N/A"
+    },
+    "gogeta_humaneval_sol_bpb_clean": {
+      "name": "gogeta_humaneval_sol_bpb_clean",
+      "alias": "gogeta_humaneval_sol_bpb_clean",
+      "sample_len": 8,
+      "bits_per_byte,none": 3.2729468677092255,
+      "bits_per_byte_stderr,none": "N/A",
+      "bits_per_char,none": 3.2729468677092255,
+      "bits_per_char_stderr,none": "N/A"
+    },
+    "gogeta_mbpp_sol_bpb": {
+      "name": "gogeta_mbpp_sol_bpb",
+      "alias": "gogeta_mbpp_sol_bpb",
+      "sample_len": 8,
+      "bits_per_byte,none": 4.94678960667078,
+      "bits_per_byte_stderr,none": "N/A",
+      "bits_per_char,none": 4.94678960667078,
+      "bits_per_char_stderr,none": "N/A"
+    },
+    "gogeta_mbpp_sol_bpb_clean": {
+      "name": "gogeta_mbpp_sol_bpb_clean",
+      "alias": "gogeta_mbpp_sol_bpb_clean",
+      "sample_len": 8,
+      "bits_per_byte,none": 4.94678960667078,
+      "bits_per_byte_stderr,none": "N/A",
+      "bits_per_char,none": 4.94678960667078,
+      "bits_per_char_stderr,none": "N/A"
+    },
+    "gogeta_cruxeval_o_ll": {
+      "name": "gogeta_cruxeval_o_ll",
+      "alias": "gogeta_cruxeval_o_ll",
+      "sample_len": 8,
+      "acc,none": 0.0,
+      "acc_stderr,none": 0.0,
+      "bits_per_byte,none": 6.930194412764138,
+      "bits_per_byte_stderr,none": "N/A",
+      "bits_per_char,none": 6.930194412764138,
+      "bits_per_char_stderr,none": "N/A"
+    },
+    "gogeta_heldout_exec": {
+      "name": "gogeta_heldout_exec",
+      "alias": "gogeta_heldout_exec",
+      "sample_len": 8,
+      "pass@1,none": 0.0,
+      "pass@1_stderr,none": 0.0,
+      "frac_correct,none": 0.0,
+      "frac_correct_stderr,none": 0.0
+    },
+    "gogeta_recall_d64": {
+      "name": "gogeta_recall_d64",
+      "alias": "gogeta_recall_d64",
+      "sample_len": 8,
+      "acc,none": 0.0,
+      "acc_stderr,none": 0.0,
+      "bits_per_byte,none": 6.485388165464444,
+      "bits_per_byte_stderr,none": "N/A"
+    },
+    "gogeta_recall_d256": {
+      "name": "gogeta_recall_d256",
+      "alias": "gogeta_recall_d256",
+      "sample_len": 8,
+      "acc,none": 0.0,
+      "acc_stderr,none": 0.0,
+      "bits_per_byte,none": 6.547507060681005,
+      "bits_per_byte_stderr,none": "N/A"
+    },
+    "gogeta_recall_d512": {
+      "name": "gogeta_recall_d512",
+      "alias": "gogeta_recall_d512",
+      "sample_len": 8,
+      "acc,none": 0.0,
+      "acc_stderr,none": 0.0,
+      "bits_per_byte,none": 6.18611909090626,
+      "bits_per_byte_stderr,none": "N/A"
+    },
+    "gogeta_recall_d960": {
+      "name": "gogeta_recall_d960",
+      "alias": "gogeta_recall_d960",
+      "sample_len": 8,
+      "acc,none": 0.0,
+      "acc_stderr,none": 0.0,
+      "bits_per_byte,none": 6.848357894075703,
+      "bits_per_byte_stderr,none": "N/A"
+    }
+  },
+  "n_samples": {
+    "gogeta_val_bpb": {
+      "original": 4000,
+      "effective": 8
+    },
+    "gogeta_uncheatable_py_bpb": {
+      "original": 500,
+      "effective": 8
+    },
+    "gogeta_humaneval_sol_bpb": {
+      "original": 164,
+      "effective": 8
+    },
+    "gogeta_humaneval_sol_bpb_clean": {
+      "original": 132,
+      "effective": 8
+    },
+    "gogeta_mbpp_sol_bpb": {
+      "original": 500,
+      "effective": 8
+    },
+    "gogeta_mbpp_sol_bpb_clean": {
+      "original": 457,
+      "effective": 8
+    },
+    "gogeta_cruxeval_o_ll": {
+      "original": 800,
+      "effective": 8
+    },
+    "gogeta_heldout_exec": {
+      "original": 2555,
+      "effective": 8
+    },
+    "gogeta_recall_d64": {
+      "original": 200,
+      "effective": 8
+    },
+    "gogeta_recall_d256": {
+      "original": 200,
+      "effective": 8
+    },
+    "gogeta_recall_d512": {
+      "original": 200,
+      "effective": 8
+    },
+    "gogeta_recall_d960": {
+      "original": 200,
+      "effective": 8
+    }
+  },
+  "versions": {
+    "python": "3.12.3",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-aarch64-with-glibc2.39",
+    "torch": "2.14.1+cu130",
+    "lm_eval": "0.4.13",
+    "transformers": "5.24.0",
+    "datasets": "5.2.0",
+    "tokenizers": "0.23.3",
+    "accelerate": "1.16.0",
+    "numpy": "2.5.5",
+    "torch_runtime": "2.14.1+cu130"
+  },
+  "git": {
+    "commit": "e6f2a7324ea4c5bc851b1863c292936c556f06c5",
+    "branch": "main",
+    "describe": "v0.4.17-dirty",
+    "dirty": true,
+    "code_dirty": true,
+    "evals_or_model_dirty": true
+  },
+  "task_config_sha256_16": {
+    "gogeta_cruxeval_o_ll": "077f1feb850fa680",
+    "gogeta_heldout_exec": "31b3693939edb728",
+    "gogeta_humaneval_sol_bpb": "691f1e949b10840d",
+    "gogeta_humaneval_sol_bpb_clean": "7276bd0cfadb8390",
+    "gogeta_mbpp_sol_bpb": "5d93ef131b0da1c6",
+    "gogeta_mbpp_sol_bpb_clean": "93e5f826b5a62b47",
+    "gogeta_uncheatable_py_bpb": "880fcb74bfbfd352",
+    "gogeta_val_bpb": "afce5d003b444b5e",
+    "gogeta_recall_d256": "82a21a8bc849cd65",
+    "gogeta_recall_d512": "8fd4347ae8d8cffc",
+    "gogeta_recall_d64": "b49cea96fa1fb011",
+    "gogeta_recall_d960": "334c8756e5f23969",
+    "gogeta_utils.py": "f2248093359ab50f"
+  },
+  "datasets": {
+    "uncheatable": {
+      "dataset": "Jellyfish042/UncheatableEval-2026-10",
+      "category": "github_python",
+      "rows": 500,
+      "bytes_downloaded": 9639318,
+      "bytes_written": 2994157,
+      "sha256": "81fa43e840b85a47ad97ad382df772fc97afc2420c3276668b6c105ab36cae48",
+      "dates": [
+        "2026-10-01T00:21:55Z",
+        "2026-10-22T23:44:05Z"
+      ],
+      "fetched": "2026-11-22T17:10:23",
+      "source": "datasets-server /filter"
+    },
+    "code-py-v1": {
+      "docs": 4000,
+      "tokens": 1059160,
+      "chars": 3938783,
+      "chars_per_token": 3.719,
+      "sha256_16": "32e4b0ede9211f61"
+    }
+  },
+  "sandbox": {
+    "ok": true,
+    "checks": {
+      "linux_and_unshare": true,
+      "pass_and_fail_scored": true,
+      "repo_not_visible": true,
+      "repo_not_writable": true,
+      "windows_drive_hidden": true,
+      "home_not_writable": true,
+      "cannot_unmount_private_view": true,
+      "network_blocked": true,
+      "timeout_kills": true,
+      "memory_capped": true,
+      "runs_as_nobody": true
+    },
+    "child_python": "/usr/bin/python3.12",
+    "platform": "linux"
+  },
+  "elapsed_s": 61.0,
+  "threads": 2,
+  "device": "cpu"
+}

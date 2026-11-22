@@ -1,0 +1,92 @@
+{
+  "run": "check-E0-s0-valbpb-full-tier1-20261122-171816",
+  "created": "2026-11-22T17:25:39",
+  "status": "eval",
+  "args": {
+    "checkpoint": "/root/fusiondance-data/checkpoints/E0-20261122-122059-s0/model.pt",
+    "random_init": null,
+    "tier": "1",
+    "tasks": "gogeta_val_bpb",
+    "limit": null,
+    "device": "cpu",
+    "batch_size": 8,
+    "threads": 2,
+    "loops": null,
+    "seed": 0,
+    "no_exec": false,
+    "name": "check-E0-s0-valbpb-full",
+    "log_samples": false
+  },
+  "tasks": [
+    "gogeta_val_bpb"
+  ],
+  "limit_note": null,
+  "model": {
+    "kind": "gogeta_checkpoint",
+    "path": "/root/fusiondance-data/checkpoints/E0-20261122-122059-s0/model.pt",
+    "bytes": 55083865,
+    "config_fields_filled_with_defaults": [
+      "gdn_neg_eigval"
+    ],
+    "n_params": 13767552,
+    "block_kinds": [
+      "attn"
+    ],
+    "loops": 4,
+    "max_seq_len": 1024
+  },
+  "results": {
+    "gogeta_val_bpb": {
+      "name": "gogeta_val_bpb",
+      "alias": "gogeta_val_bpb",
+      "sample_len": 4000,
+      "bits_per_byte,none": 0.22070745685291035,
+      "bits_per_byte_stderr,none": "N/A",
+      "bits_per_char,none": 0.2208126895108074,
+      "bits_per_char_stderr,none": "N/A"
+    }
+  },
+  "n_samples": {
+    "gogeta_val_bpb": {
+      "original": 4000,
+      "effective": 4000
+    }
+  },
+  "versions": {
+    "python": "3.12.3",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-aarch64-with-glibc2.39",
+    "torch": "2.14.1+cu130",
+    "lm_eval": "0.4.13",
+    "transformers": "5.24.0",
+    "datasets": "5.2.0",
+    "tokenizers": "0.23.3",
+    "accelerate": "1.16.0",
+    "numpy": "2.5.5",
+    "torch_runtime": "2.14.1+cu130"
+  },
+  "git": {
+    "commit": "e46abd2c572ce68b27875f71f3500310be838310",
+    "branch": "main",
+    "describe": "v0.4.14-dirty",
+    "dirty": true,
+    "code_dirty": false,
+    "evals_or_model_dirty": true
+  },
+  "task_config_sha256_16": {
+    "gogeta_val_bpb": "afce5d003b444b5e",
+    "gogeta_utils.py": "f2248093359ab50f"
+  },
+  "datasets": {
+    "code-py-v1": {
+      "docs": 4000,
+      "tokens": 1059160,
+      "chars": 3938783,
+      "chars_per_token": 3.719,
+      "sha256_16": "32e4b0ede9211f61"
+    }
+  },
+  "sandbox": null,
+  "elapsed_s": 442.5,
+  "threads": 2,
+  "device": "cpu"
+}

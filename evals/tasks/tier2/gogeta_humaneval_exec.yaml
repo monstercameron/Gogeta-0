@@ -1,0 +1,22 @@
+# Tier 2 (execution). HumanEval (164), greedy pass@1, stop sequences as lm-eval's humaneval task.
+# Programs run ONLY in evals/sandbox.py (run_suite.py refuses unless its self-test passes).
+task: gogeta_humaneval_exec
+tag: [gogeta_tier2]
+dataset_path: openai/openai_humaneval
+test_split: test
+process_docs: !function evals.tasks.gogeta_utils.process_humaneval
+unsafe_code: true
+output_type: generate_until
+doc_to_text: !function evals.tasks.gogeta_utils.doc_prompt
+doc_to_target: !function evals.tasks.gogeta_utils.doc_target
+process_results: !function evals.tasks.gogeta_utils.exec_humaneval_pass1
+repeats: 1
+generation_kwargs:
+  until: ["\nclass", "\ndef", "\n#", "\nif", "\nprint", "```"]
+  max_gen_toks: 384
+  do_sample: false
+metric_list:
+  - {metric: pass@1, aggregation: mean, higher_is_better: true}
+  - {metric: frac_correct, aggregation: mean, higher_is_better: true}
+metadata:
+  version: 1.0

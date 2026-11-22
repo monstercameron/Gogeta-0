@@ -1,0 +1,22 @@
+# Tier 2 (execution). MBPP+ (378, EvalPlus tests), native prompt format, greedy pass@1.
+# Programs run ONLY in evals/sandbox.py (run_suite.py refuses unless its self-test passes).
+task: gogeta_mbpp_plus_exec
+tag: [gogeta_tier2]
+dataset_path: evalplus/mbppplus
+test_split: test
+process_docs: !function evals.tasks.gogeta_utils.process_mbpp_plus
+unsafe_code: true
+output_type: generate_until
+doc_to_text: !function evals.tasks.gogeta_utils.doc_prompt
+doc_to_target: !function evals.tasks.gogeta_utils.doc_target
+process_results: !function evals.tasks.gogeta_utils.exec_native_pass1
+repeats: 1
+generation_kwargs:
+  until: ["```"]
+  max_gen_toks: 384
+  do_sample: false
+metric_list:
+  - {metric: pass@1, aggregation: mean, higher_is_better: true}
+  - {metric: frac_correct, aggregation: mean, higher_is_better: true}
+metadata:
+  version: 1.0

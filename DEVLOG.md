@@ -17,6 +17,17 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.20: Always push to the remote
+*2026-11-22*
+
+**What** (the human: "add this to the agents.md to always push to the remote"):
+- **AGENTS §3:** after every version is committed and tagged, run `git push origin main --follow-tags` straight away, so GitHub, the tags page and the Pages site always match the local repo; then check the Pages build. Failed pushes are reported and fixed, never forced. The rule covers only `main` and its version tags on `origin`.
+- **§0a and §5b:** pushing to `origin` is no longer on the safety list. Publishing anywhere else still needs the human.
+- This push sends v0.4.1 to v0.4.20. Earlier pushes had been held back for the human.
+- The generated per-experiment site pages and `learn.html` (nav-link regeneration) are included.
+
+---
+
 ## v0.4.19: Standard benchmark suite (lm-eval) + sandbox gap found
 *2026-11-22*
 

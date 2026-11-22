@@ -36,7 +36,7 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
 - **Never stop to ask.** Don't end a turn with a question while work remains. Status updates (§0c) are reports, not requests.
 - **The only actions you may not take on your own** (safety rules, not preferences):
   - downloading files or installing packages;
-  - pushing to GitHub or publishing anything;
+  - publishing anything outside this repo's GitHub remote (pushing `main` and version tags to `origin` is **required**, see §3);
   - deleting data or checkpoints;
   - spending money.
 
@@ -125,7 +125,8 @@ The project stays at `0.y.z` while it's experimental.
 
 - **No worktrees.** Everything happens in this one checkout.
 - Trunk is `main`. Commit directly to `main` unless the human asks for a branch.
-- Commit or tag only as part of a devlog entry or when the human asks. **Never push** unless the human asks.
+- Commit or tag only as part of a devlog entry or when the human asks.
+- **Always push to the remote** (the human's standing instruction, 2026-11-22). After every version is committed and tagged, run `git push origin main --follow-tags` straight away, so GitHub, the tags page and the Pages site always match the local repo. Then check that the Pages build is `built` (see §7). If a push fails (network, auth, a rejected non-fast-forward), don't force anything: record it in the next status update, fix the cause, and push again. Never force-push `main` or a tag. This applies only to `main` and its version tags on `origin`; other branches, repos or remotes still need the human.
 - **Remote:** `origin` = `github.com/monstercameron/Gogeta-0` (public). The local repo has `push.followTags = true`, so a plain `git push` also sends the annotated version tags of the pushed commits. On a fresh clone, set it with `git config push.followTags true` (or use `git push --follow-tags`). Never force-push `main` or a tag.
 - Never commit: PDFs, datasets, tokenized shards, checkpoints, wandb/tensorboard dirs, `.env` files (see `.gitignore`).
 
@@ -172,7 +173,7 @@ The project stays at `0.y.z` while it's experimental.
 2. **Run within the budget (§5):** use the item's `launch` command only (`experiments/launch/E<n>.sh`, `tools/launch_campaign.sh`, or `tools/launch_cpu_job.sh`). Dry-run first. Then `python tools/queue.py set <id> running` (it refuses a 2nd GPU job or a 9th CPU job). Items with `launch: null` are agent tasks (write a script, a prediction or an analysis).
 3. **Predictions first:** if an item isn't `ready` because a prediction or script is missing, do that authoring work and register it as a tagged version (§1, §6) before anything launches.
 4. **Finish:** set `done`, `dropped` or `blocked` with `--note` pointing to the evidence (run id or result file). Record it per §1 and §6: card, ledger, notebook, results registry (`tools/record_result.py`), and its own devlog entry and tag. Run `python tools/queue.py render` and commit `queue.json` + `QUEUE.md` in the same version. A conditional item whose condition turns out false is `dropped` with the reason.
-5. **`needs_human` is only for the §0a safety list:** downloads or installs, pushing or publishing, deleting data, spending money. `next` never returns these. They're parked under "For the human" in `QUEUE.md` and **never block other work**. Long GPU items (multi-hour runs) and thesis-direction calls are **not** `needs_human`: run them within the compute budget, and decide with a written memo (§0a). When a result contradicts an item's premise, re-plan: update the queue and record why. Don't stop to ask.
+5. **`needs_human` is only for the §0a safety list:** downloads or installs, publishing outside `origin` (pushing `main` + tags to `origin` is routine, §3), deleting data, spending money. `next` never returns these. They're parked under "For the human" in `QUEUE.md` and **never block other work**. Long GPU items (multi-hour runs) and thesis-direction calls are **not** `needs_human`: run them within the compute budget, and decide with a written memo (§0a). When a result contradicts an item's premise, re-plan: update the queue and record why. Don't stop to ask.
 6. **New ideas enter only via `python tools/queue.py add`**, from side quests, research notes or surprising results. They carry `why`, `source`, `depends_on`, `resources`, `ready` and `missing`, and are appended at the end. Moving one up needs `move --after <id> --reason "…"`, which is logged.
 7. **Every status update (§0c)** shows the running queue items and the next GPU/CPU picks.
 

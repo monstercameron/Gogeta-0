@@ -1,0 +1,177 @@
+{
+  "check": "K1",
+  "claims": [
+    "C12",
+    "C15"
+  ],
+  "prediction": "SWA time and memory exponents ~2 (dense mask); full attention time ~2, memory ~1; GDN time and memory ~1; streaming max |diff| ~1e-5.",
+  "criterion": "C12 'SWA costs O(n*w)' holds for our code only if the SWA time exponent <= 1.3 and the memory exponent <= 1.3. Otherwise it stays WRONG FOR OUR CODE. C15 'GDN keeps fixed memory / linear time' is VERIFIED (kernel level) if the GDN time exponent <= 1.3 and the streaming max |diff| <= 1e-3 and the state shape is constant across n.",
+  "verdicts": {
+    "C12": "WRONG FOR OUR CODE (SWA time exp 1.744, mem exp 1.953; need both <= 1.3)",
+    "C15": "VERIFIED (kernel level): GDN time exp 0.655, streaming max|diff| 0.00e+00, state shape constant",
+    "C12_pass": false,
+    "C15_pass": true
+  },
+  "data": {
+    "config": {
+      "d_model": 384,
+      "n_heads": 6,
+      "window": 256,
+      "batch": 1,
+      "ns": [
+        1024,
+        2048,
+        4096,
+        8192,
+        16384
+      ],
+      "mode": "forward-only, no_grad, bf16 autocast, mixer module only",
+      "exponent_fit": "log-log slope over n >= 4096",
+      "timing_note": "SWA mask cached during timing (built in warm-up); cleared before memory"
+    },
+    "scaling": {
+      "attn": {
+        "rows": [
+          {
+            "n": 1024,
+            "time_ms": 0.5318,
+            "peak_extra_mb": 7.12
+          },
+          {
+            "n": 2048,
+            "time_ms": 0.5018,
+            "peak_extra_mb": 13.94
+          },
+          {
+            "n": 4096,
+            "time_ms": 0.7995,
+            "peak_extra_mb": 25.12
+          },
+          {
+            "n": 8192,
+            "time_ms": 1.6796,
+            "peak_extra_mb": 49.12
+          },
+          {
+            "n": 16384,
+            "time_ms": 4.5884,
+            "peak_extra_mb": 97.12
+          }
+        ],
+        "time_exponent": 1.26,
+        "mem_exponent": 0.975
+      },
+      "swa": {
+        "rows": [
+          {
+            "n": 1024,
+            "time_ms": 0.72,
+            "peak_extra_mb": 15.6
+          },
+          {
+            "n": 2048,
+            "time_ms": 0.8792,
+            "peak_extra_mb": 52.36
+          },
+          {
+            "n": 4096,
+            "time_ms": 1.615,
+            "peak_extra_mb": 191.88
+          },
+          {
+            "n": 8192,
+            "time_ms": 5.1044,
+            "peak_extra_mb": 734.91
+          },
+          {
+            "n": 16384,
+            "time_ms": 18.1132,
+            "peak_extra_mb": 2876.97
+          }
+        ],
+        "time_exponent": 1.744,
+        "mem_exponent": 1.953
+      },
+      "gdn": {
+        "rows": [
+          {
+            "n": 1024,
+            "time_ms": 1.9368,
+            "peak_extra_mb": 12.94
+          },
+          {
+            "n": 2048,
+            "time_ms": 1.9965,
+            "peak_extra_mb": 26.03
+          },
+          {
+            "n": 4096,
+            "time_ms": 2.5861,
+            "peak_extra_mb": 50.19
+          },
+          {
+            "n": 8192,
+            "time_ms": 3.3903,
+            "peak_extra_mb": 97.52
+          },
+          {
+            "n": 16384,
+            "time_ms": 6.415,
+            "peak_extra_mb": 194.17
+          }
+        ],
+        "time_exponent": 0.655,
+        "mem_exponent": 0.976
+      }
+    },
+    "streaming": {
+      "sanity_max_abs_diff_without_carried_state": 0.10963225364685059,
+      "n": 4096,
+      "dtype": "torch.float32",
+      "out_dtype": "torch.float32",
+      "max_abs_diff_output": 0.0,
+      "max_abs_diff_final_state": 0.0,
+      "output_abs_max": 0.20249231159687042,
+      "any_nan": false,
+      "state_shape_by_n": {
+        "1024": [
+          1,
+          6,
+          64,
+          64
+        ],
+        "2048": [
+          1,
+          6,
+          64,
+          64
+        ],
+        "4096": [
+          1,
+          6,
+          64,
+          64
+        ],
+        "8192": [
+          1,
+          6,
+          64,
+          64
+        ],
+        "16384": [
+          1,
+          6,
+          64,
+          64
+        ]
+      },
+      "state_shape_constant": true
+    }
+  },
+  "ran_at": "2026-11-22T16:25:54",
+  "runtime_s": 10.8,
+  "git_commit": "f1b4ebdc6c83820f20b5da9704a6f0164cc6a8c8",
+  "git_describe": "v0.3.5-1-gf1b4ebd",
+  "torch": "2.14.1+cu130",
+  "device": "NVIDIA RTX Spark N1X (6144-core Blackwell RTX GPU)"
+}

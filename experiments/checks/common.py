@@ -83,7 +83,8 @@ def train_steps(model, batch_fn, steps, lr=1e-3, warmup=100, wd=0.1, loops=None,
 
 
 def save(check_id: str, claims: list[str], prediction: str, criterion: str, verdicts: dict, data: dict,
-         started: float) -> pathlib.Path:
+         started: float, filename: str | None = None) -> pathlib.Path:
+    """filename: optional results file stem when it differs from the check id (e.g. id SQ6 -> sq_06.json)."""
     RESULTS.mkdir(parents=True, exist_ok=True)
     dev = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu"
     rec = {
@@ -95,7 +96,7 @@ def save(check_id: str, claims: list[str], prediction: str, criterion: str, verd
         "git_commit": _git("rev-parse", "HEAD"), "git_describe": _git("describe", "--tags", "--always", "--dirty"),
         "torch": torch.__version__, "device": dev,
     }
-    out = RESULTS / f"{check_id}.json"
+    out = RESULTS / f"{filename or check_id}.json"
     out.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8")
     print(f"\n== {check_id} verdicts ==")
     for k, v in verdicts.items():

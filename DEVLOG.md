@@ -17,6 +17,20 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.0: K1: Memory and time vs context length
+*2026-11-22*
+
+**What**: check K1 (Memory and time vs context length): script, results JSON and card. Prediction committed in `f1b4ebd` before it ran.
+
+### K1: Memory and time vs context length
+- **Question:** Do our layers scale as claimed? (C12 SWA O(n·w); C15 GDN fixed memory)
+- **Result:** Exponents over n = 1k..16k: attn time 1.26 / mem 0.98; **SWA 1.74 / 1.95** (2.9 GB at 16k); **GDN 0.66 / 0.98**. GDN streaming split at 2048: max diff **0.0**, state [1,6,64,64] at every n (`results/K1.json`, commit `ea3aa5b`).
+- **Verdict vs prediction:** Hit: SWA ≈ quadratic, as predicted; GDN linear, as predicted. C12 confirmed WRONG FOR OUR CODE; **C15 VERIFIED** (kernel level).
+- **What it means:** GDN's constant-memory streaming is real on this GPU; our sliding window needs a block-sparse kernel (SQ3) before any long-context claim.
+- **Card:** experiments/cards/K1.md
+
+---
+
 ## v0.3.6: Research reviews, experiment cards + index, process rules
 *2026-11-22*
 

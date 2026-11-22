@@ -1,0 +1,1002 @@
+{
+  "version": 1,
+  "updated": "2026-11-22T17:24:03-05:00",
+  "policy": "Order = priority, highest first; `next` walks the list top to bottom and returns the first item that is queued, ready, has all dependencies done and needs no human. Ordering rule: scientific value per GPU-minute, with validity first. (1) Controls, tuning and seeds that make existing claims trustworthy: K8 leakage/arithmetic check, K7 LR sweep, tuned 3-seed E10 and E1, E9, conditional E0/E2 re-runs, replication verdicts. Every later comparison is only as good as these. (2) Cheap inference-only diagnostics on existing checkpoints (SQ50, SQ14, SQ21, SQ37, eval suite) and the K3 redesign. They cost 4-20 GPU-minutes and decide what to build next; because the campaign runner is sequential, use `next --gpu --max-minutes 10` to slot them between campaign items or while a run is cooling. (3) Thesis-critical experiments: E11 (then 3 seeds), looped neg-eig parity, E3 at the tuned LR, the loop fixes (SQ15, SQ16, loop norm) gated on SQ14, neg-eig in the looped core, SQ32. (4) Side quests (gates, KDA, NoPE, decode path, ternary x loop, computed tables, research searches). (5) Long-term: E4 full fusion, E8, Mamba-3. Compute budget (AGENTS 5): one GPU item running at a time; up to 8 CPU items alongside, thread-capped by the launcher. CPU items that can run in parallel with any GPU job: Q3, Q5 (K7 analysis), Q6, Q13, Q15, Q18, Q20 (authoring: write scripts and register predictions), Q12 (verdict writing), SQ1, SQ41. Authoring items edit experiments/checks/PREDICTIONS.md and should be done one at a time by the main agent (or by subagents given disjoint files). Items needing a registered prediction wait for Q1 (the tagged 'registered' version). New items enter via `queue.py add` and are appended at the end; reordering needs an explicit `move --reason`. Estimates come from compiled throughputs (E0 210k tok/s, E1 100k, E2 44k) plus ~2 min launch/compile overhead; they are planning numbers, not measurements. needs_human items are never picked by `next`.",
+  "order_log": [],
+  "items": [
+    {
+      "id": "Q1",
+      "kind": "analysis",
+      "title": "Registered version: K7/E10/E11/E9/K8 predictions, configs, campaigns, SQ50 script and pending research notes committed and tagged",
+      "why": "AGENTS 1+6: no run before its prediction is a tagged commit; the launcher refuses dirty code paths, so every GPU item below waits for this.",
+      "depends_on": [],
+      "resources": {
+        "type": "cpu",
+        "est_minutes": 30
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": null,
+      "status": "done",
+      "source": "in flight: control + science cleanup agent; PREDICTIONS.md K7/K8; registry E9/E10/E11",
+      "note": "Owned by the cleanup agent. When cut, the main agent marks it done. Fold the uncommitted SQ50 script, Kimi/looped/competitor notes and side-quest rows into the same version (AGENTS 1: unrelated uncommitted work goes in the same entry).",
+      "history": [
+        {
+          "t": "2026-11-22T17:24:03-05:00",
+          "from": "running",
+          "to": "done",
+          "note": "registered as tagged versions v0.4.11 (E10) and v0.4.13 (K7, K8, replication protocol); E11 in v0.4.7"
+        }
+      ],
+      "updated": "2026-11-22T17:24:03-05:00",
+      "finished": "2026-11-22T17:24:03-05:00",
+      "last_note": "registered as tagged versions v0.4.11 (E10) and v0.4.13 (K7, K8, replication protocol); E11 in v0.4.7"
+    },
+    {
+      "id": "Q2",
+      "kind": "analysis",
+      "title": "Launcher --lr pass-through and tools/launch_campaign.sh finalised",
+      "why": "The K7 campaign and every tuned-LR run pass --lr; the runner refuses --lr until the launcher has it (campaigns/README.md).",
+      "depends_on": [],
+      "resources": {
+        "type": "cpu",
+        "est_minutes": 20
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": null,
+      "status": "done",
+      "source": "experiments/launch/campaigns/README.md; in flight: cleanup agent",
+      "note": "Check: bash tools/launch_campaign.sh experiments/launch/campaigns/phase2a-k7-lr.campaign --dry-run exits 0.",
+      "history": [
+        {
+          "t": "2026-11-22T17:24:03-05:00",
+          "from": "running",
+          "to": "done",
+          "note": "launcher --lr + launch_campaign.sh committed in v0.4.10"
+        }
+      ],
+      "updated": "2026-11-22T17:24:03-05:00",
+      "finished": "2026-11-22T17:24:03-05:00",
+      "last_note": "launcher --lr + launch_campaign.sh committed in v0.4.10"
+    },
+    {
+      "id": "Q3",
+      "kind": "check",
+      "title": "K8 --plan dry run (no download, no GPU): confirms the SmolLM2 snapshot and checkpoint paths resolve",
+      "why": "Cheap gate before K8 spends GPU time; catches a revision mismatch or missing snapshot.",
+      "depends_on": [],
+      "resources": {
+        "type": "cpu",
+        "est_minutes": 2
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "bash tools/launch_cpu_job.sh --name k8-plan -- ~/.venvs/gogeta/bin/python experiments/checks/k8_external_reference.py --plan",
+      "status": "queued",
+      "source": "experiments/checks/PREDICTIONS.md K8; notes/smollm2-reference.md"
+    },
+    {
+      "id": "K7",
+      "kind": "check",
+      "title": "K7 LR sweep: lr {1e-3,2e-3,3e-3,6e-3} at 20M tokens for E10 and E1 (8 runs, seed 0)",
+      "why": "C92: every result so far used an untuned lr 3e-3. Without this, E1 vs E0 (C5) and every later comparison is not trustworthy.",
+      "depends_on": [
+        "Q1",
+        "Q2"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 43,
+        "tokens": 160000000
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "bash tools/launch_campaign.sh experiments/launch/campaigns/phase2a-k7-lr.campaign",
+      "status": "queued",
+      "source": "PREDICTIONS.md K7; experiments/launch/campaigns/phase2a-k7-lr.campaign",
+      "note": "Do a --dry-run first. Decision rule is pre-registered (best final val loss; extend the grid if the winner is at an edge)."
+    },
+    {
+      "id": "Q4",
+      "kind": "check",
+      "title": "K7 grid extension (conditional): one more LR step on the side where a winner sits at the edge",
+      "why": "K7 rule 2: a winner at the edge of the grid must be bracketed (5e-4 / 1.2e-2, then 2.5e-4 / 2.4e-2) before the LR is used.",
+      "depends_on": [
+        "Q5"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 12,
+        "tokens": 60000000
+      },
+      "ready": false,
+      "missing": [
+        "only exists if k7_lr_sweep.py reports an edge winner",
+        "extension campaign file (printed by the analysis step)"
+      ],
+      "needs_human": false,
+      "launch": "bash tools/launch_campaign.sh <extension campaign printed by k7_lr_sweep.py>",
+      "status": "queued",
+      "source": "PREDICTIONS.md K7 decision rule 2",
+      "note": "If K7 brackets both winners, mark this dropped with that note. If it is needed, run it before Q7/Q8/E9/E11/E3 (re-run Q5 afterwards)."
+    },
+    {
+      "id": "Q5",
+      "kind": "analysis",
+      "title": "K7 analysis: apply the decision rule, write results/K7.json and the Phase 2b campaign with tuned LRs",
+      "why": "Turns the sweep into LR_E10 and LR_E1, which every later run uses.",
+      "depends_on": [
+        "K7"
+      ],
+      "resources": {
+        "type": "cpu",
+        "est_minutes": 2
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "bash tools/launch_cpu_job.sh --name k7-analysis -- ~/.venvs/gogeta/bin/python experiments/checks/k7_lr_sweep.py --write-campaign",
+      "status": "queued",
+      "source": "experiments/checks/k7_lr_sweep.py",
+      "note": "Runs in parallel with the next GPU job. If it asks for a grid extension, do Q4 first."
+    },
+    {
+      "id": "K8",
+      "kind": "check",
+      "title": "K8: SmolLM2-135M bits/char reference plus our existing E0 and E1 checkpoints (leakage and arithmetic sanity)",
+      "why": "C94: is our ~0.23 bits/char plausible, or is there train/val leakage? Cheap gate on every loss number in the repo (K8a: ours >= 0.5x SmolLM2; K8b: within 5% of training-time bpc).",
+      "depends_on": [
+        "Q1",
+        "Q3"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 6
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/k8_external_reference.py --external --checkpoint ~/fusiondance-data/checkpoints/E0-20261122-122059-s0/model.pt --checkpoint ~/fusiondance-data/checkpoints/E1-20261122-124440-s0/model.pt",
+      "status": "queued",
+      "source": "PREDICTIONS.md K8; notes/smollm2-reference.md",
+      "note": "Deviation to log: the pre-registered K8 scores E10 and E1 at tuned LRs; this early run scores the existing v0.3.0 E0/E1 checkpoints with the same protocol (Q11 repeats it on the tuned ones). It writes results/K8.json: copy it aside before Q11 overwrites it."
+    },
+    {
+      "id": "Q6",
+      "kind": "analysis",
+      "title": "Write the replication analysis script (mean/std, C5 verdict, E0 parity, E2-vs-E9, E10 scorecard) per the fixed criteria",
+      "why": "The Phase 2b criteria are pre-registered but no script computes them; writing it now keeps the verdicts mechanical.",
+      "depends_on": [
+        "Q1"
+      ],
+      "resources": {
+        "type": "cpu",
+        "est_minutes": 45
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": null,
+      "status": "queued",
+      "source": "PREDICTIONS.md 'Replication protocol (Phase 2b) and the comparison criteria'",
+      "note": "New file experiments/checks/replication_analysis.py (CPU, reads summary.json of run folders). No new prediction needed: the criteria are already committed."
+    },
+    {
+      "id": "Q7",
+      "kind": "train",
+      "title": "E10 (HF Llama control) x3 seeds at LR_E10, 200M tokens each",
+      "why": "C5/C93: tuned, 3-seed dense control that replaces E0 as the yardstick; gives the seed noise.",
+      "depends_on": [
+        "Q5"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 70,
+        "tokens": 600000000
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "grep '^E10 ' experiments/launch/campaigns/phase2b-replication.campaign > ~/fusiondance-data/run/q-E10.campaign && bash tools/launch_campaign.sh ~/fusiondance-data/run/q-E10.campaign",
+      "status": "queued",
+      "source": "registry E10; PREDICTIONS.md replication protocol"
+    },
+    {
+      "id": "Q8",
+      "kind": "train",
+      "title": "E1 (hybrid) x3 seeds at LR_E1, 200M tokens each",
+      "why": "C5/C93: replicates the headline result at a tuned LR and gives E1's seed std, the noise yardstick for E2/E9/E11 comparisons.",
+      "depends_on": [
+        "Q5"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 117,
+        "tokens": 600000000
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "grep '^E1 ' experiments/launch/campaigns/phase2b-replication.campaign > ~/fusiondance-data/run/q-E1.campaign && bash tools/launch_campaign.sh ~/fusiondance-data/run/q-E1.campaign",
+      "status": "queued",
+      "source": "registry E1; PREDICTIONS.md replication protocol, criterion 3 (reproduce 0.5846 within 0.002 if LR_E1 = 3e-3)"
+    },
+    {
+      "id": "E9",
+      "kind": "train",
+      "title": "E9: unlooped control for E2 (same 5 blocks, no weight sharing), seed 0 at LR_E1",
+      "why": "C6: is E2's 2x FLOPs buying anything, or is looping the same blocks worse than running them once?",
+      "depends_on": [
+        "Q5"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 33,
+        "tokens": 200000000
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "grep '^E9 ' experiments/launch/campaigns/phase2b-replication.campaign > ~/fusiondance-data/run/q-E9.campaign && bash tools/launch_campaign.sh ~/fusiondance-data/run/q-E9.campaign",
+      "status": "queued",
+      "source": "registry E9; PREDICTIONS.md criterion 5",
+      "note": "The registry prediction assumed lr 3e-3; it is scored as written with the LR difference stated."
+    },
+    {
+      "id": "Q9",
+      "kind": "train",
+      "title": "E0 seed 0 at LR_E10 (conditional: only if LR_E10 != 3e-3)",
+      "why": "Criterion 4, implementation parity of our dense baseline vs the HF control: were the published E0 numbers fair?",
+      "depends_on": [
+        "Q5"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 23,
+        "tokens": 200000000
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "grep '^E0 ' experiments/launch/campaigns/phase2b-replication.campaign > ~/fusiondance-data/run/q-E0.campaign && bash tools/launch_campaign.sh ~/fusiondance-data/run/q-E0.campaign",
+      "status": "queued",
+      "source": "PREDICTIONS.md replication protocol, criterion 4",
+      "note": "If the generated campaign has no E0 line (LR_E10 = 3e-3), mark this dropped: the v0.3.0 E0 run is already at that LR."
+    },
+    {
+      "id": "Q10",
+      "kind": "train",
+      "title": "E2 seed 0 at LR_E1 (conditional: only if LR_E1 != 3e-3)",
+      "why": "Criterion 5: E2 and E9 must be compared at the same LR for the loop question.",
+      "depends_on": [
+        "Q5"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 80,
+        "tokens": 200000000
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "grep '^E2 ' experiments/launch/campaigns/phase2b-replication.campaign > ~/fusiondance-data/run/q-E2.campaign && bash tools/launch_campaign.sh ~/fusiondance-data/run/q-E2.campaign",
+      "status": "queued",
+      "source": "PREDICTIONS.md replication protocol, criterion 5",
+      "note": "Drop if the campaign has no E2 line. It also yields a fresh E2 checkpoint at the tuned LR for the diagnostics below."
+    },
+    {
+      "id": "Q11",
+      "kind": "check",
+      "title": "K8 again on the tuned E10 and E1 seed-0 checkpoints (the pre-registered K8 scoring)",
+      "why": "C94 as registered; also checks that doc-level bits/char matches the training-time number.",
+      "depends_on": [
+        "Q7",
+        "Q8",
+        "K8"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 6
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/k8_external_reference.py --external --checkpoint <E10 200M s0 ckpt dir>/model.pt --checkpoint <E1 200M s0 ckpt dir>/model.pt",
+      "status": "queued",
+      "source": "PREDICTIONS.md K8",
+      "note": "Resolve the checkpoint dirs from the E10/E1 cards. The K7 runs are also seed 0 (20M tokens): do not pick those."
+    },
+    {
+      "id": "Q12",
+      "kind": "analysis",
+      "title": "Replication verdicts: run Q6's script, update ledger C5/C6/C92/C93 and the E0/E1 wording everywhere, cards, notebook, devlog, tag",
+      "why": "Closes the validity block: restates 'E1 beats E0' against the tuned 3-seed control and fixes every place it appears (AGENTS 0).",
+      "depends_on": [
+        "Q6",
+        "Q7",
+        "Q8",
+        "E9"
+      ],
+      "resources": {
+        "type": "cpu",
+        "est_minutes": 45
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": null,
+      "status": "queued",
+      "source": "PREDICTIONS.md criteria 1-6; AGENTS 0 'wording follows status'"
+    },
+    {
+      "id": "Q13",
+      "kind": "analysis",
+      "title": "Write the three E2-checkpoint inference scripts (SQ14+SQ30 drift/rescale, SQ21 quantisation x loops, SQ37 repetition) and register their predictions",
+      "why": "Unlocks three minutes-long GPU diagnostics that decide which loop fix to build.",
+      "depends_on": [
+        "Q1"
+      ],
+      "resources": {
+        "type": "cpu",
+        "est_minutes": 90
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": null,
+      "status": "queued",
+      "source": "notes/research-looped.md SQ14/SQ21; notes/review-competitors.md SQ30/SQ37; extend experiments/checks/k6_loop_convergence.py",
+      "note": "Scripts: sq_14_loop_drift.py, sq_21_loop_quant.py, sq_37_repetition.py. Copy each prediction and pass rule from the notes into PREDICTIONS.md and register them in a PATCH version before running."
+    },
+    {
+      "id": "SQ50",
+      "kind": "side-quest",
+      "title": "SQ50: Kimi Delta Attention kernel check (chunk_kda vs fp32 reference, GDN reduction, fused_recurrent_kda decode, speed)",
+      "why": "C70-C72, C2: if a recurrent kernel works we get a decode path for existing GDN checkpoints (unblocks speculative decoding C19 and RL C84).",
+      "depends_on": [
+        "Q1"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 6
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_kda_kernel.py",
+      "status": "queued",
+      "source": "experiments/side-quests.md SQ50; notes/research-kimi-linear.md; the script has a PREDICTION constant",
+      "note": "Autotune can take ~5 min. Copy the script's prediction into PREDICTIONS.md in the registered version (Q1)."
+    },
+    {
+      "id": "SQ14",
+      "kind": "side-quest",
+      "title": "SQ14 (+SQ30): is E2's loop a constant drift? Coda-drowning test with cos(delta_k, h_{k-1}) and norm-rescaled eval",
+      "why": "C7/C20/C39/C40: says whether the loop fix is 'bound the norm' (SQ15/16/18) or 'change what the loop computes' (SQ17). No training.",
+      "depends_on": [
+        "Q13"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 4
+      },
+      "ready": false,
+      "missing": [
+        "script sq_14_loop_drift.py (Q13)",
+        "prediction in PREDICTIONS.md (now only in notes/research-looped.md)"
+      ],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_14_loop_drift.py --checkpoint ~/fusiondance-data/checkpoints/E2-20261122-132340-s0/model.pt",
+      "status": "queued",
+      "source": "notes/research-looped.md SQ14; experiments/side-quests.md SQ14, SQ30"
+    },
+    {
+      "id": "SQ21",
+      "kind": "side-quest",
+      "title": "SQ21: do loops amplify quantisation error? Post-hoc INT8/INT4/ternary on E2's core, delta-L(r) for r = 1..12",
+      "why": "C36/C63/C64: the fusion risk (ternary x loop) measured with no training, ahead of E4.",
+      "depends_on": [
+        "Q13"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 4
+      },
+      "ready": false,
+      "missing": [
+        "script sq_21_loop_quant.py (Q13)",
+        "prediction in PREDICTIONS.md"
+      ],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_21_loop_quant.py --checkpoint ~/fusiondance-data/checkpoints/E2-20261122-132340-s0/model.pt",
+      "status": "queued",
+      "source": "notes/research-looped.md SQ21; experiments/side-quests.md SQ21"
+    },
+    {
+      "id": "SQ37",
+      "kind": "side-quest",
+      "title": "SQ37: repetition 'attractor wells', repeated-4-gram rate in greedy continuations, E1 vs E2 at r = 2/4/8/12",
+      "why": "C55: a sampling cost of looping that loss does not show (cf. C28). Inference only.",
+      "depends_on": [
+        "Q13"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 6
+      },
+      "ready": false,
+      "missing": [
+        "script sq_37_repetition.py (Q13)",
+        "prediction in PREDICTIONS.md",
+        "no KV cache: cap at 256 new tokens x 64 prompts to stay short"
+      ],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_37_repetition.py",
+      "status": "queued",
+      "source": "notes/review-competitors.md SQ37; experiments/side-quests.md SQ37"
+    },
+    {
+      "id": "Q14",
+      "kind": "eval",
+      "title": "Benchmark suite tier 1 (bpb, HumanEval/MBPP solution bpb, held-out functional pass@1, sandboxed) on the E0/E1/E2 checkpoints",
+      "why": "C28/SQ4: loss and code quality disagreed in E0-E2; this gives the first standard-format numbers and a harness for every later run.",
+      "depends_on": [
+        "Q1"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 20
+      },
+      "ready": false,
+      "missing": [
+        "notes/benchmark-suite.md and evals/README.md (another agent still writing)",
+        "evals/ is untracked: needs a registered version with its prediction",
+        "tier-1 dataset cache not confirmed"
+      ],
+      "needs_human": true,
+      "launch": "~/.venvs/gogeta-eval/bin/python -m evals.run_suite --checkpoint ~/fusiondance-data/checkpoints/<run>/model.pt --tier 1 --device cuda",
+      "status": "queued",
+      "source": "evals/run_suite.py; notes/benchmark-suite.md (pending); experiments/side-quests.md SQ4",
+      "reason": "May need dataset downloads (python -m evals.fetch_data hf / uncheatable) and lm-eval installs in ~/.venvs/gogeta-eval; the human approves any download or install."
+    },
+    {
+      "id": "Q15",
+      "kind": "analysis",
+      "title": "Redesign K3 (MQAR): fewer pairs / more steps / Zoology recipe so the attention control reaches >= 90%; write script and prediction",
+      "why": "C16 is still UNVERIFIED because K3 was invalid (attn 8.6%); SQ59 (KDA recall) is blocked on it.",
+      "depends_on": [
+        "Q1"
+      ],
+      "resources": {
+        "type": "cpu",
+        "est_minutes": 60
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": null,
+      "status": "queued",
+      "source": "experiments/cards/K3.md; experiments/claims.md C16; SQ59",
+      "note": "Write the new prediction and the validity gate (attn >= 90%, swa(32) <= 30%) into PREDICTIONS.md first. Debug on CPU with a tiny attn-only model before spending GPU time."
+    },
+    {
+      "id": "Q16",
+      "kind": "check",
+      "title": "K3 v2: MQAR recall, GDN vs plain linear attention vs attn vs SWA, redesigned setup",
+      "why": "Settles C16 (and later SQ59: KDA vs GDN recall).",
+      "depends_on": [
+        "Q15"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 15
+      },
+      "ready": false,
+      "missing": [
+        "redesigned script k3_mqar_recall_v2.py and its prediction (Q15)"
+      ],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/k3_mqar_recall_v2.py",
+      "status": "queued",
+      "source": "experiments/cards/K3.md; claims C16"
+    },
+    {
+      "id": "E11",
+      "kind": "train",
+      "title": "E11: negative-eigenvalue GDN for language modelling, seed 0 at LR_E1, 200M tokens",
+      "why": "C43 follow-up: SQ6 shows neg-eig GDN solves parity in one pass; is it free for LM? If so it competes with the loop for 'state tracking depth'.",
+      "depends_on": [
+        "Q5"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 39,
+        "tokens": 200000000
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "LR_E1=$(grep '^E1 ' experiments/launch/campaigns/phase2b-replication.campaign | head -1 | sed 's/.*--lr //') && bash experiments/launch/E11.sh --seed 0 --lr $LR_E1 --wait-cool",
+      "status": "queued",
+      "source": "registry E11; claims C43; experiments/cards/E11.md",
+      "note": "Compare against E1 at the same LR (seed 0 first; the verdict needs 3 seeds)."
+    },
+    {
+      "id": "Q17",
+      "kind": "train",
+      "title": "E11 seeds 1 and 2 at LR_E1",
+      "why": "The registry prediction is 3 seeds; the 'free / helps / hurts' criterion uses the pooled seed std.",
+      "depends_on": [
+        "E11",
+        "Q8"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 78,
+        "tokens": 400000000
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "LR_E1=$(grep '^E1 ' experiments/launch/campaigns/phase2b-replication.campaign | head -1 | sed 's/.*--lr //') && for s in 1 2; do bash experiments/launch/E11.sh --seed $s --lr $LR_E1 --foreground --wait-cool || break; done",
+      "status": "queued",
+      "source": "registry E11 prediction",
+      "note": "If seed 0 diverges or is > 3% worse than E1 seed 0, record it as a result and skip the replication."
+    },
+    {
+      "id": "Q18",
+      "kind": "analysis",
+      "title": "Write the looped neg-eig parity check: GDN allow_neg_eigval looped x1/2/4, length generalisation to T=128 (extends sq_06_rotation_parity.py)",
+      "why": "SQ6 tested neg-eig only single-pass. Does a loop add anything on top, and does the loop still hurt length generalisation (looped GDN 61.2%)?",
+      "depends_on": [
+        "Q1"
+      ],
+      "resources": {
+        "type": "cpu",
+        "est_minutes": 40
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": null,
+      "status": "queued",
+      "source": "claims C43/C44; experiments/cards/SQ6.md; experiments/checks/sq_06_rotation_parity.py",
+      "note": "Use >= 2 seeds per arm (C44: single-pass GDN parity varies a lot). Prediction first, registered before running."
+    },
+    {
+      "id": "Q19",
+      "kind": "check",
+      "title": "Run the looped neg-eig parity check",
+      "why": "First evidence on whether neg-eig GDN replaces or complements the loop (feeds the Q23 decision).",
+      "depends_on": [
+        "Q18"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 10
+      },
+      "ready": false,
+      "missing": [
+        "script and prediction (Q18)"
+      ],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_neg_eig_looped_parity.py",
+      "status": "queued",
+      "source": "claims C43, C18"
+    },
+    {
+      "id": "E3",
+      "kind": "train",
+      "title": "E3: ternary weights on the E1 stack at LR_E1 (one ingredient: ternary=True)",
+      "why": "Thesis ingredient 3: what does ternary cost on the best mixer stack? K4 says the gap shrinks with size; E3 measures it at 14M.",
+      "depends_on": [
+        "Q5",
+        "Q8"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 45,
+        "tokens": 200000000
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "LR_E1=$(grep '^E1 ' experiments/launch/campaigns/phase2b-replication.campaign | head -1 | sed 's/.*--lr //') && bash experiments/launch/E3.sh --seed 0 --lr $LR_E1 --wait-cool",
+      "status": "queued",
+      "source": "registry E3; experiments/cards/E3.md; claims C17",
+      "note": "The registered prediction (0.605-0.645 vs E1 0.5846) was written for lr 3e-3: score as written and compare with E1 at the same LR. Ternary may prefer a different LR than FP; one seed, flag it."
+    },
+    {
+      "id": "Q20",
+      "kind": "analysis",
+      "title": "Write the shared tiny loop harness (TINY/H0: d=128, mlp 344, tiny-E2 layout, ~20M tokens, r ~ U{1..7}; L(r) for r=1..16, norm ratio, grad-norm p99.9)",
+      "why": "SQ15/16/18/31/32/34/36/38 all need it; one harness keeps their arms comparable.",
+      "depends_on": [
+        "Q1"
+      ],
+      "resources": {
+        "type": "cpu",
+        "est_minutes": 120
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": null,
+      "status": "queued",
+      "source": "notes/review-competitors.md section (d) TINY; notes/research-looped.md H0",
+      "note": "Harness plus baseline arm only. Register the baseline prediction; each SQ adds its own prediction row."
+    },
+    {
+      "id": "SQ15",
+      "kind": "side-quest",
+      "title": "SQ15 (= SQ31 V3): Parcae contractive injection, h = a*h + B(norm e), a in (0,1)",
+      "why": "C31/C7: targets the unbounded loop state (N12 <= 1.5, X12 halved, L(4) within 1%).",
+      "depends_on": [
+        "Q20",
+        "SQ14"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 15
+      },
+      "ready": false,
+      "missing": [
+        "harness (Q20)",
+        "prediction copied from notes/research-looped.md SQ15 into PREDICTIONS.md"
+      ],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_15_contractive_injection.py",
+      "status": "queued",
+      "source": "notes/research-looped.md SQ15; side-quests SQ15, SQ31"
+    },
+    {
+      "id": "SQ16",
+      "kind": "side-quest",
+      "title": "SQ16: 1/r step-size scaling of every core branch (s = 4/r)",
+      "why": "C32/C7: turns extrapolation into refinement. Pass: L(12) <= 1.002 L(4), L(16) <= 1.005 L(4), L(4) <= 1.015 baseline.",
+      "depends_on": [
+        "Q20",
+        "SQ14"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 20
+      },
+      "ready": false,
+      "missing": [
+        "harness (Q20)",
+        "prediction in PREDICTIONS.md"
+      ],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_16_step_scaling.py",
+      "status": "queued",
+      "source": "notes/research-looped.md SQ16"
+    },
+    {
+      "id": "Q21",
+      "kind": "side-quest",
+      "title": "SQ18 + SQ31: loop-boundary norm variants (Huginn core-end RMSNorm, post-norm core, optional parity arm)",
+      "why": "C37 vs C58: papers disagree on whether a loop-boundary norm is needed; settle it for our core.",
+      "depends_on": [
+        "Q20",
+        "SQ14"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 30
+      },
+      "ready": false,
+      "missing": [
+        "harness (Q20)",
+        "prediction in PREDICTIONS.md"
+      ],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_18_loop_norm.py",
+      "status": "queued",
+      "source": "notes/research-looped.md SQ18; notes/review-competitors.md SQ31"
+    },
+    {
+      "id": "Q22",
+      "kind": "train",
+      "title": "Neg-eig GDN inside the looped core at LM scale (proposed E12: E2 layout with allow_neg_eigval), at LR_E1",
+      "why": "The thesis question after E11 and Q19: does the loop still help once the mixer can track state in one pass? Compare with E2 (Q10) and E9 at the same LR.",
+      "depends_on": [
+        "E11",
+        "Q19",
+        "E9"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 80,
+        "tokens": 200000000
+      },
+      "ready": false,
+      "missing": [
+        "configs/e12_negeig_looped.json",
+        "registry entry E12 with prediction",
+        "experiments/launch/E12.sh",
+        "only worth running if E11 is free for LM"
+      ],
+      "needs_human": false,
+      "launch": "LR_E1=$(grep '^E1 ' experiments/launch/campaigns/phase2b-replication.campaign | head -1 | sed 's/.*--lr //') && bash experiments/launch/E12.sh --seed 0 --lr $LR_E1 --wait-cool",
+      "status": "queued",
+      "source": "registry E11 prediction ('next step'); notes/LABNOTEBOOK.md SQ6 DEC; claims C43"
+    },
+    {
+      "id": "Q23",
+      "kind": "analysis",
+      "title": "Decision memo for the human: what is the loop for, given neg-eig GDN? (E11, Q19, E9, Q10 in one page)",
+      "why": "The thesis may shift from 'loops add state tracking' to 'loops add something else, or nothing'. That direction change is the human's call.",
+      "depends_on": [
+        "E11",
+        "Q19",
+        "E9"
+      ],
+      "resources": {
+        "type": "cpu",
+        "est_minutes": 30
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": true,
+      "launch": null,
+      "status": "queued",
+      "source": "claims C18, C43; experiments/cards/SQ6.md",
+      "reason": "Changes the thesis direction (what the loop is for, whether E4 keeps it); the human decides."
+    },
+    {
+      "id": "SQ32",
+      "kind": "side-quest",
+      "title": "SQ32: MixerLoop (mixer x4, MLP once) at matched FLOPs and params vs full-block loop vs unshared, on TINY, plus a K5 parity arm",
+      "why": "C6/C68: tests 'loops cost 2x FLOPs for nothing' with a clean one-ingredient comparison; MixerLoop T=4 equals our loop at r=2 in core FLOPs.",
+      "depends_on": [
+        "Q20"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 30
+      },
+      "ready": false,
+      "missing": [
+        "harness (Q20)",
+        "prediction in PREDICTIONS.md"
+      ],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_32_mixerloop.py",
+      "status": "queued",
+      "source": "notes/review-competitors.md SQ32; claims C50-C52, C68"
+    },
+    {
+      "id": "SQ8",
+      "kind": "side-quest",
+      "title": "SQ8 + SQ55: sigmoid output gate vs SiLU, zero-centred RMSNorm, Kimi low-rank gate arm, on a small E1-style model",
+      "why": "C25: a two-line change to GatedDeltaNet that Qwen3.8-Next and Kimi both report as better.",
+      "depends_on": [
+        "Q8"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 30
+      },
+      "ready": false,
+      "missing": [
+        "script and prediction",
+        "config switch in gogeta/model.py (E0-E3 must stay bit-identical: re-run K7-parity)"
+      ],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_08_gate_ablation.py",
+      "status": "queued",
+      "source": "experiments/side-quests.md SQ8, SQ55; claims C25"
+    },
+    {
+      "id": "SQ51",
+      "kind": "side-quest",
+      "title": "SQ51: KDA vs GDN mixer in a small E1-style model (d=256, 20M tokens, 2 seeds; gate rank 64 and 16)",
+      "why": "Kimi Linear reports KDA > GDN at 48B; a one-ingredient test of decay granularity at our scale.",
+      "depends_on": [
+        "SQ50",
+        "Q8"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 40
+      },
+      "ready": false,
+      "missing": [
+        "SQ50 verdict (does chunk_kda work)",
+        "KDA block kind in gogeta/model.py",
+        "script and prediction"
+      ],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_51_kda_vs_gdn.py",
+      "status": "queued",
+      "source": "notes/research-kimi-linear.md SQ51; claims C70-C79"
+    },
+    {
+      "id": "SQ52",
+      "kind": "side-quest",
+      "title": "SQ52: NoPE vs RoPE in the single full-attention layer; per-position loss to T=2048 after training at 512",
+      "why": "Zero params and FLOPs; Kimi reports better long-context with NoPE global layers. Also informs length extension.",
+      "depends_on": [
+        "Q8"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 25
+      },
+      "ready": false,
+      "missing": [
+        "script and prediction",
+        "rope flag on the attn block"
+      ],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_52_nope.py",
+      "status": "queued",
+      "source": "notes/research-kimi-linear.md SQ52"
+    },
+    {
+      "id": "SQ53",
+      "kind": "side-quest",
+      "title": "SQ53: decode path (step()/generate()) via fused_recurrent_kda or a chunk-kernel T=1 fallback; greedy identity vs full re-forward, tokens/s",
+      "why": "Unblocks C19 (speculative decoding), E8 and the RL plan (C84: ~340x sampling cost without a cache); no retraining.",
+      "depends_on": [
+        "SQ50"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 40
+      },
+      "ready": false,
+      "missing": [
+        "SQ50 result",
+        "implementation in gogeta/model.py (code change: its own tagged version)"
+      ],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_53_decode.py",
+      "status": "queued",
+      "source": "notes/research-kimi-linear.md SQ53, SQ58; claims C2, C19, C84"
+    },
+    {
+      "id": "SQ38",
+      "kind": "side-quest",
+      "title": "SQ38: ternary x loop: ternary penalty delta-L(r) for r = 1..12, FP vs ternary vs ternary with inject kept FP",
+      "why": "C65/C63: the fusion question nobody has published; run after SQ21 (post-hoc) and a loop fix so norm growth does not confound it.",
+      "depends_on": [
+        "Q20",
+        "SQ21",
+        "SQ15"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 45
+      },
+      "ready": false,
+      "missing": [
+        "harness (Q20)",
+        "prediction in PREDICTIONS.md"
+      ],
+      "needs_human": false,
+      "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_38_ternary_loop.py",
+      "status": "queued",
+      "source": "notes/review-competitors.md SQ38"
+    },
+    {
+      "id": "SQ1",
+      "kind": "side-quest",
+      "title": "SQ1: embedding table size and quantisation arithmetic (computed) for the E3 model",
+      "why": "After ternarising the layers the embedding is ~2/3 of the model; a computed table says whether it is worth a run.",
+      "depends_on": [],
+      "resources": {
+        "type": "cpu",
+        "est_minutes": 15
+      },
+      "ready": false,
+      "missing": [
+        "script (computed only, no training; label the numbers 'computed')"
+      ],
+      "needs_human": false,
+      "launch": "bash tools/launch_cpu_job.sh --name sq1 -- ~/.venvs/gogeta/bin/python experiments/checks/sq_01_embedding_size.py",
+      "status": "queued",
+      "source": "experiments/side-quests.md SQ1; claims C9"
+    },
+    {
+      "id": "SQ41",
+      "kind": "side-quest",
+      "title": "SQ41: re-run the novelty search (looped x ternary x linear attention) before any public 'first' claim",
+      "why": "C65 rests on one day of arXiv searches and the field moves weekly.",
+      "depends_on": [],
+      "resources": {
+        "type": "cpu",
+        "est_minutes": 30
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": null,
+      "status": "queued",
+      "source": "notes/review-competitors.md SQ41; claims C65",
+      "note": "Subagent job (web search, CPU-only; it edits only notes/ and the main agent updates the ledger). Do not fetch PDFs without the human's OK."
+    },
+    {
+      "id": "E4",
+      "kind": "train",
+      "title": "E4: full fusion (GDN-hybrid mixer + loops + ternary)",
+      "why": "Success is v1.0.0. Only meaningful after the loop question (Q23), E3 and SQ38 are settled.",
+      "depends_on": [
+        "E3",
+        "Q23",
+        "SQ38"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 240,
+        "tokens": 200000000
+      },
+      "ready": false,
+      "missing": [
+        "config",
+        "prediction",
+        "launch script (E4.sh refuses: not designed)"
+      ],
+      "needs_human": true,
+      "launch": "bash experiments/launch/E4.sh --seed 0",
+      "status": "blocked",
+      "source": "registry E4",
+      "reason": "Estimated > 3 GPU-hours (loops plus ternary overhead, several seeds) and it fixes the thesis' final shape."
+    },
+    {
+      "id": "E8",
+      "kind": "train",
+      "title": "E8: self-speculative decoding (draft with 1-2 loops, verify with full r)",
+      "why": "Needs a decode path and a loop that is still useful at r=1-2: acceptance rate and real speedup on the laptop.",
+      "depends_on": [
+        "SQ53",
+        "Q23"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 90
+      },
+      "ready": false,
+      "missing": [
+        "decode path (SQ53)",
+        "config",
+        "prediction",
+        "launch script (E8.sh refuses: not designed)"
+      ],
+      "needs_human": false,
+      "launch": "bash experiments/launch/E8.sh",
+      "status": "blocked",
+      "source": "registry E8; claims C19"
+    },
+    {
+      "id": "SQ7",
+      "kind": "side-quest",
+      "title": "SQ7: get Mamba-3 kernels running on aarch64 + Blackwell, then a Mamba-2/Mamba-3 block for an E1-style swap",
+      "why": "C21: a real comparison of Mamba-3 vs our GDN choice. A long shot given the build uncertainty.",
+      "depends_on": [
+        "Q8"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 60
+      },
+      "ready": false,
+      "missing": [
+        "kernel build",
+        "block kind",
+        "prediction"
+      ],
+      "needs_human": true,
+      "launch": null,
+      "status": "queued",
+      "source": "experiments/side-quests.md SQ7; claims C21",
+      "reason": "Needs a new package install / source build (state-spaces/mamba) in the venv."
+    }
+  ]
+}

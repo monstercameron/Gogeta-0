@@ -17,6 +17,23 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.14: Experiment queue + autonomous-queue rule
+*2026-11-22*
+
+**What**:
+- **`experiments/queue.json`**: 45 prioritized items with dependencies, resources (GPU/CPU, minutes), `ready`/`missing`, `needs_human` and its reason, exact `launch` commands, and sources (queue subagent; reviewed by the main agent).
+- **`tools/queue.py`** (stdlib): `list`, `next --gpu|--cpu [--max-minutes N]`, `show`, `set`, `add`, `move`, `validate`, `render`. It validates ids and cycles, never reorders silently, refuses a 2nd GPU or a 9th CPU item, and `next` skips `needs_human` items.
+- **`experiments/QUEUE.md`**: the generated view.
+- **AGENTS.md §5b:** the main agent works through the queue without asking the human, and asks only for `needs_human` items (download or install, > 3 GPU-hours in one item, deleting data, pushing, thesis-direction change) or when a result contradicts an item's premise.
+- Q1 (predictions registered: v0.4.11, v0.4.13) and Q2 (`--lr` + campaign runner: v0.4.10) marked done.
+
+**Results**: `validate`: ok (45 items, no unknown dependencies, no cycles). `next --gpu` → **K7** LR sweep (43 min); `next --cpu` → **Q3** K8 `--plan` (2 min).
+**Ordering policy**: validity first (controls, tuning, seeds), then cheap inference-only diagnostics on existing checkpoints, then thesis-critical runs (E11, neg-eig in the loop, E3 at the tuned LR, loop fixes), then side quests, then long-term items.
+**Needs the human (queued, not auto-run)**: Q14 eval suite tier 1 (downloads/installs), Q23 loop-purpose decision memo (thesis direction), E4 full fusion (> 3 GPU-h), SQ7 Mamba-3 kernels (install/build).
+**Next**: run K7 (GPU) and Q3 (CPU) from the queue.
+
+---
+
 ## v0.4.13: K7 and K8 registered: LR sweep and external reference
 *2026-11-22*
 

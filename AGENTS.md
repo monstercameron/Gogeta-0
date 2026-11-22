@@ -144,6 +144,18 @@ The project stays at `0.y.z` while it's experimental.
   - The first real launch through the launcher hasn't been tested end to end (only dry runs). Watch it with `status.sh` and `tail -f` on its log.
 - **Every run is connected to Trackio.** Start the dashboard with `tools/launch_tracker.sh start` (or `tools\launch_tracker.ps1 start` from Windows) before launching, so the run can be watched live at http://127.0.0.1:7861. Runs still log to the local Trackio database if the dashboard is down, but check the run appears in it. Stop it with `tools/launch_tracker.sh stop`.
 
+## 5b. Autonomous work from the experiment queue
+
+`experiments/queue.json` is the ordered list of what to train or evaluate next, and `experiments/QUEUE.md` is its generated view. Never hand-edit either; use `python tools/queue.py`. **The main agent works through the queue without asking the human which experiment is next.**
+
+1. **Pick:** `python tools/queue.py next --gpu` and `next --cpu`. Each returns the first item that is queued, ready, has its dependencies done and doesn't need the human. Fill short idle GPU gaps with `next --gpu --max-minutes 10`.
+2. **Run within the budget (§5):** use the item's `launch` command only (`experiments/launch/E<n>.sh`, `tools/launch_campaign.sh`, or `tools/launch_cpu_job.sh`). Dry-run first. Then `python tools/queue.py set <id> running` (it refuses a 2nd GPU job or a 9th CPU job). Items with `launch: null` are agent tasks (write a script, a prediction or an analysis).
+3. **Predictions first:** if an item isn't `ready` because a prediction or script is missing, do that authoring work and register it as a tagged version (§1, §6) before anything launches.
+4. **Finish:** set `done`, `dropped` or `blocked` with `--note` pointing to the evidence (run id or result file). Record it per §1 and §6: card, ledger, notebook, results registry (`tools/record_result.py`), and its own devlog entry and tag. Run `python tools/queue.py render` and commit `queue.json` + `QUEUE.md` in the same version. A conditional item whose condition turns out false is `dropped` with the reason.
+5. **Ask the human only for `needs_human` items:** any download or install, > 3 GPU-hours in one item, deleting data, pushing to GitHub, or a thesis-direction change. `next` never returns these. Also stop and ask when a result contradicts an item's premise.
+6. **New ideas enter only via `python tools/queue.py add`**, from side quests, research notes or surprising results. They carry `why`, `source`, `depends_on`, `resources`, `ready` and `missing`, and are appended at the end. Moving one up needs `move --after <id> --reason "…"`, which is logged.
+7. **Every status update (§0c)** shows the running queue items and the next GPU/CPU picks.
+
 ## 6. Tracking runs (scientific hygiene)
 
 - **Environment:** WSL venv at `~/.venvs/gogeta`, installed from `requirements.txt`. Run everything from the repo root (inside WSL, the Windows checkout is under `/mnt/c/...`).
@@ -196,6 +208,7 @@ The project stays at `0.y.z` while it's experimental.
 | `experiments/curves/E<n>.json` | Eval-loss curve points used by the experiment-page charts |
 | `site-src/learn.md` | Newcomer primer ("Start here") → `docs/learn.html` |
 | `notes/LABNOTEBOOK.md` | Timestamped, append-only evidence (see §6) |
+| `experiments/queue.json`, `experiments/QUEUE.md`, `tools/queue.py` | Prioritized experiment queue (source of truth), its generated view, and the tool to pick/update it (§5b) |
 | `notes/science-gaps.md` | Every known methodology gap (untuned LR, single seeds, missing controls…), its fix and status |
 | `experiments/launch/campaigns/` | Campaign files for `tools/launch_campaign.sh` (one launch per line) |
 | `experiments/INDEX.md` | **Generated** lookup table of every experiment, check and side quest (status, headline, reuse, card link). Read it first. |

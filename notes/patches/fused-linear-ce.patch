@@ -1,0 +1,35 @@
+fused-linear-ce.patch  (notes/hardware-spark.md, proposal P4; claim C117; check SQ73)
+
+Opt-in: model config "fused_ce_chunks": N > 0 computes the training loss with fla's FusedLinearCrossEntropyLoss
+(already installed with flash-linear-attention 0.6.0; no new package): the head matmul, log-softmax, loss and
+both gradients run chunk by chunk, so the 32768 x 8192 logits (537 MB bf16, 1.07 GB as fp32) are never
+materialised. With N = 32 a chunk is 1024 tokens x 8192 x 2 B = 16 MiB, small enough for a 24 MiB L2. When the
+fused path is used, forward returns (None, loss): gogeta/train.py and evaluate() only read the loss. Callers that
+need logits (sample(), hf.py, evals) pass no targets and are unaffected. Default 0 = current behaviour, bit-identical.
+fla's op is marked @torch.compiler.disable, so a compiled model graph-breaks around the loss; SQ73 measures the
+head + loss in isolation and SQ74-style end-to-end timing should confirm before adoption.
+Apply after SQ73 passes: git apply notes/patches/fused-linear-ce.patch
+
+--- a/gogeta/model.py
++++ b/gogeta/model.py
+@@ -55,6 +55,7 @@
+     gdn_neg_eigval: bool = False  # GDN write strength beta in (0, 2) instead of (0, 1): negative eigenvalues (SQ2/E11)
+     ternary: bool = False
+     tie_embeddings: bool = True
++    fused_ce_chunks: int = 0      # > 0: training loss via fla FusedLinearCrossEntropyLoss (no full logits; SQ73)
+ 
+     @property
+     def head_dim(self) -> int:
+@@ -268,6 +269,12 @@
+             x = h
+         for b in self.coda:
+             x = b(x)
++        if targets is not None and self.cfg.fused_ce_chunks > 0 and x.is_cuda:
++            from fla.modules import FusedLinearCrossEntropyLoss
++            h = self.norm_out(x)
++            dt = torch.get_autocast_dtype("cuda") if torch.is_autocast_enabled("cuda") else h.dtype
++            crit = FusedLinearCrossEntropyLoss(num_chunks=self.cfg.fused_ce_chunks)
++            return None, crit(h.to(dt), targets, self.head.weight.to(dt))
+         logits = self.head(self.norm_out(x))
+         if targets is None:
+             return logits, None

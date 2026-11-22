@@ -54,7 +54,9 @@ def main():
         q, k, v, g, beta = inputs(dtype)
         ref = reference(q, k, v, g, beta, scale)
         o_chunk, _ = chunk_gated_delta_rule(q, k, v, g, beta, scale=scale)
-        o_rec, _ = fused_recurrent_gated_delta_rule(q, k, v, g, beta, scale=scale)
+        # fla 0.6.0: fused_recurrent_gated_delta_rule(q, k, v, g=None, gk=None, gv=None, beta=None, ...): the 5th
+        # positional argument is gk (per-key decay), NOT beta. Passing beta positionally caused the 'NaN' of C2.
+        o_rec, _ = fused_recurrent_gated_delta_rule(q, k, v, g=g, beta=beta, scale=scale)
         e1 = (o_chunk.float() - ref).abs().max().item()
         e2 = (o_rec.float() - ref).abs().max().item()
         # backward: compare grads of a random projection of the output
@@ -65,8 +67,8 @@ def main():
                  for a, b in zip(gr, gc))
         # The recurrent kernel is only needed for token-by-token decoding; report it, don't require it.
         with torch.no_grad():
-            o_rec_ng, _ = fused_recurrent_gated_delta_rule(q.detach(), k.detach(), v.detach(), g.detach(),
-                                                           beta.detach(), scale=scale)
+            o_rec_ng, _ = fused_recurrent_gated_delta_rule(q.detach(), k.detach(), v.detach(), g=g.detach(),
+                                                           beta=beta.detach(), scale=scale)
         e3 = (o_rec_ng.float() - ref).abs().max().item()
         good = e1 < tol and ge < 10 * tol
         ok &= good

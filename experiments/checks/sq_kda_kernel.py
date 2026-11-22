@@ -190,7 +190,7 @@ def main():
             # GDN recurrent kernel beside it (claim C2), scalar gate = channel mean
             g_h = g.mean(-1)
             ref_gdn, _ = reference(q, k, v, g_h[..., None].expand(B, T, H, K), beta, scale)
-            o_gdn_rec, _ = fused_recurrent_gated_delta_rule(q, k, v, g_h, beta, scale=scale)
+            o_gdn_rec, _ = fused_recurrent_gated_delta_rule(q, k, v, g=g_h, beta=beta, scale=scale)  # keywords: 5th positional is gk
             # fallback decode path (reported, not part of a criterion): chunk kernels called with T=1 per step,
             # carrying the state. If it works for GDN it is a stopgap for C2 on our existing GDN checkpoints.
             fb = {}
@@ -252,7 +252,7 @@ def main():
             q[:, sl], k[:, sl], v[:, sl], g[:, sl], beta[:, sl], scale=scale, initial_state=S_k,
             output_final_state=True), warmup=5, iters=50)
         sp["gdn_decode_step_ms"] = bench_ms(lambda: fused_recurrent_gated_delta_rule(
-            q[:, sl], k[:, sl], v[:, sl], g_h[:, sl], beta[:, sl], scale=scale, initial_state=S_k,
+            q[:, sl], k[:, sl], v[:, sl], g=g_h[:, sl], beta=beta[:, sl], scale=scale, initial_state=S_k,
             output_final_state=True), warmup=5, iters=50)
     ratio = sp["kda_fwdbwd_ms"] / sp["gdn_fwdbwd_ms"]
     sp["kda_over_gdn_fwdbwd"] = ratio

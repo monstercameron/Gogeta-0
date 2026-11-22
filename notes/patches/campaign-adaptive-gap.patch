@@ -1,0 +1,105 @@
+campaign-adaptive-gap.patch  (notes/hardware-spark.md, proposals P8 + P9; claims C125, C126; check SQ79)
+
+1. tools/launch_campaign.sh: new --cool-to C (default 0 = off, i.e. today's fixed --gap sleep). With --cool-to C
+   the gap after an item ends as soon as the GPU reads < C degrees (polled every 5 s, at least --gap-min s,
+   default 10), and never lasts longer than --gap. Suggested: --gap 180 --cool-to 62. The launcher's own 85/75 C
+   gates are unchanged. Observed on 2026-11-22 (refs/12-hardware/observed/): after a 2-min E10 run at 77 C the
+   GPU read 59.5 C ~15 s later, so most of the fixed 60 s gap was idle time on an already cool GPU.
+2. tools/launch_experiment.sh: every run writes GPU telemetry next to its log (<log>.gpu.csv: time, temperature,
+   utilization, SM clock, power, P-state, throttle reasons; every 10 s, nvidia-smi only), so power capping
+   and clocks are on disk for every result (AGENTS 5: "Long runs should log the GPU temperature").
+3. tools/launch_experiment.sh: TORCHINDUCTOR_CACHE_DIR=$DATA/cache/inductor. The default is
+   /tmp/torchinductor_<user>, and Ubuntu's tmpfiles rules empty /tmp at boot, so every WSL restart recompiled
+   from scratch. (Triton's own cache is already persistent in ~/.triton/cache; fla's autotune results are cached
+   there by default, FLA_CACHE_RESULTS=1.)
+Code paths: apply only as its own tagged version, and never while a campaign is queued.
+Apply: git apply notes/patches/campaign-adaptive-gap.patch
+
+--- a/tools/launch_campaign.sh
++++ b/tools/launch_campaign.sh
+@@ -93,7 +93,9 @@
+ esac
+ 
+ # ----------------------------------------------------------------------------- arguments
+-FILE="" DRY=0 FG=0 RESUME=0 POLL=60 GAP=60 STOPFAIL=0 CHILD=0 STAMP="" CNAME=""
++# --cool-to C: end the post-item gap early once the GPU is < C degrees (0 = off: sleep the full --gap);
++# --gap-min S: shortest gap when --cool-to is on (default 10). --gap stays the longest gap.
++FILE="" DRY=0 FG=0 RESUME=0 POLL=60 GAP=60 STOPFAIL=0 CHILD=0 STAMP="" CNAME="" COOLTO=0 GAPMIN=10
+ while [[ $# -gt 0 ]]; do
+   case "$1" in
+     --dry-run)      DRY=1; shift ;;
+@@ -101,6 +103,8 @@
+     --resume)       RESUME=1; shift ;;
+     --poll)         POLL=${2:-}; shift 2 || die "--poll needs a value" 2 ;;
+     --gap)          GAP=${2:-}; shift 2 || die "--gap needs a value" 2 ;;
++    --cool-to)      COOLTO=${2:-}; shift 2 || die "--cool-to needs a value" 2 ;;
++    --gap-min)      GAPMIN=${2:-}; shift 2 || die "--gap-min needs a value" 2 ;;
+     --stop-on-fail) STOPFAIL=1; shift ;;
+     --_child)       CHILD=1; STAMP=${2:-}; CNAME=${3:-}; shift 3 || die "--_child needs STAMP NAME" 2 ;;   # internal
+     -*)             usage >&2; die "unknown option: $1" 2 ;;
+@@ -109,6 +113,7 @@
+ done
+ [[ -n "$FILE" ]] || { usage >&2; die "missing campaign file" 2; }
+ [[ "$POLL" =~ ^[0-9]+$ && "$GAP" =~ ^[0-9]+$ ]] || die "--poll/--gap must be whole seconds" 2
++[[ "$COOLTO" =~ ^[0-9]+$ && "$GAPMIN" =~ ^[0-9]+$ ]] || die "--cool-to/--gap-min must be whole numbers" 2
+ [[ "$FILE" = /* ]] || FILE="$PWD/$FILE"
+ [[ -f "$FILE" ]] || die "campaign file not found: $FILE"
+ NAME=$(basename "$FILE"); NAME=${NAME%.*}
+@@ -208,7 +213,7 @@
+     echo "campaign=$NAME"; echo "file=$FILE"; echo "snapshot=$SNAP"; echo "log=$LOG"; echo "started=$(date -Is)"
+     echo "git=$(git -C "$REPO" describe --tags --always --dirty 2>/dev/null)"; echo "items=${#ITEMS[@]}"
+   } >"$RUN_DIR/campaign-$NAME.info"
+-  ARGS=("$SNAP" --_child "$STAMP" "$NAME" --poll "$POLL" --gap "$GAP")
++  ARGS=("$SNAP" --_child "$STAMP" "$NAME" --poll "$POLL" --gap "$GAP" --cool-to "$COOLTO" --gap-min "$GAPMIN")
+   (( RESUME )) && ARGS+=(--resume)
+   (( STOPFAIL )) && ARGS+=(--stop-on-fail)
+   if (( FG )); then
+@@ -279,7 +284,19 @@
+     tail -n 6 "$OUT" | sed 's/^/      | /'
+     if (( STOPFAIL )); then log "--stop-on-fail: aborting"; echo 5 >"$RUN_DIR/campaign-$NAME.exit"; exit 5; fi
+   fi
+-  (( i < ${#ITEMS[@]} && GAP > 0 )) && sleep "$GAP"
++  if (( i < ${#ITEMS[@]} && GAP > 0 )); then
++    if (( COOLTO > 0 )) && [[ -n "$NVSMI" ]]; then
++      waited=0
++      while (( waited < GAP )); do
++        t=$("$NVSMI" --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | head -1 | tr -d ' \r')
++        if (( waited >= GAPMIN )) && [[ "$t" =~ ^[0-9.]+$ ]] && awk -v a="$t" -v b="$COOLTO" 'BEGIN { exit !(a < b) }'; then break; fi
++        sleep 5; waited=$((waited + 5))
++      done
++      log "[$i/${#ITEMS[@]}] gap ${waited}s (GPU ${t:-?} C, cool-to ${COOLTO} C, max ${GAP}s)"
++    else
++      sleep "$GAP"
++    fi
++  fi
+ done
+ rc=0; (( NFAILED )) && rc=5
+ log "campaign $NAME finished: ${#ITEMS[@]} item(s), $NFAILED failed"
+--- a/tools/launch_experiment.sh
++++ b/tools/launch_experiment.sh
+@@ -371,7 +371,14 @@
+ printf "pid=%s\nexperiment=%s\nseed=%s\nlog=%s\nstarted=%s\n" "$$" "$GL_EID" "$GL_SEED" "$GL_LOG" "$(date -Is)" >"$GL_LOCK.tmp.$$"
+ mv -f "$GL_LOCK.tmp.$$" "$GL_LOCK"
+ { flock -u 9; exec 9>&-; } 2>/dev/null || true   # slot recorded: let the next launch check it
+-release() { if [ -f "$GL_LOCK" ] && grep -qx "pid=$$" "$GL_LOCK"; then rm -f "$GL_LOCK"; fi; }
++# GPU telemetry beside the training log (nvidia-smi only; stopped when the wrapper exits)
++TELEM=""
++if [ -n "$GL_NVSMI" ]; then
++  "$GL_NVSMI" --query-gpu=timestamp,temperature.gpu,utilization.gpu,clocks.sm,power.draw,pstate,clocks_event_reasons.active \
++    --format=csv -l 10 >"$GL_LOG.gpu.csv" 2>/dev/null </dev/null &
++  TELEM=$!
++fi
++release() { [ -n "$TELEM" ] && kill "$TELEM" 2>/dev/null; if [ -f "$GL_LOCK" ] && grep -qx "pid=$$" "$GL_LOCK"; then rm -f "$GL_LOCK"; fi; }
+ trap release EXIT
+ trap "exit 143" TERM
+ trap "exit 130" INT
+@@ -381,7 +388,9 @@
+ echo "=== $(date -Is) launcher: training exited with code $rc; GPU slot released"
+ exit $rc
+ '
++mkdir -p "$DATA/cache/inductor"
+ LAUNCH_ENV=(env GOGETA_TRACKER=trackio PYTHONUNBUFFERED=1 TRACKIO_DIR="$TRACKIO_EFFECTIVE" GOGETA_DATA="$DATA"
++            TORCHINDUCTOR_CACHE_DIR="$DATA/cache/inductor" GL_NVSMI="$NVSMI"
+             GL_PIDFILE="$PIDFILE" GL_LOCK="$GPU_LOCK" GL_EXITFILE="$EXITFILE"
+             GL_EID="$EID" GL_SEED="$SEED" GL_LOG="$LOG")
+ cd "$REPO" || die "cannot cd to $REPO"

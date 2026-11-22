@@ -1,0 +1,67 @@
+swa-flex-attention.patch  (notes/hardware-spark.md, proposal P3; claims C12, C115; check SQ72)
+
+Opt-in block-sparse sliding window: model config "swa_impl": "flex" runs SWA through torch's flex_attention with
+a sliding-window BlockMask (only the ~3 key blocks a 128-query block can see are computed), instead of SDPA with a
+dense [T, T] bool mask (which forces the non-flash kernel and computes all T^2 scores). Default "mask" keeps every
+existing config bit-identical. torch 2.14.1 ships an sm_12x flex default (bf16, head_dim 64: 128x64 tiles, 2
+stages, 4 warps) that fits the 99 KiB per-block shared-memory limit. Variable-length inference (sample(), T not
+a multiple of 128) falls back to the mask path, so generation never recompiles per token.
+Apply after SQ72 passes: git apply notes/patches/swa-flex-attention.patch ; then register an E1/E2-style A/B
+(one ingredient: SWA kernel) before switching any registered config.
+
+--- a/gogeta/model.py
++++ b/gogeta/model.py
+@@ -49,6 +49,7 @@
+     loops_max: int = 7
+     bptt_loops: int = 4           # backprop through the last k loops only
+     window: int = 256             # sliding-window size
++    swa_impl: str = "mask"        # SWA kernel: "mask" = SDPA + dense bool mask (v0.4 behaviour), "flex" = flex_attention block mask
+     max_seq_len: int = 1024
+     rope_base: float = 10000.0
+     conv_size: int = 4            # GDN short conv
+@@ -84,6 +85,18 @@
+ 
+ 
+ # ----------------------------------------------------------------------------- pieces
++_FLEX = None
++
++
++def _flex_attention():
++    """torch.compile'd flex_attention (eager flex is a slow reference); built on first use."""
++    global _FLEX
++    if _FLEX is None:
++        from torch.nn.attention.flex_attention import flex_attention
++        _FLEX = torch.compile(flex_attention, dynamic=False)
++    return _FLEX
++
++
+ class Rotary(nn.Module):
+     def __init__(self, head_dim: int, max_len: int, base: float):
+         super().__init__()
+@@ -129,6 +142,17 @@
+             self._mask_cache[key] = (d >= 0) & (d < self.window)  # True = attend
+         return self._mask_cache[key]
+ 
++    def _block_mask(self, T: int, device):
++        key = ("flex", T, device)
++        if key not in self._mask_cache:
++            from torch.nn.attention.flex_attention import create_block_mask
++            w = self.window
++
++            def swa(b, h, q_idx, kv_idx):
++                return (q_idx >= kv_idx) & (q_idx - kv_idx < w)
++            self._mask_cache[key] = create_block_mask(swa, B=None, H=None, Q_LEN=T, KV_LEN=T, device=device)
++        return self._mask_cache[key]
++
+     def forward(self, x):
+         B, T, D = x.shape
+         H, hd = self.cfg.n_heads, self.cfg.head_dim
+@@ -136,6 +160,8 @@
+         q, k = self.rope(q), self.rope(k)
+         if self.window is None or self.window >= T:
+             y = F.scaled_dot_product_attention(q, k, v, is_causal=True)
++        elif self.cfg.swa_impl == "flex" and x.is_cuda and T % 128 == 0:
++            y = _flex_attention()(q, k, v, block_mask=self._block_mask(T, x.device))
+         else:
+             y = F.scaled_dot_product_attention(q, k, v, attn_mask=self._mask(T, x.device))
+         return self.o(y.transpose(1, 2).reshape(B, T, D))

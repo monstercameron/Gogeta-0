@@ -1,0 +1,76 @@
+gdn-fused-conv-l2norm.patch  (notes/hardware-spark.md, proposal P5; claim C122; check SQ77)
+
+Opt-in: model config "gdn_fused_kernels": true makes each GDN layer use kernels fla 0.6.0 already ships:
+  * the short causal convs run through fla's Triton causal_conv1d with SiLU fused (one kernel instead of
+    transpose + cuDNN depthwise conv + slice + transpose + SiLU, fwd and bwd), same [C, 1, K] weights, so
+    state_dict keys and checkpoints are unchanged;
+  * q/k L2 normalisation moves inside chunk_gated_delta_rule (use_qk_l2norm_in_kernel=True; eps 1e-6 inside the
+    kernel vs F.normalize's 1e-12 clamp, so numerics differ in the last bits).
+Default false = current behaviour, bit-identical. Apply after SQ77 passes:
+git apply notes/patches/gdn-fused-conv-l2norm.patch
+
+--- a/gogeta/model.py
++++ b/gogeta/model.py
+@@ -41,6 +41,7 @@
+     d_model: int = 384
+     n_heads: int = 6              # attention + GDN heads (head_dim = d_model / n_heads)
+     mlp_hidden: int = 1024        # SwiGLU hidden size
++    gdn_fused_kernels: bool = False  # GDN: fla fused causal conv + in-kernel q/k L2 norm (SQ77); same weights
+     prelude: list = field(default_factory=lambda: ["swa"])
+     core: list = field(default_factory=lambda: ["gdn", "gdn", "swa"])
+     coda: list = field(default_factory=lambda: ["attn"])
+@@ -144,11 +145,15 @@
+ class ShortConv(nn.Module):
+     """Causal depthwise conv over time + SiLU."""
+ 
+-    def __init__(self, channels: int, k: int):
++    def __init__(self, channels: int, k: int, fused: bool = False):
+         super().__init__()
+         self.conv = nn.Conv1d(channels, channels, k, groups=channels, padding=k - 1, bias=False)
++        self.fused = fused
+ 
+     def forward(self, x):  # [B,T,C]
++        if self.fused and x.is_cuda:
++            from fla.modules.causal_conv1d import causal_conv1d
++            return causal_conv1d(x=x, weight=self.conv.weight.squeeze(1).to(x.dtype), activation="silu")[0]
+         T = x.shape[1]
+         return F.silu(self.conv(x.transpose(1, 2))[..., :T].transpose(1, 2))
+ 
+@@ -169,7 +174,8 @@
+         self.o.is_residual_out = True
+         self.a = nn.Linear(D, H, bias=False)       # decay input (full precision)
+         self.b = nn.Linear(D, H, bias=False)       # write strength beta (full precision)
+-        self.conv_q, self.conv_k, self.conv_v = (ShortConv(H * hd, cfg.conv_size) for _ in range(3))
++        self.fused = cfg.gdn_fused_kernels
++        self.conv_q, self.conv_k, self.conv_v = (ShortConv(H * hd, cfg.conv_size, self.fused) for _ in range(3))
+         # Mamba-2 style decay: g = -exp(A_log) * softplus(a(x) + dt_bias)
+         A = torch.empty(H).uniform_(1, 16)
+         self.A_log = nn.Parameter(torch.log(A))
+@@ -183,18 +189,23 @@
+     def forward(self, x):
+         B, T, _ = x.shape
+         H, hd = self.H, self.hd
+-        q = F.normalize(self.conv_q(self.q(x)).view(B, T, H, hd), dim=-1)
+-        k = F.normalize(self.conv_k(self.k(x)).view(B, T, H, hd), dim=-1)
++        l2_in_kernel = self.fused and x.is_cuda
++        q = self.conv_q(self.q(x)).view(B, T, H, hd)
++        k = self.conv_k(self.k(x)).view(B, T, H, hd)
++        if not l2_in_kernel:
++            q, k = F.normalize(q, dim=-1), F.normalize(k, dim=-1)
+         v = self.conv_v(self.v(x)).view(B, T, H, hd)
+         g = -self.A_log.float().exp() * F.softplus(self.a(x).float() + self.dt_bias.float())
+         dtype = torch.bfloat16 if x.is_cuda else x.dtype
+         if self.neg_eigval:
+             raw = self.b(x).float()  # logits; the kernel applies 2*sigmoid
+             o, _ = self._kernel(q.to(dtype), k.to(dtype), v.to(dtype), g, raw.to(dtype), scale=hd ** -0.5,
+-                                use_beta_sigmoid_in_kernel=True, allow_neg_eigval=True)
++                                use_beta_sigmoid_in_kernel=True, allow_neg_eigval=True,
++                                use_qk_l2norm_in_kernel=l2_in_kernel)
+         else:
+             beta = torch.sigmoid(self.b(x).float())
+-            o, _ = self._kernel(q.to(dtype), k.to(dtype), v.to(dtype), g, beta.to(dtype), scale=hd ** -0.5)
++            o, _ = self._kernel(q.to(dtype), k.to(dtype), v.to(dtype), g, beta.to(dtype), scale=hd ** -0.5,
++                                use_qk_l2norm_in_kernel=l2_in_kernel)
+         o = self.out_norm(o.to(x.dtype)) * F.silu(self.gate(x).view(B, T, H, hd))
+         return self.o(o.reshape(B, T, H * hd))
+ 

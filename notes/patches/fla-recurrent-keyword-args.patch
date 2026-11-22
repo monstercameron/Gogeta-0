@@ -1,0 +1,44 @@
+fla-recurrent-keyword-args.patch  (notes/hardware-spark.md, proposal P1; claims C2, C110, C111; check SQ70)
+
+fla 0.6.0's signature is fused_recurrent_gated_delta_rule(q, k, v, g=None, gk=None, gv=None, beta=None, scale=...),
+so the positional call (q, k, v, g, beta) passes beta as `gk` (per-key log decay [B,T,H,K]) and leaves beta=None
+(ones). That is the "NaN on this GPU" of C2. Pass g and beta by keyword, and make the recurrent kernel part of
+the pass criterion. Apply only after SQ70 (experiments/checks/sq_hw_fla_recurrent.py) confirms; code path, so
+its own tagged version, and not while a campaign is queued.
+Also needed (not in this patch: experiments/checks/sq_kda_kernel.py line ~193 has the same positional call for
+the GDN re-run):  fused_recurrent_gated_delta_rule(q, k, v, g=g_h, beta=beta, scale=scale)
+Apply: git apply notes/patches/fla-recurrent-keyword-args.patch
+
+--- a/tests/test_gdn_kernels.py
++++ b/tests/test_gdn_kernels.py
+@@ -54,7 +54,8 @@
+         q, k, v, g, beta = inputs(dtype)
+         ref = reference(q, k, v, g, beta, scale)
+         o_chunk, _ = chunk_gated_delta_rule(q, k, v, g, beta, scale=scale)
+-        o_rec, _ = fused_recurrent_gated_delta_rule(q, k, v, g, beta, scale=scale)
++        # g and beta by keyword: the 5th positional parameter of the recurrent kernel is `gk`, not `beta`
++        o_rec, _ = fused_recurrent_gated_delta_rule(q, k, v, g=g, beta=beta, scale=scale)
+         e1 = (o_chunk.float() - ref).abs().max().item()
+         e2 = (o_rec.float() - ref).abs().max().item()
+         # backward: compare grads of a random projection of the output
+@@ -63,15 +64,15 @@
+         gc = torch.autograd.grad((o_chunk.float() * w).sum(), (q, k, v, g, beta))
+         ge = max((a.float() - b.float()).abs().max().item() / (a.float().abs().max().item() + 1e-6)
+                  for a, b in zip(gr, gc))
+-        # The recurrent kernel is only needed for token-by-token decoding; report it, don't require it.
++        # The recurrent kernel is the token-by-token decoding path (C111): required since SQ70.
+         with torch.no_grad():
+-            o_rec_ng, _ = fused_recurrent_gated_delta_rule(q.detach(), k.detach(), v.detach(), g.detach(),
+-                                                           beta.detach(), scale=scale)
++            o_rec_ng, _ = fused_recurrent_gated_delta_rule(q.detach(), k.detach(), v.detach(), g=g.detach(),
++                                                           beta=beta.detach(), scale=scale)
+         e3 = (o_rec_ng.float() - ref).abs().max().item()
+-        good = e1 < tol and ge < 10 * tol
++        good = e1 < tol and ge < 10 * tol and e2 < tol and e3 < tol
+         ok &= good
+         print(f"{str(dtype):15s} CHUNK fwd max|chunk-ref|={e1:.2e} bwd max rel grad err={ge:.2e} "
+-              f"-> {'OK' if good else 'MISMATCH'} | recurrent (info): grad-mode {e2:.2e}, no-grad {e3:.2e}")
++              f"-> {'OK' if good else 'MISMATCH'} | recurrent: grad-mode {e2:.2e}, no-grad {e3:.2e}")
+ 
+     # speed: chunk kernel at training-like size
+     q, k, v, g, beta = inputs(torch.bfloat16)

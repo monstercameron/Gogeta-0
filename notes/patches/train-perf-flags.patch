@@ -1,0 +1,152 @@
+train-perf-flags.patch  (notes/hardware-spark.md, proposals P6 + P7; claims C118, C124; checks SQ74, SQ78)
+
+Two independent, opt-in training flags (defaults keep every run bit-identical), plus launcher/campaign passthrough:
+  --compile-mode M   torch.compile mode: default | max-autotune | max-autotune-no-cudagraphs | reduce-overhead.
+                     Recorded in the run config ("compile_mode"). Adopt a non-default mode only if SQ74 shows
+                     >= 8% at matched loss.
+  --data-on-gpu      keep train.bin on the GPU as int32 (~1.05 GB of the 96 GiB carve-out) and gather batches
+                     there. The CPU generator draws the same start indices, so batches are bit-identical to the
+                     current path (SQ78 checks this); removes the per-step numpy gather, int64 cast,
+                     pin_memory() and host->device copy (pinned memory is "limited" under WSL).
+                     Recorded in the run config ("data_on_gpu").
+Campaign lines may use both: E1 --seed 0 --compile-mode max-autotune-no-cudagraphs --data-on-gpu
+Code paths: apply only as its own tagged version, and never while a campaign is queued (require-clean).
+Apply: git apply notes/patches/train-perf-flags.patch
+
+--- a/gogeta/train.py
++++ b/gogeta/train.py
+@@ -43,7 +43,7 @@
+ 
+ # ----------------------------------------------------------------------------- data
+ class TokenData:
+-    def __init__(self, name: str, seq_len: int, seed: int):
++    def __init__(self, name: str, seq_len: int, seed: int, on_gpu: bool = False):
+         d = DATA / "datasets" / name
+         self.meta = json.loads((d / "meta.json").read_text())
+         self.train = np.memmap(d / "train.bin", dtype=np.uint16, mode="r")
+@@ -51,9 +51,17 @@
+         self.T = seq_len
+         self.g = torch.Generator().manual_seed(seed)
+         self.chars_per_token = self.meta["splits"]["train"]["chars_per_token"]
++        self.gpu_train = None
++        if on_gpu:  # int32 holds every uint16 token id exactly; ~4 bytes/token on the GPU
++            self.gpu_train = torch.from_numpy(np.asarray(self.train).astype(np.int32)).to("cuda")
++            self._offs = torch.arange(seq_len + 1, device="cuda")
+ 
+     def batch(self, B: int, device: str):
+-        ix = torch.randint(len(self.train) - self.T - 1, (B,), generator=self.g).tolist()
++        ix = torch.randint(len(self.train) - self.T - 1, (B,), generator=self.g)
++        if self.gpu_train is not None:  # same draws as below -> bit-identical batches
++            t = self.gpu_train[ix.to(self.gpu_train.device)[:, None] + self._offs].long()
++            return t[:, :-1].contiguous(), t[:, 1:].contiguous()
++        ix = ix.tolist()
+         buf = np.stack([self.train[i:i + self.T + 1] for i in ix]).astype(np.int64)
+         t = torch.from_numpy(buf).pin_memory().to(device, non_blocking=True)
+         return t[:, :-1].contiguous(), t[:, 1:].contiguous()
+@@ -178,6 +186,11 @@
+     ap.add_argument("--lr", type=float, help="override train.lr (peak LR; recorded in the run config)")
+     ap.add_argument("--require-clean", action="store_true", help="refuse to run with uncommitted changes")
+     ap.add_argument("--compile", action="store_true", help="torch.compile the model")
++    ap.add_argument("--compile-mode", default="default",
++                    choices=["default", "max-autotune", "max-autotune-no-cudagraphs", "reduce-overhead"],
++                    help="torch.compile mode (with --compile); recorded in the run config")
++    ap.add_argument("--data-on-gpu", action="store_true",
++                    help="keep train.bin on the GPU and gather batches there (bit-identical batches)")
+     ap.add_argument("--bench", type=int, default=0, help="only time N steps, no tracking/eval/ckpt")
+     args = ap.parse_args()
+ 
+@@ -197,10 +210,11 @@
+     torch.manual_seed(tc["seed"])
+     torch.backends.cuda.matmul.allow_tf32 = True
+ 
+-    data = TokenData(tc["dataset"], tc["seq_len"], tc["seed"])
++    data = TokenData(tc["dataset"], tc["seq_len"], tc["seed"], on_gpu=args.data_on_gpu)
+     model, mc = build_model(cfg, data.meta["vocab_size"], tc["seq_len"])
+     model = model.to(device)
+-    fwd_model = torch.compile(model) if args.compile else model
++    mode = None if args.compile_mode == "default" else args.compile_mode
++    fwd_model = torch.compile(model, mode=mode) if args.compile else model
+     pc = model.param_counts()
+     looped = len(model.core) > 0
+     loop_rng = random.Random(tc["seed"] + 1)
+@@ -221,7 +235,8 @@
+         run_cfg = {"config_file": str(cfg_path.relative_to(ROOT)), "arch": arch, "cli_overrides": overrides,
+                    "model": mc.to_dict(), "train": tc,
+                    "params": pc, "flops_per_token_at_default_loops": model.flops_per_token(tc["seq_len"]),
+-                   "compile": args.compile, "dataset_meta": {k: data.meta[k] for k in ("name", "source", "vocab_size")}}
++                   "compile": args.compile, "compile_mode": args.compile_mode,
++                   "data_on_gpu": args.data_on_gpu, "dataset_meta": {k: data.meta[k] for k in ("name", "source", "vocab_size")}}
+         run = Run(cfg["experiment"], config=run_cfg, seed=tc["seed"], require_clean=args.require_clean)
+         print(f"run: {run.name}", flush=True)
+ 
+--- a/tools/launch_experiment.sh
++++ b/tools/launch_experiment.sh
+@@ -3,6 +3,7 @@
+ #
+ #   bash tools/launch_experiment.sh <EXPERIMENT_ID> [--seed N] [--dry-run] [--foreground]
+ #                                   [--no-compile] [--max-tokens N] [--lr X] [--wait-cool]
++#                                   [--compile-mode M] [--data-on-gpu]
+ #
+ # What it does:
+ #   1. Looks up the experiment's config in experiments/experiments.json (fails if none).
+@@ -24,6 +25,9 @@
+ #   --lr X          override train.lr, the peak learning rate (K7 sweeps, tuned-LR runs); the run
+ #                   config records it (train.lr and cli_overrides)
+ #   --wait-cool     if the GPU is >= 85 C, poll until it is < 75 C instead of refusing
++#   --compile-mode M  torch.compile mode (default | max-autotune | max-autotune-no-cudagraphs |
++#                   reduce-overhead); recorded in the run config
++#   --data-on-gpu   keep the training tokens on the GPU (bit-identical batches; recorded)
+ #
+ # Files ($DATA = $GOGETA_DATA, default ~/fusiondance-data):
+ #   log       $DATA/logs/<EID>-s<seed>-<timestamp>.log
+@@ -52,7 +56,7 @@
+ die() { echo "launch_experiment: $1" >&2; exit "${2:-1}"; }
+ 
+ # ----------------------------------------------------------------------------- arguments
+-EID="" SEED="" SEED_GIVEN=0 DRY=0 FG=0 COMPILE=1 MAXTOK="" LR="" WAITCOOL=0
++EID="" SEED="" SEED_GIVEN=0 DRY=0 FG=0 COMPILE=1 MAXTOK="" LR="" WAITCOOL=0 COMPMODE="" DATAGPU=0
+ while [[ $# -gt 0 ]]; do
+   case "$1" in
+     --seed)       SEED=${2:-}; SEED_GIVEN=1; shift 2 || die "--seed needs a value" 2 ;;
+@@ -62,6 +66,8 @@
+     --foreground) FG=1; shift ;;
+     --no-compile) COMPILE=0; shift ;;
+     --wait-cool)  WAITCOOL=1; shift ;;
++    --compile-mode) COMPMODE=${2:-}; shift 2 || die "--compile-mode needs a value" 2 ;;
++    --data-on-gpu)  DATAGPU=1; shift ;;
+     -h|--help)    usage; exit 0 ;;
+     -*)           usage >&2; die "unknown option: $1" 2 ;;
+     *)            [[ -z "$EID" ]] || die "unexpected argument: $1" 2; EID=$1; shift ;;
+@@ -72,6 +78,7 @@
+ [[ "$EID" =~ ^E[0-9]+$ ]] || die "experiment id must look like E3, got: $EID" 2
+ [[ -z "$SEED" || "$SEED" =~ ^[0-9]+$ ]] || die "--seed must be a non-negative integer" 2
+ [[ -z "$MAXTOK" || "$MAXTOK" =~ ^[1-9][0-9]*$ ]] || die "--max-tokens must be a positive integer" 2
++[[ -z "$COMPMODE" || "$COMPMODE" =~ ^(default|max-autotune|max-autotune-no-cudagraphs|reduce-overhead)$ ]] || die "--compile-mode must be default|max-autotune|max-autotune-no-cudagraphs|reduce-overhead" 2
+ [[ -z "$LR" || "$LR" =~ ^([0-9]+\.?[0-9]*|\.[0-9]+)([eE][-+]?[0-9]+)?$ ]] || die "--lr must be a positive number, e.g. 2e-3" 2
+ 
+ # ----------------------------------------------------------------------------- registry lookup
+@@ -127,6 +134,8 @@
+ 
+ CMD=("$PY" -m gogeta.train --config "$CONFIG")
+ (( COMPILE )) && CMD+=(--compile)
++[[ -n "$COMPMODE" ]] && CMD+=(--compile-mode "$COMPMODE")
++(( DATAGPU )) && CMD+=(--data-on-gpu)
+ CMD+=(--require-clean)
+ (( SEED_GIVEN )) && CMD+=(--seed "$SEED")
+ [[ -n "$MAXTOK" ]] && CMD+=(--max-tokens "$MAXTOK")
+--- a/tools/launch_campaign.sh
++++ b/tools/launch_campaign.sh
+@@ -131,10 +131,10 @@
+     i=1
+     while (( i < ${#t[@]} )); do
+       case "${t[$i]}" in
+-        --seed|--lr|--max-tokens) (( i + 1 < ${#t[@]} )) || die "$src line $n: ${t[$i]} needs a value" 2
++        --seed|--lr|--max-tokens|--compile-mode) (( i + 1 < ${#t[@]} )) || die "$src line $n: ${t[$i]} needs a value" 2
+                                   i=$((i + 2)) ;;
+-        --no-compile)             i=$((i + 1)) ;;
+-        *) die "$src line $n: option ${t[$i]} not allowed in a campaign (allowed: --seed --lr --max-tokens --no-compile)" 2 ;;
++        --no-compile|--data-on-gpu) i=$((i + 1)) ;;
++        *) die "$src line $n: option ${t[$i]} not allowed in a campaign (allowed: --seed --lr --max-tokens --no-compile --compile-mode --data-on-gpu)" 2 ;;
+       esac
+     done
+     if [[ " $line " == *" --lr "* ]] && ! grep -q -- '--lr)' "$LAUNCHER"; then

@@ -17,6 +17,43 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.27: Hardware research registered; the C2 'NaN' was our call
+*2026-11-22*
+
+### Hardware research: NVIDIA RTX Spark N1X (registered, nothing run on the GPU)
+**What**: a subagent researched the GPU and the main agent reviewed it.
+- **`notes/hardware-spark.md`**: a spec table for the N1X vs GB10, with confidence labels.
+  - 48 SMs, 6,144 cores, CC 12.1. 5th-gen tensor cores; there is **no wgmma and no tcgen05**, and sm_120 binaries run on 12.1.
+  - LPDDR5X, 300 GB/s, coherent over NVLink-C2C. Windows reserves 96 GiB; WSL sees about 14 GB of RAM. Observed 35–56 W under training.
+  - Dense BF16 is about 98–118 TFLOP/s *if* the tensor cores run at full rate. Our measured 72.1 is 61–73% of that; SQ71 settles it.
+- **Roofline**:
+  - E0 reaches 20.3 TFLOP/s, E1 9.1 and E2 8.5 (28%, 13% and 12% of the measured peak).
+  - Training is **memory-bandwidth / elementwise-bound**: about 160 FLOP/byte for E0, below the ridge of about 290. Batch-1 decoding is launch-bound.
+  - So FP8, int8 or ternary kernels can't buy much at our shapes.
+  - This is an estimate until SQ75 profiles it.
+- **Ranked, opt-in patches** in `notes/patches/` (defaults identical; they apply alone and together):
+  - P1: fla keyword fix;
+  - P8: temperature-aware campaign gap plus a persistent inductor cache (K7-type campaigns ~20–25% shorter);
+  - P5: fused GDN conv + q/k norm (E1/E2 +5–20%);
+  - P4: fused linear cross-entropy;
+  - P3: flex-attention sliding window (fixes C12);
+  - P6/P7: compile mode, data kept on the GPU.
+
+  They're applied one at a time, each checked by its own SQ, between campaigns.
+- **Checks:** 10 GPU check scripts `experiments/checks/sq_hw_*.py`, with PREDICTION and CRITERION written before any run. They're registered by this version (queue item HW-REG) and queued as SQ70–SQ78; SQ79 is CPU.
+- **Ledger and queue:** C110–C129 and the queue items were appended before v0.4.26 was cut, so they went into that commit; they're recorded here. The side-quest rows SQ70–SQ83 are in this version.
+- **References:** 14 NVIDIA documents (62.6 MiB, PDFs git-ignored) are listed with URL, size, sha256 and reason in `refs/12-hardware/SOURCES.md`. Observed `nvidia-smi` readings are in `refs/12-hardware/observed/`, with UUIDs redacted (checked).
+- **Needs the human (parked):** Windows "Best performance" power mode (P10/SQ82); optionally install torchao (SQ83).
+
+### C2 corrected: the recurrent-kernel "NaN" was our bug
+fla 0.6.0's signature is `fused_recurrent_gated_delta_rule(q, k, v, g=None, gk=None, gv=None, beta=None, scale=...)`. The main agent read this in the installed source. `tests/test_gdn_kernels.py` called it positionally as `(q, k, v, g, beta, scale=)`, so **beta was passed as `gk`** (a per-key log decay) and the real beta defaulted to ones. The chunk kernel's 5th argument *is* beta, which is why that test passed.
+- The test and `sq_kda_kernel.py` (SQ50) now use keyword arguments.
+- **C2: REFUTED → UNVERIFIED** (the old verdict is withdrawn, because the test was invalid). SQ70 re-tests it.
+- If SQ70 passes, existing GDN checkpoints get a decode path, which unblocks SQ53, C19, C84 and E8.
+- The `notes/patches/fla-recurrent-keyword-args.patch` fix is applied directly to the test here.
+
+---
+
 ## v0.4.26: K7 done: tuned LRs E10 3e-3, E1 6e-3; Phase 2b campaign written
 *2026-11-22*
 

@@ -151,6 +151,43 @@ PAPERS = {
         ("2404.19756", "KAN",
          "Learnable univariate edge functions (splines); the 'learnable activation' extreme; parameter/compute heavy"),
     ]),
+    "14-byte-level": ("Byte-level / tokenizer-free LMs (notes: notes/research-byte-level.md, notes/research-byte-level-2025-26.md)", [
+        # --- foundational (pre-2025) ---
+        ("2105.13626", "ByT5", "2021: T5 on raw bytes; the 'robust but slow' baseline every later byte paper cites"),
+        ("2103.06874", "CANINE", "2021: char-level encoder, downsample -> deep stack -> upsample; the pooled-hierarchy idea"),
+        ("2106.12672", "Charformer", "2021: GBST, learned soft block pooling over bytes; early learned-chunking precedent"),
+        ("2305.07185", "MegaByte", "2023: fixed patches, global/local split, FLOP formulas, init std 0.006; basis of our BLT-lite (SQ181)"),
+        ("2401.13660", "MambaByte", "2024: Mamba SSM on raw bytes, Code bpb 0.396; closest precedent for GDN-on-bytes (SQ180); byte speculative decoding"),
+        ("2404.14408", "SpaceByte", "2024: rule-based patches after space-like bytes; fixed-patch ablation; cleanest matched-FLOPs byte vs subword table (SQ184)"),
+        ("2412.09871", "BLT (Byte Latent Transformer)", "2024-12: entropy patching, local enc/dec + latent core, hash n-grams; 8B/4T bytes; HumanEval/MBPP"),
+        ("2402.19155", "bGPT", "2024: next-byte prediction across file types; low priority"),
+        # --- 2025 ---
+        ("2502.14553", "MBLM (Multiscale Byte LM)", "2025-02: model-agnostic hierarchical byte decoder stack with Transformer and Mamba blocks; hybrids best on long byte sequences"),
+        ("2506.14761", "AU-Net", "2025-06: autoregressive U-Net, bytes -> words -> word pairs -> 4 words; shallow hierarchies tie BPE"),
+        ("2506.14123", "Byte-wise sampling from a BPE LM", "2025-06: BPE LM -> byte distribution; token-boundary misalignment (matters for code)"),
+        ("2507.07955", "H-Net (Dynamic Chunking)", "2025-07: learned chunking in a recursive U-Net with Mamba-2 outer layers; GitHub 0.316 vs 0.338 bpb; ICLR 2026"),
+        ("2508.05628", "H-Net++", "2025-08: H-Net for Persian; 1.9M-param cross-chunk mixer, staged sequence-length curriculum; small-data regime (1.4B tokens)"),
+        ("2511.11346", "MTPC (multi-byte prediction, prob. circuits)", "2025-11: retrofits EvaByte / byteified Llama for multi-byte speculative decoding; byte decode-speed lever"),
+        ("2512.15586", "Bolmo", "2025-12: byteify pretrained subword LMs (1B/7B) in <1% of pretraining cost; byte models do not have to be trained from scratch"),
+        # --- 2026 ---
+        ("2601.22805", "SOMBRERO", "2026-01: boundary-enrichment metric + confidence-alignment loss for learned patch boundaries (1B, code+math+text)"),
+        ("2602.04289", "Proxy Compression", "2026-02: joint raw-byte + compressed-view training, raw bytes at inference; code LM, 0.5B-14B; tokenizer leads below ~4B"),
+        ("2603.03583", "ByteFlow Net", "2026-03: coding-rate chunking with static-graph Top-K boundaries; sliding-window attn + Canon layers, 0.6B/1.3B; beats BPE Llama"),
+        ("2603.15953", "T-Free HAT", "2026-03: byte enc -> word backbone -> byte dec, 7B from scratch + Llama retrofits; word-boundary patching"),
+        ("2604.27263", "Decoupling Subword Benefits (byte simulation)", "2026-04: why subword beats bytes: training throughput (patch-4 warm-up) + boundary priors, not vocab size; 68M and 1.7B"),
+        ("2605.01188", "Compute Optimal Tokenization", "2026-05: 988 BLT models 50M-7B; params scale with bytes not tokens; optimal compression rate falls with compute"),
+        ("2605.08044", "Fast BLT", "2026-05: BLT-D diffusion / self-speculation, >50% lower decode memory-bandwidth cost"),
+        ("2605.09630", "Scratchpad Patching", "2026-05: fixes patch lag with entropy-triggered scratchpads; fixed-p vs entropy vs SpaceByte vs H-Net on code, ~2B/400B bytes"),
+        ("2605.12928", "Efficiency Gap in Byte Modeling", "2026-05: compute-matched byte vs BPE, 48M-1.2B, AR gap shrinks with scale (7.9x at 1.0 bpb, 2.3x at 0.8); counter-evidence at small scale"),
+        ("2605.30080", "ATDC (Adaptive Targeted Dynamic Chunking)", "2026-05: curriculum on H-Net compression ratio (low -> high) stabilises chunk learning; FineWeb-Edu 100B"),
+        ("2608.15454", "Dynamic Multi-Byte Prediction (MBP)", "2026-08: variable-length multi-byte decode aligned to latent segments of a hierarchical LM; no extra params"),
+        ("2609.12303", "Breaking the Token Ceiling", "2026-09: 1B byte vs token overtraining to 1T bytes; token wins at low FLOPs, byte overtakes later; distillation via byte logits"),
+        ("2610.05978", "Byte LMs: Scaling, Emergent Abstractions", "2026-10: plain byte Transformers + token-superposition + hash embeddings beat subword with scale; 3.4x speculative acceptance"),
+        ("2610.11790", "Boundary dependence vs entropy patching", "2026-10: BLT entropy rule misses computed values at tight budgets; loss-change boundary signal; from-scratch 1M-50M byte models"),
+        ("2610.22100", "Entropy patching skips computed values", "2026-10: companion; two-byte lookup-table patcher beats entropy at 50M; tiny-scale (1M-50M) patching evidence"),
+        ("2611.04215", "Tokenizer Myths", "2026-11: BPB is NOT tokenizer-agnostic for untrained/real models; caution for our byte-vs-BPE bits/char comparisons"),
+        ("2611.13607", "One Byte, One Token (27B byteified)", "2026-11: Qwen3.8-27B (GDN + full attn hybrid) to vocab-384 pure byte model, no patching; 3-5x less output per step"),
+    ]),
 }
 # Note (2026-11-22): no Qwen4 paper exists on arXiv (title search "Qwen4" returned nothing); Qwen3.8-Flash-Next is
 # Alibaba's announced Qwen4 architecture preview. Re-check and add Qwen4 here when an official report appears.

@@ -17,6 +17,23 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.57: Byte-level refs (32 papers, 2025-26 survey); quick review 18:57 triaged
+*2026-11-22*
+
+### Byte-level literature, 2025–2026 (the human's request)
+**What**: refs section **`14-byte-level`** in `refs/fetch_refs.py` holds **32 papers, each verified against the arXiv API** (title and date match): 8 foundational (ByT5, CANINE, Charformer, MegaByte, MambaByte, SpaceByte, BLT, bGPT) and 24 from 2025–26. 32 PDFs were downloaded (33.2 MB, git-ignored); `refs/README.md` was regenerated. The survey and its impact on SQ180–SQ189 are in `notes/research-byte-level-2025-26.md`. Numbers are from abstracts and HTML summaries, labelled "reported".
+**Design changes folded into the side quests**:
+- per-position loss within each patch (patch lag);
+- a patch sweep up to 16;
+- fixed-shape top-K dynamic boundaries (ByteFlow Net);
+- **bytes are expected to lose at our scale** (the tokenizer leads below ~4B on code), with a cheapest rescue arm.
+
+Also: bpb isn't tokenizer-agnostic for raw training loss, and entropy patching has a blind spot at our scale. No paper combines ternary weights with bytes.
+### Quick review 18:57 (ML theorist, Codex GPT-6 Luna)
+**SQ195**, the loop-map Jacobian gain: power iterations on E2 activations at r = 4/8. Norm growth (K6) alone doesn't show local instability. It informs the loop fixes but doesn't hard-gate them.
+
+---
+
 ## v0.4.56: Run report forms (final): every finished run has a form, filled by an agent through the cockpit MCP
 *2026-11-22*
 

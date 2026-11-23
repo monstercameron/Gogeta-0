@@ -338,13 +338,17 @@ class FusionDance(nn.Module):
             nn.init.normal_(self.adapt_down, std=0.02)
 
     # ------------------------------------------------------------------ forward
-    def forward(self, idx: torch.Tensor, targets: torch.Tensor | None = None, loops: int | None = None,
-                return_aux: bool = False):
+    def forward(self, idx: torch.Tensor | None, targets: torch.Tensor | None = None, loops: int | None = None,
+                return_aux: bool = False, inputs_embeds: torch.Tensor | None = None, return_hidden: bool = False):
         """(logits, loss) with loss = LM cross-entropy only. With MoE on and return_aux=True, returns
         (logits, loss, aux) where aux["loss"] is the weighted MoE auxiliary loss that the trainer adds to the LM
-        loss (gogeta.train.forward_backward), plus detached routing diagnostics (gogeta.moe.combine_aux)."""
+        loss (gogeta.train.forward_backward), plus detached routing diagnostics (gogeta.moe.combine_aux).
+
+        Hooks for the full stack (v0.5.12): `inputs_embeds` [B,T,d] replaces the token embedding (a coarse-to-fine byte
+        front end feeds patch embeddings), and `return_hidden=True` returns the final hidden state after norm_out
+        ([B,T,d]) instead of (logits, loss) (a byte decoder reads it). Defaults are unchanged."""
         aux = [] if self.cfg.moe_experts else None
-        x = self.embed(idx)
+        x = self.embed(idx) if inputs_embeds is None else inputs_embeds
         for b in self.prelude:
             x = b(x, aux)
         if self.core:
@@ -368,6 +372,9 @@ class FusionDance(nn.Module):
             x = h
         for b in self.coda:
             x = b(x, aux)
+        if return_hidden:
+            hid = self.norm_out(x)
+            return (hid, self.moe_aux(aux) if aux else None) if return_aux else hid
         logits = self.head(self.norm_out(x))
         loss = None
         if targets is not None:

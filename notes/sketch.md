@@ -88,6 +88,15 @@ The nice part is that looping costs extra compute and BitNet makes compute cheap
 
 - **2026-11-23 (v0.5.10), human decision:** "I want all the parts assembled and their issues designed around or fixed!" Every ingredient (GDN mixer, shared loops, ternary, MoE) stays in the model, and each cost is designed around instead of dropping the ingredient. This supersedes A2 amendment 2's loop go/no-go default. A3 tests the fixes: a ternary MoE core for the loops' unique-parameter deficit, and full-precision mixers or FFN to locate and remove ternary's cost.
 
+- **2026-11-23 (v0.5.12), human decision:** "I mean everything, ssm + sliding windows + loops + coarse to fine + bitnet + MoE + speculative decode". The target is ONE model with every component:
+  - GDN (the SSM-family mixer) + SWA + full-attention blocks;
+  - a shared loop with contractive injection;
+  - BitNet ternary with full-precision ends/mixers as fixed by A3;
+  - a ternary MoE core;
+  - a coarse-to-fine byte front/back end (bytes -> patches -> this backbone -> shared-weight byte refinement loop);
+  - lossless self-speculative decoding (draft with fewer loop passes, verify with full).
+  Build plan: two builder subagents in parallel on disjoint new files (`gogeta/decode.py` for cached inference and self-speculative decoding; `gogeta/c2f.py` for the byte front/back end around `FusionDance`), using new `inputs_embeds` / `return_hidden` hooks in `FusionDance.forward`. A4 trains the full stack once A3 picks the backbone.
+
 ## Status (2026-11-23, v0.5.7)
 
 - Phase: assembly (v0.5.0 onward). A1 (E62, exploratory, seeds 0-1, 200M code-py-v2, all vs E27), from v0.5.4: ternary in the core only -8.3%, fixed r = 4 -5.2%, 6x2 loop shape -11.6% (a parameter-changed arm, not a compensation), contractive injection -1.6% (marginal). v0.5.5: every winner still beats E27 at equal wall-clock. None of the winners' effects fell inside its registered range, except A1c's.

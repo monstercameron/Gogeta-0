@@ -140,3 +140,14 @@ def test_ternary_scope_mixer_vs_ffn():
         assert not any(isinstance(x, BitLinear) for x in b.mlp.modules())
     d = ModelConfig(**BASE).to_dict()
     assert "ternary_mixer" not in d and "ternary_ffn" not in d and "moe_core_only" not in d
+
+
+def test_inputs_embeds_and_return_hidden_hooks():
+    m = build()
+    x = torch.randint(0, 97, (2, 16))
+    with torch.no_grad():
+        a = m(x)[0]
+        b = m(None, inputs_embeds=m.embed(x))[0]
+        h = m(x, return_hidden=True)
+    assert torch.equal(a, b)
+    assert h.shape == (2, 16, 32) and torch.allclose(m.head(h), a)

@@ -18,6 +18,26 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.12: Full stack (everything): FusionDance hooks for coarse-to-fine; builders start c2f + self-speculative decoding
+*2026-11-23*
+
+**Human: "I mean everything: ssm + sliding windows + loops + coarse to fine + bitnet + MoE + speculative decode". The full-stack build starts.**
+
+| Component | Status |
+|---|---|
+| SSM-family mixer (Gated DeltaNet) + sliding-window + full attention | in the assembled model (A2/A3) |
+| Shared loop (6-block core x 2, contractive injection, fixed r) | in |
+| BitNet ternary (core; full-precision ends; mixer/FFN scope under test in A3) | in |
+| MoE (ternary experts in the shared core) | in A3m/A3mx, training now |
+| Coarse-to-fine (bytes -> patches -> backbone -> shared-weight byte refinement loop) | builder subagent writing `gogeta/c2f.py` around the real `FusionDance` (the older `model_bytes.py` carries a stale forked copy) |
+| Lossless self-speculative decoding (draft = fewer loop passes, verify = full) | builder subagent writing `gogeta/decode.py`: KV/SWA/GDN-state caches per (pass, block), parallel k-token verification, a greedy-losslessness test, and an acceptance-rate bench on a 200M A2s checkpoint |
+
+- **Code:** `FusionDance.forward` gains `inputs_embeds` (a byte front end feeds patch embeddings) and `return_hidden` (a byte decoder reads the normalised hidden state). Defaults are unchanged (`tests/test_assembly.py` 13/13, `tests.test_moe` OK).
+- **Plan:** A3 (training now) picks the backbone. A4 trains the full stack (coarse-to-fine around the A3 backbone), registered before dispatch, with an unshared single-pass byte decoder and a parameter-matched control. Speculative decoding is measured on the trained checkpoints.
+- **Decision logged** in `notes/sketch.md`.
+
+---
+
 ## v0.5.11: Worker results: GDN extrapolates past 1,024 tokens (-60.7% vs dense), GDN copy deficit beyond the window, C202 not a numerics artifact; reward forgery fixed (SQ373)
 *2026-11-23*
 

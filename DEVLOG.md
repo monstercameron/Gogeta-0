@@ -18,6 +18,21 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.35: Outside review 16:37: SQ404's larger-step premise withdrawn (AdamW scale-invariant; clipping never fires), B1 amendment 3 before any SQ404 result; SQ410 overlap dose-response
+*2026-11-23*
+
+**Outside review 16:37: SQ404's "larger step" premise withdrawn (AdamW is scale-invariant and clipping never fires), registered as B1 amendment 3 before any SQ404 result. Overlap dose-response added as SQ410.**
+
+- **Outside review** (`notes/reviews/2026-11-23-1637-review.md`, Haiku), triaged in its footer:
+  - **SQ404's premise fails.** AdamW normalises each parameter's update by its own gradient RMS, so summed shared gradients do not enlarge the step. The only scale-dependent path, global clipping at 1.0, never fires after warm-up: a log scan of 33 pulled 200M runs (A2f, A2s, A3mx, E20, E24, E27) finds no logged step after step 300 above the clip, with median grad norm 0.11-0.14. This descriptive scan ran before registration and is disclosed as such. There is no clipping component in the loop cost.
+  - **B1 amendment 3** (registered before any SQ404 result; rule unchanged): SQ404 now reads as "does the shared core's best LR differ from the global LR?", with the 0.5 arm being the core at E24's LR. The readout shows the paired per-seed differences, because df 1 gates are judged on point estimates.
+  - **SQ410:** overlap dose-response of each assembly cost (C213's mechanism), on CPU after SQ239.
+  - **Merged:** position and length profiles into SQ385; a same-denominator check into SQ387's precondition.
+  - **Rejected:** mean vs sum over passes. Under AdamW without clipping it differs only through eps.
+- **Quick review 16:34 (newcomer):** the README's first-run path exists (steps 1-5). The current thesis test is C208 (the all-parts model vs E24/E20).
+
+---
+
 ## v0.5.34: Docs refresh (hourly); B1 amendment 2: Holm family for B1's gating contrasts, registered before any B1 result
 *2026-11-23*
 

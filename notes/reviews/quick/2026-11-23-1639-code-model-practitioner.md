@@ -1,0 +1,10 @@
+# Quick review 2026-11-23-1639 - code-model practitioner (Codex GPT-6 Luna high)
+
+- **Observation:** The headline model comparison is still a research metric: A2s beats a compute-matched baseline, but the assembled model has not met the registered competitiveness rule against E24 and E20. (`DEVLOG.md`, v0.5.30; claims C208–C209)
+- **Observation:** The planned tier-1 evaluation includes sandboxed functional pass@1, but Q14 is marked HUMAN and waiting on evaluation setup and data-cache confirmation. (`experiments/QUEUE.md`, Q14)
+- **Observation:** The validation split has substantial near-duplicate overlap with training: 1,667 of 4,000 validation documents exceed the K9 n-gram threshold. That limits how directly clean80 scores speak to performance on unfamiliar code. (`experiments/claims-status.md`, C191)
+
+- **Idea [speculation]:** Test prompt-format sensitivity on the same held-out completion tasks: raw code prefixes versus instruction-wrapped prompts. **Hypothesis:** the model ranking or pass rate may depend on how a practitioner frames a coding request. **Cheapest test:** 100 tasks, greedy generation and existing functional scoring; about 5 GPU minutes at 13M parameters. **Change the plan if:** the ranking flips or either model shifts by more than 5 percentage points; report the formats separately in model comparisons.
+- **Idea [speculation]:** Test distractor sensitivity by adding unrelated in-repository code to completion prompts while keeping the target task and token budget fixed. **Hypothesis:** useful code completion may degrade when relevant context competes with plausible but irrelevant code. **Cheapest test:** paired scoring on 100 tasks with and without distractors; about 5–10 GPU minutes at 13M parameters. **Change the plan if:** pass rate drops by more than 10 points or the model ranking changes; make context selection a separate evaluation dimension.
+
+- **Question for the main agent:** For the final model, which coding workflow should be the primary target: completing a file from a code prefix or responding to an instruction?

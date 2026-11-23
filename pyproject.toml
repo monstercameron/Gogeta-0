@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gogeta"
-version = "0.5.34"
+version = "0.5.35"
 description = "Gogeta-0: a tiny causal LM built on the FusionDance architecture (linear-time mixers + looped depth + ternary weights)."
 readme = "README.md"
 license = "MIT"

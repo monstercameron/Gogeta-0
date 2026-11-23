@@ -934,3 +934,8 @@ All runs use code-py-v2, 20M tokens and one rented RTX 5090. They are explorator
   - G3, SQ350: A2f(6x2) vs A2f(6x1) (C197 wording).
 - **Exploratory readouts**, reported unadjusted and labelled exploratory: SQ401's A3m vs A2s, SQ402's fixed vs learned beta, SQ404's A2f vs E24 gap itself, and every throughput number.
 - With 2-3 seeds (df 1-2), every B1 contrast stays at screening strength whatever its p-value. A gate opens only a follow-up run or a limitation, never a VERIFIED status.
+
+### B1 amendment 3 (2026-11-23 ~16:45 EST, before any SQ404 result; outside review 16:37): SQ404's reading, rule unchanged
+- **The premise "shared weights take a larger step" is withdrawn.** AdamW (`gogeta/train.py`, fused) normalises each parameter's update by the running RMS of its own gradient, so summing the gradient over r passes does not enlarge the step (only eps differs). The one scale-dependent path, global grad-norm clipping at 1.0, never fires after warm-up. In a log scan of the pulled 200M runs (A2f 8, A2s 8, A3mx 5, E20 5, E24 5, E27 2), no logged step after step 300 had a pre-clip norm above 1.0, and the median norm was 0.11-0.14.
+- **What SQ404 still tests:** whether the shared core's best LR differs from the global LR. The 0.5 arm puts only the core (`core.*` parameters) at 3e-3, which is E24's tuned LR, while embeddings, head, inject, prelude and coda stay at 6e-3.
+- **The rule is unchanged.** A multiplier that closes more than half the A2f-vs-E24 gap still sends that comparison to a 200M re-run, read as "the core's LR was mis-set", not as "sharing enlarges steps". The readout shows the paired per-seed differences, because at df 1 the rule is judged on point estimates.

@@ -1,0 +1,41 @@
+{
+ "check": "A2-amendment3-runs",
+ "runs": [
+  {
+   "run": "E27-20261123-201328-s2",
+   "arm": "E27",
+   "seed": 2,
+   "lr": 0.006,
+   "tokens": 221609984.0,
+   "flops": 3.792837544299725e+16,
+   "dataset": "code-py-v2",
+   "clean80": 0.326384288273947,
+   "git": "4c716bdce13d70575a14d9e3b8ca1f440fb05e3a",
+   "git_describe": "v0.5.16"
+  },
+  {
+   "run": "E27-20261123-202328-s3",
+   "arm": "E27",
+   "seed": 3,
+   "lr": 0.006,
+   "tokens": 221609984.0,
+   "flops": 3.801674724461773e+16,
+   "dataset": "code-py-v2",
+   "clean80": 0.32384872579443846,
+   "git": "4c716bdce13d70575a14d9e3b8ca1f440fb05e3a",
+   "git_describe": "v0.5.16"
+  },
+  {
+   "run": "E27-20261123-203531-s4",
+   "arm": "E27",
+   "seed": 4,
+   "lr": 0.006,
+   "tokens": 221609984.0,
+   "flops": 3.784203985800397e+16,
+   "dataset": "code-py-v2",
+   "clean80": 0.3240888594154631,
+   "git": "4c716bdce13d70575a14d9e3b8ca1f440fb05e3a",
+   "git_describe": "v0.5.16"
+  }
+ ]
+}

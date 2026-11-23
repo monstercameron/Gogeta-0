@@ -93,9 +93,9 @@
    "date": "2026-11-23T14:45:00-05:00",
    "type": "compute",
    "provider": "vast.ai",
-   "amount": 12.57,
+   "amount": 13.09,
    "estimated": false,
-   "resource": "assembly waves A1, A2 and A3/A4 (gogeta-cockpit-a1-*, a2-*, a3-*; RTX 5090, at most 8 concurrent), to 14:45 with one a3 box still running the A3 LR bracket",
+   "resource": "assembly waves A1, A2 and A3/A4 (gogeta-cockpit-a1-*, a2-*, a3-*; RTX 5090, at most 8 concurrent), to 15:46 (fleet fully destroyed)",
    "experiments": [
     "E62",
     "E63",
@@ -106,7 +106,7 @@
    ],
    "purpose": "Assembly ladder A1-A4 under the human's 5090-or-better grant (v0.5.0), within the agent's self-imposed $25 cap",
    "evidence": "provider credit 57.25 at 14:45 vs 69.82 at 08:24",
-   "note": "the box still running adds about $0.50/h until it is destroyed"
+   "note": "final: all a3 boxes destroyed 15:46 (ALL A3 BOXES DESTROYED); amount = provider total 43.27 at 15:47 minus 30.18 at 08:24; includes the A3 LR bracket, A3 amendment 2 and A2 amendment 3 runs"
   }
  ],
  "reconciliations": [
@@ -140,6 +140,14 @@
    "credit_left": 57.2519,
    "provider_total_spend": 42.7481,
    "note": "first reconciliation since 2026-11-22 22:35 (X5 and X6 added); one instance running (gogeta-cockpit-a3-1, A3 LR bracket)",
+   "by": "main-agent"
+  },
+  {
+   "ts": "2026-11-23T15:47:00-0500",
+   "provider": "vast.ai",
+   "credit_left": 56.7293,
+   "provider_total_spend": 43.2707,
+   "note": "0 instances; assembly fleet (a1-a3) fully destroyed at 15:46",
    "by": "main-agent"
   }
  ]

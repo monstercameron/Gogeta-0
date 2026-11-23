@@ -17,6 +17,27 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.77: code-py-v2 built and verified byte-identical on two machines; docs refresh (hourly)
+*2026-11-22*
+
+**code-py-v2 is built** (`experiments/data_integrity/build_v2.py` at `b494ff8`, CPU only, run on two rented RTX 5090 boxes alongside their training).
+- **Runs:** 26 s on 48 CPUs and 77 s on 64 CPUs, peak RSS about 4 GB.
+- **Determinism:** all four files (`train.bin`, `train_keep_ids.npy`, `val.bin`, `docs_val.jsonl`) and the tokenizer are byte-identical across the two machines; only the manifest's `created` timestamp differs. The manifest is committed as `experiments/data_integrity/dataset-v2.manifest.json`.
+- **Size:**
+  - train: 698,714 docs (70.8% of v1's 987,154) and 202.5M tokens (77.2% of 262.4M);
+  - val: 4,000 docs, redrawn (1.39M tokens).
+- v2 validation numbers are **not comparable** with v1 val.
+- **Unblocks** most of the A3 design (E20–E27, E35, E36, E40, E41, E46–E48, E52, E53). E42–E45 also need the GDN-flags patch.
+
+**Docs refresh (hourly, Haiku), checked by the main agent:**
+- README's status line now reflects the N1X hold (6/11 Phase 2b items done), the running Phase 2b-5090, SQ220/C195, SQ214 and v2, and links the expense ledger. The main agent corrected two lines: the box count is seven live of eight rented, and v2 is built, not "scheduled".
+- `notes/sketch.md` gets the decisions for v0.4.72–v0.4.75 and the current claim counts.
+- The phase2b row in the campaigns README is updated.
+
+**First Phase 2b-5090 results** (200M tokens, in-training val_loss on the contaminated v1 val; clean80 scoring is pending): E1 s0 0.5841 and E1 s2 0.5856 (the N1X had 0.5835 and 0.5866).
+
+---
+
 ## v0.4.76: code-py-v2 builder (deterministic dedup); CPU analyses SQ225, SQ228, SQ233
 *2026-11-22*
 

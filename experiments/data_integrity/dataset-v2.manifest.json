@@ -1,0 +1,103 @@
+{
+ "created": "2026-11-23T02:30:45",
+ "dataset": "code-py-v2",
+ "source": "OpenCoder-LLM/opc-annealing-corpus",
+ "license": "ODC-By",
+ "tokenizer": {
+  "file": "code-py-v2/tokenizer.json",
+  "sha256": "0e75f39f9a6b3d743cf75bb48189cfb567ed498ed62c5237e6db9f59884a4d72",
+  "vocab_size": 8192,
+  "eos_id": 0
+ },
+ "prepare_seed": 1234,
+ "filter": {
+  "rows": 8404155,
+  "python": 997044,
+  "empty": 1,
+  "too_long": 0,
+  "dupes": 5889,
+  "kept": 991154,
+  "train_docs": 987154,
+  "val_docs": 4000,
+  "train_chars": 976520477,
+  "val_chars": 3938783
+ },
+ "derived_from": "code-py-v1",
+ "build": {
+  "script": "experiments/data_integrity/build_v2.py",
+  "seed": 1234,
+  "params": {
+   "v1_train_docs": 987154,
+   "v1_val_docs": 4000,
+   "v1_train_tokens": 262412848,
+   "jaccard": 0.5,
+   "num_perm": 64,
+   "ngram": 8,
+   "lsh": [
+    16,
+    4
+   ],
+   "max_bucket": 60,
+   "overlap_n": 13,
+   "max_overlap": 0.3,
+   "name_link_max": 50,
+   "big_family_min": 300,
+   "big_family_cap": 1,
+   "val_extra_candidates": 20000,
+   "families": 741056,
+   "docs_in_dup_families": 268633,
+   "train_dropped_in_val_candidate_families": 185732,
+   "train_dropped_name_link": 18871,
+   "val_from_v1_val": 614,
+   "val_from_train_draw": 3386,
+   "val_max_overlap_audited": 0.2996632996632997
+  }
+ },
+ "splits": {
+  "train": {
+   "docs": 698714,
+   "tokens": 202495881,
+   "chars": 766767733,
+   "files": {
+    "train.bin": {
+     "sha256": "ed3f684d9a23c650f66767b8bb2ac17f59d672628080515fb33a3ceba175965d",
+     "bytes": 404991762,
+     "block_tokens": 67108864,
+     "block_sha256": [
+      "18b617f19415b5228d253e3a0e1eb1db87fd67ddf777b31af6bf53a966bb5993",
+      "b93c8894d99a54bf77040f3829225da88f08760b37f125e002ae859dd1bf6b93",
+      "3e46f1dc05e9c9b853d5aff425cb48b759bd048f3afd84a2eed11e924cf1a5d4",
+      "6c67050c2097a3e30242e5a7c7b16fe33d8a76b1ca2c4c0a6346cd936236247f"
+     ]
+    },
+    "train_keep_ids.npy": {
+     "sha256": "e7a4bd90e890bae10e305122c9845db87cccd8daa388a66d20fdbd0f24887eda",
+     "bytes": 5589840
+    }
+   }
+  },
+  "val": {
+   "docs": 4000,
+   "tokens": 1393554,
+   "chars": 5315894,
+   "files": {
+    "docs_val.jsonl": {
+     "sha256": "bd0236430923c484d72480e98e706895502c8459a61de756a0f13df018dc08bd",
+     "bytes": 5673915
+    },
+    "val.bin": {
+     "sha256": "73f0cf160dc9c2085155e68867747eafd8056ee9b4d38118bdd7ead61dc58b08",
+     "bytes": 2787108,
+     "block_tokens": 67108864,
+     "block_sha256": [
+      "73f0cf160dc9c2085155e68867747eafd8056ee9b4d38118bdd7ead61dc58b08"
+     ]
+    }
+   }
+  }
+ },
+ "known_issues": [
+  "Template redundancy below family level remains (13-gram overlap inside train is not removed).",
+  "Val is redrawn (v1 val docs + singleton train docs that pass the 13-gram rule); it is not comparable with code-py-v1 val numbers."
+ ]
+}

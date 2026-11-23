@@ -46,14 +46,22 @@ The nice part is that looping costs extra compute and BitNet makes compute cheap
 - **2026-11-22 (v0.4.68-69):** Byte Quest E12-E16 predictions registered before any byte run (`experiments/checks/PREDICTIONS.md`); the 30 staged configs are hashed into that file.
 - **2026-11-22 (v0.4.69):** Vast.ai CLI installed; no instance rented. Each rental needs the human's explicit go-ahead (AGENTS §0a). SQ220 stayed parked until the human approved the pilot later that evening ("get 1 working first", $30 / 12 h cap).
 - **2026-11-22 (v0.4.70):** Outside review (20:37): E1's lead over E0 may be largely a baseline artifact (E0 trails E10 at identical shapes). Recorded as a C5 limitation event. Phase 2b's comparison stays E1 vs E10.
+- **2026-11-22 (v0.4.72):** AGENTS §0h, kill-on-empty (the human: "kill them unless we have no work queued up"). Rented GPUs live only while work is queued: rent just in time, batch runs per box, pull results and destroy the box when its last job ends, and destroy any box idle for more than 10 min.
+- **2026-11-22 (v0.4.73):** Cloud card choice: the RTX 5090 is the reference rental (fastest and cheapest per token vs the 3090 and N1X; SQ220, C195 PARTIAL).
+- **2026-11-22 (v0.4.73):** Operator hold on Phase 2b. After the N1X thermal kill (86.6 °C) and an unwanted auto-resume, exit 143/130 is classified as operator and never auto-resumed. `cockpit.sh --hold` blocks every resume; only the human releases it. Phase 2b stays at 6 of 11 until then.
+- **2026-11-22 (v0.4.74):** Expense tracking: an append-only ledger in `experiments/expenses.json` (purchases, estimated and reconciled compute). Public-repo rule: amounts and purposes only, with no card digits, receipts, addresses or e-mails.
+- **2026-11-22 (v0.4.74):** Phase 2b-5090 is a single-SKU replication: E10 and E1 at 7 seeds each (E11 ×3, E9 and E2 ×1), 200M tokens. The two SKUs are never pooled, and the N1X 3 + 3-seed comparison stays the registered confirmatory test (Q12).
+- **2026-11-22 (v0.4.75):** Fleet on 5090s only: 8 RTX 5090s, at most 8 concurrent, at the human's request ("the cheapest 5090s"). The N1X is limited to light work after its thermal kill. Wave 2 is pinned to one SKU. The cockpit spend approval is human-only (TTY); until the human types it, rentals run under the chat go-ahead.
 
-## Status (2026-11-22, v0.4.70)
+## Status (2026-11-22, v0.4.76)
 
 - Results so far: E1 beats E0 by 3.6% at an untuned LR, one seed (C5 partial). The outside review (v0.4.70) suggests this lead may be largely a baseline artifact: E0 trails E10 at identical shapes by about 3.7%. Out of corpus, the registered pooled test does not show transfer (SQ99, exploratory: +0.42%, cluster CI -0.13% to +1.03%; C192 REFUTED). The length re-analysis (C193, PARTIAL) finds E1 ahead on short files and behind on files over ~1,200 tokens. Looping (E2) does not pay yet (C6/C7 partial).
 - Baseline: E10 seeds 0/1 read 0.5822 / 0.5854 vs E0's 0.6063 (decisions log, v0.4.59; contaminated val). DEVLOG v0.4.70 reports a 3-seed E10 mean of 0.5845, but `experiments/INDEX.md` still lists E10 as planned. Reconcile before citing either number.
-- Claims (`experiments/claims-status.md`): 18 VERIFIED, 21 PARTIAL, 7 REFUTED, 2 WRONG FOR OUR CODE, 1 INCONCLUSIVE (C16: K3 control invalid), 71 UNVERIFIED, 2 SUPERSEDED (122 claims).
-- Running (per `experiments/QUEUE.md`, 19:24): Q7 (E10 x3 seeds). Queued: Q8 (E1 x3), E9, Q10 (E2 at the tuned LR), E11, Q15 (K3 redesign), Q18 (looped neg-eig parity). Clean-val re-score pending (K9); loss numbers remain provisional.
-- Cloud: SQ220 pilot (1x RTX 3090 on Vast.ai) running since 2026-11-22 ~20:05 after the human's go-ahead (`experiments/devlogs/SQ220.md`).
+- Claims (`experiments/claims-status.md`): 18 VERIFIED, 22 PARTIAL, 7 REFUTED, 2 WRONG FOR OUR CODE, 1 INCONCLUSIVE (C16: K3 control invalid), 71 UNVERIFIED, 2 SUPERSEDED (123 claims).
+- Running: Phase 2b-5090 on eight rented RTX 5090s (E10 and E1 at 7 seeds each, DEVLOG v0.4.74–v0.4.75), dispatched in v0.4.75, no results yet. The N1X Phase 2b is paused at 6 of 11 under the operator hold (v0.4.73). `experiments/QUEUE.md` (last updated 19:24) predates v0.4.72–v0.4.76 and still lists Q7 as running; reconcile before relying on it. Clean-val re-score pending (K9); loss numbers remain provisional.
+- SQ214 window sweep (exploratory, 4 seeds, 20M tokens): E1's SWA window 256 beats full context by 1.30% (`experiments/devlogs/SQ214.md`, v0.4.73). Not a settled result.
+- Code-py-v2 builder (`experiments/data_integrity/build_v2.py`) landed in v0.4.76. Built on two rented 5090 boxes (48 and 64 CPUs, 26 s and 77 s): all four files are byte-identical across the two machines (manifest `experiments/data_integrity/dataset-v2.manifest.json`; 698,714 train docs, 202.5M tokens; 4,000 redrawn val docs). v2 val numbers are not comparable with v1.
+- Cloud: SQ220 (RTX 3090 and RTX 5090 pilots on Vast.ai) is done: the loss reproduces the N1X within tolerance, and the 5090 is fastest and cheapest per token (`experiments/devlogs/SQ220.md`, C195 PARTIAL). Spend is tracked in `experiments/expenses.json`.
 - Byte Quest (E12-E16): staged and predicted, not run.
 - Next CPU item: SQ61 (reward sandbox hardening, C105); it must precede any GRPO run.
 

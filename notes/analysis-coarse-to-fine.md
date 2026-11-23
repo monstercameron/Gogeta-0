@@ -109,3 +109,10 @@ Our trained E1 already *is* a global model over variable-length patches: BPE tok
   - dense SWA at T = 4,096 (needs flex-attention first);
   - E2-style drift, which needs gated or contractive updates and per-pass loss.
 - **Do X1 first:** the speller on frozen E1. It is cheap, needs no new global training, isolates the loop question, and reuses Phase 2b checkpoints. X2 follows only if X1 shows shared refinement beats equal-FLOP unshared depth.
+
+---
+**Corrections (v0.4.66, outside review 20:07):**
+- X1 can't cache E1's features (about 154 GB at 200M tokens). It recomputes E1's forward on the fly with no grad, on a 20–50M-token subset of **A1's deduplicated train** (one doc per family), not features fitted to K9's templates.
+- X1 adds arm **A″** (two unshared half-width blocks, matching B's params) so sharing isn't confounded with param count, and runs **SQ216** (decoder-only seed noise) first, so the ±0.3–0.5% thresholds are testable.
+- The byte configs must raise `max_seq_len` (RoPE is capped at 1,024).
+- **New context:** C193. E1's advantage over E0 is length-dependent (−3.9% on short docs, +1.1% on docs > 1,200 tokens), so long-context behaviour matters for every byte design.

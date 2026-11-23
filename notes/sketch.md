@@ -37,12 +37,20 @@ The nice part is that looping costs extra compute and BitNet makes compute cheap
 - **2026-11-22 (K7):** Tuned LRs: E10 3e-3, E1 6e-3 (20M-token sweep, seed 0). Every earlier run used an untuned 3e-3, so E0 and E1 numbers are not yet at tuned LR.
 - **2026-11-22 (SQ70 / C110):** The "NaN" in the recurrent GDN kernel was a call-site bug (positional args), not a GPU defect. Keyword args work (C2 verified), so a GDN decode path exists. Decode for SWA and attention is still to build (SQ53).
 - **2026-11-22 (C105):** The `post_training/rewards.py` sandbox can write to the repo under WSL, so use `evals/sandbox.py` for untrusted code until SQ61 moves its hardening in.
+- **2026-11-22 (v0.4.58):** Claims ledger v2: one file per claim (`experiments/claims/ledger/C<n>.jsonl`), an immutable definition plus append-only events. `experiments/claims.md` is a frozen archive; `experiments/claims-status.md` is generated.
+- **2026-11-22 (v0.4.59):** Phase 2b's confirmatory comparisons use E10 (HF Llama at E0's shapes) as the baseline, not E0. E10 gets 0.5822 / 0.5854 on seeds 0/1 vs E0's 0.6063, and E0's scaled residual init may be a handicap (SQ200 tests it).
+- **2026-11-22 (v0.4.61):** First hourly claim audit: 48 claims checked; VERIFIED fell 23 to 18. C15 is superseded by C190. Audited claims get a 6-hour cool-down.
+- **2026-11-22 (v0.4.63, corrected v0.4.65):** SQ99 out-of-corpus: E1's in-corpus advantage does not transfer (+0.42% worse, exploratory). The cluster-robust bootstrap includes 0, so "E1 is worse out of corpus" is withdrawn; the non-transfer verdict stands.
+- **2026-11-22 (v0.4.65):** Byte Quest becomes a main-quest arc: E12-E16 (patch granularity x refinement loops), with predictions registered before any run.
 
-## Status (2026-11-22, v0.4.40)
+## Status (2026-11-22, v0.4.65)
 
-- Results so far: E1 beats E0 by 3.6% at an untuned LR, one seed (C5 partial). Looping (E2) does not pay yet (C6/C7 partial).
-- Running: Phase 2b replication at tuned LRs (Q7 E10 x3 seeds, then Q8 E1 x3, E11, E9). Clean-val re-score pending (K9).
-- Next queued: K8 re-check, benchmark tier 1, K3 redesign, looped neg-eig parity, E3 ternary at tuned LR.
+- Results so far: E1 beats E0 by 3.6% at an untuned LR, one seed (C5 partial). It does not transfer out of corpus (SQ99, exploratory; cluster CI -0.13% to +1.03%). Looping (E2) does not pay yet (C6/C7 partial).
+- Baseline: E10 (HF Llama, E0's exact shapes) reads 0.5822 / 0.5854 on seeds 0/1 vs E0's 0.6063 (contaminated val). Seed 2 is not yet in the repo. Possible E0 init handicap (SQ200).
+- Claims: 18 VERIFIED, 20 PARTIAL, 7 REFUTED, 2 WRONG FOR OUR CODE, 72 UNVERIFIED, 1 SUPERSEDED (120 claims, `experiments/claims-status.md`).
+- Running (per `experiments/QUEUE.md`, 19:24): Q7 (E10 x3 seeds). Then Q8 (E1 x3), E11, E9, and E2 at the tuned LR. Clean-val re-score pending (K9).
+- Byte Quest (E12-E16) is planned, with predictions to be registered first.
+- Next queued: K8 re-check (Q11), benchmark tier 1 (Q14, needs human approval), K3 redesign (Q15), looped neg-eig parity (Q18), E3 ternary at tuned LR, SQ200 init swap.
 
 ---
 

@@ -17,6 +17,40 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.66: SQ99 reversed: E1's advantage is length-dependent, not corpus-specific; outside review 20:07
+*2026-11-22*
+
+### SQ99 length re-analysis (from outside review 20:07, idea I1; CPU, saved per-doc NLL)
+The out-of-corpus docs average about 1,210 tokens vs about 300 in corpus (computed), so the reviewer suspected a length confound. **Confirmed.** E1-vs-E0 gap by doc length (package-clustered 95% CIs):
+- 0–300 tokens: **−3.86%** (−4.94..−2.60, 29 docs);
+- 300–600: −2.39% (−3.39..−1.32, 52);
+- 600–1,200: −0.56% (−1.13..+0.11, 96);
+- **> 1,200: +1.09% (+0.48..+1.74, 153).**
+
+**On short out-of-corpus files E1's advantage matches its in-corpus size (−3.44%);** the pooled null is driven by long files.
+- **Reading:** SQ99's "does not transfer" was mostly a **length/long-context effect**, not a corpus effect. E1 (1 attention, 2 SWA-256, 3 GDN) may fall behind E0 (6 full-attention layers) when context beyond a few hundred tokens matters. Length is confounded with file type, and this is exploratory (n=1).
+- **Ledger:** new claim **C193** (the gap shrinks and reverses with doc length), PARTIAL; **C192 REFUTED → PARTIAL** ("transfers for short docs, reverses for long").
+- Equal-source weighting (statistician quick review 19:39) barely changes the pooled gap (+0.31% vs +0.42%; median source +0.04%).
+
+### Outside review 2026-11-22 20:07 (Haiku)
+**Accepted:**
+- **SQ214, the top pick:** per-position loss bins plus an E1 SWA window sweep 64/256/1,024;
+- SQ215: a recurrence-free long-conv control;
+- SQ216: decoder-only noise floor before X1;
+- SQ217: weight EMA;
+- SQ218: the frozen test split as the confirmatory out-of-corpus set.
+
+**Design fixes:**
+- X1 can't cache features (about 154 GB), so it recomputes on the fly on A1's deduplicated train;
+- X1 adds arm A″ (param-matched to the shared arm);
+- **RoPE is capped at max_seq_len = 1,024**, so byte configs must raise it (forwarded to the byte-model builder).
+
+### Also in this version
+- The hourly docs refresh (19:3x), which updated `notes/sketch.md`.
+- Quick reviews triaged: 19:25 skeptic (SQ213 cluster CI, in v0.4.65), 19:29 cheapest-experiment hunter (SQ189 scope extended), 19:34 newcomer (README fix and Start-here path, being applied by the site agent), 19:39 statistician (source weighting).
+
+---
+
 ## v0.4.65: Byte Quest becomes a main quest (E12-E16); SQ99 cluster-robust re-analysis
 *2026-11-22*
 

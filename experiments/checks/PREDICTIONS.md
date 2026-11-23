@@ -485,3 +485,15 @@ Nothing new is predicted here. This executes items registered in v0.4.40 (sectio
 - **A3 matched arms** at 200M, seed 0, at their file LRs: E30, E31, E32, E33, E34. Registered design: "1 seed each".
 - **Blocked:** everything on code-py-v2 (E20–E27, E35, E36, E40–E53 except E50/E51). The builder is in progress, and the v2 items wait for its manifest. E42–E45 also need the GDN-flags patch.
 - **Erratum (timestamps):** the wave-2 heading's "~21:45" was an estimate. The section was written and committed at about 21:22 local (v0.4.75), still before any wave-2 dispatch. The wave-1 "~21:20" heading is consistent with v0.4.74's commit time.
+
+## Fleet wave 3a (2026-11-22 ~21:45, before dispatch): registered A3 stages on code-py-v2, all on RTX 5090
+This executes only stages registered in v0.4.40 (`experiments/design/power-cost.md`, A3 predictions), on one SKU, and adds no new predictions.
+- **Data:** v2 as committed in v0.4.77, rebuilt on each box from `build_v2.py@b494ff8` and verified against `dataset-v2.manifest.json` before use.
+- **Scoring:** v1 clean80. v1 val docs were removed, with their families, from v2 train, so this metric is comparable across v1 and v2 models.
+- **Runs (seed 0, 20M tokens unless stated):**
+  - **F0:** LR tune of the 5 primary factorial cells (E20, E21, E22, E24, E27) at {3e-3, 6e-3, 1.2e-2}: 15 runs.
+  - **F3 (tune part):** E23, E25, E26 at {3e-3, 6e-3, 1.2e-2}: 9 runs.
+  - **F4:** E35 and E36 × seeds {0, 1, 2} at their file LR: 6 runs.
+  - **E1 decomposition, minimal tier, runnable arms:** E40, E41, E46, E47, E48, plus the E1 control (e53 at 20M) at 6e-3: 6 runs. E42–E45 wait for the GDN-flags patch.
+  - **H5 dedup bridge:** E52 (E10) and E53 (E1) at 200M: 2 runs.
+- **Waits for wave 3a:** F1, F2 and F3's seeds use the LRs chosen in F0/F3 by the registered G3 rule, so they are dispatched only after F0/F3 results exist.

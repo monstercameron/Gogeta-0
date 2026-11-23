@@ -2513,6 +2513,34 @@
    "batch_file": "notes/reviews/claims/2026-11-23-1404-b5.md",
    "verdict": "WEAK",
    "note": "confirmed; superseded by C209 (compute difference stated)"
+  },
+  {
+   "id": "C211",
+   "ts": "2026-11-23T15:05:00-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1502-b1.md",
+   "verdict": "WEAK",
+   "note": "confirmed; limitation added (non-significance is not 'nothing'); UNVERIFIED pending clean80 (SQ387)"
+  },
+  {
+   "id": "C212",
+   "ts": "2026-11-23T15:05:00-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1502-b2.md",
+   "verdict": "SOLID",
+   "note": "PARTIAL justified (selection seeds, LR not bracketed)"
+  },
+  {
+   "id": "C210",
+   "ts": "2026-11-23T15:05:01-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1502-b3.md",
+   "verdict": "WEAK",
+   "note": "confirmed; UNVERIFIED until clean80 via SQ387 (registry entry)"
+  },
+  {
+   "id": "C209",
+   "ts": "2026-11-23T15:05:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1502-b4.md",
+   "verdict": "WEAK",
+   "note": "rejected; A2s LR bracket exists (A3 amendment 1, 6e-3 within 0.58% of best); evidence added"
   }
  ]
 }

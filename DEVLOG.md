@@ -18,6 +18,22 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.25: Claim audit 2026-11-23-1502: C210/C211 to UNVERIFIED until the byte decoder's clean80 score (SQ387); C209 LR objection rejected (A2s bracket exists); C212 SOLID
+*2026-11-23*
+
+**Claim audit 2026-11-23-1502: four auditors on the four newest claims. C210 and C211 go to UNVERIFIED until clean80; C209's LR objection is rejected with the bracket as evidence.**
+
+- **Scope:** four claims were due (C209-C212); the other 136 are cooling down. One Codex GPT-6 Luna auditor per claim (`notes/reviews/claims/2026-11-23-1502-b1..b4.md`), all ok.
+- **Downgrades:**
+  - **C210** (byte decoder +14.4%, WEAK, confirmed): PARTIAL -> **UNVERIFIED**. The A4 registry entry itself says "clean80 via SQ387 before any claim", and the policy requires the clean metric. The +14.39% stands as a measured result on the registered in-training v2 val metric.
+  - **C211** (second shared byte pass -1.7%): PARTIAL -> **UNVERIFIED**, on the same grounds, applied for consistency. A limitation is also added that "deep supervision adds nothing" only means no benefit was detected (+0.55%, no TOST).
+- **Rejected:** C209 (A2 headline) WEAK for "no A2s LR robustness". The robustness exists: A3 amendment 1 bracketed A2s, and 6e-3 is within 0.58% of its best (3e-3), so at its best LR the effect would be about 0.6 points larger. An evidence event now cites it, and the status stays VERIFIED.
+- **SOLID:** C212 (fixed vs random depth, PARTIAL: selection seeds, LR not bracketed).
+- **README:** C210's status wording is updated to match.
+- **Quick review 14:59 (cheapest-experiment hunter):** a known-answer scorer fixture is added to Q15, and Q16's GPU check waits on it.
+
+---
+
 ## v0.5.24: Fix: Hugging Face wrapper broken since v0.5.0 (missing assembly fields; hidden() mirror ignored them); C80 re-verified with saved output (11/11, 6/6)
 *2026-11-23*
 

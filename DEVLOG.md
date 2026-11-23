@@ -17,6 +17,22 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.69: Byte predictions bound to config hashes; Vast.ai CLI installed (no rentals)
+*2026-11-22*
+
+### Byte Quest registration hardening (quick review 19:56, reproducibility auditor, Codex)
+- **The E12–E16 predictions are bound to exact configs:** the sha256 of all 30 staged byte configs was appended to `experiments/checks/PREDICTIONS.md` ("Config binding…"), still before any byte run. Any change needs a new dated entry.
+- The EOS 0x00 collision check was already in the builder.
+- **SQ221:** byte-dataset rebuild determinism (before the first byte run).
+
+### Vast.ai CLI (the human's request: install it on Windows and hook it to the cockpit)
+- `vastai` 1.11.2 is installed for the Windows user Python (ARM64) at `%APPDATA%/Python/Python312-arm64/Scripts/vastai.exe` (not on PATH; the cockpit will call it by full path). It's also installed in the WSL cockpit venv.
+- **Windows ARM64 workaround:** vastai pins `cryptography==49.0.0`, `pillow==12.2.0` and `pycares==4.11.0`, which have no ARM64 wheels, so it was installed with `--no-deps` plus binary-only dependencies (cryptography 46.0.3, pillow 13.0.0, pycares 5.2.1). **Tested:** `--version`; `show instances` authenticates (0 instances); `search offers` returns 37 verified RTX 3090 offers, cheapest $0.113/hr.
+- **The API key is NOT in the repo** (checked with `git grep` and a tree scan). It lives in the human's `Desktop/shared/api keys.md` (added as `VAST_API_KEY` in its env block, at the human's request) and in vastai's own config (`~/.config/vastai/vast_api_key`, Windows).
+- **No instance was rented.** Renting spends money and needs the human's explicit go-ahead per rental (AGENTS §0a); the SQ220 pilot is still parked.
+
+---
+
 ## v0.4.68: Byte Quest: model family built (staged), byte dataset, causality test passes; predictions registered
 *2026-11-22*
 

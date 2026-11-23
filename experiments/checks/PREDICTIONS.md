@@ -380,3 +380,39 @@ Decode-speed benefit (P bytes per r decoder passes) is not measured by E15 and m
 winner (loops in the global body don't pay, as C6 found for E2); refute of that prior := E16a <= winner - 1.5%.
 (b) Ternary global body: +3-9% clean-val bits/char vs the bf16 winner (K4 width trend, partly offset by keeping
 all byte layers in bf16); "ternary viable" := gap <= 5%.
+
+### Config binding for the Byte Quest predictions (added 2026-11-22 ~19:58, v0.4.69, still before any byte run)
+The predictions registered in v0.4.68 apply to exactly these staged configs (sha256, first 16 hex). Any config change before a run needs a new dated entry here. Raised by quick review `notes/reviews/quick/2026-11-22-1956-reproducibility-auditor.md`.
+
+| Config | sha256[:16] |
+|---|---|
+| `e12_flat_w1024.json` | `30da6e313e4748dd` |
+| `e12_flat_w1024_20m.json` | `1a672b98d49f75ba` |
+| `e13a_p2_r1.json` | `a6828021eccc0556` |
+| `e13a_p2_r1_20m.json` | `d23d0548df93a34a` |
+| `e13b_p4_r1.json` | `d6e874f834cff234` |
+| `e13b_p4_r1_20m.json` | `3d247fd4104acbb1` |
+| `e13c_p8_r1.json` | `5d65dc75691d0882` |
+| `e13c_p8_r1_20m.json` | `3145b1864e283f7b` |
+| `e13d_p16_r1.json` | `0a062ad26c58327d` |
+| `e13d_p16_r1_20m.json` | `f445e019a94033b8` |
+| `e14a_p4_r1.json` | `e34cbf455d946e2d` |
+| `e14a_p4_r1_20m.json` | `2a6cbd6953e8b574` |
+| `e14b_p4_r2_shared.json` | `d6e583dce05e2840` |
+| `e14b_p4_r2_shared_20m.json` | `91f1866acbc876b8` |
+| `e14c_p4_r4_shared.json` | `9c94b5312d71eb44` |
+| `e14c_p4_r4_shared_20m.json` | `a40cbf4782df4a56` |
+| `e14d_p4_r2_unshared.json` | `db24fb57e0dc0bc5` |
+| `e14d_p4_r2_unshared_20m.json` | `b5fab554619c856c` |
+| `e14e_p4_rsampled.json` | `e792c39ccff81c6f` |
+| `e14e_p4_rsampled_20m.json` | `78737c4784bbe35f` |
+| `e15a_par_p4_r1.json` | `1d300274a857895e` |
+| `e15a_par_p4_r1_20m.json` | `90a6211751071b30` |
+| `e15b_par_p4_r2.json` | `1e58e3f85d6b7f74` |
+| `e15b_par_p4_r2_20m.json` | `b021bfe3f21bc086` |
+| `e15c_par_p4_r3.json` | `4fe7086bfeaa9f57` |
+| `e15c_par_p4_r3_20m.json` | `372664662845ca45` |
+| `e16a_p4_r2_looped_global.json` | `e9b0958e18353fef` |
+| `e16a_p4_r2_looped_global_20m.json` | `832992308bf8e547` |
+| `e16b_p4_r2_ternary_global.json` | `6d83780a6e24029e` |
+| `e16b_p4_r2_ternary_global_20m.json` | `65d10e883b2f4580` |

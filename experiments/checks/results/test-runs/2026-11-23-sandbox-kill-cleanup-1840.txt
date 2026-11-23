@@ -1,0 +1,7 @@
+busy_loop     PASS  returned_within_deadline=True  elapsed=1.0s  timed_out=True  survivors_at_deadline=none
+child         PASS  returned_within_deadline=True  elapsed=1.0s  timed_out=True  survivors_at_deadline=none
+setsid_child  FAIL  returned_within_deadline=False  elapsed=6.0s  timed_out=True  survivors_at_deadline=['3856 nobody   sleep 77']
+host mount table identical before/after: True (32 -> 32 entries); added: []
+stray sandbox processes at the end: none
+SOME FAILED
+rc=1

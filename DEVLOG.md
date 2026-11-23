@@ -18,6 +18,33 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.47: Outside review 18:42: sandbox setsid escape (GRPO re-gated on SQ61), C209/C205 status rows carry exact-t intervals, SQ428-SQ431
+*2026-11-23*
+
+**Outside review 18:42 + quick reviews 18:19-18:42: the sandbox has a setsid escape that stalls the reward harness, so GRPO is re-gated on SQ61. C209 and C205 status rows now carry the exact-t intervals. C209 is stable to dropping any seed (max shift 0.27 points). Four new side quests (SQ428-SQ431).**
+
+- **Sandbox escape (quick review 18:34, safety/sandbox).** `experiments/checks/sandbox_kill_cleanup.py` (saved output `results/test-runs/2026-11-23-sandbox-kill-cleanup-1840.txt`) runs three snippets that the harness must kill on its 1 s timeout.
+  - A busy loop and a same-group child are killed in 1.0 s.
+  - **A child that calls setsid survives the process-group SIGKILL** (as nobody). `rewards.run_tests` then blocks in `proc.communicate()`, which has no timeout after the kill (`post_training/rewards.py:495`), until that child exits. One generated sample can stall a reward or eval worker indefinitely.
+  - The host mount table is unchanged (32 entries), so no tmpfs leaks from the private mount namespace.
+  - The limitation is recorded on C83 (reward harness) and C106 (eval sandbox). **SQ61 now gates GRPO and code-execution evals.** The planned fix is a PID namespace (`unshare -p -f --kill-child`) plus a bounded wait after the kill; it is not done yet. The concurrent-gate idea was rejected by code read: `_GATE` is assigned only once the full self-test report exists.
+- **Stale status rows fixed (outside review 2.1, quick review 18:42).** v0.5.45 added only evidence events, and the status row shows the reason of the last status change. C209 and C205 now carry a status_change re-asserting VERIFIED (unchanged) with [-17.86, -15.46] and [-8.15, -6.95]. C209's reason adds a leave-one-seed-out check: -16.47 / -16.94 / -16.59 against -16.67 in full.
+- **Independent check of the erratum (quick review 18:19).** `experiments/checks/tq_independent.py` (SciPy 1.18.1) matches `tstat` at 11 df values, the largest difference 1.6e-14. It reproduces all seven A2 intervals from per-seed ratios without the shared helper, the largest difference 2.8e-15 points.
+- **Outside review 18:42** (`notes/reviews/2026-11-23-1842-review.md`, triage in its footer):
+  - **SQ428:** fit the endpoint of the C209 gap from existing curves (zero GPU, the reviewer's next experiment).
+  - **SQ429:** duplicate reweighting at matched tokens, gated on SQ410.
+  - **SQ430:** weight decay and the ternary flip rate (low priority).
+  - **SQ431:** a short-to-long length curriculum (low priority).
+  - **README:** A2 vs E27 is now called a recipe-level comparison (four ingredients differ). The K9 caveat adds that 1,159 of clean80's 2,333 documents (49.7%) have 50-79% overlap.
+  - **Rejected:** C214 to PARTIAL (its statement is scoped to the SQ99 set, and C213 carries the "why"); the late ternary start (already A1f, null at +0.1%).
+  - **Checked:** the SWA FLOP credit cancels between E27 and A2s (5 SWA and 8 GDN applications per token each, in expectation).
+- **Quick reviews 18:19-18:42**, with triage footers:
+  - SQ195 extends its loop-map Jacobian gain to the A2s/A2f checkpoints (ML theorist).
+  - The sequence-length timing idea was already measured by K1 (cheapest-experiment hunter).
+  - The 18:08 outside review's idea B was merged into SQ410 in v0.5.45; SQ410's row now quotes its decision rule.
+
+---
+
 ## v0.5.46: Docs refresh (hourly)
 *2026-11-23*
 

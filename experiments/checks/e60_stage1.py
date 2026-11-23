@@ -13,6 +13,9 @@ M8: tok/s of E60a and E60c vs E1 (descriptive; E1 tok/s from the 5090 Phase 2b s
 Input: experiments/checks/results/e60_stage1_runs.json (built from run summary.json + doclevel files on the fleet copies).
 Run: python experiments/checks/e60_stage1.py -> experiments/checks/results/e60_stage1.json
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))), "experiments", "checks"))
+from tstat import t_quantile as _t_exact  # noqa: E402  (exact Student t; v0.5.45 replaced a Cornish-Fisher approximation)
 import json
 import math
 import os
@@ -23,8 +26,7 @@ RES = os.path.join(ROOT, "experiments", "checks", "results")
 
 
 def tq(df):
-    z = 1.959963984540054
-    return z + (z ** 3 + z) / (4 * df) + (5 * z ** 5 + 16 * z ** 3 + 3 * z) / (96 * df ** 2)
+    return _t_exact(0.05, df)  # exact two-sided 95% t quantile (was a Cornish-Fisher approximation, 10% low at df 2)
 
 
 def welch(a, b):

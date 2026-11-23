@@ -1,0 +1,191 @@
+{
+ "quantiles": [
+  {
+   "df": 2,
+   "exact": 4.302652729749463,
+   "cornish_fisher": 3.851724253624238,
+   "cf_low_by_pct": 10.480243339356877
+  },
+  {
+   "df": 3,
+   "exact": 3.18244630528371,
+   "cornish_fisher": 3.0643320186106426,
+   "cf_low_by_pct": 3.7114306210592196
+  },
+  {
+   "df": 4,
+   "exact": 2.7764451051977943,
+   "cornish_fisher": 2.7294379555984203,
+   "cf_low_by_pct": 1.6930696562799552
+  },
+  {
+   "df": 5,
+   "exact": 2.5705818356363155,
+   "cornish_fisher": 2.547318175229351,
+   "cf_low_by_pct": 0.9049959073256342
+  },
+  {
+   "df": 8,
+   "exact": 2.306004135204166,
+   "cornish_fisher": 2.300599429198306,
+   "cf_low_by_pct": 0.23437538221853238
+  },
+  {
+   "df": 10,
+   "exact": 2.228138851986275,
+   "cornish_fisher": 2.2254160937273064,
+   "cf_low_by_pct": 0.12219876945914754
+  },
+  {
+   "df": 20,
+   "exact": 2.0859634472658657,
+   "cornish_fisher": 2.085633792594331,
+   "cf_low_by_pct": 0.015803473065012508
+  },
+  {
+   "df": 60,
+   "exact": 2.000297822014261,
+   "cornish_fisher": 2.0002858657716245,
+   "cf_low_by_pct": 0.0005977231242626502
+  },
+  {
+   "df": 140,
+   "exact": 1.977053719657114,
+   "cornish_fisher": 1.9770527840736019,
+   "cf_low_by_pct": 4.732210879820897e-05
+  }
+ ],
+ "f2": {
+  "f2_analysis.json:primary_seed_blocked": {
+   "stored_ci95": [
+    -0.043364300433488864,
+    -0.0274254331402662
+   ],
+   "exact_ci95": [
+    -0.04336430045022306,
+    -0.027425433123532
+   ],
+   "df": 140,
+   "stored_decision": "SYNERGY",
+   "exact_decision": "SYNERGY"
+  },
+  "f2_analysis.json:sensitivity_unblocked": {
+   "stored_ci95": [
+    -0.039976746334929036,
+    -0.024990596265342
+   ],
+   "exact_ci95": [
+    -0.03997674634344367,
+    -0.02499059625682737
+   ],
+   "df": 163.26005142260715,
+   "stored_decision": "SYNERGY",
+   "exact_decision": "SYNERGY"
+  },
+  "f2_analysis_all.json:primary_seed_blocked": {
+   "stored_ci95": [
+    -0.0393630834649865,
+    -0.023804784793547876
+   ],
+   "exact_ci95": [
+    -0.03936308348132114,
+    -0.023804784777213237
+   ],
+   "df": 140,
+   "stored_decision": "SYNERGY",
+   "exact_decision": "SYNERGY"
+  },
+  "f2_analysis_all.json:sensitivity_unblocked": {
+   "stored_ci95": [
+    -0.03611790622380506,
+    -0.021357512881716053
+   ],
+   "exact_ci95": [
+    -0.03611790623116821,
+    -0.021357512874352915
+   ],
+   "df": 168.66436432706777,
+   "stored_decision": "SYNERGY",
+   "exact_decision": "SYNERGY"
+  },
+  "f2_analysis_clean50.json:primary_seed_blocked": {
+   "stored_ci95": [
+    -0.04610077591275249,
+    -0.029126507007643
+   ],
+   "exact_ci95": [
+    -0.046100775930573754,
+    -0.029126506989821735
+   ],
+   "df": 140,
+   "stored_decision": "SYNERGY",
+   "exact_decision": "SYNERGY"
+  },
+  "f2_analysis_clean50.json:sensitivity_unblocked": {
+   "stored_ci95": [
+    -0.04253266996169748,
+    -0.026637661140725067
+   ],
+   "exact_ci95": [
+    -0.042532669970385115,
+    -0.02663766113203743
+   ],
+   "df": 164.85188848581657,
+   "stored_decision": "SYNERGY",
+   "exact_decision": "SYNERGY"
+  },
+  "f2_analysis_clean80.json:primary_seed_blocked": {
+   "stored_ci95": [
+    -0.043364300433488864,
+    -0.0274254331402662
+   ],
+   "exact_ci95": [
+    -0.04336430045022306,
+    -0.027425433123532
+   ],
+   "df": 140,
+   "stored_decision": "SYNERGY",
+   "exact_decision": "SYNERGY"
+  },
+  "f2_analysis_clean80.json:sensitivity_unblocked": {
+   "stored_ci95": [
+    -0.039976746334929036,
+    -0.024990596265342
+   ],
+   "exact_ci95": [
+    -0.03997674634344367,
+    -0.02499059625682737
+   ],
+   "df": 163.26005142260715,
+   "stored_decision": "SYNERGY",
+   "exact_decision": "SYNERGY"
+  },
+  "f2_analysis_dup80.json:primary_seed_blocked": {
+   "stored_ci95": [
+    -0.022882731198881553,
+    -0.005368287452523339
+   ],
+   "exact_ci95": [
+    -0.02288273121726995,
+    -0.005368287434134943
+   ],
+   "df": 140,
+   "stored_decision": "SYNERGY",
+   "exact_decision": "SYNERGY"
+  },
+  "f2_analysis_dup80.json:sensitivity_unblocked": {
+   "stored_ci95": [
+    -0.020417212610638044,
+    -0.0026026477503272184
+   ],
+   "exact_ci95": [
+    -0.020417212615445997,
+    -0.0026026477455192657
+   ],
+   "df": 196.69173746333178,
+   "stored_decision": "SYNERGY",
+   "exact_decision": "SYNERGY"
+  }
+ },
+ "decisions_changed": []
+}

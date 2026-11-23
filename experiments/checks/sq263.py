@@ -9,6 +9,9 @@ C201's registered refutation criterion: "at 200M (SQ263) ... the seed-blocked I'
 
 Run: python experiments/checks/sq263.py -> experiments/checks/results/sq263.json
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))), "experiments", "checks"))
+from tstat import t_quantile as _t_exact  # noqa: E402  (exact Student t; v0.5.45 replaced a Cornish-Fisher approximation)
 import json
 import math
 import os
@@ -25,8 +28,7 @@ CELL = {"E20": "000", "E21": "001", "E22": "010", "E24": "100", "E27": "111"}
 
 
 def t975(df):
-    z = 1.959963984540054
-    return z + (z ** 3 + z) / (4 * df) + (5 * z ** 5 + 16 * z ** 3 + 3 * z) / (96 * df ** 2)
+    return _t_exact(0.05, df)  # exact two-sided 95% t quantile (was a Cornish-Fisher approximation, 10% low at df 2)
 
 
 def main():

@@ -11,6 +11,9 @@ Run -> lr/tokens/seed come from run meta.json (experiments/checks/results/sq282_
 
 Run: python experiments/checks/sq282_sq283.py -> experiments/checks/results/sq282_sq283.json
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))), "experiments", "checks"))
+from tstat import t_quantile as _t_exact  # noqa: E402  (exact Student t; v0.5.45 replaced a Cornish-Fisher approximation)
 import json
 import math
 import os
@@ -52,11 +55,10 @@ def main():
     b = [math.log(v) for v in json.load(open(os.path.join(ROOT, "experiments", "checks", "results", "phase2b_5090.json")))["E1"].values()]
     va, vb = st.variance(a) / len(a), st.variance(b) / len(b)
     dfw = (va + vb) ** 2 / (va ** 2 / (len(a) - 1) + vb ** 2 / (len(b) - 1))
-    z = 1.959963984540054
-    tw = z + (z ** 3 + z) / (4 * dfw) + (5 * z ** 5 + 16 * z ** 3 + 3 * z) / (96 * dfw ** 2)
+    tw = _t_exact(0.05, dfw)  # exact (was Cornish-Fisher)
     dw, sew = st.mean(a) - st.mean(b), math.sqrt(va + vb)
     r2_ci = {"rel_logmean": math.expm1(dw), "ci95": [math.expm1(dw - tw * sew), math.expm1(dw + tw * sew)], "df": dfw,
-             "n": [len(a), len(b)], "method": "Welch t on log clean80 bpc (Cornish-Fisher t quantile)"}
+             "n": [len(a), len(b)], "method": "Welch t on log clean80 bpc (exact t quantile; Cornish-Fisher before v0.5.45)"}
     res = {"sweep": sweep, "two_seed_means": means, "best_lr": best,
            "W1_E32_vs_E34_best": w1_gap, "W1": "PASS" if w1_gap <= -0.05 else "FAIL",
            "W2_E34_vs_E2_best": w2_gap, "W2": "PASS" if w2_gap < 0 else "FAIL",

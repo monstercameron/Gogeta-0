@@ -122,6 +122,7 @@ The nice part is that looping costs extra compute and BitNet makes compute cheap
 - **2026-11-23 (v0.5.38), design decision (C213's registered rule fires):** the final model (E61) is sized and judged on out-of-corpus quality next to clean80. Ternary and loops are no longer treated as costs on that metric. SQ403 raises the priority of draft-aware or variable-r training (SQ381).
 - **2026-11-23 (v0.5.39):** every batch registration names its readout script's sha256-16 before dispatch, and in-flight amendments state what had been seen. Erratum: "the ternary cost vanishes" becomes "not distinguishable from 0 out of corpus".
 - **2026-11-23 (v0.5.40):** SQ411 closes the `__eq__` reward-forgery route (tests are AST-rewritten in the grader; strict checks over exact builtin types). The route no longer blocks GRPO. Honest solutions returning custom classes now fail closed, by design.
+- **2026-11-23 (v0.5.45):** Analysis scripts use the exact Student t quantile (`experiments/checks/tstat.py`), never a series approximation: the Cornish-Fisher expansion was 10% low at df 2, so n=3 intervals were too narrow (no decision changed). SQ419 (F-6, the parameter-matched control for C209) runs at 200M tokens on seeds 2-4 against the existing E27 and A2s runs, not as a 20M screen, because 20M keeps sign but not size and interactions can flip (outside review 18:08).
 
 ## Status (2026-11-23, v0.5.40)
 

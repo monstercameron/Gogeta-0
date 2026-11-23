@@ -25,6 +25,9 @@ import sys
 
 import numpy as np
 
+sys.path.insert(0, __import__('os').path.join(__import__('os').path.dirname(__import__('os').path.dirname(__import__('os').path.abspath(__file__))), 'checks'))
+from tstat import t_quantile as _t_exact  # noqa: E402
+
 W5 = {"111": 1, "100": -1, "010": -1, "001": -1, "000": 2}
 Z = 1.96
 
@@ -38,8 +41,8 @@ def welch_ci(groups, w):
     return I, se, df
 
 
-def tcrit(df):   # two-sided 95%, normal-based fallback with a small-df correction (no scipy needed)
-    return Z * (1 + (Z ** 2 + 1) / (4 * max(df, 1)) + (5 * Z ** 4 + 16 * Z ** 2 + 3) / (96 * max(df, 1) ** 2))
+def tcrit(df):   # exact two-sided 95% t quantile (v0.5.45; was a Cornish-Fisher expansion, about 10% low at df 2)
+    return _t_exact(0.05, max(df, 1))
 
 
 def decide(I, se, df, delta=0.01):

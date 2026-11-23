@@ -18,6 +18,33 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.45: Outside review 18:08 + CI erratum: Cornish-Fisher t quantile replaced by exact t in six scripts; C209 CI [-17.86, -15.46], no decision changes; SQ419 moves to 200M
+*2026-11-23*
+
+**Outside review 18:08 + CI erratum: six analysis scripts used a Cornish-Fisher t quantile that is 10% low at df 2. All now use the exact Student t. C209's interval widens to [-17.86%, -15.46%]; no decision changes anywhere. SQ419 (F-6) moves to 200M tokens on seeds 2-4.**
+
+- **Erratum.** The outside review (`notes/reviews/2026-11-23-1808-review.md`, 2.5) found that C209's CI did not reproduce from its per-seed values. The cause was a Cornish-Fisher expansion of the two-sided 95% t quantile, which gives 3.852 at df 2 against the exact 4.303 (3.7% low at df 3, 1.7% at df 4, under 0.01% from df 60).
+  - It was in six scripts: `a2_assembled.py`, `e60_stage1.py`, `sq263.py`, `sq282_sq283.py`, `experiments/design/f2_analysis.py` and `experiments/design/factorial_analysis.py`. All six now call `experiments/checks/tstat.t_quantile`.
+  - Recomputed: A2 P1 (C209) is [-17.86%, -15.46%] (was [-17.74, -15.58]); AM1 (C205) is [-8.15%, -6.95%] (was [-8.09, -7.02]); P2-P5 widen by about 10%. E60, SQ263 and SQ282/283 move in the 4th decimal; F2 (df 140+) does not move.
+  - **No decision changes** (`experiments/checks/tq_erratum.py` -> `results/tq_erratum.json`). The compute-matched C209 figure (-16.18% [-16.87, -15.48], v0.5.30) already used an exact quantile.
+  - Ledger events are on C209 and C205. C197, C202 and C203 are unchanged at reported precision.
+- **README:** both mentions of the 16.7% now carry the parameter ratio (about 1.6x E27's unique non-embedding parameters, 15.1M vs 9.5M, not parameter-matched) and the corrected CI (review 2.2).
+- **SQ419 (F-6) amended** (review section 4): it runs at 200M tokens on seeds 2-4 against the existing 200M E27 and A2s runs. That reads it at C209's own horizon with 3 runs instead of 6 fresh 20M ones, at about 4 GPU-h and about $3. It still needs the human's go-ahead, its config and a registration with the readout hash and fixed thresholds. It will report clean80, clean50 and the 50-80 overlap band.
+- **New side quests:**
+  - SQ423: loops on the bytes axis.
+  - SQ424: equal-time replot of C209.
+  - SQ425: long context for the assembled recipe.
+  - SQ426: batch-size robustness, low priority.
+  - SQ427: interaction inventory of the assembly flags.
+  - Idea B (the memorisation-band re-score) is merged into SQ410.
+- **Rejected or already covered:**
+  - 2.6: the A2 stack rule is registered in PREDICTIONS.md (A1 screen), and A2 used fresh seeds.
+  - 2.1: per-FLOP figures are already labelled analytic (C12); SQ424 measures time for the C209 pair.
+- **Quick review 18:09 (data engineer):** scored-target coverage is identical across token models by construction (shared tokenizer and windowing, and `score_perdoc` asserts that scored equals n_tok). The remaining hole is tokenizer identity in artifacts, which is SQ418.
+- **Decisions log:** the exact-t rule and SQ419's 200M horizon are recorded in `notes/sketch.md`.
+
+---
+
 ## v0.5.44: Claim audit 2026-11-23-1802: 48 claims, 17 SOLID (incl. C214), 21 NEEDS-EVIDENCE (all already UNVERIFIED), 9 WEAK as limitations, C36 WRONG rejected against the primary PDF; C3 witness scoped to the reference path
 *2026-11-23*
 

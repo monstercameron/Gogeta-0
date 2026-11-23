@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-23T18:00:37-05:00",
+  "updated": "2026-11-23T18:17:03-05:00",
   "policy": "Order = priority, highest first; `next` walks the list top to bottom and returns the first item that is queued, ready, has all dependencies done and needs no human. Ordering rule: scientific value per GPU-minute, with validity first. (1) Controls, tuning and seeds that make existing claims trustworthy: K8 leakage/arithmetic check, K7 LR sweep, tuned 3-seed E10 and E1, E9, conditional E0/E2 re-runs, replication verdicts. Every later comparison is only as good as these. (2) Cheap inference-only diagnostics on existing checkpoints (SQ50, SQ14, SQ21, SQ37, eval suite) and the K3 redesign. They cost 4-20 GPU-minutes and decide what to build next; because the campaign runner is sequential, use `next --gpu --max-minutes 10` to slot them between campaign items or while a run is cooling. (3) Thesis-critical experiments: E11 (then 3 seeds), looped neg-eig parity, E3 at the tuned LR, the loop fixes (SQ15, SQ16, loop norm) gated on SQ14, neg-eig in the looped core, SQ32. (4) Side quests (gates, KDA, NoPE, decode path, ternary x loop, computed tables, research searches). (5) Long-term: E4 full fusion, E8, Mamba-3. Compute budget (AGENTS 5): one GPU item running at a time; up to 8 CPU items alongside, thread-capped by the launcher. CPU items that can run in parallel with any GPU job: Q3, Q5 (K7 analysis), Q6, Q13, Q15, Q18, Q20 (authoring: write scripts and register predictions), Q12 (verdict writing), SQ1, SQ41. Authoring items edit experiments/checks/PREDICTIONS.md and should be done one at a time by the main agent (or by subagents given disjoint files). Items needing a registered prediction wait for Q1 (the tagged 'registered' version). New items enter via `queue.py add` and are appended at the end; reordering needs an explicit `move --reason`. Estimates come from compiled throughputs (E0 210k tok/s, E1 100k, E2 44k) plus ~2 min launch/compile overhead; they are planning numbers, not measurements. needs_human items are never picked by `next`.",
   "order_log": [
     {
@@ -1401,12 +1401,12 @@
     {
       "id": "SQ419",
       "kind": "train",
-      "title": "F-6 parameter-matched decomposition of the A2 headline: E27's recipe on A2s's 6-block core (r ~ U{1..3}) vs E27 and A2s, 20M tokens, 3 seeds",
-      "why": "C209 is not parameter-matched (A2s about 15.1M vs E27 about 9.5M unique params); F-6 splits shape/params from the compensations (outside review 2026-11-23 17:37)",
+      "title": "F-6 parameter-matched decomposition of the A2 headline: E27's recipe on A2s's 6-block core (r ~ U{1..3}), 200M tokens, seeds 2-4, vs the existing 200M E27 and A2s runs",
+      "why": "C209 is not parameter-matched (A2s about 15.1M vs E27 about 9.5M unique params); F-6 splits shape/params from the compensations (outside review 2026-11-23 17:37); amended to 200M seeds 2-4 by outside review 18:08 (read at C209's own horizon; 3 runs instead of 6)",
       "depends_on": [],
       "resources": {
         "type": "gpu",
-        "est_minutes": 30
+        "est_minutes": 240
       },
       "ready": false,
       "missing": [
@@ -1415,7 +1415,7 @@
         "a rented GPU box (human go-ahead pending)"
       ],
       "needs_human": true,
-      "launch": "fleet batch (one box), with SQ420 and SQ422",
+      "launch": "fleet batch (one box); SQ420 and SQ422 can share the box",
       "status": "queued",
       "source": "experiments/side-quests.md SQ419",
       "reason": "GPU spend: the human decides whether to rent a box for the next batch (asked 2026-11-23 17:45)",

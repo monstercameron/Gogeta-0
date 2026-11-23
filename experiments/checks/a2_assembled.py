@@ -9,6 +9,9 @@ from SQ263 (sq263_runs.json), seeds 3-4 from this wave.
     python3 experiments/checks/a2_assembled.py --gather   # WSL: pulled fleet dirs -> results/a2_runs.json
     python experiments/checks/a2_assembled.py             # -> results/a2_assembled.json
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))), "experiments", "checks"))
+from tstat import t_quantile as _t_exact  # noqa: E402  (exact Student t; v0.5.45 replaced a Cornish-Fisher approximation)
 import glob
 import json
 import math
@@ -44,8 +47,7 @@ def gather():
 
 
 def tq(df):
-    z = 1.959963984540054
-    return z + (z ** 3 + z) / (4 * df) + (5 * z ** 5 + 16 * z ** 3 + 3 * z) / (96 * df ** 2)
+    return _t_exact(0.05, df)  # exact two-sided 95% t quantile (was a Cornish-Fisher approximation, 10% low at df 2)
 
 
 def paired(a, b):

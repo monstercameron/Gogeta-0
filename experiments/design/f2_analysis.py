@@ -14,6 +14,9 @@ Only runs at the registered LR, 20M tokens and code-py-v2 are used (from each ru
 
     python3 experiments/design/f2_analysis.py --doclevel <dir of E2x score JSONs> --runs-glob "<dirs with run folders>"
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))), "experiments", "checks"))
+from tstat import t_quantile as _t_exact  # noqa: E402  (exact Student t; v0.5.45 replaced a Cornish-Fisher approximation)
 import argparse
 import glob
 import json
@@ -35,12 +38,7 @@ DELTA = 0.01
 
 def t975(df):
     # two-sided 95% t quantile (normal approximation refined; df >= 3)
-    from math import sqrt
-    z = 1.959963984540054
-    g1 = (z ** 3 + z) / 4
-    g2 = (5 * z ** 5 + 16 * z ** 3 + 3 * z) / 96
-    g3 = (3 * z ** 7 + 19 * z ** 5 + 17 * z ** 3 - 15 * z) / 384
-    return z + g1 / df + g2 / df ** 2 + g3 / df ** 3
+    return _t_exact(0.05, df)  # exact (was a 3-term Cornish-Fisher expansion before v0.5.45)
 
 
 def decide(lo, hi):

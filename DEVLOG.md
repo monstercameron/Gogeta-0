@@ -18,6 +18,26 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.93: Outside review 01:38: packing, locality-mask and MTP controls (SQ315-SQ318); SQ290 gains a ternary PTQ arm
+*2026-11-23*
+
+**Outside review 01:38 (Haiku), triaged by the main agent:**
+- **SQ315: document-masked packing in training.** Accepted (I1).
+  - Training samples flat windows from an `<|eos|>`-separated stream with no attention mask or GDN state reset (`TokenData.batch()`; confirmed by reading the code).
+  - Full attention, SWA and GDN use cross-document context differently, so the E1–E10 gap and C193's length effect may partly be packing.
+  - SQ227 only changes scoring; this changes training.
+- **SQ316: locality-prior control.** Accepted (I3): a sliding-window (256) Llama E10 at d = 256 against dense E10 and E1. If it matches E1, C198's small-width edge is the mask, not the linear mixer.
+- **SQ317:** the base-loss cost of MTP auxiliary heads on E1, for goal 6's drafter (I4).
+- **SQ318:** a per-token-class split of the E1–E10 gap on the 7+7 checkpoints (I5).
+- **SQ290** gains a post-hoc ternary absmean arm (I6).
+- **Rejected:** I2, a duplicate of SQ235 (the delta-rule ablation).
+
+**Quick review 01:39 (newcomer):** the guided-trace idea is rejected (the learn page and run forms already cover it), and the question "what is the headline while F2 is blinded" is answered in the triage footer.
+
+**Fleet:** F2 stage 2 is running on four boxes (scores blinded) and SQ238 arm B is on w4-3.
+
+---
+
 ## v0.4.92: SQ308: C197's depth edge needs the depth-scaled init; SQ307 inconclusive; docs refresh (hourly); F2 stage 2 dispatched
 *2026-11-23*
 

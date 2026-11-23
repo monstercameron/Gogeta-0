@@ -58,6 +58,8 @@ def main():
     ap.add_argument("--doclevel", required=True)
     ap.add_argument("--runs-glob", required=True)
     ap.add_argument("--out", default=os.path.join(ROOT, "experiments", "checks", "results", "f2_analysis.json"))
+    ap.add_argument("--metric", default="clean80", help="bpc key in the doclevel JSON: clean80 (primary), dup80 "
+                    "(registered memorisation readout), clean50, all")
     a = ap.parse_args()
     meta = {}
     for d in glob.glob(a.runs_glob):
@@ -78,7 +80,7 @@ def main():
         lr, mt, ds = meta[run]
         if lr is None or abs(lr - LR[arm]) > 1e-12 or mt != 20000000 or ds != "code-py-v2":
             continue
-        y[(CELL[arm], seed)] = math.log(d["bpc"]["clean80"])
+        y[(CELL[arm], seed)] = math.log(d["bpc"][a.metric])
     rows = sorted(y.items())
     cells = sorted({c for (c, _), _ in rows})
     seeds = sorted({s for (_, s), _ in rows})
@@ -110,7 +112,7 @@ def main():
     blocked["decision"] = decide(*blocked["ci95"])
     cell_means = {c: float(groups[c].mean()) for c in cells}
     ranking = sorted(cells, key=lambda c: cell_means[c])
-    res = {"n_runs": len(rows), "n_per_cell": {c: int(len(groups[c])) for c in cells}, "seeds_excluded": [0],
+    res = {"metric": a.metric, "n_runs": len(rows), "n_per_cell": {c: int(len(groups[c])) for c in cells}, "seeds_excluded": [0],
            "primary_seed_blocked": blocked, "sensitivity_unblocked": unblocked,
            "cell_mean_log_bpc": cell_means, "cell_mean_bpc": {c: math.exp(v) for c, v in cell_means.items()},
            "ranking_best_to_worst": ranking,

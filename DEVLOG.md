@@ -18,6 +18,38 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.101: Claim audit 2026-11-23-0302: 48 claims, no downgrades; C30 'WRONG' rejected against the Ouro PDF; F2 interaction holds in every overlap stratum
+*2026-11-23*
+
+**Claim audit 2026-11-23-0302:** 8 Codex auditors reviewed 48 due claims; 79 are in cool-down, and all batches ran.
+- **Verdicts:** 22 SOLID, 15 NEEDS-EVIDENCE, 10 WEAK, 1 WRONG.
+- **No status downgrades.** Most non-SOLID verdicts concern UNVERIFIED claims, where the auditors agree they stay UNVERIFIED.
+- **C30 "WRONG" is rejected after checking the PDF.** The ledger quotes Ouro-2.6B-Thinking's OlympiadBench as 76.4 at T = 4 and 39.3 at T = 8. Table 13 of `refs/11-looped-2026/2510.25741 - Ouro (LoopLM).pdf` lists, for T = 1–8: 18.96, 68.59, 75.56, **76.44**, 71.85, 69.19, 57.63, **39.26**. The auditor read the T = 5 column as T = 4.
+- **Confirmed, with limitations or qualifiers:**
+  - **C193:** post-hoc length bins with no committed script; exploratory.
+  - **C191:** K9 provenance is inconsistent. The card cites `962492d`; the JSON records `60f4dcd` with describe `gb64199d-dirty`. The result itself is reproducible from the pipeline.
+  - **C190:** exact streaming was checked at a chunk boundary only.
+  - **C73, C75, C76, C78:** scoped to the Kimi paper's reported results.
+  - **C125:** thermal only; the power limit is not established.
+  - **C38:** the negative statements are scoped to the examined papers.
+  - **C35:** scoped to the paper's tasks.
+
+**F2 interaction by overlap stratum** (quick review 02:59, ML theorist; `f2_analysis.py --metric`; dup80 is the registered memorisation readout):
+
+| Stratum | Seed-blocked I | 95% CI |
+|---|---|---|
+| clean50 | −3.76% | [−4.61%, −2.91%] |
+| clean80 (primary) | −3.54% | |
+| all docs | −3.16% | [−3.94%, −2.38%] |
+| dup80 | −1.41% | [−2.29%, −0.54%] |
+
+- It is negative everywhere and strongest on the most novel docs, so it is not a memorisation artifact. C201 gets the evidence.
+- The source-disjoint check is folded into SQ314.
+
+**Fleet:** E60's 200M runs are finishing on three boxes. A pull-and-destroy watcher takes each down when it is idle.
+
+---
+
 ## v0.4.100: Eval sandbox: /var/tmp leak found and fixed (12/12 self-test); paired batches verified; E60 LR 6e-3 for all arms
 *2026-11-23*
 

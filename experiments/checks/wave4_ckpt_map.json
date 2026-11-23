@@ -1,0 +1,22 @@
+{
+ "E1-20261123-022631-s0": "/root/fusiondance-data/cloud/fleet/gogeta-cockpit-w1-5/fusiondance-data/checkpoints/E1-20261123-022631-s0/model.pt",
+ "E1-20261123-022550-s1": "/root/fusiondance-data/cloud/fleet/gogeta-cockpit-w1-6/fusiondance-data/checkpoints/E1-20261123-022550-s1/model.pt",
+ "E1-20261123-022714-s2": "/root/fusiondance-data/cloud/fleet/gogeta-cockpit-w1-7/fusiondance-data/checkpoints/E1-20261123-022714-s2/model.pt",
+ "E1-20261123-023155-s3": "/root/fusiondance-data/cloud/fleet/gogeta-cockpit-w1-5/fusiondance-data/checkpoints/E1-20261123-023155-s3/model.pt",
+ "E1-20261123-023033-s4": "/root/fusiondance-data/cloud/fleet/gogeta-cockpit-w1-6/fusiondance-data/checkpoints/E1-20261123-023033-s4/model.pt",
+ "E1-20261123-023308-s5": "/root/fusiondance-data/cloud/fleet/gogeta-cockpit-w1-7/fusiondance-data/checkpoints/E1-20261123-023308-s5/model.pt",
+ "E1-20261123-023537-s6": "/root/fusiondance-data/cloud/fleet/gogeta-cockpit-w1-4/fusiondance-data/checkpoints/E1-20261123-023537-s6/model.pt",
+ "E10-20261123-023507-s0": "/root/fusiondance-data/cloud/fleet/gogeta-cockpit-w1-6/fusiondance-data/checkpoints/E10-20261123-023507-s0/model.pt",
+ "E10-20261123-023832-s1": "/root/fusiondance-data/cloud/fleet/gogeta-cockpit-w1-7/fusiondance-data/checkpoints/E10-20261123-023832-s1/model.pt",
+ "E10-20261123-024100-s2": "/root/fusiondance-data/cloud/fleet/gogeta-cockpit-w1-4/fusiondance-data/checkpoints/E10-20261123-024100-s2/model.pt",
+ "E10-20261123-023259-s3": "/root/fusiondance-data/cloud/fleet/gogeta-cockpit-w1-8/fusiondance-data/checkpoints/E10-20261123-023259-s3/model.pt",
+ "E10-20261123-024134-s4": "/root/fusiondance-data/cloud/fleet/gogeta-cockpit-w1-3/fusiondance-data/checkpoints/E10-20261123-024134-s4/model.pt",
+ "E10-20261123-023845-s5": "/root/fusiondance-data/cloud/fleet/gogeta-cockpit-w1-6/fusiondance-data/checkpoints/E10-20261123-023845-s5/model.pt",
+ "E10-20261123-024248-s6": "/root/fusiondance-data/cloud/fleet/gogeta-cockpit-w1-7/fusiondance-data/checkpoints/E10-20261123-024248-s6/model.pt",
+ "E1-20261122-191828-s0": "/root/fusiondance-data/checkpoints/E1-20261122-191828-s0/model.pt",
+ "E1-20261122-194523-s1": "/root/fusiondance-data/checkpoints/E1-20261122-194523-s1/model.pt",
+ "E1-20261122-201556-s2": "/root/fusiondance-data/checkpoints/E1-20261122-201556-s2/model.pt",
+ "E10-20261122-181334-s0": "/root/fusiondance-data/checkpoints/E10-20261122-181334-s0/model.pt",
+ "E10-20261122-183258-s1": "/root/fusiondance-data/checkpoints/E10-20261122-183258-s1/model.pt",
+ "E10-20261122-185531-s2": "/root/fusiondance-data/checkpoints/E10-20261122-185531-s2/model.pt"
+}

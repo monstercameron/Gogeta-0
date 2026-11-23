@@ -1,0 +1,33 @@
+docnll-E1-s0-5090|python experiments/checks/docnll.py --checkpoint E1-20261123-022631-s0
+docnll-E1-s1-5090|python experiments/checks/docnll.py --checkpoint E1-20261123-022550-s1
+docnll-E1-s2-5090|python experiments/checks/docnll.py --checkpoint E1-20261123-022714-s2
+docnll-E1-s3-5090|python experiments/checks/docnll.py --checkpoint E1-20261123-023155-s3
+docnll-E1-s4-5090|python experiments/checks/docnll.py --checkpoint E1-20261123-023033-s4
+docnll-E1-s5-5090|python experiments/checks/docnll.py --checkpoint E1-20261123-023308-s5
+docnll-E1-s6-5090|python experiments/checks/docnll.py --checkpoint E1-20261123-023537-s6
+docnll-E10-s0-5090|python experiments/checks/docnll.py --checkpoint E10-20261123-023507-s0
+docnll-E10-s1-5090|python experiments/checks/docnll.py --checkpoint E10-20261123-023832-s1
+docnll-E10-s2-5090|python experiments/checks/docnll.py --checkpoint E10-20261123-024100-s2
+docnll-E10-s3-5090|python experiments/checks/docnll.py --checkpoint E10-20261123-023259-s3
+docnll-E10-s4-5090|python experiments/checks/docnll.py --checkpoint E10-20261123-024134-s4
+docnll-E10-s5-5090|python experiments/checks/docnll.py --checkpoint E10-20261123-023845-s5
+docnll-E10-s6-5090|python experiments/checks/docnll.py --checkpoint E10-20261123-024248-s6
+docnll-n1x-E1-s0|python experiments/checks/docnll.py --checkpoint E1-20261122-191828-s0
+docnll-n1x-E1-s1|python experiments/checks/docnll.py --checkpoint E1-20261122-194523-s1
+docnll-n1x-E1-s2|python experiments/checks/docnll.py --checkpoint E1-20261122-201556-s2
+docnll-n1x-E10-s0|python experiments/checks/docnll.py --checkpoint E10-20261122-181334-s0
+docnll-n1x-E10-s1|python experiments/checks/docnll.py --checkpoint E10-20261122-183258-s1
+docnll-n1x-E10-s2|python experiments/checks/docnll.py --checkpoint E10-20261122-185531-s2
+knockout-E1-s0-5090|python experiments/checks/layer_knockout.py --checkpoint E1-20261123-022631-s0
+knockout-E1-s1-5090|python experiments/checks/layer_knockout.py --checkpoint E1-20261123-022550-s1
+knockout-E1-s2-5090|python experiments/checks/layer_knockout.py --checkpoint E1-20261123-022714-s2
+knockout-E10-s0-5090|python experiments/checks/layer_knockout.py --checkpoint E10-20261123-023507-s0
+knockout-E10-s1-5090|python experiments/checks/layer_knockout.py --checkpoint E10-20261123-023832-s1
+knockout-E10-s2-5090|python experiments/checks/layer_knockout.py --checkpoint E10-20261123-024100-s2
+ens-E1s0+E10s0-5090|python experiments/checks/ensemble.py --a E1-20261123-022631-s0 --b E10-20261123-023507-s0
+ens-E1s1+E10s1-5090|python experiments/checks/ensemble.py --a E1-20261123-022550-s1 --b E10-20261123-023832-s1
+ens-E1s2+E10s2-5090|python experiments/checks/ensemble.py --a E1-20261123-022714-s2 --b E10-20261123-024100-s2
+ens-E1s0+E1s1-5090|python experiments/checks/ensemble.py --a E1-20261123-022631-s0 --b E1-20261123-022550-s1
+ens-E10s0+E10s1-5090|python experiments/checks/ensemble.py --a E10-20261123-023507-s0 --b E10-20261123-023832-s1
+ens-E1s1+E1s2-5090|python experiments/checks/ensemble.py --a E1-20261123-022550-s1 --b E1-20261123-022714-s2
+ens-E10s1+E10s2-5090|python experiments/checks/ensemble.py --a E10-20261123-023832-s1 --b E10-20261123-024100-s2

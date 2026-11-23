@@ -87,6 +87,19 @@
  },
  "R1_verdict": "PASS",
  "R2_E32_vs_E1_7seed": -0.0715269839428101,
+ "R2_welch": {
+  "rel_logmean": -0.07152727964100207,
+  "ci95": [
+   -0.075893234814332,
+   -0.06714069745216522
+  ],
+  "df": 5.771592508170381,
+  "n": [
+   4,
+   7
+  ],
+  "method": "Welch t on log clean80 bpc (Cornish-Fisher t quantile)"
+ },
  "R2_verdict": "PASS",
  "E1_7seed_mean": 0.26794534176363477
 }

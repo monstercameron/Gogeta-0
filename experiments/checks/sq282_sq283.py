@@ -46,11 +46,22 @@ def main():
     r1 = {"rel_paired": math.expm1(m), "ci95": [math.expm1(m - T3 * se), math.expm1(m + T3 * se)],
           "rel_means": st.mean(long["E32"].values()) / st.mean(long["E2"].values()) - 1, "per_seed": [math.expm1(x) for x in d]}
     r2 = st.mean(long["E32"].values()) / e1_7 - 1
+    # R2 uncertainty (added v0.4.106 after claim audit 1037 b4): Welch CI on log bpc, E32 4 seeds vs E1 7 seeds.
+    # The registered R2 rule is the point estimate; this CI is the policy-2 companion, not a new test.
+    a = [math.log(v) for v in long["E32"].values()]
+    b = [math.log(v) for v in json.load(open(os.path.join(ROOT, "experiments", "checks", "results", "phase2b_5090.json")))["E1"].values()]
+    va, vb = st.variance(a) / len(a), st.variance(b) / len(b)
+    dfw = (va + vb) ** 2 / (va ** 2 / (len(a) - 1) + vb ** 2 / (len(b) - 1))
+    z = 1.959963984540054
+    tw = z + (z ** 3 + z) / (4 * dfw) + (5 * z ** 5 + 16 * z ** 3 + 3 * z) / (96 * dfw ** 2)
+    dw, sew = st.mean(a) - st.mean(b), math.sqrt(va + vb)
+    r2_ci = {"rel_logmean": math.expm1(dw), "ci95": [math.expm1(dw - tw * sew), math.expm1(dw + tw * sew)], "df": dfw,
+             "n": [len(a), len(b)], "method": "Welch t on log clean80 bpc (Cornish-Fisher t quantile)"}
     res = {"sweep": sweep, "two_seed_means": means, "best_lr": best,
            "W1_E32_vs_E34_best": w1_gap, "W1": "PASS" if w1_gap <= -0.05 else "FAIL",
            "W2_E34_vs_E2_best": w2_gap, "W2": "PASS" if w2_gap < 0 else "FAIL",
            "long_200M": long, "R1": r1, "R1_verdict": "PASS" if r1["rel_means"] <= -0.10 else "FAIL",
-           "R2_E32_vs_E1_7seed": r2, "R2_verdict": "PASS" if r2 <= -0.05 else "FAIL", "E1_7seed_mean": e1_7}
+           "R2_E32_vs_E1_7seed": r2, "R2_welch": r2_ci, "R2_verdict": "PASS" if r2 <= -0.05 else "FAIL", "E1_7seed_mean": e1_7}
     json.dump(res, open(os.path.join(ROOT, "experiments", "checks", "results", "sq282_sq283.json"), "w"), indent=1)
     for k in sorted(means):
         print(f"{k:12s} {means[k]:.4f}  {sweep[k]}")
@@ -59,7 +70,8 @@ def main():
     print("200M:", {a: {s: round(v, 4) for s, v in sorted(x.items())} for a, x in long.items()})
     print(f"R1 E32 vs E2 (4-seed means) {r1['rel_means'] * 100:+.2f}% (paired {r1['rel_paired'] * 100:+.2f}%, CI "
           f"[{r1['ci95'][0] * 100:+.2f}, {r1['ci95'][1] * 100:+.2f}]) -> {res['R1_verdict']}")
-    print(f"R2 E32 vs E1 7-seed mean {r2 * 100:+.2f}% -> {res['R2_verdict']}")
+    print(f"R2 E32 vs E1 7-seed mean {r2 * 100:+.2f}% -> {res['R2_verdict']} (Welch CI [{r2_ci['ci95'][0] * 100:+.2f}, "
+          f"{r2_ci['ci95'][1] * 100:+.2f}], df {r2_ci['df']:.1f})")
 
 
 if __name__ == "__main__":

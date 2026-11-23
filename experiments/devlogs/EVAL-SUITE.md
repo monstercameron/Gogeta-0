@@ -27,3 +27,7 @@ Q30 done 18:05:29: `GogetaConfig` gained `gdn_neg_eigval`; `post_training/test_h
 
 ### 2026-11-22 (time not recorded) · v0.4.33 · Caveat from K9
 Per-document val and solution-likelihood numbers for E0 inherit the near-duplicate val split that K9 found (41.7% of val docs). C107 (functional pass@1 on val docs) already noted that near-duplicates were not ruled out. See `experiments/checks/results/K9.json`. (Source: coordinator message; claims.md C107)
+
+## Claim audit 2026-11-23-1037 (v0.4.106)
+- **C106 (sandbox hides $HOME):** the audit was right that `self_test()` only checked writes to $HOME. A probe (`experiments/checks/sandbox_home_probe.py`, output `experiments/checks/results/sandbox_home_probe_2026-11-23.txt`) shows that inside `run_tests`, `os.listdir($HOME)` raises and `$HOME/.venvs` is invisible, while both exist on the host. The negative control (assert False) fails and the positive control (/proc visible) passes. SQ346 makes the probe part of `self_test()`.
+- **C109 (lm-eval mbpp_plus runs 3 base asserts):** the upstream evidence is now archived: unmodified lm_eval 0.4.13 `mbpp.yaml`, `mbpp_plus.yaml` and `utils.py` (MIT) in `evals/upstream/lm_eval-0.4.13/`, with sha256 values matching the wheel's RECORD.

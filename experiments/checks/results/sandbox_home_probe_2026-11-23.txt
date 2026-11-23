@@ -1,0 +1,8 @@
+2026-11-23T10:44:11-05:00
+fecba4e
+listdir_home_fails {'ran': True, 'passed': 1, 'error': None}
+home_venvs_invisible {'ran': True, 'passed': 1, 'error': None}
+control_true {'ran': True, 'passed': 1, 'error': None}
+neg_control_assert_false True 0
+pos_control_proc_visible True 1
+host_home_listable True host_venvs_exists True

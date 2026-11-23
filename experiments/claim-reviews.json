@@ -1561,6 +1561,342 @@
    "batch_file": "notes/reviews/claims/2026-11-23-0302-b8.md",
    "verdict": "WEAK",
    "note": "scoped to the paper's tasks"
+  },
+  {
+   "id": "C202",
+   "ts": "2026-11-23T10:44:52-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b1.md",
+   "verdict": "WEAK",
+   "note": "caveats added (selected LR, SQ337 metric); SQ344 strata"
+  },
+  {
+   "id": "C44",
+   "ts": "2026-11-23T10:44:52-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b1.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C108",
+   "ts": "2026-11-23T10:44:52-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b1.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C106",
+   "ts": "2026-11-23T10:44:52-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b1.md",
+   "verdict": "WEAK",
+   "note": "HOME-hidden probe added as evidence; SQ346"
+  },
+  {
+   "id": "C128",
+   "ts": "2026-11-23T10:44:52-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b1.md",
+   "verdict": "WEAK",
+   "note": "rejected, narrowed in v0.4.95"
+  },
+  {
+   "id": "C4",
+   "ts": "2026-11-23T10:44:52-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b1.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C195",
+   "ts": "2026-11-23T10:44:52-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b2.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C104",
+   "ts": "2026-11-23T10:44:52-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b2.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "rejected, limitation exists; needs human PDF fetch"
+  },
+  {
+   "id": "C109",
+   "ts": "2026-11-23T10:44:52-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b2.md",
+   "verdict": "WEAK",
+   "note": "upstream lm_eval 0.4.13 files archived as evidence"
+  },
+  {
+   "id": "C1",
+   "ts": "2026-11-23T10:44:52-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b2.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C103",
+   "ts": "2026-11-23T10:44:52-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b2.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C130",
+   "ts": "2026-11-23T10:44:52-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b2.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C196",
+   "ts": "2026-11-23T10:44:53-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b3.md",
+   "verdict": "WEAK",
+   "note": "rejected, TOST is the registered equivalence test"
+  },
+  {
+   "id": "C82",
+   "ts": "2026-11-23T10:44:53-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b3.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C10",
+   "ts": "2026-11-23T10:44:53-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b3.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C18",
+   "ts": "2026-11-23T10:44:53-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b3.md",
+   "verdict": "WEAK",
+   "note": "rejected, limitations exist"
+  },
+  {
+   "id": "C90",
+   "ts": "2026-11-23T10:44:53-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b3.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C95",
+   "ts": "2026-11-23T10:44:53-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b3.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C197",
+   "ts": "2026-11-23T10:44:53-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b4.md",
+   "verdict": "WEAK",
+   "note": "R2 Welch CI now stored; 20M-LR limitation"
+  },
+  {
+   "id": "C17",
+   "ts": "2026-11-23T10:44:53-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b4.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C8",
+   "ts": "2026-11-23T10:44:53-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b4.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C110",
+   "ts": "2026-11-23T10:44:53-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b4.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C83",
+   "ts": "2026-11-23T10:44:53-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b4.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C14",
+   "ts": "2026-11-23T10:44:53-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b4.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C199",
+   "ts": "2026-11-23T10:44:54-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b5.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C80",
+   "ts": "2026-11-23T10:44:54-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b5.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C20",
+   "ts": "2026-11-23T10:44:54-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b5.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C105",
+   "ts": "2026-11-23T10:44:54-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b5.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C131",
+   "ts": "2026-11-23T10:44:54-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b5.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C11",
+   "ts": "2026-11-23T10:44:54-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b5.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C198",
+   "ts": "2026-11-23T10:44:54-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b6.md",
+   "verdict": "WEAK",
+   "note": "rejected, tie-wording limitation exists"
+  },
+  {
+   "id": "C5",
+   "ts": "2026-11-23T10:44:54-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b6.md",
+   "verdict": "WEAK",
+   "note": "rejected, registered rule kept with CI qualifier"
+  },
+  {
+   "id": "C13",
+   "ts": "2026-11-23T10:44:54-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b6.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C81",
+   "ts": "2026-11-23T10:44:54-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b6.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C6",
+   "ts": "2026-11-23T10:44:54-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b6.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C101",
+   "ts": "2026-11-23T10:44:54-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b6.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C100",
+   "ts": "2026-11-23T10:44:55-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b7.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C7",
+   "ts": "2026-11-23T10:44:55-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b7.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C9",
+   "ts": "2026-11-23T10:44:55-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b7.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C12",
+   "ts": "2026-11-23T10:44:55-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b7.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C3",
+   "ts": "2026-11-23T10:44:55-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b7.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C22",
+   "ts": "2026-11-23T10:44:55-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b7.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C200",
+   "ts": "2026-11-23T10:44:55-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b8.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C43",
+   "ts": "2026-11-23T10:44:55-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b8.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C2",
+   "ts": "2026-11-23T10:44:55-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b8.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C94",
+   "ts": "2026-11-23T10:44:55-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b8.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C107",
+   "ts": "2026-11-23T10:44:55-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b8.md",
+   "verdict": "SOLID",
+   "note": "ok"
+  },
+  {
+   "id": "C92",
+   "ts": "2026-11-23T10:44:55-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1037-b8.md",
+   "verdict": "SOLID",
+   "note": "ok"
   }
  ]
 }

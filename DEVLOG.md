@@ -18,6 +18,27 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.106: Claim audit 2026-11-23-1037: 48 claims, no downgrades; C109 and C106 evidence archived, C197 R2 CI stored, C202 caveats + SQ344
+*2026-11-23*
+
+**Claim audit 2026-11-23-1037.** 8 Codex GPT-6 Luna auditors reviewed 48 claims (8 batches of 6, all 8 runs ok). Verdicts: 38 SOLID, 9 WEAK, 1 NEEDS-EVIDENCE. Each non-SOLID verdict was checked against the primary files. **No downgrades.**
+
+Confirmed and fixed with new evidence:
+- **C109:** lm-eval's  scores MBPP's 3 base asserts. The unmodified lm_eval 0.4.13 task files are archived in , with sha256 values matching the wheel's RECORD. VERIFIED stands.
+- **C106:** the sandbox hides $HOME. A probe with negative and positive controls () shows $HOME is unlistable and $HOME/.venvs is invisible inside . VERIFIED stands; SQ346 adds the probe to .
+- **C197:** R2's CI is now stored in the result JSON: -7.15%, Welch 95% CI [-7.59%, -6.71%], df 5.8. The 20M-only LR tuning is now a limitation. VERIFIED stands.
+- **C202:** limitations added (selected LR on the same seeds; SQ337 is not clean80), plus new evidence: SQ344, I by overlap stratum. The anti-synergy holds on clean50 (+5.49 log-points, every seed positive) and grows with overlap (dup80 +10.00). PARTIAL stands.
+
+Rejected, with reasons in each audit file's triage:
+- **Already handled by existing limitations:** C5 (registered rule kept with its CI qualifier), C196 (TOST is the registered equivalence test), C18, C128, C198.
+- **C104:** still PARTIAL. Archiving the paper text needs a human PDF fetch.
+
+Also in this version, from quick-review triage:
+- SQ344 (done) and SQ345 (pin the doc-level join by hashing the val file);
+- the 10:38 data-engineer join audit: all 24 SQ263 score files have identical per-stratum doc, char and token counts.
+
+---
+
 ## v0.4.105: Docs refresh (hourly)
 *2026-11-23*
 

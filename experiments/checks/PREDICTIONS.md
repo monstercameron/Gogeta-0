@@ -573,3 +573,24 @@ This executes only stages registered in v0.4.40 (`experiments/design/power-cost.
   - If D's 95% CI excludes 0 and is positive, the A3 v2 results stand as "with dedup".
   - If D's CI includes 0 and S explains the gap, v2's apparent gain is a coverage artefact, and A3 conclusions must not cite dedup.
 - **Seeds:** 4 per arm. The MDE is about 0.9% (the SQ253 sd), so a D below about 1% would read as inconclusive.
+
+## Fleet wave 6, part 2 (2026-11-22 ~23:55, before dispatch): SQ200 init 2x2 + SQ234 E1 under flat init (RTX 5090, 200M tokens)
+- **Question:** E0 (our dense FusionDance) is about 3.7% worse than E10 (HF Llama) at identical shapes. Is that the **init**? And did E1, which shares E0's init, start with the same handicap, so that C5's tie understates the mixer?
+- **Options** (v0.4.82, defaults bit-identical): `model.init` = "gogeta" (scaled residual-output) / "flat" (std 0.02) for FusionDance; "hf" / "gogeta" for E10.
+- **Arms** (seeds 0–3, 200M tokens; configs in `experiments/staged-configs/sq200/`, sha256-16 in brackets):
+  - E0-gogeta [4ba49a5374940ea0], the default, re-run on the 5090 because E0 has only 1 N1X seed;
+  - E0-flat [b2b8ce6f9dff80f9];
+  - E10-gogeta [c931615db8de0e52];
+  - E10-hf: the 7 Phase 2b-5090 seeds;
+  - E1-flat [9883c9c3e11105c9];
+  - E1-gogeta: the 7 Phase 2b-5090 seeds.
+  - LRs: E0/E10 3e-3, E1 6e-3. Not re-tuned per init (a limitation).
+- **Primary:** clean80 bpc, log scale. Init effect within architecture: paired by seed where both arms have it, Welch otherwise. Architecture effect within init. Interaction.
+- **Predictions:**
+  - **I1:** E0-flat beats E0-gogeta by ≥ 1.5%, i.e. init explains at least about half of the E0→E10 gap.
+  - **I2:** E10-gogeta is ≥ 1.0% worse than E10-hf. The scaled init hurts the HF stack too.
+  - **I3:** E1-flat beats E1-gogeta by 0.5–2.5%.
+  - **I4** (consequence, registered now): if I3 holds, E1-flat vs E10-hf is re-tested on the same seeds; an E1-flat advantage beyond the 0.9% MDE would reopen C5 as a new claim ("E1 beats E10 when both use their best init"), not as a status change to C5.
+- **Decision rule:**
+  - If I1 fails (E0-flat within ±0.5% of E0-gogeta), the E0 handicap is not the init. SQ240/SQ234-adjacent items (RoPE layout, eps) become next.
+  - All four configs double as the GPU smoke test for the new `init` option. Any rc ≠ 0 stops the wave.

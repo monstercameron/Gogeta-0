@@ -207,6 +207,11 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
   - "Might need it later" is not queued work.
   - A box with no running job for more than **10 minutes** is destroyed: no exceptions while it is idle.
 - **Batch to amortise:** each new box pays a fixed setup (~76 s env plus the data fetch) and a ~1 min cold compile. Put several runs on one box instead of one box per run. Prefer the cheapest SKU that fits the job by measured $/token (`experiments/devlogs/SQ220.md`).
+- **Pipeline the waves: queue the next wave before the current one ends** (the human, 2026-11-22: "queue the next wave up before the current wave ends so we don't waste time and money reconfiguring the VPS").
+  - While a wave runs, prepare, register and commit the next wave's job list: predictions, configs, scripts, plus any data a box must build. Then boxes that finish move straight on to it, with their env, datasets and compile cache already in place.
+  - Tearing down configured boxes and re-renting minutes later is the waste this rule prevents.
+  - Kill-on-empty still applies, but "empty" means **no current or next-wave job for that box**. If the next wave is not ready, its preparation is late, and that is the problem to fix first.
+  - Order the work so long, independent items run in the current wave while the dependent ones (LR picks, seed top-ups) are being registered.
 - **One SKU per comparison:** all arms of a comparison run on the same GPU type, and never pool them with N1X runs unless a bridge run shows the loss transfers (§5, `notes/compute-rental.md`).
 - **Every status update (§0c) lists live instances:** id, GPU, $/hr, uptime, current job, and spend vs the budget. Flag any idle box.
 - **Through the cockpit (§0e):** rent, set up, run, pull and destroy via the cockpit's cloud tools (MCP/TUI). The remote setup is `cockpit/remote/bootstrap.sh` and the dataset fetch `cockpit/remote/fetch_data.sh`. Only destroy instances we labelled (`gogeta-cockpit-*`).

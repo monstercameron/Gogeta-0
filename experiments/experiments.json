@@ -454,5 +454,31 @@
     "config": "experiments/staged-configs/code-moe/ (to be staged; needs the code-moe patch)",
     "results": {},
     "notes": "Human proposal 2026-11-22 (programming-specialised MoE in the recurrent loop). Semantic supervision (stage 3) and the Byte Quest combo (stage 4) are conditional on stage 1 (SQ255/SQ258/SQ260). Primary metric clean80 bpc; RTX 5090 only, never pooled with N1X runs."
+  },
+  {
+    "id": "E61",
+    "arc": "Final model (24 GB inference)",
+    "title": "Final model: G-1B (stretch G-3B), sized by the scaling fit, deployed on one 24 GB RTX 3090/4090",
+    "question": "Does the recipe chosen by the M2 gates (the E1-pattern hybrid at ~1.2B; loops, ternary and MoE only if they pass their gates) land within the SQ291 scaling fit's prediction, and does it run interactively on one 24 GB RTX 3090 and 4090 (batch 1, KV/state cache, lossless speculative decoding) at the predicted tok/s and memory?",
+    "prediction": "TO REGISTER when M2 closes: loss CI from SQ291, decode tok/s from SQ288, memory from SQ289 (plan estimates: G-1B ~300 tok/s bf16, ~450-600 int8 on a 3090; cache 8 KiB/token).",
+    "ingredients": [
+      "E1-pattern hybrid (GDN + SWA + full attention), GQA",
+      "KV + SWA ring cache, GDN recurrent decode",
+      "lossless speculative decoding (drafter / MTP / self-spec by fewer loops, whichever SQ298/SQ287 favour)",
+      "weight-only int8/int4 (SQ290)",
+      "loops / ternary / MoE only if their gates pass"
+    ],
+    "metrics": [
+      "clean80 / v3-test bpc",
+      "decontaminated eval battery",
+      "decode tok/s at batch 1 (3090, 4090)",
+      "peak VRAM at 32k/128k context",
+      "spec-decode acceptance and speedup"
+    ],
+    "status": "planned",
+    "version": null,
+    "config": "to be staged after M2 (notes/final-model-plan.md section 4)",
+    "results": {},
+    "notes": "Human goal 2026-11-23: final model with caching and speculative decoding on a 24 GB 3090/4090. Plan and milestones M1-M5 in notes/final-model-plan.md; final training (~$500-650 for G-1B) needs the human's approval. Binding constraint is training compute and unique tokens, not VRAM."
   }
 ]

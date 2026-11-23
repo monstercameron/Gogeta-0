@@ -11,9 +11,87 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 2. **Think in loops, not out loud.** Test whether latent loops can replace part of chain-of-thought, trading tokens (memory + quadratic cost) for compute.
 3. **The Rival Loop.** Build critique → fix into the recurrence: per-loop supervision, a grounded critic head for halting and feedback, adversarial damage-and-repair training.
 4. **Make the loops pay at inference.** Self-speculative decoding: draft with few loops, verify with many.
-5. **Do it on a laptop.** Everything trains and runs locally (RTX Spark N1X via WSL). Small models, clean ablations, honest results, including failures.
+5. **Do it on a laptop.** Experiments are small enough to train and run locally (RTX Spark N1X via WSL) or on cheap rented GPUs. Small models, clean ablations, honest results, including failures.
+6. **Ship it on a gaming GPU.** End the experiments with one final Gogeta model, sized by our own scaling fit and training budget, that runs interactive batch-1 inference with a KV/state cache and lossless speculative decoding on a single 24 GB RTX 3090 or 4090. Plan: [`notes/final-model-plan.md`](notes/final-model-plan.md) (primary target ~1.2B params, the final training run is rented).
 
 **Headline metric:** quality per bit of weight memory and per FLOP, plus how memory and compute *scale with context length*.
+
+---
+
+## v0.4.85: Goal 6: a final model on a 24 GB RTX 3090/4090 (plan, E61); SQ243 width effect (C198); SQ241; byte LR 3e-3; corpus v3 plan
+*2026-11-23*
+
+**New goal 6 (the human's request): ship the final model on a gaming GPU.** End the experiments with one model that runs batch-1 inference with a KV/state cache and lossless speculative decoding on a single 24 GB RTX 3090 or 4090. Added to the goals in DEVLOG and README; goal 5 now says the experiments run locally *or on cheap rented GPUs*.
+- **Plan:** `notes/final-model-plan.md` (planning subagent; the main agent re-derived the headline numbers).
+- **What binds is training money and unique tokens, not VRAM:**
+  - 24 GB holds about 9B params in bf16;
+  - every size we can afford fits with room for more than 1M tokens of cache;
+  - training costs about $2.15 per 1e18 FLOPs on a 5090 (computed from E1's measured 743k tok/s at $0.523/h, which assumes the 14M-scale efficiency carries over; SQ297 measures it).
+- **Primary target G-1B:**
+  - about 1.23B params: 24 blocks in E1's pattern (12 GDN, 8 SWA, 4 full attention), d = 2048, GQA with 4 KV heads;
+  - about 24–32B tokens, about $500–650 all-in;
+  - estimated (not measured) decode on a 3090: about 300 tok/s in bf16 and about 450–600 in int8;
+  - cache: 8 KiB per token, so about 1 GB at 128k context.
+- **Stretch G-3B:** about $2.8k. It needs Stack v3 data and sharded training, and is worth it only if the scaling fit predicts at least 5% better than G-1B.
+- **Speculative decoding:** a separate drafter or MTP heads are estimated at 1.5–2.9×. Self-speculation by fewer loops comes to about 1.3–1.6×.
+  - `gogeta/model.py` checks out: nothing in a loop pass depends on the total r, so the draft's pass caches can be reused.
+  - None of these acceptance rates has been measured.
+- **Gated, not assumed:** loops, ternary, MoE and the spec-decode scheme each enter the final model only if their gates pass. Milestones run from M1 (inference stack plus a 3090/4090 rental smoke test, under $2) to M4 (the final train). **M4 needs the human's approval.**
+- **Registered:** E61 "Final model" (planned) in `experiments/experiments.json`, and side quests SQ285–SQ298: sm_86/sm_89 kernels, KV/SWA cache with `generate()`, self-spec cache reuse, decode benchmark, memory envelope, int8/int4 PTQ, scaling-law fit, repeat-epoch penalty, GQA, long context, the 4090 L2 ternary core, drafter/MTP acceptance.
+- **Open for the human:** AGENTS §2 reserves v1.0.0 for the full fusion. If loops or ternary fail their gates, the final model is hybrid-only. Should it still be 1.0.0?
+
+**SQ243 two-size check** (16 runs on RTX 5090s, clean80 bpc, E1 at lr 6e-3 and E10 at 3e-3 at every width; `experiments/checks/results/sq243_sq241.json`):
+
+| Width | E1 − E10 | Paired 95% CI | Prediction |
+|---|---|---|---|
+| d = 512 | +0.05% | [−0.33%, +0.44%] | S1 PASS (tie) |
+| d = 384 | +0.08% | (Phase 2b, 7 seeds) | |
+| d = 256 | **−1.24%** | [−2.24%, −0.25%] | **S2 FAIL** (E1 better) |
+
+- **S3:** a scaling effect is called at the d = 256 end point.
+- **Read:** E1's linear mixers help only at the smallest width and the edge is gone by d = 384.
+- **But the LRs were not re-tuned per width** (a registered limitation). Small models often want higher LRs, so E10 at 3e-3 may be under-tuned at d = 256.
+- **New claim C198, PARTIAL** [exploratory: LRs not re-tuned per width]. Its refutation test is a per-width LR sweep.
+
+**SQ241 param-matched E1** (mlp_hidden 952, 10.62M non-embedding params, 4 seeds):
+- **vs E10:** +0.61%. P1 PASS (within ±1%).
+- **vs full E1:** +0.53%. P2 FAIL, by 0.03 points over the 0.5% bound (paired CI [+0.05%, +1.21%]).
+- **So** part of E1's tie with E10 rests on its 0.5M extra MLP params. This is added to C5 as evidence (event 11).
+
+**Byte Quest:**
+- **SQ188 LR sweep, e13b at 20M bytes** (val loss, nats/byte):
+  - lr 1.5e-3: 2.757 (the registered extension point);
+  - lr 3e-3: **2.712**;
+  - lr 6e-3: 2.967;
+  - lr 1.2e-2: 2.869.
+  - L1 (minimum at 6e-3 or above) and L2 (a flat basin) are both **refuted**. The registered rule puts every E13 arm at **3e-3**.
+  - These runs are short (153 steps), and the 6e-3 > 1.2e-2 ordering suggests noise at this length.
+- **E15b crashed and is fixed:**
+  - `Triton Error [CUDA]: invalid argument` in fla's chunk GDN kernel;
+  - cause: the parallel-refine decoder runs GDN over 32 × 1,025 patch groups × 3 heads, more than 65,535 rows on one CUDA grid axis;
+  - fix: `GatedDeltaNet._run_kernel` splits the batch, which is exact because sequences are independent (WIP `c064d29`; `test_byte_model` 24/24);
+  - the retry benches at 276k tok/s, 10.25 GB.
+- **SQ189 benches** (tok/s and peak memory):
+  - E13b: 82.1k, 7.41 GB;
+  - E14b: 110k, 9.39 GB;
+  - E14c: 700k, 13.4 GB;
+  - E13a: 368k, 10.7 GB.
+- **Now running:** the E13 patch-size sweep at 3e-3 plus E13b at 200M.
+
+**Corpus v3 research (the human's request):** research agent, `notes/research-corpus-v3.md`.
+- **Primary:** The Stack v3 train split (rev `159792e7`).
+  - ODC-By, not gated;
+  - repo-level rows, so we can finally split at repo level;
+  - Python is about 5% of bytes, so 2.5B tokens means about 80–105 GB of shards.
+- **Fallback:** codeparrot-clean (12.8 GB, about 8B permissive tokens).
+- **Downloads are human-only and not done.** SQ276 (a metadata-only shard census, a few GB) comes first.
+- **SQ276–SQ281 added** to the side quests.
+
+**Fleet:**
+- Wave 6 is running on 5 boxes: the SQ200 init 2×2 and the Inkling loop-variant runs, with SQ282 started.
+- w4-1 is on Byte Quest.
+- The inference batch finished: the docnll scorer matches the reference scorer within 1e-6 on every checkpoint it scored (max diff seen 3.6e-7). Analysis is pending.
+- **Early SQ200 signal** (seed 0/2, analysis pending): E0 with flat init 0.5889/0.5858 vs gogeta init 0.6076/0.6068 in-training val, which points to the init handicap.
 
 ---
 

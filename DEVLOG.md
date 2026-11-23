@@ -18,6 +18,16 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.2: Docs refresh (hourly)
+*2026-11-23*
+
+**Docs refresh (hourly, Haiku; checked by the main agent).**
+- **README:** the pitch keeps its ambition but now says the 200M penalties compound (C202, PARTIAL), and that the project is in an assembly phase testing one compensation at a time (A1, E62). The status block says the same.
+- **README, new block:** "Where we are, in plain words" under "Start reading here", accepted from quick review 11:03 (newcomer). In six sentences it explains F2, clean80/clean50, the 200M result and its LR caveat, E60/C203 (with the compute caveat), and that A1 is running. It has one link each to claims-status, side-quests and PREDICTIONS.
+- **notes/sketch.md:** status at v0.5.1: assembly phase, claims 19/27/9/2/1/71/2 = 131, A1 fleet (7 of 8 rented boxes running; the 8th never left "loading" and was destroyed for $0.08).
+
+---
+
 ## v0.5.1: Outside review 12:10: A1 amended before results (A1i truncation control, A1z placebo, A1k LR check); E60c is not compute-matched
 *2026-11-23*
 

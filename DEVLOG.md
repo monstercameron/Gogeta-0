@@ -17,6 +17,13 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.64: README carries the SQ99 warning (correction to v0.4.63)
+*2026-11-22*
+
+**Correction**: v0.4.63's entry said the README status carries the SQ99 warning, but the edit didn't apply (the hourly docs refresh had reworded the anchor sentence), so v0.4.63's README didn't contain it. This version adds it to the README status paragraph: on out-of-corpus Python, E1's advantage over E0 disappears (+0.42% worse, vs −3.44% better in corpus); exploratory; it will be re-checked with the tuned, replicated Phase 2b checkpoints.
+
+---
+
 ## v0.4.63: SQ99: E1's advantage does not transfer out of corpus (exploratory)
 *2026-11-22*
 

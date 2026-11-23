@@ -18,6 +18,28 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.21: Docs refresh (hourly)
+*2026-11-23*
+
+**Docs refresh (hourly): README, sketch and campaign notes brought up to v0.5.20; five README result statements checked against their ledger status.**
+
+- **README:**
+  - The status paragraph now carries the A3 and A4 finals and the speculative-decoding result. "Ties dense" is gone everywhere: the full-precision A2f is "0.9% below dense in point estimate, no equivalence test", and A3mx is "not shown to tie dense" (v0.5.19 erratum).
+  - A new results bullet covers A3/A4 (C208, C210 PARTIAL; SQ394).
+  - The Byte Quest table no longer says the 200M E13 runs are unanalysed (SQ374, v0.5.15).
+- **Status-wording check** (quick review 14:24), five README statements vs `experiments/claims-status.md`. Four were fixed and one already matched:
+  - "Loops don't pay yet" now says C6 PARTIAL.
+  - The A2 headline now says C209 VERIFIED at recipe level (it said "exploratory").
+  - "Ties dense" became a point estimate.
+  - The GRPO-block bullet now says C83 PARTIAL.
+  - "Does not stack" (C202 PARTIAL) already matched.
+  The long-context bullet is labelled "no ledger claim yet".
+- **notes/sketch.md:** status rewritten from v0.5.14 to v0.5.20, with claim counts matching the ledger (140 claims). Seven decisions-log entries were added (v0.5.10-v0.5.20).
+- **experiments/launch/campaigns/README.md:** the wave row now covers A1-A4, and the stale QUEUE timestamp is corrected.
+- **Checks:** the main agent verified the diff, and every cited status matches the ledger. `post_training/SETUP.md` was already current.
+
+---
+
 ## v0.5.20: A4 final: full stack not viable yet (byte decoder +14.4% vs BPE head; second shared byte pass -1.7%); fixed loop depth beats random -3.2% (3 seeds); self-speculative decoding built, not lossless under int8 activations
 *2026-11-23*
 

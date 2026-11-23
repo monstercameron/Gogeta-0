@@ -1,0 +1,20 @@
+{
+ "0": {
+  "identical_all_steps": true,
+  "first": [
+   "9c6b772176e1113d",
+   "13c6ecfaa16d06b2",
+   "2503ed40594ef405"
+  ]
+ },
+ "1": {
+  "identical_all_steps": true,
+  "first": [
+   "b1520f1539bb9595",
+   "8b5310a6cc33e678",
+   "9fd1d9e6ff5a33b9"
+  ]
+ },
+ "different_seeds_differ": true
+}
+PAIRED BATCHES OK

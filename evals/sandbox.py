@@ -43,7 +43,7 @@ from functools import lru_cache
 from post_training.rewards import (IS_LINUX, NOBODY, _HARNESS, _child_python, _drop_privileges,  # noqa: F401
                                    _limits, extract_code, score)
 
-HIDE = ("/mnt", "/tmp", "/dev/shm", "/run")
+HIDE = ("/mnt", "/tmp", "/dev/shm", "/run", "/var/tmp")  # /var/tmp added 2026-11-23: it was host-shared and writable (quick review 02:54)
 # Runs as root-in-a-new-userns (outer `unshare -rnm`), mounts the private tmpfs views, then
 # enters a NESTED user + mount namespace as uid/gid 65534 before exec'ing Python. Without the
 # nested step the child would be ns-root with CAP_SYS_ADMIN and could simply `umount /mnt`
@@ -124,6 +124,9 @@ def self_test(repo_root: str) -> dict:
         checks["windows_drive_hidden"] = r["passed"] == 1
         r = run_tests("open(%r, 'w').write('x')\n" % home_probe, ["assert True"])
         checks["home_not_writable"] = not r["ran"] and not os.path.exists(home_probe)
+        var_probe = os.path.join("/var/tmp", f".sandbox_probe_{tag}")
+        r = run_tests("open(%r, 'w').write('x')\n" % var_probe, ["assert True"])
+        checks["shared_tmp_private"] = not os.path.exists(var_probe)  # a write inside must not reach the host
         r = run_tests("import ctypes\nlibc = ctypes.CDLL(None, use_errno=True)\n"
                       "rc = libc.umount2(b'/mnt', 2)\nimport os\n"
                       "ok = rc != 0 and not os.path.exists('/mnt/c')\n", ["assert ok"])
@@ -139,7 +142,8 @@ def self_test(repo_root: str) -> dict:
     except Exception as e:  # any failure to build the sandbox = not ok
         checks["error"] = f"{type(e).__name__}: {e}"
     finally:
-        for f, key in ((probe_file, "repo_not_writable"), (home_probe, "home_not_writable")):
+        for f, key in ((probe_file, "repo_not_writable"), (home_probe, "home_not_writable"),
+                       (os.path.join("/var/tmp", f".sandbox_probe_{tag}"), "shared_tmp_private")):
             if os.path.exists(f):
                 os.remove(f)
                 checks[key] = False

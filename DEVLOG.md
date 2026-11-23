@@ -18,6 +18,46 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.100: Eval sandbox: /var/tmp leak found and fixed (12/12 self-test); paired batches verified; E60 LR 6e-3 for all arms
+*2026-11-23*
+
+**Eval sandbox fix** (quick review 02:54, safety):
+- **The leak:** a canary written to `/var/tmp` from inside `evals.sandbox.run_tests` persisted on the host, so one eval run could leave files for a later one. `/tmp`, `/dev/shm`, `/run` and `/mnt` were already private.
+- **The fix:**
+  - `/var/tmp` joins the private tmpfs mounts;
+  - a new self-test probe, `shared_tmp_private`, checks that a write inside does not reach the host.
+- **Result:**
+  - the re-probe leaves no canary on the host;
+  - `python -m evals.sandbox` passes **12/12** (`experiments/checks/results/test-runs/2026-11-23-sandbox-selftest.json`);
+  - C106 gets the evidence.
+- **SQ61's gates now include:** a world-writable-path sweep and resource budgets (02:39), alongside the network, filesystem and descendant-cleanup gates.
+
+**Paired batches verified empirically** (quick review 02:44, data engineer):
+- **The check:** `experiments/checks/check_paired_batches.py` hashes the token ids for 20 steps under seeds 0 and 1. It compares two arms that use very different amounts of global RNG.
+- **The result:** the hashes are identical at every step, and different seeds differ. The loader's own generator (`gogeta/train.py:61`) makes every seed-paired comparison truly paired.
+
+**E60 LR grid** (registered G3 rule, clean80 at 20M):
+
+| Arm | lr 3e-3 | lr 6e-3 | lr 1.2e-2 |
+|---|---|---|---|
+| E60a | 0.4493 | **0.4423** | 0.4574 |
+| E60b | 0.4507 | **0.4434** | 0.4663 |
+| E60c | 0.4474 | **0.4438** | 0.4795 |
+
+- All three arms take **6e-3**, an interior minimum, so no extension point is needed.
+- The 18 runs at 200M (3 arms × 6 seeds) are running on three 5090s.
+
+**Quick reviews 02:39, 02:44 and 02:54:** triaged in their files.
+
+**Fleet:**
+- **w4-1 is destroyed** (the human: "tear down any vps … if we don't use it").
+- A pull-and-destroy watcher will take down w4-3, w4-4 and w4-6 when E60 finishes. Nothing more is queued.
+- **Near-miss, disclosed:** the watcher's first version called the destroy helper under Windows PowerShell 5.1. There, `ConvertFrom-Json` does not enumerate arrays, so the label filter matched every instance and the destroy received all four ids.
+  - The Vast CLI rejected the multi-id call, and no box was lost (all four were verified running).
+  - The helper now force-enumerates, requires exactly one exact-label match and refuses otherwise. It is dry-run-checked under PowerShell 5.1 and 7.
+
+---
+
 ## v0.4.99: Outside review 02:37: init-matched F2 check (SQ326), context-truncation intervention (SQ327); data-order pairing confirmed by code read
 *2026-11-23*
 

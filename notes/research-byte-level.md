@@ -171,3 +171,6 @@ Not added to `refs/fetch_refs.py` (another agent owns it). Suggested `refs/14-by
 1. Run **no byte GPU work now**: prerequisites are P3 (flex SWA, otherwise T=4,096 is infeasible), a byte data path, and the K9-clean scorer (SQ95 parity). Start with BX2's build (fixed patches), since it is the only arm that is not 3.6x the FLOPs; BX1 is the control that makes BX2 interpretable.
 2. Expectation to hold ourselves to: a byte interface is a **cost** at 14M params, not a gain, and the strongest argument for it (a looped core on patches that makes loops cheap) is a hypothesis that BX2 followed by Variant C must earn.
 3. Everything in the survey is reported, not verified; ledger rows are proposed in `experiments/byte_level/proposed-claims.md`.
+
+---
+**Correction (main agent, v0.4.60):** MambaByte's "2.6x" decoding speedup (2401.13660, Table 6) is **lossy**: a drafted byte is accepted if it's in the verifier's top-3, and faithfulness to greedy MambaByte is 0.89. It's measured against plain MambaByte-972M with a 110M subword drafter, on PG19, hardware and batch not stated in that table. The paper's other "2.6x" (MambaByte vs MegaByte, Table 5) is a different comparison. See `notes/research-speculative-bytes.md`.

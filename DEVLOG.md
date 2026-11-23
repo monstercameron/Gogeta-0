@@ -17,6 +17,30 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.60: Coarse-to-fine architecture analysis; MambaByte speculative decoding research
+*2026-11-22*
+
+### Coarse-to-fine FusionDance (the human's architecture proposal, analysed by the main agent)
+`notes/analysis-coarse-to-fine.md`: a patch backbone, then patch-to-byte expansion, then a shared-weight byte refinement loop.
+- **The skeleton is known** (MegaByte, BLT, H-Net, AU-Net), and the causal one-patch shift is MegaByte's.
+- **What's new:** recurrence used as high-resolution refinement after a cheap global pass. The hypothesis is H-C2F: shared refinement beats both a single-pass decoder and **an equal-FLOP unshared decoder**.
+- **Estimated cost** at P=4 and d_local=192: r=1/2/4 is 1.04×/1.19×/1.48× E1, because dropping the 8k head (21% of E1) pays for the byte encoder. "Refine only the active region" saves compute at inference, not training. Dense SWA at T=4,096 needs the flex-attention patch.
+- **E2's lessons apply:** gated or contractive updates, per-pass loss, pass embedding, raw-byte re-injection, and the full L(r) curve.
+- **A cheaper first test: SQ207, a speller on frozen E1** (BPE tokens as patches), which isolates the loop question in minutes.
+- Side quests **SQ206–SQ209** (causality test, speller, BLT-lite with the winning decoder, exact-span eval).
+
+### Speculative decoding: tokens draft, bytes verify (MambaByte, research only)
+`notes/research-speculative-bytes.md`:
+- **MambaByte's 2.6× is lossy:** top-3 acceptance, measured against plain MambaByte-972M with a 110M subword drafter (Table 6). The "2.6×" in `notes/research-byte-level.md` is corrected.
+- **At our 13M scale** the drafter/verifier cost ratio is about 1, so the estimates are 1.0–1.4× for tokens→bytes and 1.2–1.5× for r=1→r=4 loops.
+- **GDN rollback** = state snapshot + replay. ReplaySSM (2610.13778) does this as a pointer move.
+- Side quests **SQ196–SQ199**. The first is the acceptance oracle on E2 r=1 vs r=4, about 2–3 GPU-min.
+
+### Watchdog
+INC-20261122-002 (eval-battery diagnostic mqarH exited 143) was triaged as an operator stop by that subagent and closed, the same as INC-001.
+
+---
+
 ## v0.4.59: Outside review 19:37: E0 may be a handicapped yardstick (init differs from Llama)
 *2026-11-22*
 

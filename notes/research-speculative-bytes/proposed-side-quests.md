@@ -1,0 +1,10 @@
+# Proposed side quests SQ196-SQ199 (speculative decoding across granularities)
+
+Proposals only (not merged into `experiments/side-quests.md`). Evidence: [`notes/research-speculative-bytes.md`](../research-speculative-bytes.md). All numbers are predictions or computed from stated assumptions.
+
+| ID | Idea | Why / prediction / criterion | Cost | Status |
+|---|---|---|---|---|
+| SQ196 | **Offline acceptance oracle for r=1 vs r=4 on E2** (extends SQ98): teacher-forced on K9-clean val; per-token greedy agreement, sampling acceptance sum min(p1,p4), consecutive-agreement length distribution, strata by entropy/token type; feed into the speculative speedup formula with c = 5/14 | Predicted greedy agreement 0.65-0.85, sampling acceptance 0.55-0.75, mean run 2.5-5 tokens; computed speedup 1.2-1.55x at gamma 3. Build E8 if computed speedup >= 1.3x; refuted if agreement < 0.60 (then use exit-aware training, SQ17) | ~2-3 GPU-min | idea |
+| SQ197 | **BPE-E1 drafts bytes of byte-E1**: same oracle, per-BPE-token greedy and top-3 byte match, aligned by string | Predicted alpha 0.55-0.75 greedy, 0.75-0.9 top-3; a same-size drafter (c ~ 1) needs alpha >= ~0.8 for 1.3x. Dead below 0.7 unless the drafter is smaller or a BLT-S-style local decoder drafts | ~3 GPU-min after SQ180 | idea, blocked on SQ180 |
+| SQ198 | **Decode-regime microbench (no trained model)**: whole-model decode step latency for the E1 shape (GDN `fused_recurrent` + stub/SQ53 cache), chunked verify of n in {4,8,16}, GDN state replay for a in {1..16} | Predicted step 0.4-1.0 ms eager, verify(16)/step < 1.5, replay <= 0.5 of verify. If verify(16)/step > 3, speculation is dead at batch 1 whatever the acceptance. Supplies the real c and rollback cost | ~3 GPU-min | idea |
+| SQ199 | **Exact byte distribution from the BPE model (ByteSampler, 2506.14123) on E1**: check exactness on 1k prefixes, measure per-byte cost vs a BPE step | Decides lossless vs MambaByte-style lossy (top-3) verification for scheme A. Pass: sums to 1 and reproduces BPE sequence probabilities to fp tolerance; cost per byte <= 3x a BPE step | CPU / ~5 GPU-min | idea |

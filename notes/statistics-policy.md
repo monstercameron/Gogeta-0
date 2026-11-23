@@ -25,7 +25,7 @@ All of the following, and the claim row must say so:
 Statuses:
 | Status | Training-comparison meaning |
 |---|---|
-| `VERIFIED` | 1-6 all met. |
+| `VERIFIED` | 1-6 all met, where 4 applies to difference claims and 6 to equivalence claims: an equivalence ("no effect / free / no loss") claim is VERIFIED by a passing TOST at its registered margin together with 1-3 and 5, even when the ordinary difference CI includes 0 (as C196). (Clarified v0.5.29 after quick review 2026-11-23 15:34.) |
 | `PARTIAL` | n >= 2 seeds, or n = 3 with a CI that includes 0 but the registered rule met; or n = 1 *plus* an independent deterministic confirmation. The evidence column must say which, with the n, the CI and the df. |
 | `PARTIAL` + tag **`[exploratory n=1]`** | One seed: the number is a lead, not a result. **A single-seed LM comparison is never VERIFIED.** |
 | `UNVERIFIED` | no measurement, or measurement invalid (e.g. contaminated metric, untuned control). |

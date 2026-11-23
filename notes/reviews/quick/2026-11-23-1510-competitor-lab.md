@@ -1,0 +1,12 @@
+# Quick review 2026-11-23-1510 - competitor lab (Codex GPT-6 Luna high)
+
+- **Observation:** The claims ledger lists 24 VERIFIED and 74 UNVERIFIED claims out of 141. Keep broad architectural conclusions narrow until the unverified claims have local evidence. (`experiments/claims-status.md`)
+- **Observation:** SQ379’s out-of-corpus results suggest the assembly gain survives while ternary and loop costs shrink, but the devlog says C213 is still a hypothesis pending seed-level replication. (`DEVLOG.md`, v0.5.26; C213)
+- **Observation:** The MoE capacity control and pass-count check are registered, while E8 runs and the next GPU slot is unavailable. The queue’s immediate CPU work repairs an invalid MQAR control. (`DEVLOG.md`, v0.5.27; `experiments/QUEUE.md`)
+
+- **Idea:** [speculation] Test whether the assembly advantage depends on identifier memorization: score paired held-out snippets before and after consistent local-identifier renaming for A2s and E27. **Cheapest test:** inference-only, about 5–10 GPU minutes at 13M scale. **Change the plan if:** renaming erases over half the A2s–E27 gap; prioritize structure-focused evaluation before treating the gain as code generalization.
+
+- **Question for the main agent:** What minimum out-of-corpus result would make C213 strong enough to change the model’s design priorities?
+## Triage
+- Identifier-renaming probe: merged into SQ194 (formatting robustness: semantics-preserving rewrites scored before and after) as an extension. It adds consistent local-identifier renaming for A2s vs E27 and A2f vs E24, with this review's threshold (renaming erases more than half the gap).
+- Question (what minimum out-of-corpus result would make C213 change design priorities?): SQ400 must show, with a paired-by-seed CI over at least 3 seeds per arm (seed variance included, not only the package bootstrap), two things. First, the ternary cost out of corpus (A2s vs A2f) has a 95% CI upper bound below +3%, while its clean80 cost stays above +5%. Second, the loop cost out of corpus (A2f vs E24) has a CI that includes 0 or favours loops. If both hold, the design priority moves from designing around ternary and loops on clean80 to sizing and scoring the final model (E61) on out-of-corpus quality, and the MoE/precision fixes are judged there. If either fails, C213 stays a hypothesis and the clean80 design-arounds continue. This threshold is written into SQ400's registration before it runs.

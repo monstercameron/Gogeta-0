@@ -18,6 +18,29 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.29: Outside review 15:37: optimizer confound of weight sharing (SQ404), temporal holdout (SQ405); statistics policy clarified for equivalence claims (TOST)
+*2026-11-23*
+
+**Outside review 15:37: the optimizer confound of sharing (SQ404, top pick), temporal holdout (SQ405), threshold sensitivity and a training-free halting signal folded into existing items. Statistics policy clarified for equivalence claims.**
+
+- **Outside review** (`notes/reviews/2026-11-23-1537-review.md`, Haiku), triaged in its footer:
+  - **SQ404 (top pick):** shared weights sum their gradients over passes at one global LR, so they step larger than unshared weights. The loop cost that decides D3 (A2f vs E24 +3.2%) may partly be step size. The test is a core-only LR multiplier of 0.5/1/2 vs unshared, at 20M tokens, 2 seeds. It needs a per-group LR option, and its prediction is registered before it runs.
+  - **SQ405:** temporal holdout (post-snapshot code). It needs the human for any download.
+  - **Merged:** a training-free halting signal into SQ403 (per-token KL between r = 1 and r = 2 vs the loss gain); clean50/clean80/full-val sensitivity of the A2/A3 headlines into SQ239; a target-alignment audit as a precondition of SQ387.
+  - **Rejected after checking the code:** the claim that the compute-matched readout is on a different scale from C209. Both store `expm1` of the mean log ratio. The provisional matched gap (n 2) is -16.2% [-19.6, -12.5], against C209's -16.67%.
+  - **Covered:** the seed-variance floor (SQ388 uses Phase 2b's 7-seed groups) and data-matching E27_cm (the registered match is on FLOPs).
+- **Statistics policy, clarified** (quick review 15:34): criterion 4 (CI excludes 0) applies to difference claims and criterion 6 (TOST) to equivalence claims. An equivalence claim is VERIFIED by a passing TOST at its registered margin even when the difference CI includes 0, as C196 already was. No claim's status changes.
+- **Quick reviews triaged, all footers in `notes/reviews/quick/`:**
+  - 15:10: identifier renaming, SQ194; C213's design-change threshold sent for SQ400's registration.
+  - 15:14: the 24 GB bench target is a rented 3090/4090, in E8's queue note.
+  - 15:19: leave-one-package-out is required in SQ400.
+  - 15:24: input manifest, SQ299.
+  - 15:29: the main target is quality per FLOP and per byte on code.
+  - 15:34: bootstrap calibration, SQ213.
+- **Running:** compute-matched E27 seed 4 (A2 amendment 3, last box).
+
+---
+
 ## v0.5.28: Docs refresh (hourly); A3 amendment 2: A2f LR-robust, ternary cost +9.5% at each arm's best LR
 *2026-11-23*
 

@@ -18,11 +18,11 @@
 <header class="page-head"><div class="wrap">
   <span class="eyebrow">Experiment E11 · Reverse Kamehameha</span>
   <h1 class="exp-title">Negative-eigenvalue Gated DeltaNet for language modelling</h1>
-  <p class="status-line"><span class="pill planned">Charging</span>
-     
+  <p class="status-line"><span class="pill done">Fusion stable</span>
+     <span class="muted">recorded in v0.4.79</span>
      <span class="muted">config <code>configs/e11_negeig.json</code></span></p>
   <p class="lead"><b>The question:</b> Does letting GDN&#x27;s write strength go negative (beta in (0, 2), i.e. negative eigenvalues) cost or help language modelling? E1&#x27;s exact layout and recipe with one change (gdn_neg_eigval). Motivated by SQ6 arm (e): 100% parity in one pass and length generalisation, vs 97.9%/61.2% for looping (ledger C43).</p>
-  
+  <div class="stats"><div class="stat-card"><div class="v">0.584</div><div class="k">validation loss</div><div class="sub">-3.6% vs E0</div></div></div>
 </div></header>
 <section class="article"><div class="wrap prose">
   <h2 id="what-it-will-test-in-plain-english">What it will test, in plain English</h2>
@@ -34,12 +34,12 @@
 <p>FusionDance's original bet was that looping would give the model the "keep track of state" ability that these fast layers lack. If a free one-setting change does that better, the loop may be needed for something else, or not at all. That would be a big, useful surprise.</p>
 <h2 id="status">Status</h2>
 <p><strong>Registered, not run.</strong> Config <code>configs/e11_negeig.json</code> and the prediction are written. It runs after the learning-rate sweep (K7), with 3 seeds, next to E1.</p>
-  
+  <details class="viz-table"><summary>All recorded numbers</summary><div class="table-wrap"><table class="kv"><tbody><tr><th>Validation loss</th><td>0.5842</td></tr><tr><th>val_loss_note</th><td>RTX 5090 3-seed mean (0.5831/0.5838/0.5856), contaminated val; N1X run killed (thermal)</td></tr><tr><th>clean80_bpc_5090_mean3</th><td>0.2671</td></tr><tr><th>claim</th><td>C196 (equivalent to E1 within 1%)</td></tr><tr><th>evidence</th><td>experiments/checks/results/phase2b_5090.json</td></tr></tbody></table></div></details>
   <p class="muted small">New to the jargon? <a href="../learn.html">Start here</a> for plain-English definitions of loss, tokens, parameters and FLOPs.</p>
   <div class="pager"><a class="btn" href="E10.html">← E10</a><a class="btn" href="../devlog.html#experiments-section">All experiments</a><a class="btn" href="E12.html">E12 →</a></div>
 </div></section>
 <footer><div class="wrap">
-  <span>Gogeta-0 · FusionDance architecture · v0.4.78</span>
+  <span>Gogeta-0 · FusionDance architecture · v0.4.79</span>
   <span>An independent research project and fan homage, not affiliated with or endorsed by the Dragon Ball rights holders.</span>
 </div></footer>
 <script src="../assets/charts.js"></script>

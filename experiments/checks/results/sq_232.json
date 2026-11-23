@@ -1,0 +1,29 @@
+{
+ "check": "SQ232",
+ "title": "Same-SKU (RTX 5090) same-seed replay floor at 20M tokens, seed 0, lr 3e-3",
+ "E10_val_loss": [
+  1.0297,
+  1.029,
+  1.0312
+ ],
+ "E1_val_loss": [
+  1.0051,
+  1.0056,
+  1.0079
+ ],
+ "E10_clean80_bpc_replays": [
+  0.4608,
+  0.4625
+ ],
+ "E1_clean80_bpc_replays": [
+  0.4558,
+  0.4567
+ ],
+ "spread_val_loss": {
+  "E10": 0.0022,
+  "E1": 0.0028
+ },
+ "prediction": "P-R1: |dval| between same-seed same-SKU replays <= 0.002",
+ "verdict": "FAIL (narrowly): spreads 0.0022 (E10) and 0.0028 (E1); runs are not bitwise reproducible (no --deterministic), so cross-SKU deltas up to ~0.002 (C195) are within run-to-run noise",
+ "runs": "first values = the SQ220 5090 bridge runs; others = wave-1 replays (worker.status on boxes w1-4/5/8)"
+}

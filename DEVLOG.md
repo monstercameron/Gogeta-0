@@ -17,6 +17,39 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.79: Phase 2b-5090 done: E1 ties E10 (7 seeds), E11 equivalent to E1 (C196), loops don't pay; SQ232 replay floor 0.002
+*2026-11-22*
+
+**Phase 2b-5090 is complete** (`experiments/devlogs/PHASE2B-5090.md`, `experiments/checks/results/phase2b_5090.json`).
+- **Design:** registered before dispatch (v0.4.74). 19 runs at 200M tokens on 6 rented RTX 5090s, commit `8441ad0`, each box's dataset rebuilt and verified byte-identical. Every checkpoint is scored on clean80.
+- **Clean80 bpc means:**
+  - E10: 0.26772 (7 seeds);
+  - E1: 0.26795 (7 seeds);
+  - E11: 0.26710 (3 seeds);
+  - E9: 0.2773 (1 seed);
+  - E2: 0.2845 (1 seed).
+- **R1, E1 vs E10:** E1 +0.08%, paired 95% CI [−0.00087, +0.00132], p 0.64. **A tie.** The sign matches the N1X test (C5 REFUTED, v0.4.78), but the CI spans 0. Over both machines (10 seeds per arm), E1 is within about ±0.4% of a tuned transformer and not better.
+- **R3, E11 vs E1:** −0.13%, TOST p 0.002 inside the registered ±1% margin, so they are **equivalent**. New claim **C196, VERIFIED** (3 seeds, clean80, RTX 5090).
+- **Holm (m = 2):** neither comparison rejects equality.
+- **R2, cross-SKU:** **pass**. 6/6 matched items within 0.0010 val_loss of the N1X; clean80 of N1X vs 5090 checkpoints within 0.0008. C195 gets evidence; it stays PARTIAL because the 3090 half is 20M only.
+- **Loops (descriptive, 1 seed):** E2 (looped) is 2.6% worse than its unlooped twin E9 and 6.2% worse than E1. C6 gets evidence.
+
+**SQ232, same-SKU replay floor** (`sq_232.json`):
+- Same-seed 5090 replays differ by 0.0022 (E10) and 0.0028 (E1) at 20M tokens. P-R1 (≤ 0.002) fails narrowly.
+- So cross-SKU deltas of up to about 0.002 are within run-to-run noise (C195 limitation).
+
+**Registry:** E10, E11 and E9 are now `done` in `experiments/experiments.json`, with their clean80 results; E1 gets its Phase 2b numbers. This fixes the stale "E10 planned" in INDEX that the reviews flagged.
+
+**What this means:** at 13.8M params and 200M tokens, the hybrid mixers (E1) tie a well-tuned transformer, and negative-eigenvalue GDN (E11) changes nothing measurable. The open questions move to:
+- scale (SQ243, the two-size check);
+- implementation parity of the control (SQ234);
+- real wall-clock efficiency (SQ244);
+- whether loops or ternary can earn their place: the A3 factorial and controls now running on the fleet.
+
+**Quick review 21:47 (newcomer):** SQ246 (calibration, descriptive) accepted. The main open test is now the FusionDance combination vs its controls.
+
+---
+
 ## v0.4.78: C5 REFUTED on the registered primary metric: E1 is 0.18% worse than the E10 control; outside review 21:40
 *2026-11-22*
 

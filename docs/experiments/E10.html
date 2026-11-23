@@ -18,11 +18,11 @@
 <header class="page-head"><div class="wrap">
   <span class="eyebrow">Experiment E10 · Scouter Calibration</span>
   <h1 class="exp-title">Reference control: Hugging Face Llama at E0&#x27;s size</h1>
-  <p class="status-line"><span class="pill planned">Charging</span>
-     
+  <p class="status-line"><span class="pill done">Fusion stable</span>
+     <span class="muted">recorded in v0.4.79</span>
      <span class="muted">config <code>configs/e10_llama_ref.json</code></span></p>
   <p class="lead"><b>The question:</b> Is our own dense baseline (E0) a fair yardstick? Hugging Face&#x27;s unmodified LlamaForCausalLM at exactly E0&#x27;s size (13.77M params, 10.62M non-embedding, same FLOPs), trained with the same data and loop at its own tuned learning rate and 3 seeds, becomes the control every other model is compared to.</p>
-  
+  <div class="stats"><div class="stat-card"><div class="v">0.585</div><div class="k">validation loss</div><div class="sub">-3.6% vs E0</div></div></div>
 </div></header>
 <section class="article"><div class="wrap prose">
   <h2 id="what-it-will-test-in-plain-english">What it will test, in plain English</h2>
@@ -33,12 +33,12 @@
 <p>The predictions and pass criteria were written before any run, in the <a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/experiments.json">registry</a> and in <code>experiments/checks/PREDICTIONS.md</code>.</p>
 <h2 id="status">Status</h2>
 <p><strong>Planned.</strong> Its config and launch script are ready (<code>configs/e10_llama_ref.json</code>, <code>experiments/launch/E10.sh</code>). A CPU check confirms E10 has exactly E0's parameter count and per-token arithmetic. Nothing has been trained yet.</p>
-  
+  <details class="viz-table"><summary>All recorded numbers</summary><div class="table-wrap"><table class="kv"><tbody><tr><th>Validation loss</th><td>0.5845</td></tr><tr><th>val_loss_note</th><td>N1X 3-seed mean at lr 3e-3 (seeds 0-2), contaminated val</td></tr><tr><th>clean80_bpc_n1x_mean3</th><td>0.2672</td></tr><tr><th>clean80_bpc_5090_mean7</th><td>0.2677</td></tr><tr><th>n_seeds</th><td>{&#x27;N1X&#x27;: 3, &#x27;RTX5090&#x27;: 7}</td></tr><tr><th>evidence</th><td>experiments/checks/results/REPLICATION-stats.json, experiments/checks/results/phase2b_5090.json</td></tr></tbody></table></div></details>
   <p class="muted small">New to the jargon? <a href="../learn.html">Start here</a> for plain-English definitions of loss, tokens, parameters and FLOPs.</p>
   <div class="pager"><a class="btn" href="E9.html">← E9</a><a class="btn" href="../devlog.html#experiments-section">All experiments</a><a class="btn" href="E11.html">E11 →</a></div>
 </div></section>
 <footer><div class="wrap">
-  <span>Gogeta-0 · FusionDance architecture · v0.4.78</span>
+  <span>Gogeta-0 · FusionDance architecture · v0.4.79</span>
   <span>An independent research project and fan homage, not affiliated with or endorsed by the Dragon Ball rights holders.</span>
 </div></footer>
 <script src="../assets/charts.js"></script>

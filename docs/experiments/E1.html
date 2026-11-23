@@ -46,12 +46,12 @@
 <ul><li><strong>One seed.</strong> A 3.6% gap at this scale is probably real (it held at every checkpoint), but the replication runs that would confirm it were interrupted.</li><li>Short context only (1,024 tokens). The big promised win of these layers is on <em>long</em> inputs, which we haven't measured yet.</li><li>More parameters than E0 (+4%). A small part of the gap could come from that rather than the layer types.</li></ul>
 <h2 id="what-s-next">What's next</h2>
 <p>E1's layer mix is now the best "mixer stack" we have. <a href="E2.html">E2</a> takes those same ingredients and adds the loop.</p>
-  <details class="viz-table"><summary>All recorded numbers</summary><div class="table-wrap"><table class="kv"><tbody><tr><th>Validation loss</th><td>0.5846</td></tr><tr><th>Bits per character</th><td>0.2267</td></tr><tr><th>Parameters (non-embedding)</th><td>11.09M</td></tr><tr><th>Training compute (FLOPs)</th><td>1.821e+16</td></tr><tr><th>Training time</th><td>39 min</td></tr><tr><th>Speed (tokens/s)</th><td>86k</td></tr><tr><th>Peak GPU memory</th><td>7.1 GB</td></tr><tr><th>Run id</th><td>E1-20261122-124440-s0</td></tr></tbody></table></div></details>
+  <details class="viz-table"><summary>All recorded numbers</summary><div class="table-wrap"><table class="kv"><tbody><tr><th>Validation loss</th><td>0.5846</td></tr><tr><th>Bits per character</th><td>0.2267</td></tr><tr><th>Parameters (non-embedding)</th><td>11.09M</td></tr><tr><th>Training compute (FLOPs)</th><td>1.821e+16</td></tr><tr><th>Training time</th><td>39 min</td></tr><tr><th>Speed (tokens/s)</th><td>86k</td></tr><tr><th>Peak GPU memory</th><td>7.1 GB</td></tr><tr><th>Run id</th><td>E1-20261122-124440-s0</td></tr><tr><th>phase2b</th><td>{&#x27;clean80_bpc_n1x_mean3_lr6e-3&#x27;: 0.2677, &#x27;clean80_bpc_5090_mean7_lr6e-3&#x27;: 0.26795, &#x27;vs_E10&#x27;: &#x27;C5 REFUTED (v0.4.78): E1 not better than E10 (+0.18% N1X, +0.08% 5090)&#x27;}</td></tr></tbody></table></div></details>
   <p class="muted small">New to the jargon? <a href="../learn.html">Start here</a> for plain-English definitions of loss, tokens, parameters and FLOPs.</p>
   <div class="pager"><a class="btn" href="E0.html">← E0</a><a class="btn" href="../devlog.html#experiments-section">All experiments</a><a class="btn" href="E2.html">E2 →</a></div>
 </div></section>
 <footer><div class="wrap">
-  <span>Gogeta-0 · FusionDance architecture · v0.4.78</span>
+  <span>Gogeta-0 · FusionDance architecture · v0.4.79</span>
   <span>An independent research project and fan homage, not affiliated with or endorsed by the Dragon Ball rights holders.</span>
 </div></footer>
 <script src="../assets/charts.js"></script>

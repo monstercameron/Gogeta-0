@@ -212,6 +212,28 @@ class CampaignTests(Fx):
             sh.assert_not_called()
         self.assertIn("only", watchdog.resume_campaign(str(self.d / "x.campaign"), True)["refused"])
 
+    def test_sigterm_stopped_campaign_is_operator_never_auto_resumed(self):
+        # 2026-11-22: the human ordered a GPU kill (overheat); the runner exited 143 and the watchdog auto-resumed it as "transient"
+        self.campaign("p2b", 3, 1, "143", "[t] [2/3] E11 --seed 0\n  Terminated\n  connection reset by peer\n")
+        with mock.patch.object(watchdog, "resume_campaign") as rc:
+            r = watchdog.scan_once()
+        self.assertEqual(r["incidents"][0]["classification"]["category"], "operator")
+        rc.assert_not_called()
+
+    def test_hold_flag_blocks_manual_and_auto_resume(self):
+        f = self.d / "campaigns/h-resume-1.campaign"
+        f.write_text("E1 --seed 0\n")
+        hold = watchdog.cdir() / "hold.flag"
+        hold.parent.mkdir(parents=True, exist_ok=True)
+        hold.write_text("HOLD by the human\n")
+        with mock.patch.object(core, "_sh") as sh:
+            self.assertIn("operator hold", watchdog.resume_campaign(str(f), True)["refused"])
+            self.assertIn("operator hold", watchdog.resume_campaign(str(f), _auto=True)["refused"])
+            sh.assert_not_called()
+        hold.unlink()
+        with mock.patch.object(core, "_gpu_slot", return_value={"held": True}):
+            self.assertNotIn("operator hold", watchdog.resume_campaign(str(f), True)["refused"])
+
 
 class IncidentTests(Fx):
     def make(self):

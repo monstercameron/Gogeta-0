@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gogeta-0 cockpit TUI (Textual). Run in WSL: ~/.venvs/gogeta-cockpit/bin/python cockpit/tui.py
 
-Tabs: Dashboard, Queue, Experiments, Claims, Devlog, Logs, Errors, Runs, Search.  `?` = key bindings.
+Tabs: Dashboard, Queue, Experiments, Claims, Devlog, Logs, Errors, Incidents, Runs, Cloud, Fleet, Search.  `?` = key bindings.
 All data comes from cockpit/core.py and cockpit/logdb.py (the same code the MCP server uses).
 """
 from __future__ import annotations
@@ -13,7 +13,9 @@ import traceback
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import cloud  # noqa: E402
 import core  # noqa: E402
+import fleet  # noqa: E402
 import logdb  # noqa: E402
 import runform  # noqa: E402
 import watchdog  # noqa: E402
@@ -30,7 +32,7 @@ from textual.widgets import (Button, DataTable, Footer, Header, Input, Label, Pr
 GOLD = "#f5a623"
 TABS = [("dashboard", "Dashboard", "d"), ("queue", "Queue", "u"), ("experiments", "Experiments", "e"),
         ("claims", "Claims", "c"), ("devlog", "Devlog", "v"), ("logs", "Logs", "l"), ("errors", "Errors", "x"), ("incidents", "Incidents", "i"),
-        ("runs", "Runs", "h"), ("search", "Search", "s")]
+        ("runs", "Runs", "h"), ("cloud", "Cloud", "k"), ("fleet", "Fleet", "j"), ("search", "Search", "s")]
 HELP = """[b #f5a623]Gogeta-0 cockpit: key bindings[/]
 
   [b]d u e c v l x h s[/]   jump to Dashboard / Queue / Experiments / Claims / Devlog / Logs / Errors / Runs / Search
@@ -42,6 +44,11 @@ HELP = """[b #f5a623]Gogeta-0 cockpit: key bindings[/]
   Errors: [b]R[/] resolve selected (note required).
   Logs: [b]f[/] toggle follow.
   Runs: [b]Run forms[/] button lists every finished run with its form status (NONE / DRAFT / filled); [b]Draft form[/] drafts the selected run.
+  Cloud ([b]k[/]): live Vast offers (GPU / max $/h filter), approvals, every instance on the account; [b]Approve budget[/] (HUMAN ONLY, typed
+        confirmation), [b]Revoke[/], [b]Up (rent)[/] cheapest offer within the approval (dry run, then confirm), [b]Destroy[/] (asks first).
+  Fleet ([b]j[/]): one row per GPU: job, step/total, loss, val, tok/s, ETA, temp + mood, power, $/h, $ so far, IP:port; detail: metadata,
+        budget bar, loss sparkline, $/1M tok, vs N1X. [b]Refresh[/] polls over ssh; [b]Tail[/]; [b]Setup[/] (bootstrap.sh); [b]Push data[/];
+        [b]Run job[/]; [b]Stop job[/]; [b]Pull[/]; [b]Attach[/]; [b]Destroy[/] / [b]Fleet down[/] (both ask first). Idle rows say SUGGEST DESTROY.
 
 State-changing buttons: server Start/Stop and queue Launch. Launch only calls the project launchers and is refused
 while the GPU slot is held. Everything shown is token-redacted. Nothing here deletes data."""
@@ -101,6 +108,45 @@ class HelpScreen(ModalScreen[None]):
     @on(Button.Pressed)
     def pressed(self) -> None:
         self.dismiss()
+
+
+class ApproveForm(ModalScreen[dict]):
+    """HUMAN ONLY: the one place in the cockpit UI that creates a spend approval. Typed confirmation required (no MCP equivalent exists)."""
+    BINDINGS = [Binding("escape", "dismiss({})", "Cancel")]
+
+    def compose(self) -> ComposeResult:
+        with Vertical(id="dialog"):
+            yield Static("[b]Approve a Vast.ai budget[/] (on-demand). Agents can then rent only inside it.", id="dialog-text")
+            yield Input(value="30", placeholder="total cap $", id="ap-total")
+            yield Input(value="0.30", placeholder="per-instance $/h cap", id="ap-ph")
+            yield Input(value="1", placeholder="max instances", id="ap-n")
+            yield Input(value="RTX 3090", placeholder="allowed GPUs (comma-separated)", id="ap-gpus")
+            yield Input(value="12", placeholder="valid hours (<= 24)", id="ap-h")
+            yield Input(placeholder="purpose (what the money is for)", id="ap-purpose")
+            yield Input(placeholder="type APPROVE <total>, e.g. APPROVE 30.00", id="ap-confirm")
+            with Horizontal(id="dialog-buttons"):
+                yield Button("Approve", id="yes", variant="warning")
+                yield Button("Cancel", id="no")
+
+    @on(Button.Pressed)
+    def pressed(self, ev: Button.Pressed) -> None:
+        if ev.button.id != "yes":
+            self.dismiss({})
+            return
+        v = {k: self.query_one("#ap-" + k, Input).value.strip() for k in ("total", "ph", "n", "gpus", "h", "purpose", "confirm")}
+        try:
+            phrase = "APPROVE %.2f" % float(v["total"])
+        except ValueError:
+            self.notify("total must be a number", severity="error")
+            return
+        if v["confirm"] != phrase:
+            self.notify("Type exactly: %s" % phrase, severity="error")
+            return
+        r = cloud.create_approval(v["total"], v["ph"], v["n"], v["gpus"], v["purpose"], v["h"], "tui")
+        if not r.get("created"):
+            self.notify("refused: %s" % r.get("refused"), severity="error")
+            return
+        self.dismiss({"created": r["approval"]["id"]})
 
 
 def bar(value, lo, hi, width=20) -> str:
@@ -232,6 +278,34 @@ class CockpitApp(App):
                 yield DataTable(id="runs-table", cursor_type="row", zebra_stripes=True)
                 yield DataTable(id="forms-table", cursor_type="row", zebra_stripes=True)
                 yield RichLog(id="form-detail", wrap=True, markup=False)
+            with TabPane("Cloud", id="cloud"):
+                with Horizontal(classes="toolbar"):
+                    yield Input(value="RTX 3090", placeholder="GPU", id="cl-gpu")
+                    yield Input(value="0.40", placeholder="max $/h", id="cl-maxdph")
+                    yield Button("Search offers", id="cl-search")
+                    yield Button("Approve budget...", id="cl-approve", variant="warning")
+                    yield Button("Revoke", id="cl-revoke")
+                    yield Button("Up (rent)...", id="cl-up", variant="error")
+                    yield Button("Destroy...", id="cl-destroy", variant="error")
+                yield Static("", id="cl-summary", classes="card")
+                yield DataTable(id="cl-approvals", cursor_type="row", zebra_stripes=True)
+                yield DataTable(id="cl-instances", cursor_type="row", zebra_stripes=True)
+                yield DataTable(id="cl-offers", cursor_type="row", zebra_stripes=True)
+            with TabPane("Fleet", id="fleet"):
+                with Horizontal(classes="toolbar"):
+                    yield Button("Refresh", id="fl-refresh")
+                    yield Button("Tail", id="fl-tail")
+                    yield Button("Setup", id="fl-setup")
+                    yield Button("Push data", id="fl-push")
+                    yield Button("Run job...", id="fl-run", variant="primary")
+                    yield Button("Stop job", id="fl-stop")
+                    yield Button("Pull", id="fl-pull")
+                    yield Button("Attach", id="fl-attach")
+                    yield Button("Destroy...", id="fl-destroy", variant="error")
+                    yield Button("Fleet down...", id="fl-down", variant="error")
+                yield Static("", id="fl-summary", classes="card")
+                yield DataTable(id="fl-table", cursor_type="row", zebra_stripes=True)
+                yield RichLog(id="fl-detail", wrap=True, markup=False, max_lines=1500)
             with TabPane("Search", id="search"):
                 yield Input(placeholder="search devlog, claims, cards, notes... (enter)", id="search-input")
                 yield DataTable(id="search-table", cursor_type="row", zebra_stripes=True)
@@ -251,6 +325,10 @@ class CockpitApp(App):
             "runs-table": ["run", "exp", "seed", "lr", "status", "val_loss", "bpc", "tok/s", "start"],
             "forms-table": ["run", "exp", "seed", "lr", "val_loss", "form"],
             "search-table": ["file:line", "text"],
+            "cl-approvals": ["approval", "valid", "reserved/cap $", "spent $", "inst", "GPUs", "expires h", "purpose"],
+            "cl-instances": ["id", "label", "managed", "state", "gpu", "$/h", "$ so far", "job"],
+            "cl-offers": ["offer", "gpu", "$/h", "rel", "cuda", "driver", "VRAM", "down Mb/s", "where"],
+            "fl-table": ["label", "gpu", "mode/state", "job", "step", "loss", "val", "tok/s", "ETA", "temp", "util", "W", "$/h", "$", "ip:port", "idle"],
         }.items():
             t = self.query_one("#" + tid, DataTable)
             t.add_columns(*cols)
@@ -259,6 +337,7 @@ class CockpitApp(App):
         self.refresh_dashboard()
         self.set_interval(5, self.refresh_dashboard)
         self.set_interval(2, self.tail_log)
+        self.set_interval(15, self.fleet_tick)
         self.load_tab("dashboard")
         self.load_claims()
 
@@ -294,7 +373,13 @@ class CockpitApp(App):
 
     def load_tab(self, tid: str) -> None:
         {"queue": self.load_queue, "experiments": self.load_experiments, "claims": self.load_claims,
-         "devlog": self.load_devlog, "logs": self.load_logs, "errors": self.load_errors, "incidents": self.load_incidents, "runs": self.load_runs}.get(tid, lambda: None)()
+         "devlog": self.load_devlog, "logs": self.load_logs, "errors": self.load_errors, "incidents": self.load_incidents, "runs": self.load_runs,
+         "cloud": self.load_cloud, "fleet": lambda: self.load_fleet(True)}.get(tid, lambda: None)()  # live ssh poll on open / r
+
+    def fleet_tick(self) -> None:
+        """Auto-refresh the Fleet tab (live ssh poll) while it is on screen, so remote GPUs are monitored without key presses."""
+        if self.query_one("#tabs", TabbedContent).active == "fleet":
+            self.load_fleet(True)
 
     # ------------------------------------------------------------------ dashboard
     def refresh_dashboard(self) -> None:
@@ -313,8 +398,10 @@ class CockpitApp(App):
         n, ni, wd = d["unresolved"], d["inc_open"], d["wd"]
         wd_txt = ("OK, beat %ss ago" % wd["heartbeat_age_s"]) if wd["healthy"] else (
             "RUNNING but stale" if wd["running"] else "NOT RUNNING (Incidents tab > Watchdog)")
+        hold = watchdog.cdir() / "hold.flag"
+        hold_txt = "  |  HOLD: campaign resumes blocked (cockpit.sh --release-hold)" if hold.exists() else ""
         self.query_one("#errbadge", Static).update(
-            Text("INCIDENTS OPEN: %d (i)  |  errors unresolved: %d (x)  |  watchdog: %s" % (max(ni, 0), max(n, 0), wd_txt),
+            Text("INCIDENTS OPEN: %d (i)  |  errors unresolved: %d (x)  |  watchdog: %s%s" % (max(ni, 0), max(n, 0), wd_txt, hold_txt),
                  style="bold white on #a02020" if (ni > 0 or n > 0 or not wd["healthy"]) else "green"))
         g = s["gpu"]
         slot = g["slot"]
@@ -402,6 +489,8 @@ class CockpitApp(App):
             self.action_follow()
         elif bid.startswith("inc-"):
             self.incident_button(bid)
+        elif bid.startswith(("cl-", "fl-")):
+            self.cloud_button(bid)
         elif bid == "err-resolve":
             self.action_resolve()
         elif bid == "err-all":
@@ -779,6 +868,192 @@ class CockpitApp(App):
             t.add_row(r["id"][:28], r["experiment"] or "", str(r["seed"]), str(r["lr"] or ""), r["status"] or "",
                       "%.4f" % r["val_loss"] if r["val_loss"] else "-", "%.4f" % r["val_bpc"] if r["val_bpc"] else "-",
                       "%d" % r["tokens_per_s"] if r["tokens_per_s"] else "-", (r["start"] or "")[:19])
+
+    # ------------------------------------------------------------------ cloud / fleet (cockpit/cloud.py, cockpit/fleet.py)
+    def load_cloud(self) -> None:
+        self.bg("cloud", lambda: {"appr": cloud.approvals(True), "inst": cloud.instances(), "brief": cloud.brief_lines(False)}, self.apply_cloud)
+
+    def apply_cloud(self, d: dict) -> None:
+        if d.get("error"):
+            self.query_one("#cl-summary", Static).update("cloud error: " + escape(str(d["error"])))
+            return
+        self.query_one("#cl-summary", Static).update(escape("\n".join(d["brief"])) + "\n[dim]Approvals: human only (this tab or cockpit.sh --approve-spend). "
+                                                     "Agents (MCP) can rent only inside one.[/]")
+        t = self.query_one("#cl-approvals", DataTable)
+        t.clear()
+        for a in d["appr"]["approvals"]:
+            t.add_row(a["id"], "yes" if a["valid"] else "NO", "%.2f / %.2f" % (a["reserved_usd"], a["max_usd_total"] or 0), "%.2f" % a["spent_actual_usd"],
+                      "%s/%s" % (a["active_instances"], a["max_instances"]), ",".join(a["allowed_gpus"] or []), str(a["expires_in_h"]), (a["purpose"] or "")[:40], key=a["id"])
+        t = self.query_one("#cl-instances", DataTable)
+        t.clear()
+        inst = d["inst"]
+        for r in inst.get("cockpit", []):
+            t.add_row(r["id"], r["label"], "yes", r["state"], r["gpu"] or "", "%.3f" % (r["dph"] or 0), "%.3f" % r["cost_usd"], str(r["job"] or ""), key=r["id"])
+        for r in inst.get("not_managed", []):
+            t.add_row(r["id"], str(r["label"] or ""), "read-only" if str(r["label"] or "").startswith(cloud.LABEL_PREFIX) else "NO", r["status"] or "",
+                      r["gpu"] or "", "%.3f" % (r["dph"] or 0), "-", "", key=r["id"])
+
+    def search_offers(self) -> None:
+        gpu = self.query_one("#cl-gpu", Input).value.strip() or "RTX 3090"
+        try:
+            mx = float(self.query_one("#cl-maxdph", Input).value or 0)
+        except ValueError:
+            mx = 0.0
+
+        def done(o):
+            t = self.query_one("#cl-offers", DataTable)
+            t.clear()
+            if o.get("error"):
+                self.notify(str(o["error"])[:150], severity="error")
+                return
+            for x in o["offers"]:
+                t.add_row(str(x["id"]), x["gpu_name"], "%.4f" % (x["dph_total"] or 0), str(x["reliability"]), str(x["cuda_max_good"]), str(x["driver_version"]),
+                          str(x["gpu_ram_gb"]), str(x["inet_down_mbps"]), str(x["geolocation"] or "")[:24], key=str(x["id"]))
+            self.notify("%d offers, min $%s/h, median $%s/h" % (o["count"], o["min_dph"], o["median_dph"]))
+        self.bg("vast_offers", cloud.offers, done, gpu, 1, 0.98, True, mx, "dph_total", 40)
+
+    def _sel(self, table_id: str):
+        t = self.query_one(table_id, DataTable)
+        if not t.row_count:
+            return None
+        try:
+            return t.coordinate_to_cell_key(t.cursor_coordinate).row_key.value
+        except Exception:  # noqa: BLE001
+            return None
+
+    def load_fleet(self, refresh: bool) -> None:
+        self.bg("vast_status", lambda: fleet.vast_status("", refresh), self.apply_fleet)
+
+    def apply_fleet(self, d: dict) -> None:
+        self._fleet = {r["instance"]: r for r in d.get("instances", [])}
+        t = self.query_one("#fl-table", DataTable)
+        t.clear()
+        for r in d.get("instances", []):
+            t.add_row(r["label"][:24], r["gpu"] or "", "%s/%s" % (r["mode"], r["state"]), (r["job"] or "-")[:28],
+                      "%s/%s" % (r["step"], r["total"]) if r.get("step") is not None else "-", str(r.get("loss") or "-"), str(r.get("val_loss") or "-"),
+                      str(r.get("tok_s") or "-"), ("%sm" % r["eta_min"]) if r.get("eta_min") is not None else "-",
+                      "%s %s" % (r.get("temp_c") if r.get("temp_c") is not None else "?", r["fun"]["mood"].split()[0]), str(r.get("util_pct") or "-"),
+                      "%s/%s" % (r.get("power_w") or "-", r.get("power_limit_w") or "-"), "%.3f" % (r["dph"] or 0), "%.3f" % r["accrued_usd"],
+                      "%s:%s" % (r.get("ip") or "-", r.get("ssh_port") or "-"), ("SUGGEST DESTROY %sm" % r["idle_min"]) if r.get("suggest") else str(r["idle_min"]),
+                      key=r["instance"])
+        lt = d.get("lifetime") or {}
+        self.query_one("#fl-summary", Static).update(
+            "[b #f5a623]FLEET POWER LEVEL[/] %s tok/s   burn $%.3f/h   lifetime $%.2f over %.2f GPU-h, %s jobs done   %s" % (
+                "{:,}".format(int(d.get("fleet_power_level_tok_s") or 0)), d.get("burn_usd_per_h") or 0, lt.get("spend_usd") or 0, lt.get("gpu_hours") or 0,
+                lt.get("jobs_done", 0), "" if d.get("live_listing") else "(vastai listing unavailable)"))
+        sel = self._sel("#fl-table")
+        if sel and sel in self._fleet:
+            self.show_fleet_row(self._fleet[sel])
+
+    def show_fleet_row(self, r: dict) -> None:
+        log = self.query_one("#fl-detail", RichLog)
+        log.clear()
+        run = r.get("run") or {}
+        cmpx = r.get("vs_n1x") or {}
+        log.write("\n".join([
+            "%s  [%s / %s]  %s %s GB  driver %s  | %s cores, %s GB RAM | %s (hosting %s, %s) | rel %s | net up/down %s/%s Mb/s" % (
+                r["label"], r["mode"], r["state"], r["gpu"], r.get("vram_gb"), r.get("driver"), r.get("cpu_cores"), r.get("ram_gb"), r.get("location"),
+                r.get("hosting_type"), r.get("verification"), r.get("reliability"), r.get("inet_up_mbps"), r.get("inet_down_mbps")),
+            "ssh root@%s -p %s (display only: never commit or paste it)   uptime %.2f h" % (r.get("ip"), r.get("ssh_port"), r.get("uptime_h") or 0),
+            "COST $%.4f/h (gpu %s + disk %s; bandwidth $/GB up/down %s) | accrued $%.4f | to finish $%s | run so far $%s" % (
+                r["dph"] or 0, r["dph_parts"]["gpu"], r["dph_parts"]["disk"], r["dph_parts"]["bandwidth_usd_per_gb_up_down"], r["accrued_usd"],
+                r.get("projected_to_finish_usd"), r.get("run_cost_usd")),
+            "BUDGET %s %s: $%s of $%s, $%s left (expires %s)" % (r.get("approval"), r.get("budget_bar") or "", r.get("approval_spent_usd"), r.get("approval_cap_usd"),
+                                                                 r.get("budget_remaining_usd"), r.get("approval_expires")),
+            "GPU util %s%%  mem %s/%s MiB  temp %s C %s  power %s/%s W  clocks sm %s / mem %s MHz" % (
+                r.get("util_pct"), r.get("mem_used_mib"), r.get("mem_total_mib"), r.get("temp_c"), r["fun"]["mood"], r.get("power_w"), r.get("power_limit_w"),
+                r.get("clock_sm_mhz"), r.get("clock_mem_mhz")),
+            "RUN %s | config %s seed %s lr %s tokens %s commit %s | step %s/%s loss %s val %s | %s tok/s ETA %s min" % (
+                run.get("name"), run.get("config"), run.get("seed"), run.get("lr"), run.get("max_tokens"), run.get("commit"), r.get("step"), r.get("total"),
+                r.get("loss"), r.get("val_loss"), r.get("tok_s"), r.get("eta_min")),
+            "loss %s   $/1M tok %s   tokens per cent %s" % (r["fun"]["loss_sparkline"] or "(no curve yet)", r["fun"]["usd_per_1M_tokens"], r["fun"]["tokens_per_cent"]),
+            "vs N1X: %s" % (("%s: tok/s x%s, val delta %s (%s)" % (cmpx.get("local_run"), cmpx.get("tok_s_ratio"), cmpx.get("val_loss_delta"), cmpx.get("note")))
+                            if cmpx else "no matching local run"),
+            "setup: %s  job: %s  last line: %s%s" % (r.get("setup"), r.get("job") or "-", r.get("last_line") or "-",
+                                                     ("\n" + r["suggest"]) if r.get("suggest") else ""),
+            ("POLL ERROR: " + r["poll_error"]) if r.get("poll_error") else ""]))
+
+    @on(DataTable.RowHighlighted, "#fl-table")
+    def fleet_row(self, ev: DataTable.RowHighlighted) -> None:
+        if ev.row_key is not None and ev.row_key.value in getattr(self, "_fleet", {}):
+            self.show_fleet_row(self._fleet[ev.row_key.value])
+
+    def _result(self, label: str):
+        def done(r):
+            log = self.query_one("#fl-detail", RichLog)
+            log.write("\n== %s ==\n%s" % (label, json.dumps(r, indent=1, default=str)[:4000]))
+            bad = r.get("error") or r.get("refused")
+            self.notify("%s: %s" % (label, str(bad)[:140] if bad else "ok"), severity="warning" if bad else "information")
+            self.load_fleet(False)
+        return done
+
+    def cloud_button(self, bid: str) -> None:
+        if bid == "cl-search":
+            self.search_offers()
+        elif bid == "cl-approve":
+            self.push_screen(ApproveForm(), lambda r: (self.notify(str(r)[:160]), self.load_cloud()) if r else None)
+        elif bid == "cl-revoke":
+            aid = self._sel("#cl-approvals")
+            if aid:
+                self.push_screen(Confirm("Revoke approval [b]%s[/]? Its running instances are then destroyed by the watchdog." % escape(aid)),
+                                 lambda ok: self.bg("revoke", cloud.revoke_approval, lambda r: (self.notify(str(r)), self.load_cloud()), aid, "tui") if ok else None)
+        elif bid == "cl-up":
+            gpu = self.query_one("#cl-gpu", Input).value.strip() or "RTX 3090"
+
+            def dry(r):
+                if not r.get("dry_run"):
+                    self.notify("not possible: %s" % str(r.get("refused") or r.get("error"))[:160], severity="warning")
+                    return
+                self.push_screen(Confirm("RENT (spends money): %s offer %s at $%.4f/h, max %s h = $%.2f reserved on %s.\n\n%s" % (
+                    escape(r["gpu"]), r["offer_id"], r["dph"], r["max_hours"], r["projected_usd"], r["approval"], escape(r["command"]))),
+                    lambda ok: self.bg("vast_up", lambda: fleet.vast_up(gpu, 4.0, r["approval"], "TUI vast up", confirm=True, dry_run=False),
+                                       lambda x: (self.notify(("rented %s" % x.get("label")) if x.get("rented") else str(x.get("refused") or x.get("error"))[:150]),
+                                                  self.load_cloud())) if ok else None)
+            self.bg("vast_up_dry", lambda: fleet.vast_up(gpu, 4.0, "", "TUI vast up", dry_run=True), dry)
+        elif bid in ("cl-destroy", "fl-destroy"):
+            iid = self._sel("#cl-instances" if bid == "cl-destroy" else "#fl-table")
+            if not iid:
+                self.notify("Select an instance first.", severity="warning")
+                return
+
+            def go(ok):
+                if ok:
+                    self.bg("vast_down", lambda: fleet.vast_down(iid, confirm=True), lambda r: (self.notify(
+                        "destroyed" if r.get("destroyed") else str(r.get("refused") or r.get("error"))[:150]), self.load_cloud(), self.load_fleet(False)))
+            self.push_screen(Confirm("DESTROY instance [b]%s[/]? This deletes the instance and everything on it (pull results first). "
+                                     "Only cockpit-registry instances can be destroyed." % escape(iid)), go)
+        elif bid == "fl-refresh":
+            self.load_fleet(True)
+        elif bid == "fl-down":
+            self.bg("fleet_down_dry", lambda: fleet.fleet_down(dry_run=True), lambda p: self.push_screen(Confirm(
+                "FLEET DOWN: destroy %d instance(s), cancel %d queued job(s); running jobs lost: %s" % (
+                    len(p["destroy"]), len(p["cancel_queued"]), escape(", ".join(p["running_jobs_lost"]) or "none"))),
+                lambda ok: self.bg("fleet_down", lambda: fleet.fleet_down(confirm=True), self._result("fleet down")) if ok else None))
+        else:
+            iid = self._sel("#fl-table")
+            if not iid:
+                self.notify("Select a Fleet row first.", severity="warning")
+                return
+            if bid == "fl-tail":
+                self.bg("vast_tail", fleet.vast_tail, lambda r: (self.query_one("#fl-detail", RichLog).clear(),
+                                                                 self.query_one("#fl-detail", RichLog).write(r.get("text") or str(r))), iid, 120)
+            elif bid == "fl-setup":
+                self.push_screen(Confirm("Run cockpit/remote/bootstrap.sh on %s at the current pushed commit (background, ~/setup.log)?" % escape(iid)),
+                                 lambda ok: self.bg("vast_setup", lambda: fleet.vast_setup(iid, confirm=True), self._result("setup")) if ok else None)
+            elif bid == "fl-push":
+                self.push_screen(Prompt("Dataset to upload to %s (allowlist + sha256 verify), e.g. code-py-v1 or code-py-v1-bytes:" % iid),
+                                 lambda ds: self.bg("vast_push", lambda: fleet.vast_push_data(iid, ds.strip(), confirm=True), self._result("push data")) if ds and ds.strip() else None)
+            elif bid == "fl-run":
+                self.push_screen(Prompt("Job for %s: 'E10 --seed 0 --max-tokens 20000000' or 'configs/e10_llama_ref.json --seed 0 --lr 3e-3'" % iid),
+                                 lambda sp: self.bg("vast_run_job", lambda: fleet.vast_run_job(iid, sp.strip(), confirm=True), self._result("run job")) if sp and sp.strip() else None)
+            elif bid == "fl-stop":
+                self.push_screen(Confirm("Stop the cockpit job on %s (SIGTERM)?" % escape(iid)),
+                                 lambda ok: self.bg("vast_stop", lambda: fleet.vast_stop_job(iid, confirm=True), self._result("stop job")) if ok else None)
+            elif bid == "fl-pull":
+                self.bg("vast_pull", lambda: fleet.vast_pull(iid), self._result("pull"))
+            elif bid == "fl-attach":
+                self.push_screen(Confirm("Attach %s to the cockpit registry (control enabled; watchdog only suggests destroying it)?" % escape(iid)),
+                                 lambda ok: self.bg("vast_attach", lambda: fleet.vast_attach(iid, "", confirm=True), self._result("attach")) if ok else None)
 
     # ------------------------------------------------------------------ search
     @on(Input.Submitted, "#search-input")

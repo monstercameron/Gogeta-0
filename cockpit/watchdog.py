@@ -6,7 +6,8 @@
 Detects (polling existing PID files, campaign state/logs and status files; never touches code):
   run_failed / run_died / run_stopped, run_hung, log_traceback / log_nan / log_oom / log_triton,
   campaign_aborted (incl. preflight REFUSED) with a resume campaign file, cpu_job_failed,
-  server_down (tracker 7861, viz 7870, site 8791), gpu_hot (>= 85 C), disk_low.
+  server_down (tracker 7861, viz 7870, site 8791), gpu_hot (>= 85 C), disk_low,
+  cloud (cockpit/fleet.py: cloud_destroy_* / cloud_idle_suggest; remote_traceback/nan/oom/hung/dead on rented GPUs).
 Each detection becomes: a row in SQLite `incidents`, a JSON file in ~/fusiondance-data/cockpit/incidents/,
 and one line appended to ~/fusiondance-data/cockpit/incidents.log (stable, greppable).
 Automatic actions are limited to containment/retry: restart a down server (max 3/h, backoff), write a resume campaign
@@ -164,7 +165,7 @@ def _new_id(con) -> str:
 def _write_json(inc: dict) -> None:
     d = cdir() / "incidents"
     d.mkdir(exist_ok=True)
-    (d / (inc["id"] + ".json")).write_text(json.dumps(inc, indent=1, default=str, ensure_ascii=False))
+    (d / (inc["id"] + ".json")).write_text(core.redact(json.dumps(inc, indent=1, default=str, ensure_ascii=False)))
 
 
 def _log_line(inc_id, sev, kind, subject, category, status, summary) -> None:
@@ -229,7 +230,7 @@ def record(f: dict, auto_actions: list | None = None) -> dict | None:
         con.execute("INSERT INTO incidents(id,ts,kind,severity,subject_type,subject,campaign,category,status,summary,bundle,actions,notes,"
                     "resume_file,agent_brief,updated,fingerprint) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                     (inc["id"], inc["ts"], inc["kind"], inc["severity"], inc["subject_type"], inc["subject"], inc["campaign"],
-                     cls["category"], "open", inc["summary"], json.dumps(inc["bundle"], default=str), json.dumps(inc["actions"]),
+                     cls["category"], "open", inc["summary"], core.redact(json.dumps(inc["bundle"], default=str)), core.redact(json.dumps(inc["actions"])),
                      "[]", inc["resume_file"], inc["agent_brief"], _iso(), fp))
         con.commit()
     finally:
@@ -442,7 +443,10 @@ def d_campaigns(ctx):
         outs = sorted(core.LOG_DIR.glob("campaign-%s-*-%d.out" % (c["name"], c["done"] + 1))) if core.LOG_DIR.exists() else []
         if outs:
             text += "\n" + _tail(outs[-1], 30_000, 40)
-        out.append({"kind": "campaign_aborted", "subject": c["name"], "subject_type": "campaign", "campaign": c["name"],
+        # A runner ended by SIGTERM/SIGINT (exit 143/130) was stopped on purpose by the human or an agent: classify it
+        # "operator" so it is never auto-resumed (2026-11-22: a human-ordered thermal kill was auto-resumed as "transient").
+        stopped = {"hint": "operator"} if str(c["exit"]) in ("130", "143") else {}
+        out.append({**stopped, "kind": "campaign_aborted", "subject": c["name"], "subject_type": "campaign", "campaign": c["name"],
                     "key": "%s-exit%s-%d" % (c["name"], c["exit"], c["done"]), "severity": "high", "log": c["log"], "tail": text,
                     "summary": "campaign %s ended (exit %s) with %d of %d items unfinished" % (c["name"], c["exit"], len(left), c["total"]),
                     "repro": "bash tools/launch_campaign.sh --status %s" % c["name"], "_left": left, "_c": c,
@@ -519,12 +523,30 @@ def d_disk(ctx):
              "repro": "df -h %s; du -sh %s/*" % (core.DATA, core.DATA), "evidence": {"free_gb": round(free_gb, 1)}}]
 
 
-DETECTORS = [d_runs, d_logs, d_campaigns, d_cpu, d_servers, d_thermal, d_disk]
+def d_cloud(ctx):
+    """Cloud guards + dispatcher (cockpit/fleet.py): destroys over-time / idle / stuck / over-budget cockpit instances (each an incident),
+    SSH-polls remote runs (NaN/OOM/traceback/hung/dead incidents tagged with the instance), rents just-in-time for queued jobs
+    within the human approval. No network at all when nothing is running or queued."""
+    try:
+        from . import fleet
+    except ImportError:
+        import fleet  # type: ignore
+    if not fleet.enabled():
+        return []
+    out = fleet.watch(ctx["now"])
+    t = fleet.tick()
+    return out + list(t.get("findings") or [])
+
+
+DETECTORS = [d_runs, d_logs, d_campaigns, d_cpu, d_servers, d_thermal, d_disk, d_cloud]
 
 
 # --------------------------------------------------------------------------- safe recovery
 def _gate_resume(auto: bool) -> str | None:
     """Reason NOT to launch a resume campaign now, or None."""
+    hold = cdir() / "hold.flag"   # operator hold: only a human removes it (cockpit.sh --release-hold); blocks manual AND auto
+    if hold.exists():
+        return "operator hold: %s" % core._read(hold).strip()[:160]
     if core.code_paths_dirty():
         return "launch-relevant code paths are dirty: %s" % core.code_paths_dirty()[:3]
     if core._gpu_slot()["held"]:
@@ -597,7 +619,7 @@ def handle_findings(ctx, findings: list) -> list:
         if f["kind"] == "campaign_aborted":
             left, c = f.pop("_left"), f.pop("_c")
             if not _known(_fp(f["kind"], f["subject"], f.get("key", ""))):
-                cls = classify(f.get("tail", ""))
+                cls = classify(f.get("tail", ""), f.get("hint", ""))
                 p = write_resume_file(c, left, cls["category"] + ": " + f["summary"])
                 f["resume_file"] = str(p.relative_to(core.REPO)) if core.REPO in p.parents else str(p)
                 acts.append("wrote %s with %d unfinished item(s)" % (f["resume_file"], len(left)))

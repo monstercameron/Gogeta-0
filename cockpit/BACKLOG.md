@@ -15,3 +15,10 @@ Known gaps and limits, and requests agents hit but did not fix (with the reason)
 - [ ] Run forms: `gogeta_run_form_draft` recomputes the charts on every call (about 1 s per run); cache by (run id, series length) if the TUI feels slow.
 - [ ] Run forms: sibling comparison only covers finished runs with the same experiment id and token budget (plus same-budget runs of other experiments as context); no matching on config hash or campaign yet.
 - [ ] `tui_check.py` was flaky once (FAILED: 2, ~18:53): every wait was a fixed 15 s poll while the log tail / run-forms drafts compute under GPU-host load. Waits are now 40 s and the Runs-tab step waits for the history table first; if it recurs, make the checks event-driven instead of polling.
+- [ ] Cloud: `DEFAULT_IMAGE` (pytorch/pytorch:2.14.1-cuda13.0-cudnn9-devel) tag not verified on Docker Hub; bootstrap.sh installs its own pinned torch, so any CUDA 13 image with python works. Verify before the first fleet rent.
+- [ ] Cloud: no real rent/destroy has gone through cockpit.rent/destroy yet (only the fake shim); the first real fleet run should be watched (`gogeta_fleet_status`).
+- [ ] Cloud: approvals integrity rests on file permissions + the created_by/created_via/expiry checks; an agent editing spend-approvals.json by hand is a rules violation the code cannot fully prevent (no secret to sign with).
+- [ ] Cloud: interruptible (bid) instances are not supported (on-demand only until mid-run resume lands, notes/compute-rental.md).
+- [ ] Cloud: bandwidth $ is shown as $/GB rates + billed GB, not folded into accrued cost; storage after destroy is not tracked.
+- [ ] Cloud: unmanaged gogeta-cockpit-* instances have no idle history (idle minutes unknown until attached).
+- [ ] Cloud: fetch_data.sh covers code-py-v1 only; byte datasets always use the sha256-checked upload.

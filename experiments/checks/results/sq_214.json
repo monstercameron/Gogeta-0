@@ -1,0 +1,95 @@
+{
+ "check": "SQ214",
+ "title": "E1 SWA window sweep (64/256/1024), 20M tokens, 4 seeds, one RTX 5090",
+ "status": "exploratory (notes/statistics-policy.md section 4): never changes a claim status",
+ "registered": "experiments/checks/PREDICTIONS.md, section 'Registered SQ214 window-sweep...' (v0.4.71) + pre-run amendment (v0.4.72)",
+ "configs": {
+  "64": "experiments/staged-configs/sq214/e1_w64_20m.json",
+  "256": "experiments/staged-configs/sq214/e1_w256_20m.json",
+  "1024": "experiments/staged-configs/sq214/e1_w1024_20m.json"
+ },
+ "commit": "bd03492",
+ "hardware": "1x RTX 5090 (Vast.ai, on-demand)",
+ "primary_metric": "clean80 doc-level bits/char (experiments/stats/score_doclevel.py)",
+ "arms": {
+  "1024": {
+   "clean80_bpc_by_seed": {
+    "0": 0.45202,
+    "1": 0.45202,
+    "2": 0.45428,
+    "3": 0.45505
+   },
+   "clean80_mean": 0.45334,
+   "clean80_sd": 0.00156,
+   "clean50_mean": 0.53631,
+   "all_mean": 0.37651
+  },
+  "256": {
+   "clean80_bpc_by_seed": {
+    "0": 0.44946,
+    "1": 0.4461,
+    "2": 0.44703,
+    "3": 0.44751
+   },
+   "clean80_mean": 0.44752,
+   "clean80_sd": 0.00142,
+   "clean50_mean": 0.53079,
+   "all_mean": 0.37054
+  },
+  "64": {
+   "clean80_bpc_by_seed": {
+    "0": 0.45242,
+    "1": 0.45127,
+    "2": 0.45226,
+    "3": 0.44777
+   },
+   "clean80_mean": 0.45093,
+   "clean80_sd": 0.00217,
+   "clean50_mean": 0.53501,
+   "all_mean": 0.37325
+  }
+ },
+ "paired_vs_w256": {
+  "1024": {
+   "diffs": [
+    0.00257,
+    0.00592,
+    0.00725,
+    0.00755
+   ],
+   "mean": 0.00582,
+   "sd": 0.00228,
+   "t": 5.1,
+   "df": 3,
+   "t_crit_95": 3.182,
+   "rel_pct": 1.3
+  },
+  "64": {
+   "diffs": [
+    0.00297,
+    0.00517,
+    0.00523,
+    0.00026
+   ],
+   "mean": 0.00341,
+   "sd": 0.00235,
+   "t": 2.91,
+   "df": 3,
+   "t_crit_95": 3.182,
+   "rel_pct": 0.76
+  }
+ },
+ "pooled_seed_sd_bpc": 0.00175,
+ "verdicts": {
+  "W1": "FAIL: |w1024 - w256| = +1.30% (predicted <= 1.0%), and in the opposite direction (full attention is worse)",
+  "W2": "PASS: w64 is +0.76% worse than w256 (predicted +0.3..+2.0%); paired t 2.91 < 3.18, so not significant at 95% on its own",
+  "W3": "FAIL: order is w256 < w64 < w1024 (predicted w1024 <= w256 <= w64)",
+  "decision_rule": "no confirmatory 200M run: w1024 does not beat w256 (it loses by 0.0058 bpc, > 2x seed sd 0.0035). C193's window explanation loses support; SQ219/SQ226 are next"
+ },
+ "caveats": [
+  "20M tokens only: full attention may need more data than SWA to pay off",
+  "docs > 1,024 tokens are scored in chunks (SQ226 confound)",
+  "in-training val_loss is on the contaminated val; only clean80 is used here"
+ ],
+ "raw": "~/fusiondance-data/cloud/sq220-5090/Gogeta-0/experiments/stats/doclevel/SQ214*.json (not committed; per-run JSONs)"
+}

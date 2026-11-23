@@ -1,0 +1,98 @@
+{
+ "check": "SQ220",
+ "title": "Cloud bridge + throughput: N1X vs RTX 3090 vs RTX 5090",
+ "protocol": "same commit family (9712842 / bd03492: identical gogeta/ code), clean clone, --require-clean, sha256-verified data, seed 0, lr 3e-3, 20M tokens, --compile",
+ "tolerance": "notes/reproducibility.md: |dval| <= 0.004 (provisional)",
+ "runs": {
+  "E10": {
+   "N1X": {
+    "val_loss": 1.0286,
+    "tok_s_median": 202000.0,
+    "tok_s_overall": 177000.0,
+    "wall_min": 1.885,
+    "peak_mem_gb": 4.39
+   },
+   "RTX3090": {
+    "val_loss": 1.0306,
+    "tok_s_median": 272500.0,
+    "tok_s_overall": 223200.0,
+    "wall_min": 1.495,
+    "peak_mem_gb": 4.34
+   },
+   "RTX5090": {
+    "val_loss": 1.0297,
+    "tok_s_median": 845000.0,
+    "tok_s_overall": 670300.0,
+    "wall_min": 0.498,
+    "peak_mem_gb": 4.39
+   }
+  },
+  "E1": {
+   "N1X": {
+    "val_loss": 1.0071,
+    "tok_s_median": 138000.0,
+    "tok_s_overall": 132400.0,
+    "wall_min": 2.521,
+    "peak_mem_gb": 7.1
+   },
+   "RTX3090": {
+    "val_loss": 1.0078,
+    "tok_s_median": 254500.0,
+    "tok_s_overall": 124800.0,
+    "wall_min": 2.673,
+    "peak_mem_gb": 7.06
+   },
+   "RTX5090": {
+    "val_loss": 1.0051,
+    "tok_s_median": 743000.0,
+    "tok_s_overall": 349800.0,
+    "wall_min": 0.954,
+    "peak_mem_gb": 7.1
+   }
+  }
+ },
+ "deltas_vs_N1X": {
+  "E10": {
+   "RTX3090": 0.002,
+   "RTX5090": 0.0011
+  },
+  "E1": {
+   "RTX3090": 0.0007,
+   "RTX5090": -0.002
+  }
+ },
+ "price_usd_per_h": {
+  "N1X": "~0.02 (assumed electricity: ~130 W at $0.15/kWh; hardware treated as sunk)",
+  "RTX3090": 0.232,
+  "RTX5090": 0.523
+ },
+ "usd_per_1B_tokens_E1": {
+  "N1X": 0.04,
+  "RTX3090": 0.253,
+  "RTX5090": 0.196
+ },
+ "usd_per_1B_tokens_E10": {
+  "RTX3090": 0.236,
+  "RTX5090": 0.172
+ },
+ "per_box_fixed_overhead": {
+  "bootstrap_from_scratch_s": 76,
+  "dataset_rebuild_s": "46 build + ~40 download",
+  "cold_compile_s": "~30 (5090, E1: 0.954 vs 0.471 min)",
+  "upload_path_s": 494
+ },
+ "verdicts": {
+  "P1": "PASS (3090: +0.0020 / +0.0007; 5090: +0.0011 / -0.0020)",
+  "P2": "PASS (E1 < E10 on all three)",
+  "P3_3090": "PARTIAL MISS: 1.35x / 1.84x vs predicted 2-3x",
+  "P4": "PASS",
+  "5-P1": "PASS",
+  "5-P2": "PASS by far: 3.10x (E10) / 2.92x (E1) the 3090, predicted >= 1.10x / 1.25x",
+  "5-P3": "PASS: 5090 $/token is 23-27% BELOW the 3090's (predicted within +-30%)"
+ },
+ "spend_usd": {
+  "RTX3090": "~0.15 (about 40 min)",
+  "RTX5090": "~0.19 (about 22 min)"
+ },
+ "logs": "~/fusiondance-data/cloud/sq220-{3090,5090}/ (not committed)"
+}

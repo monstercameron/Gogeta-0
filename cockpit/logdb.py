@@ -30,7 +30,7 @@ try:  # package import (python -m cockpit.logdb) or script import (cockpit/ on s
 except ImportError:  # pragma: no cover
     import core  # type: ignore
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 HOST = socket.gethostname()
 
 
@@ -83,6 +83,26 @@ CREATE TABLE IF NOT EXISTS incidents(
   campaign TEXT, category TEXT, status TEXT NOT NULL DEFAULT 'open', summary TEXT, bundle TEXT, actions TEXT,
   notes TEXT, resume_file TEXT, agent_brief TEXT, updated TEXT, fingerprint TEXT UNIQUE);
 CREATE INDEX IF NOT EXISTS ix_incidents_status ON incidents(status, ts);
+""",
+    4: """
+CREATE TABLE IF NOT EXISTS cloud_instances(
+  id TEXT PRIMARY KEY, label TEXT NOT NULL, provider TEXT NOT NULL DEFAULT 'vast', approval_id TEXT, session_id TEXT, offer_id TEXT, machine_id TEXT, gpu_name TEXT,
+  num_gpus INTEGER, dph REAL, max_hours REAL, reserved_usd REAL, purpose TEXT, image TEXT, disk_gb INTEGER, created TEXT,
+  created_epoch REAL, state TEXT NOT NULL, state_since REAL, mode TEXT NOT NULL DEFAULT 'manual', driver TEXT, job_id TEXT,
+  live_status TEXT, ssh_host TEXT, ssh_port INTEGER, meta TEXT, setup_state TEXT, setup_commit TEXT, setup_s REAL, ready_epoch REAL,
+  remote_env TEXT, data_ok TEXT, push_dataset TEXT, push_state TEXT, last_poll_epoch REAL, last_poll_ok_epoch REAL,
+  last_heartbeat_epoch REAL, last_busy_epoch REAL, poll TEXT, jobs_done INTEGER DEFAULT 0, destroyed_epoch REAL,
+  destroy_reason TEXT, cost_usd REAL);
+CREATE INDEX IF NOT EXISTS ix_cloud_instances_state ON cloud_instances(state);
+CREATE TABLE IF NOT EXISTS cloud_sessions(
+  id TEXT PRIMARY KEY, approval_id TEXT, gpu_name TEXT, image TEXT, max_instances INTEGER, max_hours REAL, disk_gb INTEGER,
+  min_cuda REAL, commit_sha TEXT, purpose TEXT, created TEXT, status TEXT, exclude_machines TEXT, provider TEXT DEFAULT 'vast', max_dph REAL);
+CREATE TABLE IF NOT EXISTS cloud_jobs(
+  id TEXT PRIMARY KEY, session_id TEXT, launch TEXT, experiment TEXT, dataset TEXT, status TEXT, instance_id TEXT, attempts INTEGER,
+  setup_retries INTEGER, created TEXT, queued_epoch REAL, started_epoch REAL, ended_epoch REAL, remote_run TEXT, exit_code INTEGER,
+  result_dir TEXT, verified INTEGER, checkpoint INTEGER, checkpoint_ok INTEGER, error TEXT, setup_usd REAL, run_usd REAL,
+  teardown_usd REAL, manifest_sha256 TEXT, metrics TEXT, after_job TEXT);
+CREATE INDEX IF NOT EXISTS ix_cloud_jobs_status ON cloud_jobs(status);
 """,
 }
 

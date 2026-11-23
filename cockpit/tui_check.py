@@ -32,7 +32,7 @@ async def run(size, shots):
         if shots:
             app.save_screenshot("dashboard_%dx%d.svg" % size, path=str(SHOTS))
         checks = {"queue": ("#queue-table", 1), "experiments": ("#exp-table", 1), "claims": ("#claims-table", 1),
-                  "devlog": ("#dev-table", 1), "errors": ("#errors-table", 0), "incidents": ("#incidents-table", 0), "runs": ("#runs-table", 1), "search": ("#search-table", 0)}
+                  "devlog": ("#dev-table", 1), "errors": ("#errors-table", 0), "incidents": ("#incidents-table", 0), "runs": ("#runs-table", 1), "cloud": ("#cl-approvals", 0), "fleet": ("#fl-table", 0), "search": ("#search-table", 0)}
         for tab, (sel, minrows) in checks.items():
             app.query_one("#tabs", TabbedContent).active = tab
             t = app.query_one(sel, DataTable)

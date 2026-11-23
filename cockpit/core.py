@@ -48,16 +48,26 @@ _REDACT = [
     (re.compile(r"(?i)(bearer\s+)[A-Za-z0-9._\-]{8,}"), r"\1[REDACTED]"),
     (re.compile(r"(?i)(authorization:\s*)\S+(\s+\S+)?"), r"\1[REDACTED]"),
     (re.compile(r"sk-[A-Za-z0-9_\-]{16,}"), "sk-[REDACTED]"),
+    (re.compile(r"(?i)(--api[-_]key(?:=|\s+))(?!\[REDACTED\])\S+"), r"\1[REDACTED]"),  # vastai --api-key KEY / --api-key=KEY
+    (re.compile(r"(?i)(vast_api_key\S*\s*[=:]?\s*)[0-9a-f]{16,}"), r"\1[REDACTED]"),
 ]
+# Any 64-hex string could be a Vast.ai API key (they are 64 lowercase hex). sha256 digests look the same, so a value that is
+# explicitly labelled as a digest right before it (sha256 / sha256sum / digest / checksum) is kept; everything else is masked.
+_HEX64 = re.compile(r"(?<![0-9A-Fa-f])[0-9A-Fa-f]{64}(?![0-9A-Fa-f])")
+_DIGEST_LABEL = re.compile(r"(?i)(sha-?256(sum)?|digest|checksum)[\"'\w]*[\"']?\s*[:=]?\s*[\"'\[]?\s*$")
+
+
+def _hex64(m) -> str:
+    return m.group(0) if _DIGEST_LABEL.search(m.string[max(0, m.start() - 48):m.start()]) else "[REDACTED-HEX64]"
 
 
 def redact(text: str) -> str:
-    """Strip secrets (HF tokens, token=..., write_token, bearer/auth headers) from any text we return."""
+    """Strip secrets (HF tokens, token=..., write_token, bearer/auth headers, --api-key values, 64-hex keys) from any text we return."""
     if not text:
         return text
     for pat, rep in _REDACT:
         text = pat.sub(rep, text)
-    return text
+    return _HEX64.sub(_hex64, text)
 
 
 def _read(p: Path, limit: int | None = None) -> str:
@@ -1016,3 +1026,23 @@ def backlog_top(n: int = 5) -> list:
 
 def backlog() -> dict:
     return {"text": _cap(_read(REPO / "cockpit/BACKLOG.md"), 8000), "top": backlog_top(10)}
+
+
+_brief_prev2 = brief
+
+
+def brief(max_chars: int = 4000) -> dict:
+    """One-call overview. CLOUD SPENDING comes FIRST: running cloud instances that cost money are never silent."""
+    try:
+        try:
+            from . import cloud as _cl, fleet as _fl
+        except ImportError:
+            import cloud as _cl  # type: ignore
+            import fleet as _fl  # type: ignore
+        lines = _cl.brief_lines() + _fl.brief_lines()
+    except Exception as ex:  # noqa: BLE001
+        lines = ["CLOUD: status unavailable (%r): check gogeta_vast_instances" % ex]
+    head = "\n".join(lines)[:1200] + "\n"
+    b = _brief_prev2(max_chars=max_chars - len(head) - 5)
+    text = redact(head + b["text"])
+    return {"text": _cap(text, max_chars), "bytes": len(text.encode())}

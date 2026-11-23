@@ -5,8 +5,10 @@ Run (WSL):  ~/.venvs/gogeta-cockpit/bin/python cockpit/mcp_server.py
 Every tool call is recorded in the SQLite store (tool_calls) with redacted args, duration and ok/error;
 uncaught exceptions also go to `errors` with the full traceback.
 Tools that CHANGE STATE are marked "STATE-CHANGING" in their description:
-  gogeta_start_server, gogeta_stop_server, gogeta_launch_queue_item (confirm=true), gogeta_resolve_error, gogeta_incident_update, gogeta_resume_campaign (confirm=true), gogeta_watchdog (start/stop), gogeta_run_form_submit (writes experiments/run-forms/ only).
-There are no delete operations.
+  gogeta_start_server, gogeta_stop_server, gogeta_launch_queue_item (confirm=true), gogeta_resolve_error, gogeta_incident_update, gogeta_resume_campaign (confirm=true), gogeta_watchdog (start/stop), gogeta_run_form_submit (writes experiments/run-forms/ only),
+  cloud: gogeta_cloud_up/session, gogeta_vast_rent/run, gogeta_fleet_up/dispatch (SPEND: inside the human budget + confirm),
+  gogeta_cloud_down, gogeta_vast_destroy, gogeta_fleet_down (stop spending, confirm), gogeta_cloud_setup/data/run/stop/pull/attach (control, confirm).
+No tool creates or edits a spend approval (human only: TUI or cockpit.sh --approve-spend). Nothing deletes local data.
 """
 from __future__ import annotations
 
@@ -17,8 +19,11 @@ import traceback
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import cloud  # noqa: E402
 import core  # noqa: E402
+import fleet  # noqa: E402
 import logdb  # noqa: E402
+import providers  # noqa: E402
 import runform  # noqa: E402
 import watchdog  # noqa: E402
 from mcp.server.fastmcp import FastMCP  # noqa: E402
@@ -31,9 +36,11 @@ mcp = FastMCP("gogeta-cockpit", instructions=(
 
 RO = ToolAnnotations(readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=False)
 RW = ToolAnnotations(readOnlyHint=False, destructiveHint=False, idempotentHint=False, openWorldHint=False)
+CLOUD_RO = ToolAnnotations(readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=True)
+CLOUD_RW = ToolAnnotations(readOnlyHint=False, destructiveHint=True, idempotentHint=False, openWorldHint=True)
 
 
-def tool(name: str, readonly: bool = True):
+def tool(name: str, readonly: bool = True, cloud_: bool = False):
     """Register a logged tool: records timing/args in tool_calls and exceptions in errors."""
     def deco(fn):
         @functools.wraps(fn)
@@ -48,14 +55,15 @@ def tool(name: str, readonly: bool = True):
                 logdb.tool_call("mcp", name, k, (time.time() - t0) * 1000, False, "%s: %s" % (type(ex).__name__, ex))
                 logdb.error("mcp", str(ex), type(ex).__name__, traceback.format_exc(), context={"tool": name, "args": k})
                 return {"error": "%s: %s" % (type(ex).__name__, ex)}
-        return mcp.tool(name=name, annotations=RO if readonly else RW)(inner)
+        ann = (CLOUD_RO if readonly else CLOUD_RW) if cloud_ else (RO if readonly else RW)
+        return mcp.tool(name=name, annotations=ann)(inner)
     return deco
 
 
-def expose(fn, name: str, readonly: bool = True):
+def expose(fn, name: str, readonly: bool = True, cloud_: bool = False):
     """Extension pattern: turn ANY core function (typed args, docstring, JSON-able dict result) into a logged MCP tool.
     The schema comes from its type hints, the description from its docstring."""
-    return tool(name, readonly)(fn)
+    return tool(name, readonly, cloud_)(fn)
 
 
 @tool("gogeta_brief")
@@ -252,6 +260,40 @@ expose(core.backlog, "gogeta_backlog")  # cockpit backlog: read before adding fe
 expose(runform.run_form_draft, "gogeta_run_form_draft")
 expose(runform.run_form_submit, "gogeta_run_form_submit", readonly=False)
 expose(runform.run_forms_list, "gogeta_run_forms")
+
+# Cloud GPUs: cockpit/providers/ (vast, ssh, ... plugins) + cockpit/cloud.py (guardrails) + cockpit/fleet.py (lifecycle, fleet, monitoring).
+# There is deliberately NO tool that creates, extends, revokes or edits a spend approval / standing budget: those come only from the
+# human (TUI Cloud tab form, or `cockpit.sh --approve-spend` on a terminal). MCP spin-ups are allowed but bounded by that budget.
+# read-only (free)
+expose(providers.providers, "gogeta_cloud_providers", cloud_=True)
+expose(cloud.offers, "gogeta_cloud_offers", cloud_=True)
+expose(cloud.offers, "gogeta_vast_offers", cloud_=True)
+expose(cloud.instances, "gogeta_vast_instances", cloud_=True)
+expose(cloud.cost_estimate, "gogeta_vast_cost", cloud_=True)
+expose(cloud.balance_ok, "gogeta_vast_balance", cloud_=True)
+expose(cloud.approvals, "gogeta_vast_approvals", cloud_=True)
+expose(fleet.cloud_status, "gogeta_cloud_status", cloud_=True)
+expose(fleet.cloud_logs, "gogeta_cloud_logs", cloud_=True)
+expose(fleet.fleet_status, "gogeta_fleet_status", cloud_=True)
+expose(fleet.fleet_logs, "gogeta_fleet_logs", cloud_=True)
+# stop spending (always allowed for cockpit-labelled registry instances; confirm-gated; logged with the price)
+expose(fleet.cloud_down, "gogeta_cloud_down", readonly=False, cloud_=True)
+expose(cloud.destroy, "gogeta_vast_destroy", readonly=False, cloud_=True)
+expose(fleet.fleet_down, "gogeta_fleet_down", readonly=False, cloud_=True)
+# control a cockpit instance (confirm-gated; no new spend)
+expose(fleet.cloud_setup, "gogeta_cloud_setup", readonly=False, cloud_=True)
+expose(fleet.cloud_data, "gogeta_cloud_data", readonly=False, cloud_=True)
+expose(fleet.cloud_run, "gogeta_cloud_run", readonly=False, cloud_=True)
+expose(fleet.cloud_stop, "gogeta_cloud_stop", readonly=False, cloud_=True)
+expose(fleet.cloud_pull, "gogeta_cloud_pull", readonly=False, cloud_=True)
+expose(fleet.vast_attach, "gogeta_cloud_attach", readonly=False, cloud_=True)
+# SPEND MONEY: budget-gated (a valid human approval must cover it; checked before any create call) and confirm-gated; dry_run first
+expose(fleet.cloud_up, "gogeta_cloud_up", readonly=False, cloud_=True)
+expose(fleet.cloud_session, "gogeta_cloud_session", readonly=False, cloud_=True)
+expose(cloud.rent, "gogeta_vast_rent", readonly=False, cloud_=True)
+expose(fleet.vast_run, "gogeta_vast_run", readonly=False, cloud_=True)
+expose(fleet.fleet_up, "gogeta_fleet_up", readonly=False, cloud_=True)
+expose(fleet.dispatch, "gogeta_fleet_dispatch", readonly=False, cloud_=True)
 
 
 @mcp.resource("gogeta://agents", name="AGENTS.md", description="Binding repo rules for agents", mime_type="text/markdown")

@@ -171,6 +171,14 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
 - **Never mask failures:** a crash that changes a result's validity (a partial run, a changed seed or LR, a discarded item) is recorded in the devlog **and** the claims ledger, not just fixed.
 - **Post-mortem:** every incident that cost more than 10 minutes of GPU time gets a 3-line post-mortem (cause, fix, how we stop it recurring) in the devlog entry that fixes it.
 - **Resume support:** campaigns resume at item granularity today (`--resume`, resume campaign files). Mid-run training resume needs `notes/patches/cockpit-resilience-train.patch` (applied between campaigns).
+- **Stopped on purpose means stopped.** A runner ended by SIGTERM/SIGINT (exit 143/130) is classified `operator` and never auto-resumed. When the human says stop or hold, also set the operator hold: `bash cockpit/cockpit.sh --hold "reason"`.
+  - The hold blocks every campaign resume, manual or by the watchdog, and the TUI header shows it.
+  - Only the human releases it: `bash cockpit/cockpit.sh --release-hold`, in an interactive terminal.
+  - (2026-11-22: a human-ordered thermal kill was auto-resumed as "transient"; fixed in v0.4.73.)
+- **Reconnect after any session or WSL restart (do this first):** `bash cockpit/cockpit.sh --reconnect`. It starts the watchdog if it is down, then prints the hold state, local GPU and jobs, campaigns, open incidents and every live cloud instance with its job and spend.
+  - Opening the TUI also starts the watchdog. Its Fleet tab polls remote boxes on open and every 15 s.
+  - Remote jobs run detached (`nohup`) and survive disconnects, so reconnecting is observation only.
+  - Re-arm any monitors you need, then apply §0h: an idle box is pulled, then destroyed.
 
 ## 0g. Be adaptive: extend the cockpit, don't work around it
 

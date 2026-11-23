@@ -17,6 +17,68 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.73: Cloud pilot results: the 5090 is fastest and cheapest per token; SQ214 window sweep (w256 best); cockpit Vast integration; thermal-kill fixes
+*2026-11-22*
+
+**SQ220 done: cloud bridge across three machines** (`experiments/devlogs/SQ220.md`, `experiments/checks/results/sq_220.json`).
+- **Setup:** the same training code (`gogeta/`, `configs/`, `tools/` identical at `9712842` and `bd03492`), the same data sha256, seed 0, lr 3e-3, 20M tokens.
+- **Loss transfers.** val_loss vs the N1X:
+  - E10: 3090 +0.0020, 5090 +0.0011;
+  - E1: 3090 +0.0007, 5090 −0.0020.
+
+  All are within the ±0.004 tolerance. New claim **C195** (PARTIAL: seed 0, 20M tokens, two SKUs). E1 < E10 on every machine.
+- **Speed (steady-state median tokens/s):**
+
+| | N1X | RTX 3090 | RTX 5090 |
+|---|---|---|---|
+| E10 | 202k | 272.5k | **845k** |
+| E1 | 138k | 254.5k | **743k** |
+| $/hr | ~0.02 (electricity, assumed) | 0.232 | 0.523 |
+| $ per 1B E1 tokens | ~0.04 | 0.253 | **0.196** |
+| 200M-token E1 run | 24.2 min | 13.1 min | **4.5 min** |
+
+- **The 5090 wins both value per dollar** (23–27% cheaper per token than the 3090) **and time** (about 3× the 3090). The 3090-part "overhead-bound" reading was wrong.
+- **Prediction outcomes:** P3 was a partial miss (3090 only 1.35×/1.84×). 5-P2 and 5-P3 passed.
+- **Per-box fixed cost** is about 3.3 min: 76 s env from scratch, about 90 s on-box dataset rebuild, about 30 s cold compile. Nothing is uploaded from the operator's machine.
+- **Spend:** about $0.35 in total. Both boxes were destroyed as soon as their work ended (AGENTS §0h).
+
+**SQ214 done (window sweep part; exploratory)** (`experiments/devlogs/SQ214.md`, `experiments/checks/results/sq_214.json`):
+- **Design:** E1's two SWA layers at window 64/256/1024, 4 seeds each, 20M tokens, one RTX 5090.
+- **Clean80 bpc means:** w64 0.4509, **w256 0.4475**, w1024 0.4533.
+- **Full context is worse:** +1.30% (paired t 5.1, df 3, all four seeds the same sign). w64 is +0.76%.
+- **Registered predictions:** W1 fail, W2 pass, W3 fail. The decision rule says no confirmatory run.
+- **C193** gets a limitation (event 4): the "SWA window caps long-doc context" explanation of its > 1,200-token reversal loses support. SQ226 (scorer chunking) and SQ219 (context removal) are next.
+- The 20M-token seed sd is 0.0017 bpc (0.39%), a by-product for SQ216.
+
+**Incident: N1X thermal kill, then an unwanted auto-resume** (post-mortem):
+- **Cause:**
+  - The N1X reached 86.6 °C (limit 85 °C) during Phase 2b item 7 (E11 s0), and the human ordered a kill. The campaign runner and the run were SIGTERMed; the partial E11 run is discarded.
+  - The watchdog classified the runner's exit 143 as "transient" and auto-launched `phase2b-replication-resume-1`. E1 s0 ran on the N1X from 20:53 until a session/WSL restart killed it around 21:01.
+  - Separately, the launcher only gates *new* launches on temperature; nothing throttles a running job.
+- **Fix:**
+  - Exit 143/130 is classified `operator` and never auto-resumed.
+  - A new operator hold (`cockpit.sh --hold`, human-only `--release-hold`) blocks every resume, and the TUI header shows it.
+  - Two regression tests were added (watchdog 24/24).
+- **Prevention:**
+  - The hold is set now, per the human's "Hold for now". Phase 2b stays at 6 of 11 until the human releases it.
+  - A running-job thermal guard is queued.
+
+**Cockpit Vast integration** (cockpit subagent, verified by the main agent: 77/77 tests, MCP probe, headless TUI check):
+- **Plugins:** a provider interface with Vast plus a bring-your-own SSH box.
+- **57 MCP tools:** read-only status/offers/cost; confirm-gated setup/data/run/pull/down; budget-gated up/session/dispatch.
+- **Guards:** spend checked before every rent under a human-only approval (`cockpit.sh --approve-spend`, TTY). AGENTS §0h is enforced in code: pull then destroy on an empty queue, a 10-min idle kill, teardown in `finally`.
+- **TUI:** Cloud (`k`) and Fleet (`j`) tabs. The Fleet tab now polls live on open and every 15 s; it used to poll only on its Refresh button.
+- **Launcher:** the `cockpit.ps1` wslpath bug is fixed.
+
+**Reconnection** (the human: "make sure the reconnection is smooth and easy to do if not automatic"):
+- `cockpit.sh --reconnect` restarts the watchdog if it is down, then prints the hold, GPU, campaigns, incidents and live cloud instances.
+- Opening the TUI also starts the watchdog. After the restart the watchdog had been down, and nothing auto-started it.
+- AGENTS §0f now makes reconnecting the first step after any restart, and records the stop-means-stopped rule.
+
+**Quick review 20:50 (systems/hardware):** SQ231 accepted (a micro-batch throughput curve with gradient accumulation, which keeps the optimisation identical).
+
+---
+
 ## v0.4.72: Outside review 20:40; cloud kill-on-empty rule (AGENTS 0h); on-box dataset rebuild verified byte-identical
 *2026-11-22*
 

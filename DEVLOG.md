@@ -18,6 +18,23 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.41: Docs refresh (hourly)
+*2026-11-23*
+
+**Docs refresh (hourly): README, sketch, campaigns and post-training setup brought to v0.5.40.**
+
+- **README:**
+  - The out-of-corpus paragraph now uses SQ400's figures. The ternary cost is "not distinguishable from 0" (+0.42% [-0.92, +1.77]), and the loop cost reverses (A2f vs E24 -1.91%, C214 VERIFIED on the one SQ99 set). C213 stays PARTIAL.
+  - Other status updates: B1 is reported as read out (v0.5.36), the SQ411 reward fix is noted (C83 stays PARTIAL), and total spend is $44.01.
+  - The quick-start gains an assembled-model run line (`experiments/staged-configs/a3/a3mx.json`).
+- **notes/sketch.md:** status to v0.5.40, and the claim counts match the ledger (25 VERIFIED, 27 PARTIAL, 9 REFUTED, 2 WRONG FOR OUR CODE, 1 INCONCLUSIVE, 75 UNVERIFIED, 3 SUPERSEDED; 142). The decisions log gains v0.5.34-v0.5.40, including "the final model is judged on out-of-corpus quality" (v0.5.38) and the frozen-readout rule (v0.5.39).
+- **post_training/SETUP.md:** SQ411's AST-rewritten comparisons; test_rewards is 34 tests; the still-open routes are listed.
+- **experiments/launch/campaigns/README.md:** B1 is marked done (v0.5.36).
+- **Check:** the main agent checked the diff and verified the claim counts against `experiments/claims-status.md`.
+- **Quick review 17:29 (newcomer):** a 5M/10M screening horizon is added to SQ414 (zero GPU); "Next picks" is the queue's operative list.
+
+---
+
 ## v0.5.40: SQ411 closes the __eq__ reward-forgery route (14 arms 1/1 -> 0/1, test_rewards 34/34); scoring invariant for aggregates (SQ407); 20M screens predict sign, understate size (SQ414)
 *2026-11-23*
 

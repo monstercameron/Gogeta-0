@@ -18,6 +18,26 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.6: Outside review 12:15: A3 leave-one-out ladder planned; SQ369-SQ372; A2 fleet: one box failed setup, jobs requeued
+*2026-11-23*
+
+**Outside review 12:15 (Haiku) and quick review 12:09 (ML theorist), triaged. A3 is planned.**
+
+- **A3 plan, adopted from the review:** a leave-one-out ladder on the assembled model A2s, on fresh seeds 5-9, registered after A2 reads out. The arms are A2s minus contractive injection, minus fixed r, with a 3x4 core (same 12 applications, half the unique core params: C197 inside the stack), A2f (no ternary), and A2s itself. It attributes the stack to its components, which the "do the components work together" question needs.
+- **What A2 can claim** (12:09 review): a recipe-level claim only (A2s vs E27, and within 5% of dense if P2 passes). Mechanism claims need factorials on the recipe (SQ369 ternary x loop count, and the A3 ladder).
+- **New side quests:**
+  - SQ369: ternary x loop count on the assembled recipe.
+  - SQ370: is the 20M->200M sign flip a cosine-schedule artifact (WSD vs cosine at 20M)?
+  - SQ371: goal-6 decision memo. At 1.2B, neither ternary nor loops changes what fits in 24 GB, so their case rests on decode speed.
+  - SQ372: amend E13 to compare patch sizes at matched FLOPs.
+- **Merged into existing side quests:** ternary code churn into SQ365; a 200M state-tracking probe for loops into SQ68; a parameter-matched byte decoder arm (A'') into SQ207.
+- **Flags checked:** the A2 configs' 20M max_tokens is overridden by `--max-tokens 200000000` on every job, the same pattern as F2. The README's "P = 2 best so far" does not exist. E24 is A2's unshared matched-FLOP reference. SQ207 and the assembly items are missing from the stale `queue.json` and go in the next queue update.
+- **A2 fleet:**
+  - Box 4 failed setup (the torch download died after 526 s). It was taken out of rotation, its two jobs (A2s seed 3, E27 seed 3) were requeued first, and it was destroyed for $0.12.
+  - Six boxes are training, and box 5 is still loading.
+
+---
+
 ## v0.5.5: Claim audit 2026-11-23-1202: 35 claims, no downgrades (C203 Holm checked, C30 WRONG rejected); A1 holds at equal wall-clock
 *2026-11-23*
 

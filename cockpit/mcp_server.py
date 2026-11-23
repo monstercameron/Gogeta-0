@@ -21,6 +21,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import cloud  # noqa: E402
 import core  # noqa: E402
+import expenses  # noqa: E402
 import fleet  # noqa: E402
 import logdb  # noqa: E402
 import providers  # noqa: E402
@@ -266,6 +267,8 @@ expose(runform.run_forms_list, "gogeta_run_forms")
 # human (TUI Cloud tab form, or `cockpit.sh --approve-spend` on a terminal). MCP spin-ups are allowed but bounded by that budget.
 # read-only (free)
 expose(providers.providers, "gogeta_cloud_providers", cloud_=True)
+expose(expenses.expenses, "gogeta_expenses")  # expense ledger summary (experiments/expenses.json)
+expose(expenses.expenses_reconcile, "gogeta_expenses_reconcile", readonly=False)  # appends the provider's live numbers
 expose(cloud.offers, "gogeta_cloud_offers", cloud_=True)
 expose(cloud.offers, "gogeta_vast_offers", cloud_=True)
 expose(cloud.instances, "gogeta_vast_instances", cloud_=True)

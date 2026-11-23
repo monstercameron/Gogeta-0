@@ -449,3 +449,29 @@ The predictions registered in v0.4.68 apply to exactly these staged configs (sha
   - The seed spread in the decision rule becomes the sd across the 4 seeds of each arm (pooled over arms).
   - W1–W3 are unchanged. The 20M-token seed sd and its CI are reported as a by-product (SQ216).
   - **Scoring caveat (SQ226):** docs longer than 1,024 tokens are scored in chunks, which restarts the recurrent state. The primary metric is unchanged, but any window effect is read with that caveat until SQ226 runs.
+
+## Registered fleet wave 1 (2026-11-22 ~21:20, before any of these runs exists): Phase 2b on RTX 5090 plus SQ232
+
+### Phase 2b-5090: an independent single-SKU replication
+- **Design:**
+  - The same 11 items as `experiments/launch/campaigns/phase2b-replication.campaign`: E10 × 3 seeds at lr 3e-3; E1 × 3 and E11 × 3 at 6e-3; E9 s0 and E2 s0 at 6e-3. 200M tokens each.
+  - All of them run on rented RTX 5090s (one SKU), with the same code as the N1X campaign (`gogeta/`, `configs/` and `tools/` are unchanged since `9712842`).
+  - Checkpoints are pulled; clean-val doc-level scoring (`experiments/stats/score_doclevel.py`) runs on every checkpoint.
+- **Status relative to the N1X campaign (no forking path):**
+  - The N1X Phase 2b E1-vs-E10 comparison (3 + 3 seeds, complete) **stays the registered confirmatory test**, Q12, per Addendum A2. Its clean-val scoring is still to run.
+  - The 5090 run is a **second, independent replication** of the same design, registered here before any 5090 Phase 2b number exists.
+  - It is confirmatory for the arms the N1X campaign did not finish (E11 vs E1; E9 and E2, single seed, so descriptive only). It replicates E1 vs E10.
+  - The two SKUs are never pooled in one test: C195's ±0.004 tolerance is larger than the effects in question.
+- **Predictions:**
+  - **R1:** on the 5090, the E1-vs-E10 sign on clean80 bpc matches the N1X's sign (whatever that turns out to be).
+  - **R2:** 5090 val_loss per item within ±0.004 of the matching N1X item, for the 6 items the N1X finished (extends C195 to 200M tokens).
+  - **R3:** E11 vs E1, the registered E11 hypothesis (`experiments/checks/PREDICTIONS.md`, E11 section), judged on the 5090 alone.
+
+### SQ232: same-SKU replay floor
+- **Design:** E10 and E1 at seed 0, lr 3e-3, 20M tokens, `--compile`, each run **twice** on RTX 5090s (4 runs), compared with the earlier 5090 bridge runs (E10 1.0297, E1 1.0051).
+- **Prediction P-R1:** |Δval_loss| between same-seed same-SKU replays ≤ 0.002, smaller than the cross-SKU differences in C195 (up to 0.0020). If replays differ by ≥ 0.002, C195's agreement is within run-to-run noise and the tolerance discussion changes.
+- **Wave-1 amendment (same session, before dispatch; outside review 21:10, critique 4 and idea I6):**
+  - Phase 2b-5090 runs **E10 and E1 at seeds 0–6 (7 per arm)** instead of 0–2, because at n = 3 the E1-vs-E10 difference sits at about 0.5 SE, and resolving 0.3% at 80% power needs about 7 seeds per arm (computed in the review).
+  - E11 stays at seeds 0–2, and E9 and E2 at seed 0.
+  - The registered test for R1 is the paired-by-seed difference over seeds 0–6 (Welch as a sensitivity check), on clean80 bpc, with Holm across the two Phase 2b-5090 confirmatory comparisons (E1 vs E10; E11 vs E1).
+  - **The resolvable effect is stated before any result:** with an assumed per-arm sd of 0.0020 on val_loss (the N1X 3-seed sd), the 95% half-width of the paired mean difference at n = 7 is about 0.0018 (computed with sd_diff about 0.0020, an assumption).

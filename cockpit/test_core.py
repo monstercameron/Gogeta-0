@@ -1010,3 +1010,25 @@ class CloudLiveReadOnlySmoke(TmpDB):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ExpensesTests(unittest.TestCase):
+    def test_summary_and_reconcile_keep_only_two_numbers(self):
+        import expenses
+        d = Path(tempfile.mkdtemp())
+        led = d / "expenses.json"
+        led.write_text(json.dumps({"currency": "USD", "entries": [
+            {"id": "X1", "date": "d", "type": "credit_purchase", "amount": 100.0},
+            {"id": "X2", "date": "d", "type": "compute", "amount": 0.3, "experiments": ["A", "B"]}], "reconciliations": []}))
+        fake = {"credit": 99.5, "total_spend": -0.5, "email": "someone@example.com", "billaddress_line1": "1 Road"}
+        with mock.patch.object(expenses, "LEDGER", led):
+            s = expenses.expenses()
+            self.assertEqual((s["credit_bought"], s["compute_estimated"], s["per_experiment_estimated"]), (100.0, 0.3, {"A": 0.15, "B": 0.15}))
+            with mock.patch("providers.vast.run", return_value=(0, dict(fake), "")):
+                r = expenses.expenses_reconcile("t")
+            self.assertEqual((r["appended"]["credit_left"], r["appended"]["provider_total_spend"]), (99.5, 0.5))
+            txt = led.read_text()
+            self.assertNotIn("example.com", txt)
+            self.assertNotIn("Road", txt)
+            self.assertAlmostEqual(expenses.expenses()["unattributed_gap"], 0.2)
+        shutil.rmtree(d)

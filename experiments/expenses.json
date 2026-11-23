@@ -1,0 +1,63 @@
+{
+ "about": "Gogeta-0 expense ledger (USD). Append-only: credit purchases, compute spend per rental, and reconciliations against the provider's own account numbers. PUBLIC repo: never record card digits, receipt numbers or links, billing addresses or e-mails; receipts stay with the human. Read and reconcile via the cockpit: bash cockpit/cockpit.sh --expenses [reconcile], MCP gogeta_expenses / gogeta_expenses_reconcile.",
+ "currency": "USD",
+ "entries": [
+  {
+   "id": "X1",
+   "date": "2026-11-22T19:54:05-05:00",
+   "type": "credit_purchase",
+   "provider": "vast.ai",
+   "amount": 100.0,
+   "purpose": "Prepaid Vast.ai credit for rented GPUs (budget approved by the human: $30 total / 12 h for the pilot)",
+   "paid_by": "human",
+   "evidence": "receipt e-mailed to the human (not stored in the repo)"
+  },
+  {
+   "id": "X2",
+   "date": "2026-11-22T20:05:00-05:00",
+   "type": "compute",
+   "provider": "vast.ai",
+   "amount": 0.15,
+   "estimated": true,
+   "resource": "1x RTX 3090 on-demand, $0.232/h, ~40 min (instance 62070434, destroyed)",
+   "experiments": [
+    "SQ220"
+   ],
+   "purpose": "SQ220 part 1: bridge runs E10/E1 + E0/E1/E2 benches; setup and data-rebuild tests",
+   "evidence": "experiments/devlogs/SQ220.md"
+  },
+  {
+   "id": "X3",
+   "date": "2026-11-22T20:38:00-05:00",
+   "type": "compute",
+   "provider": "vast.ai",
+   "amount": 0.19,
+   "estimated": true,
+   "resource": "1x RTX 5090 on-demand, $0.523/h, ~22 min (instance 62073471, destroyed)",
+   "experiments": [
+    "SQ220",
+    "SQ214"
+   ],
+   "purpose": "SQ220 part 2 bridge (E10/E1) + SQ214 window sweep (12 runs) + clean-val scoring",
+   "evidence": "experiments/devlogs/SQ220.md, experiments/devlogs/SQ214.md"
+  }
+ ],
+ "reconciliations": [
+  {
+   "ts": "2026-11-22T21:12:00-05:00",
+   "provider": "vast.ai",
+   "credit_left": 99.58,
+   "provider_total_spend": 0.42,
+   "note": "provider's own total (incl. storage, bandwidth, boot minutes) vs 0.34 estimated in X2+X3; the 0.08 gap is unattributed boot/storage time. Autobill off (credit-only billing).",
+   "by": "main-agent"
+  },
+  {
+   "ts": "2026-11-22T21:12:07-0500",
+   "provider": "vast.ai",
+   "credit_left": 99.5761,
+   "provider_total_spend": 0.4239,
+   "note": "first cockpit reconcile after both pilot boxes were destroyed",
+   "by": "cockpit"
+  }
+ ]
+}

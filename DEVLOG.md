@@ -17,6 +17,35 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.74: Expense ledger; outside review 21:10; fleet wave 1 registered (Phase 2b on 5090s at 7 seeds, SQ232)
+*2026-11-22*
+
+**Expenses are now tracked** (the human: "lets track our expenses").
+- **Ledger:** `experiments/expenses.json`, append-only: credit purchases, per-rental compute (estimated), and reconciliations against the provider's own numbers. Cockpit access: `bash cockpit/cockpit.sh --expenses [reconcile]`, MCP `gogeta_expenses` and `gogeta_expenses_reconcile` (80/80 tests).
+- **Public-repo rule:** amounts and purposes only. No card digits, receipt numbers or links, addresses or e-mails; the reconcile path keeps only the two numbers it needs.
+- **To date:**
+  - **$100.00** Vast.ai credit bought by the human (2026-11-22 16:54 PST);
+  - **$0.4239** compute actually charged, against $0.34 estimated across the 3090 and 5090 pilot boxes; the $0.08 gap is boot, storage and bandwidth time;
+  - **$99.58** credit left.
+- Auto-billing is off (credit-only), so Vast cannot charge the card on its own.
+
+**Outside review 21:10 (Haiku), triaged:**
+- **Critiques accepted:**
+  - SQ214's "w64 worse" is not significant at n = 4 (erratum in its devlog), and the C193 limitation rests on the aggregate, not the > 1,200-token bin.
+  - E1 vs E10 mixes mixer and init (SQ234).
+  - **At n = 3 the Phase 2b verdict sits at about 0.5 SE**, so 7 seeds per arm are needed for a 0.3% effect.
+- **New queue items:** SQ234 (E1 under E10's init), SQ235 (delta-rule ablation), SQ236 (membership gap), SQ237 (GDN-only length extrapolation).
+- **Quick reviews:** 21:10 reproducibility auditor gave SQ232 (same-SKU replay floor) and SQ233 (machine-readable outputs for the VERIFIED C1/C3).
+
+**Fleet wave 1 registered before dispatch** (`experiments/checks/PREDICTIONS.md`). The human asked for "several of the cheapest 5090s, max 8 concurrent", running every experiment, CPU jobs included, and the N1X limited to light work after its 86.6 °C thermal kill.
+- **Phase 2b-5090,** an independent single-SKU replication: E10 and E1 at **7 seeds each**, E11 × 3, E9 and E2 × 1, all at 200M tokens, scored on clean80.
+  - The N1X 3 + 3-seed E1-vs-E10 comparison stays the registered confirmatory Q12 test.
+  - The two SKUs are never pooled.
+  - Predictions R1–R3. The resolvable effect is stated up front: a half-width of about 0.0018 at n = 7, under an assumed sd.
+- **SQ232:** same-SKU replay pairs for E10 and E1. Prediction P-R1: |Δ| ≤ 0.002.
+
+---
+
 ## v0.4.73: Cloud pilot results: the 5090 is fastest and cheapest per token; SQ214 window sweep (w256 best); cockpit Vast integration; thermal-kill fixes
 *2026-11-22*
 

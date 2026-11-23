@@ -13,6 +13,7 @@
 #   bash cockpit/cockpit.sh --cloud approvals|offers|instances|balance|brief   read-only cloud queries
 #   bash cockpit/cockpit.sh --reconnect        after a session/WSL restart: start the watchdog if it is down, then print
 #                                              hold state, GPU, campaigns, open incidents and every live cloud instance + job
+#   bash cockpit/cockpit.sh --expenses [reconcile]   expense ledger (experiments/expenses.json); reconcile = append the provider's live credit/spend
 #   bash cockpit/cockpit.sh --hold "reason"    operator hold: no campaign resume (manual or watchdog auto-resume) until released
 #   bash cockpit/cockpit.sh --release-hold     HUMAN ONLY (TTY): remove the hold
 #   The TUI (no flag) also starts the watchdog if it is down, so opening the cockpit is enough to reconnect.
@@ -31,6 +32,7 @@ case "${1:-}" in
   --revoke-spend) shift; cd "$REPO"; exec python3 "$HERE/cloud.py" revoke "$@" ;;
   --revoke-ssh-key) shift; cd "$REPO"; exec python3 "$HERE/cloud.py" revoke-ssh-key "$@" ;;
   --cloud) shift; cd "$REPO"; exec python3 "$HERE/cloud.py" "$@" ;;
+  --expenses) shift; cd "$REPO"; exec python3 "$HERE/expenses.py" "$@" ;;
   --hold) shift; mkdir -p "$HOME/fusiondance-data/cockpit"
           echo "HOLD $(date -Is): ${*:-operator hold}. No campaign resume until a human runs: bash cockpit/cockpit.sh --release-hold" \
             > "$HOME/fusiondance-data/cockpit/hold.flag"; cat "$HOME/fusiondance-data/cockpit/hold.flag"; exit ;;

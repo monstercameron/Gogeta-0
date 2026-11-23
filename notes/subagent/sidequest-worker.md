@@ -90,3 +90,13 @@ r=1: +27.88% vs r=2 [+23.53,+32.22] (above the registered range +3..+25%, meets 
 
 ## SQ400 (done; registered, P1-P7 all met; decision rule fires)
 Out of corpus (330 SQ99 files), paired-by-seed 95% CI: ternary cost A2s vs A2f +0.42% [-0.92,+1.77] (n=6; clean80-300 +8.94%); assembly gain A2s vs E27 -11.26% [-11.59,-10.93] (n=3); A2f vs E20 +1.46% [+0.47,+2.45] (n=6); E27 vs E20 +14.79% (ratio 0.514 of clean80); A3mx vs E20 +0.81% [-0.24,+1.85] (n=3); loop cost A2f vs E24 -1.90% [-3.40,-0.40] (n=6; clean80 +2.49%). Main agent's triage rule: both conditions hold with n>=3, so C213 changes design priorities. Files: `experiments/checks/sq400_ooc_registered.py`, `results/sq400.json`, `sq400_part{0,1}.json`, `experiments/devlogs/SQ400.md`.
+
+## SQ411 (done): `__eq__` reward-forgery route closed (rewards.py)
+Tests are AST-rewritten in the grader before the fork: every non-identity comparison and assert/not truthiness goes through harness-bound strict checks requiring exact builtin value types (and containers of them); else the assertion fails. test_rewards: before 30 OK, after 34 OK. Probe: 14 forgery arms 1/1 -> 0/1 (eq, reflected, ne, lt, contains, bool, not-bool, int/list/str subclasses, nested, dict value, chained, and/or); honest controls unchanged. Fail-closed for custom-class returns (documented). Files: `post_training/rewards.py`, `post_training/test_rewards.py`, `experiments/checks/reward_forgery_probe.py`, `experiments/checks/results/reward_forgery_probe_sq411.txt`, `experiments/devlogs/SQ411.md`.
+
+## SQ414 (done): do 20M screens predict 200M?
+11 arms, in-run 20M point vs 200M end: Spearman 0.84, Kendall 0.67, 9/55 (16%) pairs flip; B1 direct 20M (A2f, A2s, A3m, E24): Spearman 1.0, 0/6 flips; all 8 named contrasts keep sign but magnitudes grow 1.5-2.5x (A2s vs A2f 2.2->6.5, E27 vs E20 8.1->20.5). Neither trigger (corr<0.5, >25% flips) met. Files: `experiments/checks/sq414_screen_predicts.py`, `results/sq414.json`, `experiments/devlogs/SQ414.md`.
+## Status: SQ407 and SQ239/SQ410/SQ385 re-score running (CPU); SQ265 next.
+
+## SQ407 (done; CPU fp32 only): scorer invariance, A2s / A2f / E27 seed 2, 200 docs, 6 configs
+Order: bit-identical at bs 1. Batch 8 vs 1: max per-doc rel diff A2s 7.1e-5, A2f 1.6e-7, E27 5.0e-4 (median 0); A2s-vs-E27 contrast range 1e-4 points (<0.1). Per-doc threshold 1e-4 exceeded for E27 only -> pin batch size for per-doc analyses; aggregates unaffected. Files: `experiments/checks/sq407_scorer_invariance.py`, `results/sq407.json`, `experiments/devlogs/SQ407.md`.

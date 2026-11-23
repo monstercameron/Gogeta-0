@@ -1,0 +1,50 @@
+{
+ "check": "SQ239-parseability",
+ "git": "8488ef2",
+ "status": "descriptive census",
+ "val": {
+  "all": {
+   "n": 4000,
+   "parse_rate": 0.999
+  },
+  "algorithmic_corpus": {
+   "n": 2556,
+   "parse_rate": 0.9984350547730829
+  },
+  "synthetic_code_snippet": {
+   "n": 1444,
+   "parse_rate": 1.0
+  }
+ },
+ "clean80": {
+  "all": {
+   "n": 2333,
+   "parse_rate": 0.9982854693527646
+  },
+  "algorithmic_corpus": {
+   "n": 1220,
+   "parse_rate": 0.9967213114754099
+  },
+  "synthetic_code_snippet": {
+   "n": 1113,
+   "parse_rate": 1.0
+  }
+ },
+ "train_sample": {
+  "all": {
+   "n": 20000,
+   "parse_rate": 0.99945
+  },
+  "algorithmic_corpus": {
+   "n": 12539,
+   "parse_rate": 0.9991227370603717
+  },
+  "synthetic_code_snippet": {
+   "n": 7461,
+   "parse_rate": 1.0
+  }
+ },
+ "source_gap_points_val": 0.15649452269170805,
+ "train_val_gap_points": 0.044999999999995044,
+ "adds_parseability_stratum": false
+}

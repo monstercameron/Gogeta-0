@@ -77,10 +77,15 @@ NOBODY = 65534
 #   * the result travels over a pipe to the grader, which checks the inner nonce and structure and is the only process
 #     that writes the final nonce-tagged line; a worker that dies (os._exit, sys.exit, kill) yields "no result", and
 #     print()-forged lines in the worker's stdout are discarded;
-#   * a solution that leaves extra threads running or a trace/profile hook set is scored as failed.
+#   * a solution that leaves extra threads running or a trace/profile hook set is scored as failed;
+#   * (SQ411) the tests are AST-rewritten before the fork: every non-identity comparison and the truthiness of an assert / `not`
+#     goes through a harness-bound check that requires BOTH sides to be exact builtin value types (or containers of them), so
+#     a solution-defined __eq__/__lt__/__contains__/__bool__ is never called and a non-builtin result fails the assertion.
 # Residual risk (documented, not closed): code running in the worker can still imitate the worker's side of the pipe
-# protocol (it can enumerate /proc/self/fd) or tamper with the tests' objects (e.g. return an object whose __eq__ is
-# always true). This is a process sandbox, not a security boundary.
+# protocol (it can enumerate /proc/self/fd) or tamper with state the tests read through other routes than the rewritten
+# comparisons (e.g. a test that calls a solution-defined helper whose own code lies, or compares via a method such as
+# `.equals`). Solutions that return non-builtin objects (custom classes, numpy arrays) fail equality assertions by design.
+# This is a process sandbox, not a security boundary.
 _HARNESS = r"""
 import sys, os, json, builtins, threading
 def _main():
@@ -100,6 +105,105 @@ def _main():
         for _name, _v in _lim.items():
             resource.setrlimit(getattr(resource, _name), (_v, _v))
     _tests = _payload["tests"]
+    # ---- SQ411: tests are AST-rewritten BEFORE the fork (so nothing the solution does can touch the rewriter): every non-identity
+    # comparison (==, !=, <, <=, >, >=, in, not in) and the truthiness of an assert / of `not` goes through a harness-bound strict
+    # check that first requires BOTH sides to be builtin value types (exact type, no subclasses) or containers of them, so a
+    # solution-defined __eq__ / __lt__ / __contains__ / __bool__ is never called; anything else makes the assertion fail.
+    import ast, operator, collections, fractions, decimal, datetime
+    _ast = ast
+    _ATOMS = {int, float, complex, bool, str, bytes, bytearray, type(None), range, fractions.Fraction, decimal.Decimal,
+              datetime.date, datetime.datetime, datetime.time, datetime.timedelta}
+    _SEQ = {list, tuple, set, frozenset, collections.deque}
+    _MAP = {dict, collections.OrderedDict, collections.defaultdict, collections.Counter}
+    _bool, _int = bool, int
+    _OPS = [operator.eq, operator.ne, operator.lt, operator.le, operator.gt, operator.ge,
+            lambda a, b: operator.contains(b, a), lambda a, b: not operator.contains(b, a)]
+    _CODE = {_ast.Eq: 0, _ast.NotEq: 1, _ast.Lt: 2, _ast.LtE: 3, _ast.Gt: 4, _ast.GtE: 5, _ast.In: 6, _ast.NotIn: 7}
+
+    def _ok(x, d=0):
+        t = _type(x)
+        if t in _ATOMS:
+            return True
+        if d > 40:
+            return False
+        if t in _SEQ:
+            for e in x:
+                if not _ok(e, d + 1):
+                    return False
+            return True
+        if t in _MAP:
+            for k, v in x.items():
+                if not (_ok(k, d + 1) and _ok(v, d + 1)):
+                    return False
+            return True
+        return False
+
+    def _sc(code, a, b):
+        if _ok(a) and _ok(b):
+            return _bool(_OPS[code](a, b))
+        return False
+
+    def _st(x):
+        if _type(x) is _bool:
+            return x
+        return _bool(x) if _ok(x) else False
+
+    def _sn(x):
+        if _type(x) is _bool:
+            return not x
+        return (not _bool(x)) if _ok(x) else False
+
+    def _nm(n):
+        return _ast.Name(id=n, ctx=_ast.Load())
+
+    class _Rw(_ast.NodeTransformer):
+        n = 0
+
+        def visit_Compare(self, node):
+            self.generic_visit(node)
+            ops = node.ops
+            if all(_type(o) in (_ast.Is, _ast.IsNot) for o in ops):
+                return node
+            operands = [node.left] + list(node.comparators)
+            vals, prev = [], operands[0]
+            for i, o in enumerate(ops):
+                nxt = operands[i + 1]
+                if i + 1 < len(operands) - 1:      # a middle operand is evaluated once: bind it with a walrus
+                    _Rw.n += 1
+                    tmp = "__rw_t%d" % _Rw.n
+                    right = _ast.NamedExpr(target=_ast.Name(id=tmp, ctx=_ast.Store()), value=nxt)
+                    nxt_ref = _nm(tmp)
+                else:
+                    right, nxt_ref = nxt, nxt
+                if _type(o) in (_ast.Is, _ast.IsNot):
+                    vals.append(_ast.Compare(left=prev, ops=[o], comparators=[right]))
+                else:
+                    vals.append(_ast.Call(func=_nm("__sc__"), args=[_ast.Constant(value=_CODE[_type(o)]), prev, right], keywords=[]))
+                prev = nxt_ref
+            return vals[0] if _len(vals) == 1 else _ast.BoolOp(op=_ast.And(), values=vals)
+
+        def test(self, node):
+            if _type(node) is _ast.BoolOp:
+                return _ast.BoolOp(op=node.op, values=[self.test(v) for v in node.values])
+            if _type(node) is _ast.UnaryOp and _type(node.op) is _ast.Not:
+                o = node.operand
+                inner = self.test(o) if (_type(o) is _ast.BoolOp or (_type(o) is _ast.UnaryOp and _type(o.op) is _ast.Not)) else self.visit(o)
+                return _ast.Call(func=_nm("__sn__"), args=[inner], keywords=[])
+            return _ast.Call(func=_nm("__st__"), args=[self.visit(node)], keywords=[])
+
+        def visit_Assert(self, node):
+            node.test = self.test(node.test)
+            if node.msg is not None:
+                node.msg = self.visit(node.msg)
+            return node
+
+    _tcodes = []
+    for _t in _payload["tests"]:
+        try:
+            _tree = _Rw().visit(_ast.parse(_t, "<test>", "exec"))
+            _tcodes.append(_compile(_ast.fix_missing_locations(_tree), "<test>", "exec"))
+        except _BE as _e:
+            _tcodes.append(_type(_e).__name__ + ": " + _str(_e)[:200])
     _r1, _w1 = _pipe()
     _r2, _w2 = _pipe()
     _pid = _fork()
@@ -129,11 +233,16 @@ def _main():
                 _exit(0)
             _inner += _c
         if _res["ran"]:
-            for _t in _tests:
+            for _c in _tcodes:
+                if _type(_c) is _str:                   # the test did not compile / rewrite: it fails
+                    if _res["error"] is None:
+                        _res["error"] = _c
+                    continue
                 _tns = _dict(_ns)
                 _tns["__builtins__"] = _dict(_pristine)
+                _tns["__sc__"], _tns["__st__"], _tns["__sn__"] = _sc, _st, _sn
                 try:
-                    _exec(_compile(_t, "<test>", "exec"), _tns)
+                    _exec(_c, _tns)
                     _res["passed"] += 1
                 except _BE as _e:
                     if _res["error"] is None:

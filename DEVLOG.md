@@ -18,6 +18,26 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.40: SQ411 closes the __eq__ reward-forgery route (14 arms 1/1 -> 0/1, test_rewards 34/34); scoring invariant for aggregates (SQ407); 20M screens predict sign, understate size (SQ414)
+*2026-11-23*
+
+**SQ411 closes the `__eq__` reward-forgery route (14 forgery arms 1/1 -> 0/1, test_rewards 34/34). Scoring is order- and batch-invariant for aggregates (SQ407). 20M screens predict 200M signs but understate effects 1.5-2.5x (SQ414).**
+
+- **SQ411** (worker; the main agent re-ran `post_training.test_rewards`: 34/34 OK):
+  - How it works: tests are AST-rewritten in the grader before the fork. Every non-identity comparison and every assert/`not` truthiness goes through a harness-bound strict check over exact builtin value types (or containers of them).
+  - Probe (`results/reward_forgery_probe_sq411.txt`, committed harness vs working tree): eq, reflected eq, ne, lt, contains, truthy, not-falsy, int/list/str subclasses, nested list, dict value, chained and and/or all go from 1/1 to 0/1. Honest controls and the SQ373 arms are unchanged.
+  - Status: the route no longer blocks GRPO. C83 records the evidence and the routes still open (solution-defined helpers, `.equals`, any/all over forged iterables). Honest solutions returning custom classes now fail closed, by design.
+- **SQ407** (CPU fp32, A2s/A2f/E27, 200 docs): doc order leaves per-doc NLL bit-identical. Batch 8 vs 1 moves only a few docs (max relative 7.1e-5 for A2s, 5.0e-4 for E27; median 0), and aggregates are identical to 6 decimals. The A2s-E27 contrast moves 1e-4 log-points against a threshold of 0.1, so published aggregates stand. Per-doc analyses pin batch size 1. The GPU bf16 half is not run.
+- **SQ414:** across 11 arms, the in-run 20M rank vs the 200M end gives Spearman 0.84 with 16% of pairs flipped. B1's arms against their 200M counterparts give Spearman 1.0 with no flips. Every named contrast keeps its sign, and magnitudes grow 1.5-2.5x by 200M. So 20M screens are fine for sign and understate size, which fits B1's small 20M effects.
+- **SQ225 parseability census:** 99.8-99.95% of docs parse; source and split gaps are below 0.2 points, so no stratum is added.
+- **Running (worker):** the per-doc re-score of 30 checkpoints (about 2 h), feeding SQ239, SQ410 and SQ385; then SQ265.
+- **Quick reviews:**
+  - 17:14: the A2s-A1a comparator check is labelled exploratory on C209; a two-way bootstrap for C214 is added to SQ213.
+  - 17:19: SQ418 (tokenizer identity in score artifacts and box checks).
+  - 17:24: SQ75 becomes a sequence-length sweep.
+
+---
+
 ## v0.5.39: Outside review 17:10: A2 headline holds against fixed-depth E27 (-12.6%); C214 style-shift limitation; decode frontier is E8's next step; readouts frozen before dispatch; erratum on 'vanishes'
 *2026-11-23*
 

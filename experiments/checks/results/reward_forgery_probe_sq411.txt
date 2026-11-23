@@ -1,0 +1,44 @@
+## BEFORE (committed HEAD rewards.py)
+control_honest_fail {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+control_honest_pass {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+control_honest_pass_containers {'ran': True, 'passed': 3, 'total': 3, 'error': None}
+exec_noop {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+compile_noop {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+assertionerror_swallow {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+sys_exit0 {'ran': False, 'passed': 0, 'total': 1, 'error': 'no result (exit code 0)'}
+eq_always_true {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+eq_reflected_right {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+ne_always_true {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+lt_always_true {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+contains_always_true {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+bool_always_true {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+not_bool_forged {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+int_subclass_eq {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+list_subclass_eq {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+str_subclass_eq {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+nested_container_eq {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+dict_value_eq {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+chained_compare {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+and_or_forged {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+## AFTER (working tree)
+control_honest_fail {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+control_honest_pass {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+control_honest_pass_containers {'ran': True, 'passed': 3, 'total': 3, 'error': None}
+exec_noop {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+compile_noop {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+assertionerror_swallow {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+sys_exit0 {'ran': False, 'passed': 0, 'total': 1, 'error': 'no result (exit code 0)'}
+eq_always_true {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+eq_reflected_right {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+ne_always_true {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+lt_always_true {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+contains_always_true {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+bool_always_true {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+not_bool_forged {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+int_subclass_eq {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+list_subclass_eq {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+str_subclass_eq {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+nested_container_eq {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+dict_value_eq {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+chained_compare {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+and_or_forged {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}

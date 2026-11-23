@@ -267,6 +267,65 @@ class TestForgery(unittest.TestCase):
         self.assertEqual((r["passed"], r["total"]), (2, 3), r)
 
 
+class TestEqForgery(unittest.TestCase):
+    """SQ411: a solution returning an object with always-true __eq__/__ne__/__lt__/__contains__/__bool__ (or a subclass of a builtin
+    type that overrides them) must not pass assertions; honest builtin-valued solutions still pass every comparison form."""
+
+    A = ("class A:\n    def __eq__(self, o): return True\n    def __ne__(self, o): return True\n    def __lt__(self, o): return True\n"
+         "    def __gt__(self, o): return True\n    def __contains__(self, o): return True\n    def __bool__(self): return True\n"
+         "    def __hash__(self): return 0\n")
+    FORGED = {
+        "eq": (A + "def f():\n    return A()\n", "assert f() == 2"),
+        "eq_reflected": (A + "def f():\n    return A()\n", "assert 2 == f()"),
+        "ne": (A + "def f():\n    return A()\n", "assert f() != 2"),
+        "lt": (A + "def f():\n    return A()\n", "assert f() < 0"),
+        "gt": (A + "def f():\n    return A()\n", "assert 0 > f()"),
+        "contains": (A + "def f():\n    return A()\n", "assert 99 in f()"),
+        "truthy": (A + "def f():\n    return A()\n", "assert f()"),
+        "not_falsy": ("class A:\n    def __bool__(self): return False\ndef f():\n    return A()\n", "assert not f()"),
+        "int_subclass": ("class I(int):\n    def __eq__(self, o): return True\ndef f():\n    return I(1)\n", "assert f() == 2"),
+        "list_subclass": ("class L(list):\n    def __eq__(self, o): return True\ndef f():\n    return L([1])\n", "assert f() == [2, 3]"),
+        "str_subclass": ("class S(str):\n    def __eq__(self, o): return True\ndef f():\n    return S('a')\n", "assert f() == 'b'"),
+        "nested_list": (A + "def f():\n    return [A()]\n", "assert f() == [2]"),
+        "dict_value": (A + "def f():\n    return {'k': A()}\n", "assert f() == {'k': 2}"),
+        "chained": (A + "def f():\n    return A()\n", "assert 0 == f() == 5"),
+        "and": (A + "def f():\n    return A()\n", "assert f() == 2 and f() != 2"),
+        "in_message_form": (A + "def f():\n    return A()\n", "assert f() == 2, 'msg'"),
+    }
+
+    def test_forged_objects_score_zero(self):
+        for name, (code, test) in self.FORGED.items():
+            for mode in ("off", "auto"):
+                with self.subTest(case=name, fs_isolation=mode):
+                    r = run_tests(code, [test], fs_isolation=mode)
+                    self.assertTrue(r["ran"], r)
+                    self.assertEqual(r["passed"], 0, (name, r))
+
+    def test_honest_builtin_values_pass_every_comparison_form(self):
+        code = ("from fractions import Fraction\nfrom collections import Counter, OrderedDict\n"
+                "def f():\n    return {'a': [1, (2, 3.5)], 'b': {4, 5}, 'c': 'x', 'd': None}\n"
+                "def g():\n    return 7\ndef e():\n    return []\ndef h():\n    return Fraction(1, 3)\ndef c():\n    return Counter('aab')\n")
+        tests = ["assert f() == {'a': [1, (2, 3.5)], 'b': {4, 5}, 'c': 'x', 'd': None}", "assert f() != {}", "assert g() > 3", "assert g() >= 7",
+                 "assert 1 < g() < 10", "assert g() in [1, 7]", "assert 9 not in (1, 2)", "assert g()", "assert not e()", "assert not (g() == 8 or e())",
+                 "assert g() == 7 and f()['c'] == 'x'", "assert h() == Fraction(2, 6)", "assert c() == Counter({'a': 2, 'b': 1})", "assert abs(g() - 7.0) < 1e-9",
+                 "assert f()['d'] is None", "assert isinstance(f(), dict)"]
+        r = run_tests(code, tests)
+        self.assertEqual((r["passed"], r["total"]), (len(tests), len(tests)), r)
+
+    def test_honest_failures_still_fail_and_nonbuiltin_fails_closed(self):
+        r = run_tests("def f():\n    return 1\n", ["assert f() == 2", "assert f() != 1", "assert f() > 5", "assert not f()", "assert 3 in [f()]"])
+        self.assertEqual(r["passed"], 0, r)
+        # by design: an honest solution returning a non-builtin type fails equality (fail closed)
+        r = run_tests("class P:\n    def __init__(self, x): self.x = x\n    def __eq__(self, o): return self.x == o.x\ndef f():\n    return P(1)\n",
+                      ["assert f() == P(1)"])
+        self.assertEqual(r["passed"], 0, r)
+
+    def test_unrewritable_test_fails_not_crashes(self):
+        r = run_tests("def f():\n    return 1\n", ["assert f( ==", "assert f() == 1"])
+        self.assertEqual((r["passed"], r["total"]), (1, 2), r)
+        self.assertIn("SyntaxError", r["error"])
+
+
 if __name__ == "__main__":
     print("sandbox:", sandbox_info())
     unittest.main(verbosity=2)

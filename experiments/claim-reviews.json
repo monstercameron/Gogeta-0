@@ -672,6 +672,202 @@
    "batch_file": "notes/reviews/claims/2026-11-22-2005-b8.md",
    "verdict": "NEEDS-EVIDENCE",
    "note": "2608.18230 not in refs; no calculation file"
+  },
+  {
+   "id": "C196",
+   "ts": "2026-11-22T22:10:30-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b1.md",
+   "verdict": "WEAK",
+   "note": "status rejected - TOST is registered rule; limitation added"
+  },
+  {
+   "id": "C61",
+   "ts": "2026-11-22T22:10:30-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b1.md",
+   "verdict": "WEAK",
+   "note": "wording only; origin attributes LT2"
+  },
+  {
+   "id": "C53",
+   "ts": "2026-11-22T22:10:30-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b1.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "UNVERIFIED stands; repo unavailable"
+  },
+  {
+   "id": "C24",
+   "ts": "2026-11-22T22:10:30-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b1.md",
+   "verdict": "WEAK",
+   "note": "wording only; origin attributes paper"
+  },
+  {
+   "id": "C195",
+   "ts": "2026-11-22T22:10:30-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b2.md",
+   "verdict": "WEAK",
+   "note": "stale qualifier corrected; PARTIAL kept"
+  },
+  {
+   "id": "C60",
+   "ts": "2026-11-22T22:10:30-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b2.md",
+   "verdict": "WEAK",
+   "note": "limitation: LT2 tested set only"
+  },
+  {
+   "id": "C52",
+   "ts": "2026-11-22T22:10:30-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b2.md",
+   "verdict": "SOLID",
+   "note": "matches paper"
+  },
+  {
+   "id": "C23",
+   "ts": "2026-11-22T22:10:30-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b2.md",
+   "verdict": "SOLID",
+   "note": "matches paper"
+  },
+  {
+   "id": "C194",
+   "ts": "2026-11-22T22:10:31-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b3.md",
+   "verdict": "SOLID",
+   "note": "SQ50 timeout; UNVERIFIED right"
+  },
+  {
+   "id": "C59",
+   "ts": "2026-11-22T22:10:31-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b3.md",
+   "verdict": "SOLID",
+   "note": "K6 consistent; untested"
+  },
+  {
+   "id": "C51",
+   "ts": "2026-11-22T22:10:31-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b3.md",
+   "verdict": "WEAK",
+   "note": "overstatement already flagged in row"
+  },
+  {
+   "id": "C21",
+   "ts": "2026-11-22T22:10:31-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b3.md",
+   "verdict": "WEAK",
+   "note": "wording only"
+  },
+  {
+   "id": "C66",
+   "ts": "2026-11-22T22:10:31-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b4.md",
+   "verdict": "SOLID",
+   "note": "matches Huginn"
+  },
+  {
+   "id": "C58",
+   "ts": "2026-11-22T22:10:31-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b4.md",
+   "verdict": "SOLID",
+   "note": "K6 narrow"
+  },
+  {
+   "id": "C50",
+   "ts": "2026-11-22T22:10:31-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b4.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "limitation: no local PDF"
+  },
+  {
+   "id": "C19",
+   "ts": "2026-11-22T22:10:31-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b4.md",
+   "verdict": "WEAK",
+   "note": "limitation: obsolete C2 blocker"
+  },
+  {
+   "id": "C65",
+   "ts": "2026-11-22T22:10:32-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b5.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "limitation: no search log"
+  },
+  {
+   "id": "C57",
+   "ts": "2026-11-22T22:10:32-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b5.md",
+   "verdict": "SOLID",
+   "note": "matches TRM+Mamba2 tables"
+  },
+  {
+   "id": "C29",
+   "ts": "2026-11-22T22:10:32-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b5.md",
+   "verdict": "WEAK",
+   "note": "limitation: single-study scope"
+  },
+  {
+   "id": "C64",
+   "ts": "2026-11-22T22:10:32-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b6.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "planned check only; status right"
+  },
+  {
+   "id": "C56",
+   "ts": "2026-11-22T22:10:32-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b6.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "anecdotal source; status right"
+  },
+  {
+   "id": "C27",
+   "ts": "2026-11-22T22:10:32-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b6.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "planned check only; status right"
+  },
+  {
+   "id": "C63",
+   "ts": "2026-11-22T22:10:32-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b7.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "limitation: SQ38 not INT4 PTQ"
+  },
+  {
+   "id": "C55",
+   "ts": "2026-11-22T22:10:32-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b7.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "planned check only"
+  },
+  {
+   "id": "C26",
+   "ts": "2026-11-22T22:10:32-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b7.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "planned check only"
+  },
+  {
+   "id": "C62",
+   "ts": "2026-11-22T22:10:33-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b8.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "UNVERIFIED stands"
+  },
+  {
+   "id": "C54",
+   "ts": "2026-11-22T22:10:33-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b8.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "confounds recorded; UNVERIFIED stands"
+  },
+  {
+   "id": "C25",
+   "ts": "2026-11-22T22:10:33-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2203-b8.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ8 idea; UNVERIFIED stands"
   }
  ]
 }

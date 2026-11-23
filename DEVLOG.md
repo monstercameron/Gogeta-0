@@ -17,6 +17,49 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.80: Fleet waves 1-3b done (106 runs on 8x RTX 5090, $6.54); claim audit 2203; outside review 22:30; C197 (scale is the lever)
+*2026-11-22*
+
+**Fleet waves 1–3b are complete.** 106 training runs, 0 failed, every checkpoint scored on clean80 (`experiments/checks/results/fleet_2026-11-22.json`).
+- **Hardware:** 8 rented RTX 5090s (one rental failed and never started), $0.50–0.70/hr each, about 1.2 h per box.
+- **Spend:** **$6.54**, reconciled against the provider (total $6.96 to date; $93.04 credit left; `experiments/expenses.json` X4).
+- **Avoidable cost:** about $1 of idle time, from two of my mistakes:
+  - a worker script written with CRLF line endings, so reassigned boxes died at once (about 10–15 min, 6 boxes, until the human caught it);
+  - five boxes pulled but not destroyed for about 10 min.
+
+  Both are fixed, and every box is now destroyed when its queue empties (AGENTS §0h).
+
+**Results** (clean80 bpc, RTX 5090; registered A3/HPO stages, judged by their registrations):
+- **Phase 2b-5090** (v0.4.79): E1 ties E10; E11 ≈ E1 (C196).
+- **K7-5090 LR grid** (tuning): best LRs are E1 6e-3 (0.4477) and E10 3e-3 (0.4613), the same as the N1X's K7.
+- **H1 second seeds:** the same order (E1 6e-3 0.4464 < 3e-3 0.4518; E10 3e-3 0.4572 < 2e-3 0.4764).
+- **H2 horizon (200M):** E10 at 2e-3 is 0.2672, at 3e-3 0.2672 (7-seed mean 0.2677), at 6e-3 0.2753. E1 at 3e-3 is 0.2680, against 6e-3's 0.2679. The 20M optima hold at 200M within noise.
+- **H4 warmup-30:** worse at every LR (E50 at 3e-3 0.6376; E51 at 6e-3 0.6679), so warmup 300 stays.
+- **A3 matched arms (200M, v1, 1 seed):**
+  - E30, dense param-matched: 0.2770;
+  - E31, dense FLOP-matched: 0.2814;
+  - **E32, 14 unshared blocks at E2's FLOPs: 0.2486**;
+  - **E33, 12 unshared blocks: 0.2484**;
+  - E34, E9 widened: 0.2834.
+
+  E32/E33 are 7.2% better than E1 and 12.6% better than E2, beyond their registered prediction ranges. At matched FLOPs, unique-parameter capacity is the lever, and loops survive at most as parameter efficiency. **New claim C197:** PARTIAL [exploratory n=1].
+- **A3 on code-py-v2 (20M):**
+  - F0 LR picks by G3: E20 3e-3, E21 6e-3, E22 6e-3, E23 6e-3, E24 3e-3, E25 6e-3, E26 1.2e-2, E27 6e-3, with edge extensions run for E20, E24 and E26.
+  - **F1 pilot seed sd is about 0.6–1.2% (log)**, against the 0.4% the factorial power calculation assumed, so **F2 at N = 46 is under-powered**. Sizing F2 needs a new registration; nothing runs before that.
+  - F4 loop partners: E35 0.4716 (3-seed mean), E36 0.4403.
+  - E1 decomposition (minimal tier, 1 seed): E1 control 0.4342; E40 (GDN → attention) 0.4646; E41 (SWA only) 0.4631; E46 0.4392; E47 0.4380; E48 0.4341. The GDN layers matter (removing them costs about 7%), and moving the attention layer barely matters.
+  - H5 dedup bridge (200M): E52 (E10 on v2) 0.2614 and E53 (E1 on v2) 0.2599, both better than on v1 (0.2677 / 0.2679). **Not read as a dedup effect before the dedup-only control SQ238** (v2 changes both coverage and duplication).
+
+**Claim audit 22:03** (8 Codex auditors, 28 claims; verified by a subagent with spot-checks by the main agent):
+- No status changes; 6 limitations added (C60, C29, C63, C19, C50, C65); C195 gets evidence.
+- The auditor's push to downgrade C196 was rejected: the registered rule is TOST equivalence, and it passed. A limitation records the width of the ±1% margin.
+
+**SQ233 closed:** C1 and C3 now have measured GPU artifacts (RTX 5090: GDN kernels ALL OK; model tests 12/12), in `C1.json` and `C3.json`.
+
+**Outside review 22:30 and quick review 22:31 (statistician):** SQ248 layer knockout (top pick), SQ249 E1+E10 logit ensemble, SQ250 token- vs doc-weighting, SQ251 distillation, SQ252 overlap-cutoff sensitivity, SQ253 power for the two-size check. The token-ratio and ternary legs are folded into SQ243.
+
+---
+
 ## v0.4.79: Phase 2b-5090 done: E1 ties E10 (7 seeds), E11 equivalent to E1 (C196), loops don't pay; SQ232 replay floor 0.002
 *2026-11-22*
 

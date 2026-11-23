@@ -40,6 +40,35 @@
    ],
    "purpose": "SQ220 part 2 bridge (E10/E1) + SQ214 window sweep (12 runs) + clean-val scoring",
    "evidence": "experiments/devlogs/SQ220.md, experiments/devlogs/SQ214.md"
+  },
+  {
+   "id": "X4",
+   "date": "2026-11-22T21:24:00-05:00",
+   "type": "compute",
+   "provider": "vast.ai",
+   "amount": 6.54,
+   "estimated": false,
+   "resource": "8x RTX 5090 on-demand, $0.50-0.70/h each, ~1.2 h each (fleet 'gogeta-cockpit-w1-*'; 1 failed rental never started; all destroyed by 22:35)",
+   "experiments": [
+    "PHASE2B-5090",
+    "SQ232",
+    "K7-5090",
+    "H1",
+    "H2",
+    "H4",
+    "A3",
+    "F0",
+    "F1",
+    "F3",
+    "F4",
+    "E1-decomposition",
+    "H5",
+    "SQ233",
+    "code-py-v2 build"
+   ],
+   "purpose": "Fleet waves 1-3b (106 training runs + scoring, 0 failed)",
+   "evidence": "experiments/checks/results/fleet_2026-11-22.json; provider reconciliation 2026-11-22 22:35 ($6.9631 total spend - $0.4239 before)",
+   "note": "includes ~15-25 min of avoidable idle time (CRLF worker bug, boxes pulled but not destroyed), roughly $1"
   }
  ],
  "reconciliations": [
@@ -57,6 +86,14 @@
    "credit_left": 99.5761,
    "provider_total_spend": 0.4239,
    "note": "first cockpit reconcile after both pilot boxes were destroyed",
+   "by": "cockpit"
+  },
+  {
+   "ts": "2026-11-22T22:35:09-0500",
+   "provider": "vast.ai",
+   "credit_left": 93.0369,
+   "provider_total_spend": 6.9631,
+   "note": "after fleet wave 1-3b; all 8 boxes destroyed",
    "by": "cockpit"
   }
  ]

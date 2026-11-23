@@ -1,76 +1,97 @@
 {
-  "claim": "C3",
-  "date": "2026-11-22T21:23:02-05:00",
-  "git_commit": "8441ad0",
-  "git_dirty": false,
-  "device": "cpu (CUDA_VISIBLE_DEVICES empty)",
-  "torch": "2.14.1+cu130",
-  "command": "CUDA_VISIBLE_DEVICES= python experiments/checks/c1_c3_rerun.py",
-  "checks": [
-    {
-      "name": "causal[attn]",
-      "criterion": "past diff < 1e-4 and future diff > 1e-4",
-      "tol_past": 0.0001,
-      "min_future": 0.0001,
-      "status": "measured",
-      "past_diff": 0.0,
-      "future_diff": 3.323728322982788,
-      "passed": true
-    },
-    {
-      "name": "causal[swa]",
-      "criterion": "past diff < 1e-4 and future diff > 1e-4",
-      "tol_past": 0.0001,
-      "min_future": 0.0001,
-      "status": "measured",
-      "past_diff": 0.0,
-      "future_diff": 3.098865032196045,
-      "passed": true
-    },
-    {
-      "name": "causal[gdn]",
-      "criterion": "past diff < 1e-4 and future diff > 1e-4",
-      "tol_past": 0.0001,
-      "min_future": 0.0001,
-      "status": "not_runnable_on_cpu",
-      "error": "RuntimeError: 0 active drivers ([]). There should only be one.",
-      "passed": null
-    },
-    {
-      "name": "causal[looped]",
-      "criterion": "past diff < 1e-4 and future diff > 1e-4",
-      "tol_past": 0.0001,
-      "min_future": 0.0001,
-      "status": "not_runnable_on_cpu",
-      "error": "RuntimeError: 0 active drivers ([]). There should only be one.",
-      "passed": null
-    },
-    {
-      "name": "swa window cutoff",
-      "criterion": "inside diff > 1e-4 and outside diff < 1e-5",
-      "min_inside": 0.0001,
-      "tol_outside": 1e-05,
-      "status": "measured",
-      "inside_diff": 1.1071395874023438,
-      "outside_diff": 0.0,
-      "passed": true
-    }
-  ],
-  "recorded": {
-    "source": "notes/LABNOTEBOOK.md:63 (transcription)",
-    "past_diff": "exactly 0",
-    "outside_window_diff": 0,
-    "tests": "10/10 PASS (GPU, includes gdn/looped)"
+ "claim": "C3",
+ "date": "2026-11-22T21:23:02-05:00",
+ "git_commit": "8441ad0",
+ "git_dirty": false,
+ "device": "cpu (CUDA_VISIBLE_DEVICES empty)",
+ "torch": "2.14.1+cu130",
+ "command": "CUDA_VISIBLE_DEVICES= python experiments/checks/c1_c3_rerun.py",
+ "checks": [
+  {
+   "name": "causal[attn]",
+   "criterion": "past diff < 1e-4 and future diff > 1e-4",
+   "tol_past": 0.0001,
+   "min_future": 0.0001,
+   "status": "measured",
+   "past_diff": 0.0,
+   "future_diff": 3.323728322982788,
+   "passed": true
   },
-  "reproduced_subset": [
-    "causal[attn]",
-    "causal[swa]",
-    "swa window cutoff"
+  {
+   "name": "causal[swa]",
+   "criterion": "past diff < 1e-4 and future diff > 1e-4",
+   "tol_past": 0.0001,
+   "min_future": 0.0001,
+   "status": "measured",
+   "past_diff": 0.0,
+   "future_diff": 3.098865032196045,
+   "passed": true
+  },
+  {
+   "name": "causal[gdn]",
+   "criterion": "past diff < 1e-4 and future diff > 1e-4",
+   "tol_past": 0.0001,
+   "min_future": 0.0001,
+   "status": "not_runnable_on_cpu",
+   "error": "RuntimeError: 0 active drivers ([]). There should only be one.",
+   "passed": null
+  },
+  {
+   "name": "causal[looped]",
+   "criterion": "past diff < 1e-4 and future diff > 1e-4",
+   "tol_past": 0.0001,
+   "min_future": 0.0001,
+   "status": "not_runnable_on_cpu",
+   "error": "RuntimeError: 0 active drivers ([]). There should only be one.",
+   "passed": null
+  },
+  {
+   "name": "swa window cutoff",
+   "criterion": "inside diff > 1e-4 and outside diff < 1e-5",
+   "min_inside": 0.0001,
+   "tol_outside": 1e-05,
+   "status": "measured",
+   "inside_diff": 1.1071395874023438,
+   "outside_diff": 0.0,
+   "passed": true
+  }
+ ],
+ "recorded": {
+  "source": "notes/LABNOTEBOOK.md:63 (transcription)",
+  "past_diff": "exactly 0",
+  "outside_window_diff": 0,
+  "tests": "10/10 PASS (GPU, includes gdn/looped)"
+ },
+ "reproduced_subset": [
+  "causal[attn]",
+  "causal[swa]",
+  "swa window cutoff"
+ ],
+ "not_rerun": [
+  "causal[gdn]",
+  "causal[looped]"
+ ],
+ "pass_measured_subset": true,
+ "note": "CPU rerun covers attn, swa and SWA cutoff only; gdn and looped (which contains gdn) need the Triton kernel on GPU.",
+ "gpu_rerun_2026-11-22": {
+  "device": "NVIDIA GeForce RTX 5090 (sm_120), Vast.ai",
+  "result": "12/12 passed",
+  "checks": [
+   "causal[attn] past 0.0 future 3.1",
+   "causal[swa] past 0.0 future 2.9",
+   "causal[gdn] past 0.0 future 2.4",
+   "causal[looped] past 0.0 future 1.3",
+   "swa window cutoff inside 1.7 outside 0.0",
+   "bitlinear ternary levels [-1,0,1]",
+   "ternary model swaps projections (27 BitLinear)",
+   "loop count changes output",
+   "bptt grads reach prelude + inject",
+   "ternary looped backward finite",
+   "causal[gdn neg-eig] past 0.0 future 2.5",
+   "neg-eig changes the computation (max logit diff 0.248)"
   ],
-  "not_rerun": [
-    "causal[gdn]",
-    "causal[looped]"
-  ],
-  "pass_measured_subset": true,
-  "note": "CPU rerun covers attn, swa and SWA cutoff only; gdn and looped (which contains gdn) need the Triton kernel on GPU."
+  "command": "python tests/test_gdn_kernels.py; python tests/test_model.py",
+  "commit": "8441ad0",
+  "status": "measured"
+ }
 }

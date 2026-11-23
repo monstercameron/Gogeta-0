@@ -867,3 +867,8 @@ Prompted by outside review 2026-11-23 12:10 (`notes/reviews/2026-11-23-1210-revi
 - **Rule:** A2f is LR-robust at 6e-3 if its seed-5 clean80 at 6e-3 is within 1% of the best of {3e-3, 6e-3, 1.2e-2}. If not, the ternary cost is restated at A2f's best LR, and C207 gains an LR limitation.
 - **Prediction:** robust (within 1%), as A2s was at 3e-3 (+0.6%).
 - **SQ392 protocol clarification (2026-11-23 ~14:50, before running; outside review 14:41, critique 2.4):** both dense arms are built with `max_seq_len = 2048`, so the RoPE cos/sin table covers every scored position. The baseline uses raw positions 0-2047, and the interpolated arm divides positions by 2 before the table lookup. Nothing else differs between the two arms.
+
+## SQ403 eval-time pass count on A2s (2026-11-23 ~15:15 EST, before running; outside review 15:07, I-4)
+- **Setup:** A2s 200M checkpoints, seeds 2-4 (trained at fixed r = 2), clean80 doc-level bpc scored at r = 1, 2 and 3 (eval only, the same scorer as `score_doclevel.py`; eval r recorded in the result JSON).
+- **Prediction:** r = 1 is at least 5% worse than r = 2 (range +3% to +25%), because the decode bench's teacher-forced argmax agreement of r = 1 with r = 2 is only 0.869. r = 3 is within +-2% of r = 2 (range -1% to +4%), since SQ341/SQ348 found loss best at the trained r.
+- **Reading:** a large r = 1 gap shows the second pass is used. It does not show the pass beats unshared depth, because a model trained at r = 2 and run at r = 1 is a distribution shift. SQ401 and A2f vs E24 cover the capacity question.

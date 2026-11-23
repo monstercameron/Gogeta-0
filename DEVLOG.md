@@ -18,6 +18,21 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.27: Outside review 15:07: dense capacity control for the MoE core (SQ401), GDN beta ablation (SQ402), eval-time pass count on A2s (SQ403, registered); init depth checked, no confound
+*2026-11-23*
+
+**Outside review 15:07: a dense capacity control for the MoE core (SQ401), a GDN beta ablation (SQ402) and an eval-time pass-count check on A2s (SQ403, registered). The init-depth concern was checked and is clean.**
+
+- **Outside review** (`notes/reviews/2026-11-23-1507-review.md`, Haiku), triaged in its footer:
+  - **SQ401:** A2s with a dense 2048-hidden core FFN vs the MoE core (A3m). C206's -3.3% is measured against a dense FFN with half the core FFN params, and C203 found a param-matched dense FFN beats the MoE on the E1 stack. If dense ties or wins, the MoE step is capacity, not routing.
+  - **SQ402:** GDN with fixed vs learned write strength (beta).
+  - **SQ403** (prediction registered in PREDICTIONS.md): clean80 at eval r = 1/2/3 on the A2s checkpoints. Prediction: r = 1 is at least 5% worse and r = 3 within 2% of r = 2.
+  - **Init depth vs trained r, checked now:** no confound. The A2/A3 configs set loops = loops_min = loops_max = 2. The random-r arms use loops = 4, the mean of U{1..7}. A1a and A1i share loops = 4, so C212 has no init difference.
+  - **Agreed as reading rules:** ternary arms are counted at full-precision FLOPs, so "matched compute" means quality at equal analytic FLOPs and ternary's benefit is bytes. The assembly headlines are FLOP-matched, not param-matched; each claim's scope states its params.
+  - **Not added:** the memory-matched ternary control duplicates SQ393.
+
+---
+
 ## v0.5.26: Worker results: ternary and loop costs nearly vanish out of corpus while the assembly gain survives (SQ379, hypothesis C213; SQ400 registered follow-up); coda attention carries long-range copy (SQ383); ternary loops not contractive (SQ353); packed ternary 16x (SQ378)
 *2026-11-23*
 

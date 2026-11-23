@@ -72,3 +72,21 @@ Smooth fp loops are contractive (E22 gain_rel 0.45->0.85, A2f 0.57/0.74); ternar
 
 ## SQ383 (done): coda-attention copy ablation on A2s (seeds 2-4)
 swa256 coda: copy NLL +0.0% (gap 128), +41.9% [+34.9,+48.9] (256), +13.3% [+7.8,+18.8] (512); bpc +2.76% [+2.26,+3.27]; second-copy NLL falls to the no-copy level at 256/512. zero coda: bpc +72%. The coda's full attention carries copy beyond the window. Files: `experiments/checks/sq383_coda_attention_copy.py`, `results/sq383.json`, `experiments/devlogs/SQ383.md`.
+
+## SQ395 (done): compute-to-target, A2s vs E27 (seeds 2-4, from logs)
+A2s reaches E27's final loss with 108.5/118.2/116.6M tokens (ratio 0.54/0.59/0.58); the ratio is 0.55-0.68 at every eval step from 1,000 (seed mean), min 0.555 at step 3000: not an endpoint effect. FLOP ratio A2s/E27 = 1.063 (FINAL lines). In-training final gap -12 to -13.5% (clean80 -16.7%). Files: `experiments/checks/sq395_compute_to_target.py`, `results/sq395.json`, `experiments/devlogs/SQ395.md`.
+## Note on `experiments/checks/sq339_cpu.py` (asked by main)
+The uncommitted edits to sq339_cpu.py are mine and finished: it is the shared CPU loader; the only uncommitted change is the one-line `ckpt_path` fallback to ~/fusiondance-data/checkpoints (needed by SQ377 for local E1 checkpoints). Keep it: sq339/340/341/347/348/349/351/353/365/374/377/378/379/382/383/392 import it.
+
+## SQ392 (done; registered): linear RoPE interpolation on the dense cell 000 (SQ351 docs, seeds 0-2)
+Prediction NOT met. Interpolation (positions/2, zero-shot) worsens the dense cell: +28.2%, +53.2%, +15.0% nats/token in bins 0-512, 512-1024, 1024-2048 (set B; last CI +2.1..+28.0); hybrid-vs-dense in 1024-2048 goes from -60.7% to -78.3% [-86.0,-70.5]. Rule: still beyond -50% -> long-context result stands "vs unscaled RoPE", control weak (no NTK/YaRN/fine-tune). Raw arm reproduces SQ351 exactly. Files: `experiments/checks/sq392_rope_interpolation.py`, `results/sq392.json`, `experiments/devlogs/SQ392.md`.
+## SQ400 predictions written into PREDICTIONS.md (section SQ400, P1-P7 + the main agent's decision rule verbatim); script `experiments/checks/sq400_ooc_registered.py` ready (parts 0/1 then --analyze); runs queued after SQ403.
+
+## SQ377 (done): block duplication at inference, E24 (14 blocks) and E1 (6 blocks), seeds 0-2
+0 of 27 (E24) and 0 of 11 (E1) variants beat the base. E24 best dup of block 4: +1.27% [+0.25,+2.28]; most +5-11%; E1 best +11.5%. Files: `experiments/checks/sq377_block_duplication.py`, `results/sq377.json`, `experiments/devlogs/SQ377.md`. SQ400 part 0 running; SQ403 running (A2s s2: r=1 +28.1%, r=3 +8.2% vs r=2, so far).
+
+## SQ403 (done; registered): eval-time pass count on A2s seeds 2-4 (clean80, all 2,333 docs, CPU scorer)
+r=1: +27.88% vs r=2 [+23.53,+32.22] (above the registered range +3..+25%, meets >=5%); r=3: +7.60% [+6.37,+8.83] (prediction +-2%, range -1..+4: NOT met). A fixed-r model is sharply tuned to its trained pass count. Files: `experiments/checks/sq403_eval_pass_count.py`, `results/sq403.json`, `experiments/devlogs/SQ403.md`.
+
+## SQ400 (done; registered, P1-P7 all met; decision rule fires)
+Out of corpus (330 SQ99 files), paired-by-seed 95% CI: ternary cost A2s vs A2f +0.42% [-0.92,+1.77] (n=6; clean80-300 +8.94%); assembly gain A2s vs E27 -11.26% [-11.59,-10.93] (n=3); A2f vs E20 +1.46% [+0.47,+2.45] (n=6); E27 vs E20 +14.79% (ratio 0.514 of clean80); A3mx vs E20 +0.81% [-0.24,+1.85] (n=3); loop cost A2f vs E24 -1.90% [-3.40,-0.40] (n=6; clean80 +2.49%). Main agent's triage rule: both conditions hold with n>=3, so C213 changes design priorities. Files: `experiments/checks/sq400_ooc_registered.py`, `results/sq400.json`, `sq400_part{0,1}.json`, `experiments/devlogs/SQ400.md`.

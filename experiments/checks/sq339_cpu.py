@@ -51,7 +51,7 @@ def best_runs() -> dict:
 
 
 def ckpt_path(run: str) -> str:
-    p = glob.glob(f"{FLEET}/*/fusiondance-data/checkpoints/{run}/model.pt")
+    p = glob.glob(f"{FLEET}/*/fusiondance-data/checkpoints/{run}/model.pt") or glob.glob(os.path.expanduser(f"~/fusiondance-data/checkpoints/{run}/model.pt"))
     assert len(p) == 1, (run, p)
     return p[0]
 

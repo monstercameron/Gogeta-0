@@ -13,3 +13,6 @@
 ## Question
 
 - Will SQ75 record unprofiled step time as a baseline for its kernel breakdown?
+## Triage
+- Profiler overhead alongside SQ75: accepted and written into SQ75's queue note (via `tools/queue.py`). SQ75 records the warmed, unprofiled median step time next to the profiled breakdown and reports the overhead. If tracing adds more than 10%, the buckets are used for categorisation only and the leading bottleneck is confirmed with focused timings.
+- Question (will SQ75 record an unprofiled baseline?): yes, as of this triage; it is part of SQ75's definition now. Note that SQ75 is the next GPU pick but needs a box: no GPU is rented, and it would ride on the next batch.

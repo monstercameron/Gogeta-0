@@ -18,6 +18,55 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.94: C197 VERIFIED (4 seeds); the lever is unique params, not depth (SQ282); dedup alone is worth 1.6% (SQ238, C200 VERIFIED)
+*2026-11-23*
+
+**SQ283, C197's seed replication** (registered R1/R2; 200M tokens, lr 6e-3, seeds 0–3):
+
+| Model | Mean clean80 bpc | vs E32 |
+|---|---|---|
+| E32 (14 unshared blocks) | **0.2488** | |
+| E2 (looped) | 0.2834 | E32 is **12.2%** better (paired CI [−13.1%, −11.3%], R1 PASS) |
+| E1 (7 seeds) | 0.2679 | E32 is **7.15%** better (Welch CI [−7.60%, −6.71%], R2 PASS) |
+
+- **C197 is upgraded from PARTIAL to VERIFIED.**
+- **Caveats:** the deep stack needs its depth-scaled init (SQ308), and the 200M arms all ran at 6e-3. At 20M, E32 is flat between 3e-3 and 6e-3.
+
+**SQ282, depth vs width with fair LRs** (registered W1/W2; 20M tokens, 2 seeds, lr {3e-3, 6e-3, 1.2e-2}):
+- **Best LRs:** E32 3e-3 (0.4371), E34 3e-3 (**0.4331**), E2 6e-3 (0.4919).
+- **W1 FAIL:** at their best LRs, the wide 5-block E34 *ties* the deep E32 (E32 is +0.93%, within 2 seed sd of 1.7%).
+  - The v0.4.84 "E34 is 14% worse" was a learning-rate artifact: E34 is very LR-sensitive (+26% at 1.2e-2).
+  - By the registered rule, **C197's lever is unique parameters at matched FLOPs, not distinct depth.**
+- **W2 PASS:** E34 beats the looped E2 by 12%.
+- **Consequence:** E60 (Code-MoE, which adds width-like capacity) regains its prior. Its gates (SQ282 and SQ238) are both now closed.
+- **README:** the scale sentence is corrected.
+
+**SQ238, the dedup-only control** (registered D1–D3; 200M, E1, lr 6e-3, 4 seeds):
+
+| Corpus | Mean clean80 bpc |
+|---|---|
+| code-py-v1sub (no dedup, v2's doc count) | 0.2663 |
+| code-py-v2 (deduplicated) | 0.2620 |
+| code-py-v1 (full) | 0.2679 |
+
+- **Dedup effect** D = **+1.62%**, paired CI [+0.92%, +2.31%], all 4 seeds positive. **D1 PASS.**
+- **Coverage/size effect** S = +0.64%. **D2 PASS.**
+- **D3:** D + S = 2.27%, against the H5 gap of 3.08% (single seed).
+- **Rule:** the A3 v2 results stand as "with dedup".
+- **New claim C200, VERIFIED** (one architecture and one LR, noted as limitations).
+
+**Fleet:**
+- **w4-3 sat idle about 65 min** (00:55–02:00 EST) after SQ238 arm B. Its JOBS DONE line was lost during the operator hold and the monitor restarts, as happened with w4-5. It now runs SQ263.
+- New practice (also saved as an agent memory): after any monitor gap, check every rented box directly.
+- SQ263 (24 runs at 200M, blinded) is running on four boxes.
+- **Spend:** about $19 of the approved $30.
+
+**Quick reviews:**
+- 01:44 (reproducibility auditor): SQ319, filling the TBD claim scopes; 117 of 127 definitions have one.
+- 01:49 (safety): SQ61 gains a descendant-cleanup gate.
+
+---
+
 ## v0.4.93: Outside review 01:38: packing, locality-mask and MTP controls (SQ315-SQ318); SQ290 gains a ternary PTQ arm
 *2026-11-23*
 

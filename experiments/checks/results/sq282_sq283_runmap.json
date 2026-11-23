@@ -1,0 +1,215 @@
+{
+ "runs": {
+  "E2-20261123-022613-s0": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 200000000,
+   "seed": 0
+  },
+  "E2-20261123-043955-s0": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "seed": 0
+  },
+  "E2-20261123-044104-s0": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.003,
+   "max_tokens": 20000000,
+   "seed": 0
+  },
+  "E2-20261123-044320-s0": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.012,
+   "max_tokens": 20000000,
+   "seed": 0
+  },
+  "E2-20261123-045138-s1": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.003,
+   "max_tokens": 20000000,
+   "seed": 1
+  },
+  "E2-20261123-045515-s1": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "seed": 1
+  },
+  "E2-20261123-045628-s1": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 200000000,
+   "seed": 1
+  },
+  "E2-20261123-045839-s1": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.012,
+   "max_tokens": 20000000,
+   "seed": 1
+  },
+  "E2-20261123-051343-s2": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 200000000,
+   "seed": 2
+  },
+  "E2-20261123-053056-s3": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 200000000,
+   "seed": 3
+  },
+  "E32-20261123-025706-s0": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 200000000,
+   "seed": 0
+  },
+  "E32-20261123-043716-s0": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.003,
+   "max_tokens": 20000000,
+   "seed": 0
+  },
+  "E32-20261123-043732-s0": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "seed": 0
+  },
+  "E32-20261123-044106-s0": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.012,
+   "max_tokens": 20000000,
+   "seed": 0
+  },
+  "E32-20261123-044430-s1": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.003,
+   "max_tokens": 20000000,
+   "seed": 1
+  },
+  "E32-20261123-045252-s1": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "seed": 1
+  },
+  "E32-20261123-045625-s1": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.012,
+   "max_tokens": 20000000,
+   "seed": 1
+  },
+  "E32-20261123-045949-s1": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 200000000,
+   "seed": 1
+  },
+  "E32-20261123-050456-s2": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 200000000,
+   "seed": 2
+  },
+  "E32-20261123-052209-s3": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 200000000,
+   "seed": 3
+  },
+  "E32-20261123-061938-s0": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "seed": 0
+  },
+  "E32-20261123-062249-s1": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "seed": 1
+  },
+  "E32-20261123-062559-s2": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "seed": 2
+  },
+  "E34-20261123-025714-s0": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 200000000,
+   "seed": 0
+  },
+  "E34-20261123-043834-s0": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "seed": 0
+  },
+  "E34-20261123-043858-s0": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.003,
+   "max_tokens": 20000000,
+   "seed": 0
+  },
+  "E34-20261123-044208-s0": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.012,
+   "max_tokens": 20000000,
+   "seed": 0
+  },
+  "E34-20261123-044533-s1": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.003,
+   "max_tokens": 20000000,
+   "seed": 1
+  },
+  "E34-20261123-045355-s1": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "seed": 1
+  },
+  "E34-20261123-045728-s1": {
+   "dataset": "code-py-v1",
+   "init": "gogeta",
+   "lr": 0.012,
+   "max_tokens": 20000000,
+   "seed": 1
+  }
+ },
+ "source": "run meta.json pulled from the fleet"
+}

@@ -652,3 +652,20 @@ Source: outside review 2026-11-23 00:10. C197's limitation (event 4): E34, which
   - W3 holds → C198's d = 256 component is supported on fresh seeds. It stays PARTIAL, because "ties" at d = 384/512 would still need TOST.
   - Gap within ±0.5% → the d = 256 effect is refuted as selection plus noise.
   - Otherwise → inconclusive.
+
+## SQ308 (2026-11-23 ~01:15 EST, before dispatch): init-controlled depth test of C197
+- **Why:** the default "gogeta" init scales residual-output weights by 0.02/√(2·depth) (`gogeta/model.py`, `_init_weights`): std 0.0058 for 6-block E1 and 0.0038 for 14-block E32. So C197's depth comparison is also an init comparison, and C199 shows init moves all-attention stacks by about 3.5–3.8%. Outside review 2026-11-23 01:07, idea A.
+- **Arms:** 20M tokens, lr 6e-3, seeds 0–2, RTX 5090, clean80 bpc. 12 runs (sha256-16 in brackets):
+  - E1-gogeta: `configs/e1_hybrid.json` [622b918b6b7195fe] with `--lr 6e-3`;
+  - E1-flat: `experiments/staged-configs/sq200/e1_flat.json` [9883c9c3e11105c9];
+  - E32-gogeta: `experiments/staged-configs/e32_unshared14_e2flops.json` [53513fe81a78512c];
+  - E32-flat: `experiments/staged-configs/sq308/e32_flat.json` [56422fa326dedc9c].
+  - All with `--max-tokens 20000000`.
+- **Predictions:**
+  - **G1:** E32-flat vs E32-gogeta is within ±1.0%. The hybrid pattern was init-insensitive in SQ200 (I3), and E32 uses the same mixers.
+  - **G2:** E32 beats E1 by ≥ 3% under **both** inits (paired by seed, CI excluding 0).
+- **Decision rule:**
+  - G1 holds and G2 holds → C197's depth lever is not an init artifact at 20M. C197 gets this as evidence; it stays exploratory at 200M.
+  - The flat-init gap is within ±1% while the gogeta gap is ≥ 3% → the C197 lever is an init artifact. C197 gets a limitation, and the README's scale wording is withdrawn.
+  - Anything else → inconclusive, reported as such.
+- **Limitation:** this runs at 20M tokens, whereas C197 is a 200M result. LRs are not re-tuned per init.

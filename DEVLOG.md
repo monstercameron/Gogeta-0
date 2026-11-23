@@ -18,6 +18,29 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.90: Outside review 01:07: C197's depth result is confounded with init (SQ308 registered); README width wording fixed; SQ309-SQ312
+*2026-11-23*
+
+**Outside review 01:07 (Haiku), triaged:**
+- **Idea A (accepted, registered as SQ308):** the default "gogeta" init scales residual outputs by 0.02/√(2·depth) (`gogeta/model.py`, `_init_weights`).
+  - That gives std 0.0058 for 6-block E1 and 0.0038 for 14-block E32.
+  - So C197's "14 unshared blocks beat E1 by 7%" is also an init comparison, and C199 shows init can move all-attention stacks by 3.5–3.8%.
+  - **SQ308 design:** E1 and E32 at 20M tokens × {gogeta, flat} × seeds 0–2, 12 runs. Configs are sha-bound; `staged-configs/sq308/e32_flat.json` is new.
+  - **G1:** the E32 init effect is within ±1%.
+  - **G2:** E32 beats E1 by ≥ 3% under both inits.
+  - **Rule:** a flat-init gap within ±1% means C197's lever is an init artifact.
+- **Also accepted:**
+  - SQ309: length-bucketed sampling, testing whether C193's long-document deficit is data exposure;
+  - SQ310: an equal wall-clock replot from existing logs (CPU);
+  - SQ311: E32 on the out-of-corpus length bins;
+  - SQ312: zero-init residual branches.
+- **README (the review's flag, AGENTS §0 wording lag):** the width sentences now say:
+  - "no difference detected" at d = 512, instead of "ties";
+  - E1 is 1.2–1.7% better at d = 256 (exploratory, with SQ307 running);
+  - the init result is C199 PARTIAL, and SQ308 checks the C197 init confound.
+
+---
+
 ## v0.4.89: Claim audit 2026-11-23-0102: C199 downgraded to PARTIAL, C198 caveats; F2 blinding disclosure + blinded estimator committed
 *2026-11-23*
 

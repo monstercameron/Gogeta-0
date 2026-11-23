@@ -642,3 +642,13 @@ Source: outside review 2026-11-23 00:10. C197's limitation (event 4): E34, which
   - Anything else → C198 stays PARTIAL, marked inconclusive at 2 seeds.
 - **Known remaining confound:** E1 uses FusionDance's init and E10 HF's. SQ200 (running, d = 384) measures the init effect; it is not re-tested here.
 
+
+## SQ307 (2026-11-23 ~01:10 EST, before dispatch): fresh-seed confirmation of SQ301 at d = 256
+- **Why:** SQ301 picked each arm's best LR on seeds 0–1 and reported the gap on those same seeds (claim audit 2026-11-23-0102, C198). E1's best LR (1.2e-2) sat at the grid edge.
+- **Arms:** the SQ243 d = 256 configs, unchanged: E1 at lr 1.2e-2 and 1.8e-2, and E10 at 3e-3. Fresh seeds 2–5, so 12 runs. RTX 5090, clean80 bpc.
+- **Primary:** E1 at 1.2e-2 (the SQ301-selected LR) vs E10 at 3e-3, paired by seed (n = 4). E1 at 1.8e-2 is secondary and only tells us whether the E1 optimum lies beyond the old grid.
+- **Prediction W3:** the paired gap E1 − E10 is ≤ −1.0%, with a 95% CI excluding 0. [Reasoning: the SQ243 6e-3 result, −1.24% on 4 seeds, already sits below −1%.]
+- **Decision rule for C198:**
+  - W3 holds → C198's d = 256 component is supported on fresh seeds. It stays PARTIAL, because "ties" at d = 384/512 would still need TOST.
+  - Gap within ±0.5% → the d = 256 effect is refuted as selection plus noise.
+  - Otherwise → inconclusive.

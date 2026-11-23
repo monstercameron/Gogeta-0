@@ -18,6 +18,38 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.20: A4 final: full stack not viable yet (byte decoder +14.4% vs BPE head; second shared byte pass -1.7%); fixed loop depth beats random -3.2% (3 seeds); self-speculative decoding built, not lossless under int8 activations
+*2026-11-23*
+
+**A4 final: the full stack is not viable yet. The byte decoder costs +14.4% against the BPE head. The second shared byte pass works (-1.7%). Fixed loop depth beats random (-3.2%, 3 seeds). Self-speculative decoding is built but is not lossless under int8 activations.**
+
+- **A4, final** (seeds 5-7, 200M tokens, v0.5.16; `experiments/checks/a4_fullstack.py` -> `results/a4_fullstack.json`, provenance OK). Registered metric: in-training v2 val, nats per target token incl. EOT. It is not clean80 (SQ387), and that limitation is stated:
+  - **R1: A4a (byte decoder) vs A3mx (BPE head) +14.39% [+13.39, +15.39]**, far outside the predicted -2% to +6%. **The registered viability rule (within 3%) fails.** EOT accounts for 0.072 nats per token of the gap; without it A4a is still about +7%.
+  - **R2': second shared byte pass (A4d vs A4b) -1.68% [-1.73, -1.62]**, Holm step 1 rejects, in range.
+  - R2'': deep supervision (A4a vs A4d) +0.55% [+0.00, +1.10], not significant: the aux loss does not help.
+  - R3: shared vs unshared param-matched (A4a vs A4c) -1.10% [-2.04, -0.15], not significant after Holm.
+  - Throughput: 210-250k tok/s vs A3mx's 288k.
+- **New claims (PARTIAL: registered metric not clean80, decoder LR not bracketed):** C210 (the byte decoder's 14% cost), C211 (second shared pass -1.7%; deep supervision null).
+- **Design-around registered as SQ394 (top pick):**
+  - a wider decoder (d_local 256/384);
+  - a hybrid head that keeps the BPE loss on the trunk;
+  - a frozen-trunk A4d, to separate decoder capacity from the trunk losing its token-level signal.
+  The human's directive keeps the byte decoder in the model, so its cost is designed around, not dropped.
+- **A1 amendment 2, final: fixed loop depth beats random depth -3.17% [-3.73, -2.60]** (seeds 0-2, df 2), in the registered range. **C212 is PARTIAL**: A1a and A1i ran at E27's bracketed LR without their own bracket, and seeds 0-1 were the selection seeds.
+- **Self-speculative decoding built** (E8; `gogeta/decode.py`, `tests/test_decode.py` ALL PASS on a rerun here, `experiments/devlogs/SPEC-DECODE.md`, `results/spec_decode_bench.json`):
+  - The decoder caches KV, the SWA window and the GDN state for every (pass, core block), with exact rollback. Drafting uses r_draft passes and verification checks the k drafts in one step.
+  - CPU bench on the A2s s2 checkpoint (r_full = 2): r_draft = 1 accepts 70% at k = 4 (3.7 tokens per verify call) and 57% at k = 8 (5.2).
+  - **Lossless: FAIL** on 16 of 120 runs, all at near-tie steps. The int8 activation rounding differs between a 1-token and a k-token pass; with activation quantisation off, 30 of 30 runs are lossless. The criteria were revised after the smoke run (stated in the script), and the original criterion fails too.
+  - Exact losslessness needs batch-invariant matmuls in the verify path. The GPU (fla) path and wall-clock speedup are not measured yet.
+- **A3 amendment 1 (LR bracket), half in:** at 3e-3, A3mx is 0.6% worse than at 6e-3, and A2s is 0.6% better (within the 1% margin). The 1.2e-2 pair is training on the last box, and C206-C208 stay PARTIAL until it lands.
+- **Fleet:** six of seven A3/A4 boxes finished and were destroyed by the controller (about $4.2). One box remains for the LR pair.
+- **Quick reviews:**
+  - 14:14: per-source split, merged into SQ239.
+  - 14:19: pass@1 by loop count rejected at 13M, because the pass@1 floor is about 2%.
+  - 14:24: the A3/A4 success criterion is answered (A3mx vs E24).
+
+---
+
 ## v0.5.19: Outside review 14:09: SQ392 positional control for the long-context result (registered), SQ391 MoD across loop passes, SQ393 bits-matched quality; erratum: A3mx does not tie dense (TOST p 0.58)
 *2026-11-23*
 

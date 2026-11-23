@@ -18,8 +18,8 @@
 <header class="page-head"><div class="wrap">
   <span class="eyebrow">Experiment E8 · Instant Transmission</span>
   <h1 class="exp-title">Self-speculative decoding</h1>
-  <p class="status-line"><span class="pill planned">Charging</span>
-     
+  <p class="status-line"><span class="pill running">Powering up</span>
+     <span class="muted">recorded in v0.5.20</span>
      </p>
   <p class="lead"><b>The question:</b> Draft with 1–2 loops, verify with full r: what is the acceptance rate, and the real speedup on the laptop?</p>
   
@@ -29,12 +29,12 @@
 <aside class="callout"><p><strong>Use the loop to type faster.</strong> A looped model can make a quick rough guess of the next few words using only 1–2 passes, then check all of them at once with the full number of passes. Correct guesses are kept, and wrong ones are thrown away and redone. The output is identical to normal generation, just faster.</p></aside>
 <aside class="prediction-box"><b>Prediction (written before the run)</b><p>Not written yet. It must be written before the run starts.</p></aside><h2 id="status">Status</h2>
 <p>Not run yet. It also needs a fix: the fast step-by-step kernel for our memory layers currently returns errors on this laptop's GPU (noted in the lab notebook).</p>
-  
+  <details class="viz-table"><summary>All recorded numbers</summary><div class="table-wrap"><table class="kv"><tbody><tr><th>checkpoint</th><td>A2s-20261123-170724-s2 (CPU fp32)</td></tr><tr><th>acceptance_r_draft1_k4</th><td>0.7010</td></tr><tr><th>tokens_per_verify_r_draft1_k8</th><td>5.2300</td></tr><tr><th>lossless</th><td>FAIL: 16 of 120 bench runs diverge from plain greedy at near-tie steps (int8 activation rounding differs between 1-token and k-token passes); 30 of 30 lossless with activation quantisation off</td></tr><tr><th>evidence</th><td>experiments/checks/results/spec_decode_bench.json</td></tr></tbody></table></div></details>
   <p class="muted small">New to the jargon? <a href="../learn.html">Start here</a> for plain-English definitions of loss, tokens, parameters and FLOPs.</p>
   <div class="pager"><a class="btn" href="E7.html">← E7</a><a class="btn" href="../devlog.html#experiments-section">All experiments</a><a class="btn" href="E9.html">E9 →</a></div>
 </div></section>
 <footer><div class="wrap">
-  <span>Gogeta-0 · FusionDance architecture · v0.5.19</span>
+  <span>Gogeta-0 · FusionDance architecture · v0.5.20</span>
   <span>An independent research project and fan homage, not affiliated with or endorsed by the Dragon Ball rights holders.</span>
 </div></footer>
 <script src="../assets/charts.js"></script>

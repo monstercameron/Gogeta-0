@@ -222,11 +222,17 @@
       "acceptance rate",
       "decode tokens/sec"
     ],
-    "status": "planned",
-    "version": null,
+    "status": "running",
+    "version": "v0.5.20",
     "config": null,
-    "results": {},
-    "notes": ""
+    "results": {
+      "checkpoint": "A2s-20261123-170724-s2 (CPU fp32)",
+      "acceptance_r_draft1_k4": 0.701,
+      "tokens_per_verify_r_draft1_k8": 5.23,
+      "lossless": "FAIL: 16 of 120 bench runs diverge from plain greedy at near-tie steps (int8 activation rounding differs between 1-token and k-token passes); 30 of 30 lossless with activation quantisation off",
+      "evidence": "experiments/checks/results/spec_decode_bench.json"
+    },
+    "notes": "Decode path built in v0.5.20 (gogeta/decode.py: KV/SWA/GDN caches, rollback, self-speculative r_draft < r_full). GPU (fla) path and wall-clock speedup not measured yet."
   },
   {
     "id": "E9",
@@ -645,10 +651,33 @@
       "nats per target token, paired by seed",
       "clean80 bpc via SQ387 before any claim"
     ],
-    "status": "running",
-    "version": null,
+    "status": "done",
+    "version": "v0.5.20",
     "config": "experiments/staged-configs/a4/",
-    "results": {},
-    "notes": "Seeds 5-7, 200M tokens; first dispatch failed in 1 s on a missing PYTHONPATH in the fleet worker (13:51) and was requeued."
+    "results": {
+      "val_loss": 1.1837,
+      "effects_paired": {
+        "R1_A4a_vs_A3mx": 0.1439,
+        "R2_A4a_vs_A4b": -0.0114,
+        "R2p_A4d_vs_A4b": -0.0168,
+        "R2pp_A4a_vs_A4d": 0.0055,
+        "R3_A4a_vs_A4c": -0.011
+      },
+      "decisions": {
+        "full_stack_viable (A4a within 3% of A3mx: CI upper <= +3%)": false,
+        "refinement_loop_earns_place (R2 CI below 0)": true,
+        "second_pass_alone (R2' Holm CI below 0)": true,
+        "deep_supervision (R2'' Holm)": {
+          "reject": false,
+          "rel": 0.005486132146111334
+        },
+        "sharing_vs_unique (R3 Holm)": {
+          "reject": false,
+          "rel": -0.011023578790512672
+        }
+      },
+      "evidence": "experiments/checks/results/a4_fullstack.json"
+    },
+    "notes": "Seeds 5-7, 200M tokens. val_loss = A4a's mean val nats per target token (v2 val, not clean80; SQ387). The full stack is NOT viable by the registered rule: the byte decoder costs +14.4% vs A3mx's BPE head. The second shared byte pass helps (-1.7%, Holm). First dispatch failed in 1 s on a missing PYTHONPATH in the fleet worker (13:51) and was requeued."
   }
 ]

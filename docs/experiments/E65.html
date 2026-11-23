@@ -18,20 +18,20 @@
 <header class="page-head"><div class="wrap">
   <span class="eyebrow">Experiment E65 · Assembly</span>
   <h1 class="exp-title">A4 full stack: coarse-to-fine byte decoder around the all-parts backbone (tokens as patches)</h1>
-  <p class="status-line"><span class="pill running">Powering up</span>
-     
+  <p class="status-line"><span class="pill done">Fusion stable</span>
+     <span class="muted">recorded in v0.5.20</span>
      <span class="muted">config <code>experiments/staged-configs/a4/</code></span></p>
   <p class="lead"><b>The question:</b> Does a byte-level spelling decoder on top of the A3mx backbone work, and does a shared second refinement pass (with or without deep supervision) beat a single pass or an unshared, parameter-matched pair?</p>
-  
+  <div class="stats"><div class="stat-card"><div class="v">1.184</div><div class="k">validation loss</div><div class="sub">+95.2% vs E0</div></div></div>
 </div></header>
 <section class="article"><div class="wrap prose">
   <p class="muted">No write-up yet.</p><aside class="prediction-box"><b>Prediction (written before the run)</b><p>Registered: experiments/checks/PREDICTIONS.md, sections &#x27;A4 full stack&#x27; and &#x27;A4 amendment 1&#x27; (R2&#x27;, R2&#x27;&#x27;, R3 under Holm).</p></aside>
-  
+  <details class="viz-table"><summary>All recorded numbers</summary><div class="table-wrap"><table class="kv"><tbody><tr><th>Validation loss</th><td>1.1837</td></tr><tr><th>effects_paired</th><td>{&#x27;R1_A4a_vs_A3mx&#x27;: 0.1439, &#x27;R2_A4a_vs_A4b&#x27;: -0.0114, &#x27;R2p_A4d_vs_A4b&#x27;: -0.0168, &#x27;R2pp_A4a_vs_A4d&#x27;: 0.0055, &#x27;R3_A4a_vs_A4c&#x27;: -0.011}</td></tr><tr><th>decisions</th><td>{&#x27;full_stack_viable (A4a within 3% of A3mx: CI upper &lt;= +3%)&#x27;: False, &#x27;refinement_loop_earns_place (R2 CI below 0)&#x27;: True, &quot;second_pass_alone (R2&#x27; Holm CI below 0)&quot;: True, &quot;deep_supervision (R2&#x27;&#x27; Holm)&quot;: {&#x27;reject&#x27;: False, &#x27;rel&#x27;: 0.005486132146111334}, &#x27;sharing_vs_unique (R3 Holm)&#x27;: {&#x27;reject&#x27;: False, &#x27;rel&#x27;: -0.011023578790512672}}</td></tr><tr><th>evidence</th><td>experiments/checks/results/a4_fullstack.json</td></tr></tbody></table></div></details>
   <p class="muted small">New to the jargon? <a href="../learn.html">Start here</a> for plain-English definitions of loss, tokens, parameters and FLOPs.</p>
   <div class="pager"><a class="btn" href="E64.html">← E64</a><a class="btn" href="../devlog.html#experiments-section">All experiments</a><span></span></div>
 </div></section>
 <footer><div class="wrap">
-  <span>Gogeta-0 · FusionDance architecture · v0.5.19</span>
+  <span>Gogeta-0 · FusionDance architecture · v0.5.20</span>
   <span>An independent research project and fan homage, not affiliated with or endorsed by the Dragon Ball rights holders.</span>
 </div></footer>
 <script src="../assets/charts.js"></script>

@@ -85,3 +85,9 @@ of v2's v1-val-driven exclusions: v1sub is at least as clean against v1 val as v
 
 **Run** (box with v1 `docs_train.jsonl`, KEEP=1): `python experiments/data_integrity/build_v1_subset.py --manifest v1sub.manifest.json`.
 Expected cost: same pipeline as build_v2 minus the two 13-gram scans, about 3-5 min on 24 cores, peak RAM ~6-9 GB, output ~0.4 GB.
+
+**Built and verified (2026-11-23, v0.4.91):** two RTX 5090 boxes (w4-1 and w4-5) built it independently in 43 s and 37 s, with byte-identical output.
+- train.bin sha256 `7e0f15f1…c77ee4`: 698,714 docs, 196,510,203 tokens.
+- Exclusion: 179,069 v1 train docs excluded (165,732 in v1-val families, 13,337 more by the rare-name link), leaving 808,085 eligible.
+- val.bin and docs_val.jsonl are byte-identical to v1's.
+- Manifest: `experiments/data_integrity/dataset-v1sub.manifest.json`.

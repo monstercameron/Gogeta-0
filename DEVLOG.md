@@ -18,6 +18,42 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.91: F2 stage 1 done: blinded sigma 0.0087, N_final 221 (stage 2 = 87 runs); code-py-v1sub verified on two boxes; fleet down to 5
+*2026-11-23*
+
+**F2 blinded variance re-estimation** (registered in the wave-5 amendment). This is recorded **before** stage 2 dispatches.
+- **Estimator:** `experiments/design/f2_blinded_sigma.py`, committed in v0.4.89 before it was run. Output is in `experiments/checks/results/f2_blinded_sigma.json`.
+- **Stage 1:** 135 runs, 27 seeds × 5 cells, including the pilot's seeds 0–2.
+- **Sigma:** seed-blocked log-sd **0.00873** (residual df 104); unblocked 0.00945.
+- **Registered rule:** N_final = min(246, ⌈235·(σ_blocked/0.009)²⌉) = **221**.
+- **Allocation:** the registered shape (E20 twice the others) gives E20 = 74 and the other cells 37 each. **Stage 2 = 87 runs**: E20 seeds 27–73, the other cells seeds 27–36, at the registered LRs.
+- **Nothing else was computed or looked at:** no cell means, contrasts or interaction estimates. The display-blinding disclosure is in v0.4.89, and more is below.
+- **Design note, found now:** under the seed-blocked primary model, a seed run by only one cell adds no information about the cell contrasts. So E20's seeds 37–73 inform only the unblocked sensitivity analysis and E20's own variance.
+  - The registered allocation is followed unchanged; changing it after seeing stage-1 sigma would itself be a deviation.
+  - The primary analysis's effective N for contrasts is the 37 seeds shared by all five cells.
+  - The analysis must report this alongside the power.
+- **More blinding exposure** (quick review 01:10, SQ313):
+  - **67 F2 stage-1 per-run score files were committed and pushed in v0.4.88**, so they are publicly readable;
+  - they are no longer copied into the repo until this step;
+  - review agents are told not to compute per-cell F2 results.
+
+**code-py-v1sub (SQ238's control data) is verified:**
+- two boxes, w4-1 and w4-5, built it independently in 43 s and 37 s, with byte-identical output (train.bin sha256 `7e0f15f1…`);
+- 698,714 docs, 196.5M tokens;
+- manifest: `experiments/data_integrity/dataset-v1sub.manifest.json`;
+- details in `notes/data-v2.md`.
+
+**Fleet:**
+- **w4-5 is destroyed** (2.78 h, about $1.65). It sat idle for about 40 min after its last batch: its JOBS DONE event was lost while the operator hold and monitor restarts were in progress. Its inference outputs (knockout, ensemble, docnll) were pulled first.
+- Five boxes remain.
+- **Queue reconciled:** Q7/Q8 are marked done; they ran on the N1X and are superseded by the 7-seed 5090 arms.
+
+**Quick reviews:**
+- **01:10 and 01:24 (safety):** SQ61 now requires a fail-closed GRPO reward path that refuses to score when network or filesystem isolation is missing (C83). SQ313 is the blinding redaction check.
+- **01:18 (cheapest-experiment hunter):** the Q8 preflight idea is rejected, since Q8 was a stale entry and the launcher already runs a preflight.
+
+---
+
 ## v0.4.90: Outside review 01:07: C197's depth result is confounded with init (SQ308 registered); README width wording fixed; SQ309-SQ312
 *2026-11-23*
 

@@ -1,0 +1,91 @@
+{
+ "created": "2026-11-23T04:39:25",
+ "dataset": "code-py-v1sub",
+ "source": "OpenCoder-LLM/opc-annealing-corpus",
+ "license": "ODC-By",
+ "tokenizer": {
+  "file": "code-py-v1sub/tokenizer.json",
+  "sha256": "0e75f39f9a6b3d743cf75bb48189cfb567ed498ed62c5237e6db9f59884a4d72",
+  "vocab_size": 8192,
+  "eos_id": 0
+ },
+ "prepare_seed": 1234,
+ "filter": {
+  "rows": 8404155,
+  "python": 997044,
+  "empty": 1,
+  "too_long": 0,
+  "dupes": 5889,
+  "kept": 991154,
+  "train_docs": 987154,
+  "val_docs": 4000,
+  "train_chars": 976520477,
+  "val_chars": 3938783
+ },
+ "derived_from": "code-py-v1",
+ "build": {
+  "script": "experiments/data_integrity/build_v1_subset.py",
+  "seed": 1234,
+  "params": {
+   "v1_train_docs": 987154,
+   "v1_val_docs": 4000,
+   "count": 698714,
+   "selection_seed": 1234,
+   "families_jaccard": 0.5,
+   "num_perm": 64,
+   "ngram": 8,
+   "max_bucket": 60,
+   "name_link_max": 50,
+   "excluded_in_v1_val_families": 165732,
+   "excluded_name_link_only": 13337,
+   "excluded_total": 179069,
+   "eligible": 808085,
+   "dedup": false
+  }
+ },
+ "splits": {
+  "train": {
+   "docs": 698714,
+   "tokens": 196510203,
+   "chars": 740464992,
+   "files": {
+    "train.bin": {
+     "sha256": "7e0f15f14908d8b26fafe503de9eee3aaa0c204e4b7d7c8eff3cd73b40c77ee4",
+     "bytes": 393020406,
+     "block_tokens": 67108864,
+     "block_sha256": [
+      "9a84ba69cd2acef02959841c6fb96679d029c11517215b2fd328848885b92ae5",
+      "0cdd34eff0e2db1ec61fa28f81679fc4f53064fac32e1a310e1e7a210c89cde3",
+      "2566618d6436ee979f19ce00c76955a7ba466e7c455410ca2dd9b6c508c3a0c6"
+     ]
+    },
+    "train_keep_ids.npy": {
+     "sha256": "4929b320eaa20cdd874bf3ee8e75db0f6db149cd5480748afdede069ed6b2cb5",
+     "bytes": 5589840
+    }
+   }
+  },
+  "val": {
+   "docs": 4000,
+   "tokens": 1059160,
+   "chars": 3938783,
+   "files": {
+    "docs_val.jsonl": {
+     "sha256": "f821d119e552fd94e69414f35849f323cd6d3e9744c771b68da7b563e7e377a9",
+     "bytes": 4249988
+    },
+    "val.bin": {
+     "sha256": "32e4b0ede9211f61d7aa7aea28aa7ecf406e04f02948b0ad0250ddbd41c385d4",
+     "bytes": 2118320,
+     "block_tokens": 67108864,
+     "block_sha256": [
+      "32e4b0ede9211f61d7aa7aea28aa7ecf406e04f02948b0ad0250ddbd41c385d4"
+     ]
+    }
+   }
+  }
+ },
+ "known_issues": [
+  "NOT deduplicated: a uniform random subset of v1 train (near-duplicate families kept), the dedup-only control for code-py-v2 (same doc count). Val is v1's val unchanged, so v1 val numbers apply; docs sharing a family or rare first name with a v1 val doc are excluded."
+ ]
+}

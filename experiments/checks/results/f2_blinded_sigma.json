@@ -1,0 +1,18 @@
+{
+ "n_runs": 135,
+ "n_per_cell": {
+  "E20": 27,
+  "E21": 27,
+  "E22": 27,
+  "E24": 27,
+  "E27": 27
+ },
+ "n_seeds": 27,
+ "resid_df": 104,
+ "sigma_seed_blocked": 0.008725023770450195,
+ "sigma_unblocked": 0.009451768116611954,
+ "rule": "N_final = min(246, ceil(235 * (sigma_blocked / 0.009)^2)); stage2 = N_final - n_runs",
+ "n_final": 221,
+ "stage2_runs": 86,
+ "blinding": "no cell means, contrasts or interaction estimates are computed for output or stored"
+}

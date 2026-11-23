@@ -18,6 +18,47 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.98: Docs refresh (hourly); F2 audits: inputs reconciled, estimator validated, seed-robust, wall-clock caveat (C201)
+*2026-11-23*
+
+**F2 audits** (from quick reviews 02:25, reproducibility auditor, and 02:29, competitor lab), all CPU-only:
+- **Inputs reconciled** (`experiments/checks/results/f2_input_manifest.json`): the 250 committed E2x score files break down as follows, with no duplicate (cell, seed) among the included runs.
+
+  | Disposition | Files |
+  |---|---|
+  | Included | 217 |
+  | Other factorial cells (E23/E25/E26) | 16 |
+  | Seed 0, excluded as registered | 5 |
+  | LR-sweep runs at non-registered LRs | 12 |
+
+- **Estimator validated** (`experiments/design/check_f2_analysis_synthetic.py`): on synthetic data with a known I = −3.5% plus seed effects, the seed-blocked estimate returns −3.500% exactly with no noise. With noise 0.008 it returns −3.97%, CI [−4.87%, −3.07%], covering the truth.
+- **Seed-robust:** leaving out each of the 73 seeds keeps I in [−3.69%, −3.42%], with no sign flip (`f2_loso_wall.json`).
+- **The wall-clock differs from the FLOPs match.** Median minutes per 20M run:
+
+  | Cell | Median minutes |
+  |---|---|
+  | 000 (dense) | 0.58 |
+  | 001 (ternary) | 0.60 |
+  | 010 (loops) | 0.69 |
+  | 100 (GDN) | 0.94 |
+  | 111 (full fusion) | 0.92 |
+
+  So the best-quality cell (GDN) costs about 1.6× the wall time at this scale. This is added to C201 as a limitation.
+
+**Docs refresh (hourly, Haiku; diff checked by the main agent):**
+- README:
+  - C5 is worded "0.18% worse in the point estimate; the CI spans zero";
+  - C197 is VERIFIED on 4 seeds, with the lever being unique params;
+  - the F2 prediction-was-wrong note is added;
+  - C198 is shown as PARTIAL.
+- `notes/sketch.md`: status refreshed to v0.4.97 with claim counts (19 VERIFIED, 26 PARTIAL, 129 claims), plus decision lines for v0.4.95–v0.4.97.
+
+**Fleet:**
+- w4-6 now runs the E60 stage-1 LR grid (9 runs at 20M), the first GPU use of the MoE code.
+- SQ263 (200M F2 cells) is finishing on three boxes.
+
+---
+
 ## v0.4.97: F2 result: the fusion ingredients interact (I = -3.5%, SYNERGY; C201) - the registered prediction was wrong
 *2026-11-23*
 

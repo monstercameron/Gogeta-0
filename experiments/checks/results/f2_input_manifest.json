@@ -1,0 +1,1515 @@
+{
+ "n_files": 250,
+ "counts": {
+  "seed 0 (LR selection, excluded as registered)": 5,
+  "not the registered LR (0.006)": 2,
+  "not the registered LR (0.012)": 5,
+  "not the registered LR (0.0015)": 2,
+  "INCLUDED": 217,
+  "not the registered LR (0.003)": 3,
+  "not an F2 cell (E23/E25/E26)": 16
+ },
+ "duplicate_cell_seed_among_included": {},
+ "rows": [
+  {
+   "run": "E20-20261123-025702-s0",
+   "cell": "E20",
+   "seed": 0,
+   "disposition": "seed 0 (LR selection, excluded as registered)"
+  },
+  {
+   "run": "E20-20261123-025749-s0",
+   "cell": "E20",
+   "seed": 0,
+   "disposition": "not the registered LR (0.006)"
+  },
+  {
+   "run": "E20-20261123-025827-s0",
+   "cell": "E20",
+   "seed": 0,
+   "disposition": "not the registered LR (0.012)"
+  },
+  {
+   "run": "E20-20261123-030831-s0",
+   "cell": "E20",
+   "seed": 0,
+   "disposition": "not the registered LR (0.0015)"
+  },
+  {
+   "run": "E20-20261123-031348-s1",
+   "cell": "E20",
+   "seed": 1,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-031426-s2",
+   "cell": "E20",
+   "seed": 2,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-045932-s3",
+   "cell": "E20",
+   "seed": 3,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-050558-s4",
+   "cell": "E20",
+   "seed": 4,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-050608-s5",
+   "cell": "E20",
+   "seed": 5,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-051225-s6",
+   "cell": "E20",
+   "seed": 6,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-051337-s11",
+   "cell": "E20",
+   "seed": 11,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-051815-s12",
+   "cell": "E20",
+   "seed": 12,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-051937-s13",
+   "cell": "E20",
+   "seed": 13,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-052335-s10",
+   "cell": "E20",
+   "seed": 10,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-052514-s14",
+   "cell": "E20",
+   "seed": 14,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-052527-s15",
+   "cell": "E20",
+   "seed": 15,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-052825-s16",
+   "cell": "E20",
+   "seed": 16,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-053351-s19",
+   "cell": "E20",
+   "seed": 19,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-053415-s18",
+   "cell": "E20",
+   "seed": 18,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-053755-s17",
+   "cell": "E20",
+   "seed": 17,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-053813-s20",
+   "cell": "E20",
+   "seed": 20,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-055523-s21",
+   "cell": "E20",
+   "seed": 21,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-055957-s22",
+   "cell": "E20",
+   "seed": 22,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-060411-s23",
+   "cell": "E20",
+   "seed": 23,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-060442-s24",
+   "cell": "E20",
+   "seed": 24,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-060916-s25",
+   "cell": "E20",
+   "seed": 25,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-061042-s26",
+   "cell": "E20",
+   "seed": 26,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-061803-s8",
+   "cell": "E20",
+   "seed": 8,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-062047-s7",
+   "cell": "E20",
+   "seed": 7,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-062234-s9",
+   "cell": "E20",
+   "seed": 9,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-063401-s27",
+   "cell": "E20",
+   "seed": 27,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-063640-s36",
+   "cell": "E20",
+   "seed": 36,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-063707-s53",
+   "cell": "E20",
+   "seed": 53,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-063746-s54",
+   "cell": "E20",
+   "seed": 54,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-063825-s55",
+   "cell": "E20",
+   "seed": 55,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-063835-s28",
+   "cell": "E20",
+   "seed": 28,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-063905-s56",
+   "cell": "E20",
+   "seed": 56,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-063937-s32",
+   "cell": "E20",
+   "seed": 32,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-063944-s57",
+   "cell": "E20",
+   "seed": 57,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064024-s58",
+   "cell": "E20",
+   "seed": 58,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064103-s59",
+   "cell": "E20",
+   "seed": 59,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064115-s37",
+   "cell": "E20",
+   "seed": 37,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064142-s60",
+   "cell": "E20",
+   "seed": 60,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064156-s38",
+   "cell": "E20",
+   "seed": 38,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064222-s61",
+   "cell": "E20",
+   "seed": 61,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064237-s39",
+   "cell": "E20",
+   "seed": 39,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064301-s62",
+   "cell": "E20",
+   "seed": 62,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064314-s29",
+   "cell": "E20",
+   "seed": 29,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064319-s40",
+   "cell": "E20",
+   "seed": 40,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064340-s63",
+   "cell": "E20",
+   "seed": 63,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064400-s41",
+   "cell": "E20",
+   "seed": 41,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064420-s64",
+   "cell": "E20",
+   "seed": 64,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064443-s42",
+   "cell": "E20",
+   "seed": 42,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064500-s65",
+   "cell": "E20",
+   "seed": 65,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064524-s43",
+   "cell": "E20",
+   "seed": 43,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064540-s66",
+   "cell": "E20",
+   "seed": 66,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064606-s44",
+   "cell": "E20",
+   "seed": 44,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064619-s67",
+   "cell": "E20",
+   "seed": 67,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064641-s33",
+   "cell": "E20",
+   "seed": 33,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064647-s45",
+   "cell": "E20",
+   "seed": 45,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064659-s68",
+   "cell": "E20",
+   "seed": 68,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064729-s46",
+   "cell": "E20",
+   "seed": 46,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064738-s69",
+   "cell": "E20",
+   "seed": 69,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064749-s30",
+   "cell": "E20",
+   "seed": 30,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064810-s47",
+   "cell": "E20",
+   "seed": 47,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064818-s70",
+   "cell": "E20",
+   "seed": 70,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064852-s48",
+   "cell": "E20",
+   "seed": 48,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064857-s71",
+   "cell": "E20",
+   "seed": 71,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064933-s49",
+   "cell": "E20",
+   "seed": 49,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-064937-s72",
+   "cell": "E20",
+   "seed": 72,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-065015-s50",
+   "cell": "E20",
+   "seed": 50,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-065016-s73",
+   "cell": "E20",
+   "seed": 73,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-065056-s51",
+   "cell": "E20",
+   "seed": 51,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-065138-s52",
+   "cell": "E20",
+   "seed": 52,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-065226-s31",
+   "cell": "E20",
+   "seed": 31,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-065345-s34",
+   "cell": "E20",
+   "seed": 34,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E20-20261123-070045-s35",
+   "cell": "E20",
+   "seed": 35,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-025904-s0",
+   "cell": "E21",
+   "seed": 0,
+   "disposition": "not the registered LR (0.003)"
+  },
+  {
+   "run": "E21-20261123-025959-s0",
+   "cell": "E21",
+   "seed": 0,
+   "disposition": "seed 0 (LR selection, excluded as registered)"
+  },
+  {
+   "run": "E21-20261123-030041-s0",
+   "cell": "E21",
+   "seed": 0,
+   "disposition": "not the registered LR (0.012)"
+  },
+  {
+   "run": "E21-20261123-030909-s1",
+   "cell": "E21",
+   "seed": 1,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-030950-s2",
+   "cell": "E21",
+   "seed": 2,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-050023-s3",
+   "cell": "E21",
+   "seed": 3,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-050639-s4",
+   "cell": "E21",
+   "seed": 4,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-050701-s5",
+   "cell": "E21",
+   "seed": 5,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-051417-s11",
+   "cell": "E21",
+   "seed": 11,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-051856-s12",
+   "cell": "E21",
+   "seed": 12,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-052025-s13",
+   "cell": "E21",
+   "seed": 13,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-052126-s14",
+   "cell": "E21",
+   "seed": 14,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-052609-s15",
+   "cell": "E21",
+   "seed": 15,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-052610-s10",
+   "cell": "E21",
+   "seed": 10,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-052946-s16",
+   "cell": "E21",
+   "seed": 16,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-053430-s19",
+   "cell": "E21",
+   "seed": 19,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-053457-s18",
+   "cell": "E21",
+   "seed": 18,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-053852-s20",
+   "cell": "E21",
+   "seed": 20,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-053900-s17",
+   "cell": "E21",
+   "seed": 17,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-055604-s21",
+   "cell": "E21",
+   "seed": 21,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-055801-s22",
+   "cell": "E21",
+   "seed": 22,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-060516-s23",
+   "cell": "E21",
+   "seed": 23,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-060524-s24",
+   "cell": "E21",
+   "seed": 24,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-060958-s25",
+   "cell": "E21",
+   "seed": 25,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-061121-s26",
+   "cell": "E21",
+   "seed": 26,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-061450-s6",
+   "cell": "E21",
+   "seed": 6,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-061844-s8",
+   "cell": "E21",
+   "seed": 8,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-062151-s7",
+   "cell": "E21",
+   "seed": 7,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-062316-s9",
+   "cell": "E21",
+   "seed": 9,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-063442-s27",
+   "cell": "E21",
+   "seed": 27,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-063721-s36",
+   "cell": "E21",
+   "seed": 36,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-063917-s28",
+   "cell": "E21",
+   "seed": 28,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-064041-s32",
+   "cell": "E21",
+   "seed": 32,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-064355-s29",
+   "cell": "E21",
+   "seed": 29,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-064746-s33",
+   "cell": "E21",
+   "seed": 33,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-064830-s30",
+   "cell": "E21",
+   "seed": 30,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-065308-s31",
+   "cell": "E21",
+   "seed": 31,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-065449-s34",
+   "cell": "E21",
+   "seed": 34,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E21-20261123-070149-s35",
+   "cell": "E21",
+   "seed": 35,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-025703-s0",
+   "cell": "E22",
+   "seed": 0,
+   "disposition": "not the registered LR (0.012)"
+  },
+  {
+   "run": "E22-20261123-030122-s0",
+   "cell": "E22",
+   "seed": 0,
+   "disposition": "not the registered LR (0.003)"
+  },
+  {
+   "run": "E22-20261123-030301-s0",
+   "cell": "E22",
+   "seed": 0,
+   "disposition": "seed 0 (LR selection, excluded as registered)"
+  },
+  {
+   "run": "E22-20261123-031152-s1",
+   "cell": "E22",
+   "seed": 1,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-031333-s2",
+   "cell": "E22",
+   "seed": 2,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-050124-s3",
+   "cell": "E22",
+   "seed": 3,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-050727-s4",
+   "cell": "E22",
+   "seed": 4,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-050802-s5",
+   "cell": "E22",
+   "seed": 5,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-050936-s9",
+   "cell": "E22",
+   "seed": 9,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-051503-s11",
+   "cell": "E22",
+   "seed": 11,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-051943-s12",
+   "cell": "E22",
+   "seed": 12,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-052121-s13",
+   "cell": "E22",
+   "seed": 13,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-052213-s14",
+   "cell": "E22",
+   "seed": 14,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-052656-s15",
+   "cell": "E22",
+   "seed": 15,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-052918-s10",
+   "cell": "E22",
+   "seed": 10,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-053108-s17",
+   "cell": "E22",
+   "seed": 17,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-053119-s16",
+   "cell": "E22",
+   "seed": 16,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-053513-s19",
+   "cell": "E22",
+   "seed": 19,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-053544-s18",
+   "cell": "E22",
+   "seed": 18,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-053936-s20",
+   "cell": "E22",
+   "seed": 20,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-055652-s21",
+   "cell": "E22",
+   "seed": 21,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-055913-s22",
+   "cell": "E22",
+   "seed": 22,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-060609-s24",
+   "cell": "E22",
+   "seed": 24,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-060626-s23",
+   "cell": "E22",
+   "seed": 23,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-060747-s25",
+   "cell": "E22",
+   "seed": 25,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-061204-s26",
+   "cell": "E22",
+   "seed": 26,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-061603-s6",
+   "cell": "E22",
+   "seed": 6,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-061931-s8",
+   "cell": "E22",
+   "seed": 8,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-062305-s7",
+   "cell": "E22",
+   "seed": 7,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-063452-s31",
+   "cell": "E22",
+   "seed": 31,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-063529-s27",
+   "cell": "E22",
+   "seed": 27,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-063807-s36",
+   "cell": "E22",
+   "seed": 36,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-064004-s28",
+   "cell": "E22",
+   "seed": 28,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-064152-s32",
+   "cell": "E22",
+   "seed": 32,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-064441-s29",
+   "cell": "E22",
+   "seed": 29,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-064857-s33",
+   "cell": "E22",
+   "seed": 33,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-064918-s30",
+   "cell": "E22",
+   "seed": 30,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-065602-s34",
+   "cell": "E22",
+   "seed": 34,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E22-20261123-070303-s35",
+   "cell": "E22",
+   "seed": 35,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E23-20261123-025705-s0",
+   "cell": "E23",
+   "seed": 0,
+   "disposition": "not an F2 cell (E23/E25/E26)"
+  },
+  {
+   "run": "E23-20261123-025920-s0",
+   "cell": "E23",
+   "seed": 0,
+   "disposition": "not an F2 cell (E23/E25/E26)"
+  },
+  {
+   "run": "E23-20261123-030643-s0",
+   "cell": "E23",
+   "seed": 0,
+   "disposition": "not an F2 cell (E23/E25/E26)"
+  },
+  {
+   "run": "E23-20261123-031507-s1",
+   "cell": "E23",
+   "seed": 1,
+   "disposition": "not an F2 cell (E23/E25/E26)"
+  },
+  {
+   "run": "E23-20261123-031612-s2",
+   "cell": "E23",
+   "seed": 2,
+   "disposition": "not an F2 cell (E23/E25/E26)"
+  },
+  {
+   "run": "E24-20261123-025903-s0",
+   "cell": "E24",
+   "seed": 0,
+   "disposition": "seed 0 (LR selection, excluded as registered)"
+  },
+  {
+   "run": "E24-20261123-030013-s0",
+   "cell": "E24",
+   "seed": 0,
+   "disposition": "not the registered LR (0.006)"
+  },
+  {
+   "run": "E24-20261123-030125-s0",
+   "cell": "E24",
+   "seed": 0,
+   "disposition": "not the registered LR (0.012)"
+  },
+  {
+   "run": "E24-20261123-031400-s0",
+   "cell": "E24",
+   "seed": 0,
+   "disposition": "not the registered LR (0.0015)"
+  },
+  {
+   "run": "E24-20261123-032150-s1",
+   "cell": "E24",
+   "seed": 1,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-032258-s2",
+   "cell": "E24",
+   "seed": 2,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-050323-s3",
+   "cell": "E24",
+   "seed": 3,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-050336-s4",
+   "cell": "E24",
+   "seed": 4,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-051001-s5",
+   "cell": "E24",
+   "seed": 5,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-051552-s11",
+   "cell": "E24",
+   "seed": 11,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-051602-s9",
+   "cell": "E24",
+   "seed": 9,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-051714-s12",
+   "cell": "E24",
+   "seed": 12,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-052301-s13",
+   "cell": "E24",
+   "seed": 13,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-052305-s14",
+   "cell": "E24",
+   "seed": 14,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-052743-s15",
+   "cell": "E24",
+   "seed": 15,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-053153-s10",
+   "cell": "E24",
+   "seed": 10,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-053153-s17",
+   "cell": "E24",
+   "seed": 17,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-053418-s16",
+   "cell": "E24",
+   "seed": 16,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-053558-s19",
+   "cell": "E24",
+   "seed": 19,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-053632-s18",
+   "cell": "E24",
+   "seed": 18,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-055300-s20",
+   "cell": "E24",
+   "seed": 20,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-055736-s21",
+   "cell": "E24",
+   "seed": 21,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-060035-s22",
+   "cell": "E24",
+   "seed": 22,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-060654-s24",
+   "cell": "E24",
+   "seed": 24,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-060741-s23",
+   "cell": "E24",
+   "seed": 23,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-060828-s25",
+   "cell": "E24",
+   "seed": 25,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-061246-s26",
+   "cell": "E24",
+   "seed": 26,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-061716-s6",
+   "cell": "E24",
+   "seed": 6,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-062015-s8",
+   "cell": "E24",
+   "seed": 8,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-062418-s7",
+   "cell": "E24",
+   "seed": 7,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-063602-s31",
+   "cell": "E24",
+   "seed": 31,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-063615-s27",
+   "cell": "E24",
+   "seed": 27,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-063852-s36",
+   "cell": "E24",
+   "seed": 36,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-064053-s28",
+   "cell": "E24",
+   "seed": 28,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-064301-s32",
+   "cell": "E24",
+   "seed": 32,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-064526-s29",
+   "cell": "E24",
+   "seed": 29,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-065003-s30",
+   "cell": "E24",
+   "seed": 30,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-065007-s33",
+   "cell": "E24",
+   "seed": 33,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-065711-s34",
+   "cell": "E24",
+   "seed": 34,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E24-20261123-070412-s35",
+   "cell": "E24",
+   "seed": 35,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E25-20261123-030013-s0",
+   "cell": "E25",
+   "seed": 0,
+   "disposition": "not an F2 cell (E23/E25/E26)"
+  },
+  {
+   "run": "E25-20261123-030135-s0",
+   "cell": "E25",
+   "seed": 0,
+   "disposition": "not an F2 cell (E23/E25/E26)"
+  },
+  {
+   "run": "E25-20261123-030301-s0",
+   "cell": "E25",
+   "seed": 0,
+   "disposition": "not an F2 cell (E23/E25/E26)"
+  },
+  {
+   "run": "E25-20261123-031423-s1",
+   "cell": "E25",
+   "seed": 1,
+   "disposition": "not an F2 cell (E23/E25/E26)"
+  },
+  {
+   "run": "E25-20261123-031535-s2",
+   "cell": "E25",
+   "seed": 2,
+   "disposition": "not an F2 cell (E23/E25/E26)"
+  },
+  {
+   "run": "E26-20261123-030418-s0",
+   "cell": "E26",
+   "seed": 0,
+   "disposition": "not an F2 cell (E23/E25/E26)"
+  },
+  {
+   "run": "E26-20261123-030523-s0",
+   "cell": "E26",
+   "seed": 0,
+   "disposition": "not an F2 cell (E23/E25/E26)"
+  },
+  {
+   "run": "E26-20261123-030631-s0",
+   "cell": "E26",
+   "seed": 0,
+   "disposition": "not an F2 cell (E23/E25/E26)"
+  },
+  {
+   "run": "E26-20261123-031651-s0",
+   "cell": "E26",
+   "seed": 0,
+   "disposition": "not an F2 cell (E23/E25/E26)"
+  },
+  {
+   "run": "E26-20261123-032406-s1",
+   "cell": "E26",
+   "seed": 1,
+   "disposition": "not an F2 cell (E23/E25/E26)"
+  },
+  {
+   "run": "E26-20261123-032515-s2",
+   "cell": "E26",
+   "seed": 2,
+   "disposition": "not an F2 cell (E23/E25/E26)"
+  },
+  {
+   "run": "E27-20261123-030235-s0",
+   "cell": "E27",
+   "seed": 0,
+   "disposition": "not the registered LR (0.003)"
+  },
+  {
+   "run": "E27-20261123-030407-s0",
+   "cell": "E27",
+   "seed": 0,
+   "disposition": "seed 0 (LR selection, excluded as registered)"
+  },
+  {
+   "run": "E27-20261123-030525-s0",
+   "cell": "E27",
+   "seed": 0,
+   "disposition": "not the registered LR (0.012)"
+  },
+  {
+   "run": "E27-20261123-031504-s1",
+   "cell": "E27",
+   "seed": 1,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-031624-s2",
+   "cell": "E27",
+   "seed": 2,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-050430-s3",
+   "cell": "E27",
+   "seed": 3,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-050441-s4",
+   "cell": "E27",
+   "seed": 4,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-051108-s5",
+   "cell": "E27",
+   "seed": 5,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-051658-s11",
+   "cell": "E27",
+   "seed": 11,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-051817-s12",
+   "cell": "E27",
+   "seed": 12,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-051912-s9",
+   "cell": "E27",
+   "seed": 9,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-052404-s13",
+   "cell": "E27",
+   "seed": 13,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-052411-s14",
+   "cell": "E27",
+   "seed": 14,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-052611-s15",
+   "cell": "E27",
+   "seed": 15,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-053259-s17",
+   "cell": "E27",
+   "seed": 17,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-053504-s10",
+   "cell": "E27",
+   "seed": 10,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-053601-s16",
+   "cell": "E27",
+   "seed": 16,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-053702-s19",
+   "cell": "E27",
+   "seed": 19,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-053739-s18",
+   "cell": "E27",
+   "seed": 18,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-055407-s20",
+   "cell": "E27",
+   "seed": 20,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-055844-s21",
+   "cell": "E27",
+   "seed": 21,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-060217-s22",
+   "cell": "E27",
+   "seed": 22,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-060328-s23",
+   "cell": "E27",
+   "seed": 23,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-060800-s24",
+   "cell": "E27",
+   "seed": 24,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-060931-s25",
+   "cell": "E27",
+   "seed": 25,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-061349-s26",
+   "cell": "E27",
+   "seed": 26,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-061650-s7",
+   "cell": "E27",
+   "seed": 7,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-061859-s6",
+   "cell": "E27",
+   "seed": 6,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-062122-s8",
+   "cell": "E27",
+   "seed": 8,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-063524-s35",
+   "cell": "E27",
+   "seed": 35,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-063722-s27",
+   "cell": "E27",
+   "seed": 27,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-063745-s31",
+   "cell": "E27",
+   "seed": 31,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-063959-s36",
+   "cell": "E27",
+   "seed": 36,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-064159-s28",
+   "cell": "E27",
+   "seed": 28,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-064445-s32",
+   "cell": "E27",
+   "seed": 32,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-064633-s29",
+   "cell": "E27",
+   "seed": 29,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-065111-s30",
+   "cell": "E27",
+   "seed": 30,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-065150-s33",
+   "cell": "E27",
+   "seed": 33,
+   "disposition": "INCLUDED"
+  },
+  {
+   "run": "E27-20261123-065853-s34",
+   "cell": "E27",
+   "seed": 34,
+   "disposition": "INCLUDED"
+  }
+ ]
+}

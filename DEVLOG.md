@@ -18,6 +18,28 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.1: Outside review 12:10: A1 amended before results (A1i truncation control, A1z placebo, A1k LR check); E60c is not compute-matched
+*2026-11-23*
+
+**Outside review 12:10 (Haiku) and quick review 11:24 (ML theorist), triaged. The A1 screen is amended before any A1 result exists.**
+
+- **A1 amendment 1** (registered in `experiments/checks/PREDICTIONS.md`):
+  - **A1i:** E27 with full backprop through every pass. A1a (fixed r = 4) also removes E27's gradient truncation when r > 4, so it was not a single change; A1i separates the two.
+  - **A1z:** a placebo. E27 is re-run unchanged on the new fleet, to measure environment drift and the screen's false-positive rate. With 10 arms the -1.0% rule has roughly a 20-25% chance of at least one false winner.
+  - **A1k:** E27 at lr 1.2e-2, checking whether 6e-3 sits at an LR edge.
+  - **New reading rules:** A1g and A1h are "parameter-changed" arms, not compensations; dense E20 joins the table, so "share of the gap closed" is paired; throughput is reported next to each effect; winners count only after A2 confirms them on fresh seeds 2-4.
+- **Correction to v0.5.0:** E60c (dense 2048 FFN) vs E60a (MoE) is parameter-matched, not compute-matched. E60c's FFN matmuls cost about 2x E60a's active experts. Their near-equal wall time reflects MoE gather overhead, not equal compute. C203 gains that limitation; its main result (E60a vs E1 at matched active FLOPs) stands.
+- **New side quests:**
+  - SQ353: loop-state perturbation gain.
+  - SQ354: loss sharpness.
+  - SQ355: LR grid for the ternary arms.
+  - SQ356: distillation into the fused cell.
+  - SQ357: per-pass low-rank adapters, an A2 candidate.
+  - SQ358: ternary MoE experts; MoE with ternary currently raises in `gogeta/model.py`.
+- **Fleet:** 8 RTX 5090s were rented for A1 (about $4.4/h). Seven have finished setup and the 16 original A1 jobs are dispatching; box 3 is still loading. The extra arms run at this commit on the first boxes to finish.
+
+---
+
 ## v0.5.0: Assembly begins: compensation hooks + A1 screen registered; E60 done (MoE -2.7%, dense-wide FFN -4.2%; C203)
 *2026-11-23*
 

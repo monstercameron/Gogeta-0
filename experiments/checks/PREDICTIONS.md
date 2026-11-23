@@ -733,3 +733,15 @@ Source: outside review 2026-11-23 00:10. C197's limitation (event 4): E34, which
 - **Design:** all 5 cells at their best LR, seeds 0-2, CPU. Synthetic sequences: filler from clean v2 val docs with a 32-token span copied after a gap of 128, 256 or 512 tokens, 200 sequences per gap (fixed seed 0). y = log of the mean NLL on the second copy's tokens.
 - **Estimand:** I_copy = y111 - y100 - y010 - y001 + 2·y000, with the seed-blocked estimator of `experiments/checks/sq263.py`.
 - **Prediction:** at gaps 256 and 512, I_copy > 0 with a seed-blocked 95% CI excluding 0, and |I_copy| within 0.5x to 2x of I_bpc (+6.2 log-points). **Falsifier:** |I_copy| < 1 point or the opposite sign at both gaps: the reversal would then be general modelling, not a recall deficit.
+
+### A1 amendment 1 (2026-11-23 ~11:35 EST, before any A1 result exists): truncation control, placebo, LR check
+Prompted by outside review 2026-11-23 12:10 (`notes/reviews/2026-11-23-1210-review.md`). Added before any A1 run finished; no A1 number had been seen.
+- **New arms** (seeds 0 and 1, 200M tokens, same paired analysis vs E27):
+  - **A1i** [0798341738a823ff]: E27 with `bptt_loops = 7`, i.e. full backprop through every pass. A1a (fixed r = 4) also removes the truncation that E27 applies when r > 4, so A1a vs A1i separates "fixed depth" from "no truncation". Prediction: -0.5% (-2% to +1%).
+  - **A1z** [f95bfccd70ea2fa7], the **placebo**: E27 unchanged, re-run on the A1 fleet at the A1 commit. Prediction: |effect| < 0.5%. If |effect| >= 1.0% or both seeds move the same way by more than 0.7%, the screen's reference is unreliable and every A1 effect is re-read against A1z instead of the SQ263 E27 runs.
+  - **A1k:** E27 at lr 1.2e-2 (`--lr 1.2e-2`; SQ263 already has 2e-3, which lost 0.64%). It checks whether the fused cell's LR is at an edge. Prediction: within +/-1% of 6e-3.
+- **Reading rules added:**
+  - A1g and A1h change unique parameters, C197's known lever. They are reported as "parameter-changed arms", not as compensations, and are compared with the per-parameter expectation from C197.
+  - The dense E20 (SQ263, seeds 0-1, 3e-3) is added to the table, so each arm's "share of the E27-to-dense gap closed" is a paired number.
+  - Each arm's tokens/s vs E27 is reported next to its effect. A winner that costs more than 10% throughput is flagged and not stacked without a wall-clock note.
+  - Multiplicity: with 10 arms and a 2-seed paired sd of about 0.55%, the -1.0% rule has a roughly 20-25% chance of at least one false winner. A1 winners therefore count only after A2 confirms them on **fresh seeds (2-4)**; A2 never reuses seeds 0-1.

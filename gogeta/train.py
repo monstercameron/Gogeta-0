@@ -260,6 +260,23 @@ def sample(model, tok, prompt: str, n_new: int, device, temperature=0.8, top_k=4
 
 
 # ----------------------------------------------------------------------------- main
+
+def param_groups(model, tc: dict) -> list[dict]:
+    """AdamW parameter groups: decay (dim >= 2) vs no-decay. With train.core_lr_mult != 1 (SQ404), the shared core's
+    parameters ("core.*") get their own groups carrying "lr_mult", which the LR schedule multiplies in. The default
+    returns the original two groups, bit-identical."""
+    core_mult = float(tc.get("core_lr_mult", 1.0))
+    if core_mult == 1.0:
+        decay = [p for n, p in model.named_parameters() if p.dim() >= 2]
+        no_decay = [p for n, p in model.named_parameters() if p.dim() < 2]
+        return [{"params": decay, "weight_decay": tc["weight_decay"]}, {"params": no_decay, "weight_decay": 0.0}]
+    groups = []
+    for core, mult in ((False, 1.0), (True, core_mult)):
+        ps = [(n, p) for n, p in model.named_parameters() if n.startswith("core.") == core]
+        groups += [{"params": [p for n, p in ps if p.dim() >= 2], "weight_decay": tc["weight_decay"], "lr_mult": mult},
+                   {"params": [p for n, p in ps if p.dim() < 2], "weight_decay": 0.0, "lr_mult": mult}]
+    return [g for g in groups if g["params"]]
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", required=True)
@@ -299,11 +316,8 @@ def main():
     looped = len(model.core) > 0
     loop_rng = random.Random(tc["seed"] + 1)
 
-    decay = [p for n, p in model.named_parameters() if p.dim() >= 2]
-    no_decay = [p for n, p in model.named_parameters() if p.dim() < 2]
-    opt = torch.optim.AdamW([{"params": decay, "weight_decay": tc["weight_decay"]},
-                             {"params": no_decay, "weight_decay": 0.0}],
-                            lr=tc["lr"], betas=(tc["beta1"], tc["beta2"]), fused=True)
+    groups = param_groups(model, tc)
+    opt = torch.optim.AdamW(groups, lr=tc["lr"], betas=(tc["beta1"], tc["beta2"]), fused=True)
 
     tokens_per_step = tc["batch_size"] * tc["seq_len"]
     total_steps = args.bench or math.ceil(tc["max_tokens"] / tokens_per_step)
@@ -327,7 +341,7 @@ def main():
         for step in range(total_steps):
             lr = lr_at(step, total_steps, tc)
             for gp in opt.param_groups:
-                gp["lr"] = lr
+                gp["lr"] = lr * gp.get("lr_mult", 1.0)
             r = loop_rng.randint(mc.loops_min, mc.loops_max) if looped else None
             if tc.get("ternary_start_frac"):  # full-precision training first, ternary QAT from this fraction on (A1)
                 if set_ternary_quant(model, step >= tc["ternary_start_frac"] * total_steps):

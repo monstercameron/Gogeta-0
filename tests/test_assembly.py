@@ -151,3 +151,61 @@ def test_inputs_embeds_and_return_hidden_hooks():
         h = m(x, return_hidden=True)
     assert torch.equal(a, b)
     assert h.shape == (2, 16, 32) and torch.allclose(m.head(h), a)
+
+
+def test_core_mlp_hidden_widens_only_the_core_ffn():  # SQ401
+    assert "core_mlp_hidden" not in ModelConfig(**BASE).to_dict()
+    a, same = build(), build(core_mlp_hidden=64)        # equal to mlp_hidden: identical model and output
+    assert torch.equal(out(a), out(same))
+    m = build(core_mlp_hidden=128)
+    for b in m.core:
+        assert b.mlp.down.in_features == 128
+    for b in [*m.prelude, *m.coda]:
+        assert b.mlp.down.in_features == 64
+    assert m.param_counts()["core"] > a.param_counts()["core"]
+    assert m.flops_per_token(16) > a.flops_per_token(16)
+    assert ModelConfig(**BASE, core_mlp_hidden=128).to_dict()["core_mlp_hidden"] == 128
+
+
+def test_gdn_beta_fixed_is_constant_and_leaves_b_without_grad():  # SQ402 (CPU torch path of GatedDeltaNet)
+    kw = dict(prelude=["swa"], core=["gdn", "swa"], coda=["attn"])
+    assert "gdn_beta_fixed" not in ModelConfig(**{**BASE, **kw}).to_dict()
+    try:
+        build(**kw, gdn_beta_fixed=0.5, gdn_neg_eigval=True)
+        raise AssertionError("gdn_beta_fixed + gdn_neg_eigval must raise")
+    except ValueError:
+        pass
+    from gogeta.decode import _gdn_recurrence_torch
+
+    def ref_kernel(q, k, v, g, beta, scale=None, **_):  # torch reference recurrence (fla's kernel needs a GPU)
+        B, T, H, K = q.shape
+        S = torch.zeros(B, H, K, v.shape[-1])
+        o, *_rest = _gdn_recurrence_torch(q.float(), k.float(), v.float(), g.float(), beta.float(), scale, S, T)
+        return o.to(q.dtype), None
+
+    def with_ref(m):
+        for b in m.core:
+            if b.kind == "gdn":
+                b.mixer._kernel = ref_kernel
+        return m
+    a, f = with_ref(build(**kw)), with_ref(build(**kw, gdn_beta_fixed=0.5))
+    assert not torch.equal(out(a), out(f))
+    f.train()
+    x = torch.randint(0, 97, (2, 16))
+    _, loss = f(x[:, :-1], x[:, 1:], loops=2)
+    loss.backward()
+    gdn = [b.mixer for b in f.core if b.kind == "gdn"][0]
+    assert gdn.b.weight.grad is None or float(gdn.b.weight.grad.abs().sum()) == 0.0
+    assert gdn.q.weight.grad is not None and float(gdn.q.weight.grad.abs().sum()) > 0
+
+
+def test_core_lr_mult_param_groups():  # SQ404
+    from gogeta.train import param_groups
+    m = build()
+    tc = {"weight_decay": 0.1}
+    g1 = param_groups(m, tc)
+    assert len(g1) == 2 and all("lr_mult" not in g for g in g1)
+    g2 = param_groups(m, {**tc, "core_lr_mult": 2.0})
+    n_core = sum(p.numel() for n, p in m.named_parameters() if n.startswith("core."))
+    assert sum(p.numel() for g in g2 if g["lr_mult"] == 2.0 for p in g["params"]) == n_core
+    assert sum(p.numel() for g in g2 for p in g["params"]) == sum(p.numel() for p in m.parameters())

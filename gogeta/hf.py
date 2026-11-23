@@ -96,6 +96,8 @@ class GogetaConfig(PreTrainedConfig):
     ternary_mixer: bool = True
     ternary_ffn: bool = True
     moe_core_only: bool = False
+    core_mlp_hidden: int = 0
+    gdn_beta_fixed: float = 0.0
     tie_word_embeddings: bool = True
     # HF / generation fields (ids match gogeta/assets/tokenizer-code-py-v1.json)
     eos_token_id: int | None = 0

@@ -18,6 +18,33 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.31: GPU batch B1 registered: SQ401 (MoE core vs dense capacity), SQ402 (fixed GDN beta), SQ404 (core LR multiplier); three off-by-default switches added and tested
+*2026-11-23*
+
+**GPU batch B1 registered before dispatch (the human: "Yes, rent one"): SQ401 (is the MoE core's gain capacity?), SQ402 (does GDN's learned write strength matter?), SQ404 (is part of the loop cost step size?). It adds three switches, all off by default.**
+
+- **New switches** (defaults bit-identical; `to_dict()` omits them at their defaults, so existing config hashes are unchanged):
+  - `ModelConfig.core_mlp_hidden` (SQ401): the shared core's dense SwiGLU width, with prelude and coda keeping `mlp_hidden`. FLOPs follow from the actual parameter counts.
+  - `ModelConfig.gdn_beta_fixed` (SQ402): a constant GDN write strength instead of sigmoid(b(x)). It is mutually exclusive with `gdn_neg_eigval`, and the decode path honours it.
+  - `train.core_lr_mult` (SQ404): an LR multiplier for the shared core's parameters only, via `gogeta.train.param_groups`. The default returns the original two AdamW groups.
+  - Both new model fields are also added to the Hugging Face wrapper's config (`gogeta/hf.py`), so the v0.5.0-v0.5.23 break (C80) cannot repeat.
+- **Tests** (CPU): `tests/test_assembly.py` 16/16, including three new tests:
+  - core width: equal width gives identical output, only the core widens, params and FLOPs rise;
+  - fixed beta: it changes the output, `b` gets no gradient, the neg-eigval combination raises (torch reference recurrence);
+  - core LR groups: they cover every parameter, and the core gets the multiplier.
+
+  `tests/test_moe.py` 15/15, `tests/test_c2f.py` 17/17, `post_training/test_hf.py` 11/11. `tests/test_decode.py` is running and is reported in the next version.
+- **Registered** (PREDICTIONS.md, "GPU batch B1"), 20M tokens, exploratory screens, paired by seed on clean80:
+  - **SQ401** (seeds 0-2): A2s vs A3m vs A2s with a dense core FFN of 2048. Prediction: dense-2048 vs A3m -1% (-3% to +1%). If dense matches or beats the MoE, C206's step is capacity.
+  - **SQ402** (seeds 0-1): E1 with learned beta vs beta fixed at 1.0 and 0.5. Prediction: +1.5% and +1%. Within 0.5% means gating carries the mixer.
+  - **SQ404** (seeds 0-1): A2f with core LR x0.5 / x1 / x2 vs E24. Prediction: A2f vs E24 +2% at 20M, with the best multiplier (0.5) closing less than half of it. If more than half closes, the comparison is re-run at 200M.
+- **Configs:** `experiments/staged-configs/b1/` (5 new, sha256-16 in the registration). The batch is 23 runs on one rented RTX 5090, about 1-1.5 h and about $1.
+- **Quick reviews:**
+  - 15:44: path-class fixture audit (SQ61).
+  - 15:52: claim promotion gate (SQ274) and scorer invariance for ternary arms (SQ407).
+
+---
+
 ## v0.5.30: A2 headline holds at matched compute: A2s vs FLOP-matched E27 -16.18% [-16.87, -15.48] (A2 amendment 3, C209); assembly fleet torn down ($13.09)
 *2026-11-23*
 

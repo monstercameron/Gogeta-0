@@ -247,14 +247,18 @@ def _gdn_step(m: GatedDeltaNet, st: GDNState, x: torch.Tensor, n_log: int) -> to
     o = None
     if x.is_cuda and USE_FLA_ON_CUDA and not _FLA_FAILED:
         try:
-            b_arg = raw if m.neg_eigval else torch.sigmoid(raw)
+            b_arg = (torch.full_like(raw, m.beta_fixed) if getattr(m, "beta_fixed", 0.0)  # SQ402 constant beta
+                     else raw if m.neg_eigval else torch.sigmoid(raw))
             o, S, hist_new, S_pre = _gdn_recurrence_fla(q, k, v, g, b_arg, scale, st.S, keep_from, m.neg_eigval)
         except Exception as exc:  # noqa: BLE001  (fall back to the torch recurrence, remember why)
             _FLA_FAILED.append(f"{type(exc).__name__}: {exc}")
             o = None
     if o is None:
         dt = x.dtype   # training casts q/k/v/beta to x.dtype on CPU before the kernel
-        beta = (2.0 * torch.sigmoid(raw.to(dt).float())) if m.neg_eigval else torch.sigmoid(raw).to(dt).float()
+        if getattr(m, "beta_fixed", 0.0):   # SQ402: constant beta, as in GatedDeltaNet.forward
+            beta = torch.full_like(raw, m.beta_fixed).to(dt).float()
+        else:
+            beta = (2.0 * torch.sigmoid(raw.to(dt).float())) if m.neg_eigval else torch.sigmoid(raw).to(dt).float()
         o, S, hist_new, S_pre = _gdn_recurrence_torch(q.to(dt).float(), k.to(dt).float(), v.to(dt).float(), g, beta,
                                                       scale, st.S, keep_from)
     c_old = n_log - n_new_logged            # logged tokens carried over from earlier steps

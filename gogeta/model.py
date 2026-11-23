@@ -82,6 +82,8 @@ class ModelConfig:
     ternary_mixer: bool = True        # ternary=True: mixer projections (attention qkv/o, GDN q/k/v/gate/o) ternary (A3)
     ternary_ffn: bool = True          # ternary=True: FFN (SwiGLU or MoE experts) ternary (A3)
     moe_core_only: bool = False       # moe_experts > 0: MoE FFN only in the shared core; prelude/coda keep SwiGLU (A3)
+    core_mlp_hidden: int = 0          # > 0: the shared core's dense SwiGLU uses this hidden size; prelude/coda keep mlp_hidden (SQ401)
+    gdn_beta_fixed: float = 0.0       # > 0: GDN write strength beta is this constant instead of sigmoid(b(x)) (SQ402)
 
     @property
     def head_dim(self) -> int:
@@ -98,7 +100,8 @@ class ModelConfig:
 
 
 _ASSEMBLY_DEFAULTS = {"loop_embed": False, "inject_contractive": False, "ternary_acts": True, "ternary_fp_ends": False,
-                      "loop_adapter_rank": 0, "ternary_mixer": True, "ternary_ffn": True, "moe_core_only": False}
+                      "loop_adapter_rank": 0, "ternary_mixer": True, "ternary_ffn": True, "moe_core_only": False,
+                      "core_mlp_hidden": 0, "gdn_beta_fixed": 0.0}
 
 
 # ----------------------------------------------------------------------------- BitLinear
@@ -239,6 +242,9 @@ class GatedDeltaNet(nn.Module):
         # Negative eigenvalues (Grazzi et al.; verified locally by SQ6 arm (e)): beta = 2*sigmoid(b(x)) in (0, 2),
         # so (I - beta k k^T) can flip sign. fla only allows this with the sigmoid applied inside the kernel.
         self.neg_eigval = cfg.gdn_neg_eigval
+        self.beta_fixed = float(cfg.gdn_beta_fixed)
+        if self.beta_fixed and self.neg_eigval:
+            raise ValueError("gdn_beta_fixed and gdn_neg_eigval are mutually exclusive")
 
     def forward(self, x):
         B, T, _ = x.shape
@@ -253,7 +259,8 @@ class GatedDeltaNet(nn.Module):
             o, _ = self._kernel(q.to(dtype), k.to(dtype), v.to(dtype), g, raw.to(dtype), scale=hd ** -0.5,
                                 use_beta_sigmoid_in_kernel=True, allow_neg_eigval=True)
         else:
-            beta = torch.sigmoid(self.b(x).float())
+            beta = (torch.full((B, T, H), self.beta_fixed, device=x.device) if self.beta_fixed  # SQ402
+                    else torch.sigmoid(self.b(x).float()))
             o, _ = self._kernel(q.to(dtype), k.to(dtype), v.to(dtype), g, beta.to(dtype), scale=hd ** -0.5)
         o = self.out_norm(o.to(x.dtype)) * F.silu(self.gate(x).view(B, T, H, hd))
         return self.o(o.reshape(B, T, H * hd))
@@ -295,7 +302,8 @@ class FusionDance(nn.Module):
         if cfg.moe_experts and cfg.moe_core_only:
             ends_cfg = replace(ends_cfg, moe_experts=0)
         mk = lambda kinds, c: nn.ModuleList(Block(k, c, self.rope) for k in kinds)
-        self.prelude, self.core, self.coda = mk(cfg.prelude, ends_cfg), mk(cfg.core, cfg), mk(cfg.coda, ends_cfg)
+        core_cfg = replace(cfg, mlp_hidden=cfg.core_mlp_hidden) if cfg.core_mlp_hidden else cfg
+        self.prelude, self.core, self.coda = mk(cfg.prelude, ends_cfg), mk(cfg.core, core_cfg), mk(cfg.coda, ends_cfg)
         for i, b in enumerate([*self.prelude, *self.core, *self.coda]):
             if b.moe:
                 b.mlp.layer_idx = i

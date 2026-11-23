@@ -872,3 +872,46 @@ Prompted by outside review 2026-11-23 12:10 (`notes/reviews/2026-11-23-1210-revi
 - **Setup:** A2s 200M checkpoints, seeds 2-4 (trained at fixed r = 2), clean80 doc-level bpc scored at r = 1, 2 and 3 (eval only, the same scorer as `score_doclevel.py`; eval r recorded in the result JSON).
 - **Prediction:** r = 1 is at least 5% worse than r = 2 (range +3% to +25%), because the decode bench's teacher-forced argmax agreement of r = 1 with r = 2 is only 0.869. r = 3 is within +-2% of r = 2 (range -1% to +4%), since SQ341/SQ348 found loss best at the trained r.
 - **Reading:** a large r = 1 gap shows the second pass is used. It does not show the pass beats unshared depth, because a model trained at r = 2 and run at r = 1 is a distribution shift. SQ401 and A2f vs E24 cover the capacity question.
+
+## SQ400 registered out-of-corpus test of the "costs are memorisation" hypothesis, C213 (2026-11-23 ~15:20 EST, before running the new seeds; written by the side-quest worker at the main agent's request)
+- **Question:** SQ379 (seeds 2-4, package-clustered CI only) found the ternary cost (A2s vs A2f: +8-10% on the 300-doc clean80 subset) and the loop/fusion cost shrink or vanish out of corpus, while the assembly gain survives. Is that a property of the models (C213: the costs are mostly in-distribution capacity / memorisation) once seed variance is included?
+- **Arms (200M tokens, best LR; seeds where checkpoints exist):** A2s (2-7), A2f (2-7), E20 dense (2-7), E24 GDN (2, 4, 5, 6, 7; seed 3 is missing), E27 full fusion (2-4 only), A3mx (5-7, A3 references A2s/A2f/E20/E24 at the same seeds). The seeds 2-4 scores are re-used from SQ379 (same scorer, same docs); seeds 5-7 are new.
+- **Data:** (1) the SQ99 out-of-corpus set (330 local library files, K9-scanner overlap < 20%, sha256-verified), (2) the same files split into stdlib vs site-packages (a held-out-by-source slice; the locked `code-py-v1-test` set is NOT used), (3) the in-corpus clean80 300-doc subset of SQ339 for the same models, as the reference for the shrinkage ratio.
+- **Estimand:** per comparison, the effect = mean over paired seeds of 100 x (bpc_arm / bpc_base - 1) on aggregate bits/char, with TWO intervals: the t-interval over the per-seed paired effects (df = n - 1, includes seed variance) and the package-clustered bootstrap over documents (B = 2000, as SQ379). The paired-by-seed interval is the one used for the rules below.
+- **Predictions (effects on the SQ99 out-of-corpus set unless stated):**
+  - **P1 ternary cost, A2s vs A2f (seeds 2-7):** mean within +-1.5% and the paired-by-seed 95% CI includes 0 (SQ379: +0.22% at n = 3). In-corpus (clean80-300) it stays above +7%.
+  - **P2 assembly gain, A2s vs E27 (seeds 2-4):** between -9% and -13%; the paired-by-seed CI excludes -5% (SQ379: -11.3%).
+  - **P3 parity with dense, A2f vs E20 (seeds 2-7):** between +0.5% and +3% (SQ379: +1.65%): out of corpus A2f is NOT better than dense, unlike on clean80 (about -1%).
+  - **P4 fusion cost, E27 vs E20 (seeds 2-4):** the out-of-corpus effect is 0.4-0.65 of the clean80-300 effect (SQ379: +14.8% vs +28.7%, ratio 0.52).
+  - **P5 MoE, A3mx vs E20 (seeds 5-7):** the out-of-corpus effect is smaller in magnitude than the clean80-300 effect, with the same sign (if A3mx is worse than dense in corpus it is less worse out of corpus; if better, less better).
+  - **P6 slices:** the ternary-cost estimate (P1) has the same sign on the stdlib slice and the site-packages slice, and neither slice's paired-by-seed CI excludes 0 above +3%.
+- **Rule for C213:** SUPPORTED (as an evidence event, not VERIFIED) if P1 holds (CI includes 0, |mean| < 1.5%) AND P4 holds (ratio < 0.65) AND P3 holds. WEAKENED if P1's paired-by-seed CI excludes 0 with a mean of +2% to +5% (the cost shrinks but does not vanish). REFUTED if P1's mean is above +5% with the CI above 0 (the cost is the same out of corpus). Report the table whether or not the rule fires; the CIs do not cover doc-sampling and seed variance jointly, and n differs by comparison.
+- **Falsifiers by prediction:** P2 fails if the A2s-vs-E27 gap is above -5% (assembly gain not out of corpus); P3 fails if A2f is below -1% vs dense out of corpus (parity holds there too).
+  - **P7 loop cost, A2f vs E24 (seeds 2, 4, 5, 6, 7):** the out-of-corpus paired-by-seed CI includes 0 or favours the looped A2f (SQ379: -0.41% at n = 2; clean80-300: +2.5% to +3.3%).
+- **Decision rule (main agent's triage of quick review 15:10, verbatim):** C213 changes design priorities only if, with a paired-by-seed 95% CI over at least 3 seeds per arm, BOTH hold: (1) the out-of-corpus ternary cost (A2s vs A2f) has its CI upper bound below +3% while its clean80 cost stays above +5%; (2) the out-of-corpus loop cost (A2f vs E24) has a CI that includes 0 or favours loops. Otherwise C213 stays a hypothesis.
+
+## GPU batch B1 (2026-11-23 ~16:00 EST, before dispatch; human: "Yes, rent one"): SQ401, SQ402, SQ404 at 20M tokens
+All runs use code-py-v2, 20M tokens and one rented RTX 5090. They are exploratory 20M screens (statistics-policy section 4), not confirmatory. Each comparison is paired by seed (shared data order, `gogeta/train.py:61-65`) on clean80 doc-level bpc, log scale, df = n - 1. Configs are in `experiments/staged-configs/b1/` (sha256-16 in brackets); code is v0.5.31 (`core_mlp_hidden`, `gdn_beta_fixed`, `train.core_lr_mult`, all off by default and bit-identical).
+
+### SQ401: is the MoE core's gain capacity or routing? (C206)
+- **Arms, seeds 0-2, lr 6e-3:** A2s (`a2/a2s.json`, dense core FFN 1024); A3m (`a3/a3m.json`, ternary MoE core 4 x 512 top-2); **A2s-core2048** [11ad9cba0f7e6fb4] (dense core FFN 2048, the MoE bank's total width; about 2x the core FFN FLOPs). Params and FLOPs are reported per arm.
+- **Predictions:**
+  - A3m vs A2s = -3% (range -5% to -1%), the C206 direction at 20M;
+  - A2s-core2048 vs A3m = -1% (range -3% to +1%), following C203 on the E1 stack.
+- **Rule:**
+  - If A2s-core2048 is at or below A3m (paired mean <= 0), C206 gains the limitation "at 20M the MoE step is matched or beaten by a dense FFN of the same total width (more FLOPs)", and the MoE's case rests on active FLOPs.
+  - If A2s-core2048 is worse than A3m by more than 1%, routing adds something beyond capacity.
+
+### SQ402: does the delta rule's learned write strength matter? (GDN mixer)
+- **Arms, seeds 0-1, lr 6e-3:** E1 on v2 (`e53_e1_v2.json`, learned beta = sigmoid(b(x))); **beta fixed at 1.0** [50f7fd633718a8d6]; **beta fixed at 0.5** [bc2dac73445f9c49].
+- **Predictions:** fixed 1.0 vs learned = +1.5% (range 0% to +4%); fixed 0.5 vs learned = +1% (range -0.5% to +3%).
+- **Rule:** if both fixed arms lie within 0.5% of learned beta, the mixer's gain is attributed to gating and decay rather than the learned delta-rule write strength (exploratory, 2 seeds), and C18/C43's state-tracking motivation gets that caveat.
+
+### SQ404: is part of the loop cost step size? (sharing confound, D3)
+- **Arms, seeds 0-1:** A2f (`a2/a2f.json`, lr 6e-3) with core_lr_mult 0.5 [d0458a387e118e8a], 1 (the base config) and 2 [40944c715bf98d50]; and the unshared GDN hybrid E24 (`e24_fact100.json`, its tuned lr 3e-3).
+- **Predictions:**
+  - A2f (mult 1) vs E24 at 20M = +2% (range 0% to +5%).
+  - The best multiplier closes less than half of that gap. Predicted best: 0.5, with the gap shrinking to +1.5% (range 0% to +4%).
+- **Rule:**
+  - If the best multiplier closes more than half of the 20M gap, the A2f vs E24 comparison (C209 limitation, D3) is re-run at 200M at that multiplier before any loop-cost conclusion.
+  - If the best multiplier is 1, or it closes less than half the gap, the loop cost is not a step-size artifact at 20M.

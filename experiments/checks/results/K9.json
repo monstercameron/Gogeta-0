@@ -7152,13 +7152,13 @@
       "change_without_near80_pct": 25.844082996186103,
       "band50_skipped": "1159 docs in the 50-80% band (> 1000), not scored"
     },
-    "peak_rss_gb": 2.69,
+    "peak_rss_gb": 2.75,
     "notes": "overlap = fraction of a doc's 13-grams (content tokens, no EOS inside) occurring in the reference = train minus the 4,000 held-out pseudo-val docs; boilerplate = 1,000 query 13-grams with the highest reference count; near-dup fractions are over docs with >= 1 13-gram."
   },
-  "ran_at": "2026-11-22T18:21:38",
-  "runtime_s": 200.5,
-  "git_commit": "60f4dcd84303853911b619ba10d87f867de6848d",
-  "git_describe": "v0.4.31-1-gb64199d-dirty",
+  "ran_at": "2026-11-23T08:27:32",
+  "runtime_s": 58.0,
+  "git_commit": "d10f5a24f6a376959f7c9ed37c6dcb5bb0f7bf57",
+  "git_describe": "",
   "torch": "2.14.1+cu130",
   "device": "cpu"
 }

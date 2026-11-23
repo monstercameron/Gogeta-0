@@ -18,6 +18,42 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.103: SQ263: at 200M the fusion ingredients compound (I = +6.2%, anti-synergy); C201 REFUTED, C202; K9 reproduced exactly; fleet killed
+*2026-11-23*
+
+**SQ263, the registered 200M gate on the five F2 cells**, is analysed (24 runs on code-py-v2, 3 seeds per arm; cell, LR and tokens read from run `meta.json`; `experiments/checks/sq263.py`).
+
+| Cell | 200M clean80, vs dense at each cell's best LR |
+|---|---|
+| 100 GDN | **−4.0%** |
+| 010 loops | +10.6% |
+| 001 ternary | +15.8% |
+| 111 full fusion | **+30.8%** |
+
+- **Interaction:** I = **+6.21%**, seed-blocked 95% CI [+4.20%, +8.22%], df 8 (Welch: +6.21%, [+4.44%, +7.97%]). **Anti-synergy:** at the registered horizon, the ingredients' penalties compound.
+- **H2' FAIL:** the 20M-selected 6e-3 still beats 2e-3 at 200M in all three six-e-3 cells (2e-3 is worse by +0.93%, +0.20% and +0.64%). The reversal is not an LR-transfer artifact.
+- **C201 is REFUTED** by its own registered refutation criterion. Its 20M synergy (−3.5%) is real at 20M only; the interaction's sign depends on the horizon.
+- **New claim C202:** anti-synergy at 200M. It is PARTIAL, because H3' was registered as descriptive and there are 3 seeds per cell.
+- **What this means for the thesis:** the full fusion is the worst cell at 200M. GDN alone remains the only ingredient that helps. The README and the F2 devlog are updated.
+- **Analysis timing:** this was analysed in the session after the human's "kill the fleet"; the data had been collected before.
+
+**K9 reproduced exactly** (quick review 08:24): a re-run at clean commit `d10f5a2` (CPU, 58 s) gives identical values for every measured field, including 1,667/4,000 near-duplicates and all per-doc overlaps. `K9.json` now records the clean commit, and C191's provenance limitation is superseded.
+
+**Queue reconciled:** E9, Q10, Q11 and Q12 are marked done (all ran in Phase 2b on the N1X or the 5090). The rendered next picks are now SQ50 (GPU) and SQ61 (CPU).
+
+**Fleet killed** (the human: "kill the fleet"):
+- The last three boxes (w4-3, w4-4, w4-6) were pulled and destroyed at 08:24 EST. All E60 runs were saved: 18 at 200M plus the 9-run LR grid.
+- **Disclosure:**
+  - the boxes sat idle for about 5 h after finishing (03:15–03:22). The pull-and-destroy watcher ran inside the agent session and stopped when the session was interrupted. Cost: about $8.5.
+  - **Total compute spend is $30.13**, against the approved $30 (credit $69.82).
+  - Lesson saved to agent memory: destroy each box as its last job is pulled, and check instances at the start of every session.
+
+**Quick reviews 08:24 (reproducibility) and 08:29 (competitor lab):**
+- SQ274 gains a commit-provenance check.
+- SQ335: the per-document spread of the F2 interaction.
+
+---
+
 ## v0.4.102: Outside review 03:08: GDN memory horizon, init-vs-data seed split, dynamic eval (SQ330-SQ334); SQ222 promoted; README first-run path
 *2026-11-23*
 

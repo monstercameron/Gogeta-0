@@ -18,6 +18,28 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.34: Docs refresh (hourly); B1 amendment 2: Holm family for B1's gating contrasts, registered before any B1 result
+*2026-11-23*
+
+**Docs refresh (hourly). B1 amendment 2 (the Holm family for B1's gating contrasts) registered before any B1 result.**
+
+- **B1 amendment 2** (PREDICTIONS.md; quick review 16:14), committed while B1 is still training and before any result is read:
+  - The gating contrasts form one Holm family, alpha 0.05: G1 SQ401 dense-2048 vs A3m, G2 SQ404 best core multiplier vs 1 (gap closure against E24), and G3 SQ350 A2f(6x2) vs A2f(6x1).
+  - Everything else is an exploratory readout, reported unadjusted.
+  - No B1 contrast can promote a claim: 20M screens with 2-3 seeds can only open a follow-up or add a limitation.
+- **Docs** (Haiku; diff checked by the main agent; statuses match the ledger; no B1 result stated):
+  - README status: the compute-matched A2 headline (-16.2% [-16.9, -15.5], v0.5.30), spend $43.27, B1 running, C213's confound; a new results bullet for C212 (PARTIAL, fresh seed -3.1%).
+  - The sketch's status and decisions log go to v0.5.33.
+  - The campaigns README gains a B1 row. SETUP.md is unchanged because it is current.
+- **Quick reviews:**
+  - 16:14: the Holm family above.
+  - 16:19: micro-batch invariance is already tested (`tests/test_options.py`).
+  - 16:24: run order and clocks cannot move loss; the SQ232 same-seed replay floor (0.2-0.3%) is the noise floor for B1.
+  - 16:29: parseability census, SQ225.
+- **B1 progress:** 8 of 23 runs done by 16:25, all exit code 0, about 2 min each.
+
+---
+
 ## v0.5.33: Outside review 16:07: SQ350 parameter-matched loop control added to the running B1 batch (amendment 1); SQ408, SQ409; C212 selection-seed limitation; B1 box training
 *2026-11-23*
 

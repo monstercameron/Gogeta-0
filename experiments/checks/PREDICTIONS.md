@@ -926,3 +926,11 @@ All runs use code-py-v2, 20M tokens and one rented RTX 5090. They are explorator
 - **Rule** (exploratory, 2 seeds):
   - If the loop effect at equal params is at least 3x the size of A2f's remaining gap to E24, loops are a real compute lever and the D3 cost is mainly a unique-parameter cost (C197). C197's wording then gains "at matched FLOPs, not matched params".
   - If the loop effect is under 1%, the second pass does little even at equal params.
+
+### B1 amendment 2 (2026-11-23 ~16:20 EST, before any B1 result; quick review 16:14): multiplicity for the B1 readout
+- **Gating contrasts** (each triggers a follow-up or a ledger change) form one Holm family, alpha 0.05. They are reported Holm-adjusted next to the unadjusted estimates:
+  - G1, SQ401: A2s-core2048 vs A3m (a C206 limitation);
+  - G2, SQ404: best core multiplier vs mult 1, as gap closure against E24 (a 200M re-run);
+  - G3, SQ350: A2f(6x2) vs A2f(6x1) (C197 wording).
+- **Exploratory readouts**, reported unadjusted and labelled exploratory: SQ401's A3m vs A2s, SQ402's fixed vs learned beta, SQ404's A2f vs E24 gap itself, and every throughput number.
+- With 2-3 seeds (df 1-2), every B1 contrast stays at screening strength whatever its p-value. A gate opens only a follow-up run or a limitation, never a VERIFIED status.

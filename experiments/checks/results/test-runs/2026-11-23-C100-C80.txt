@@ -1,0 +1,88 @@
+== tests.test_options tests.test_moe (venv gogeta) 2026-11-23T02:21:26-05:00 commit 5e72d80 + uncommitted MoE patch
+  _cpu_device_warning()
+/root/.venvs/gogeta/lib/python3.12/site-packages/fla/ops/nsa/naive.py:19: ImportWarning: Flash Attention is not installed. Please install it via `pip install flash-attn --no-build-isolation`
+  warnings.warn(
+/root/.venvs/gogeta/lib/python3.12/site-packages/fla/ops/nsa/parallel.py:25: ImportWarning: Flash Attention is not installed. Please install it via `pip install flash-attn --no-build-isolation`
+  warnings.warn(
+/root/.venvs/gogeta/lib/python3.12/site-packages/fla/layers/attn.py:28: ImportWarning: Flash Attention is not installed. Please install it via `pip install flash-attn --no-build-isolation`
+  warnings.warn(
+/root/.venvs/gogeta/lib/python3.12/site-packages/fla/layers/bitattn.py:29: ImportWarning: Flash Attention is not installed. Please install it via `pip install flash-attn --no-build-isolation`
+  warnings.warn(
+/root/.venvs/gogeta/lib/python3.12/site-packages/fla/ops/deltaformer/parallel.py:20: ImportWarning: Flash Attention is not installed. Please install it via `pip install flash-attn --no-build-isolation`
+  warnings.warn(
+/root/.venvs/gogeta/lib/python3.12/site-packages/fla/layers/mla.py:35: ImportWarning: Flash Attention is not installed. Please install it via `pip install flash-attn --no-build-isolation`
+  warnings.warn(
+/root/.venvs/gogeta/lib/python3.12/site-packages/fla/layers/rodimus.py:41: ImportWarning: Flash Attention is not installed. Please install it via `pip install flash-attn --no-build-isolation`
+  warnings.warn(
+ok
+test_dense_forward_signature_unchanged (tests.test_moe.TestDefaultsBitIdentical.test_dense_forward_signature_unchanged) ... ok
+test_dense_to_dict_has_no_moe_keys (tests.test_moe.TestDefaultsBitIdentical.test_dense_to_dict_has_no_moe_keys) ... ok
+test_explicit_dense_moe_fields_match_prechange (tests.test_moe.TestDefaultsBitIdentical.test_explicit_dense_moe_fields_match_prechange) ... ok
+test_training_losses_match_prechange (tests.test_moe.TestDefaultsBitIdentical.test_training_losses_match_prechange) ... /mnt/c/Users/mreca/Desktop/Gogeta-0/gogeta/train.py:197: UserWarning: CUDA is not available or torch_xla is imported. Disabling autocast.
+  with torch.autocast("cuda", dtype=torch.bfloat16):
+ok
+test_configs_derive_from_e1 (tests.test_moe.TestE60Accounting.test_configs_derive_from_e1) ... ok
+test_design_table (tests.test_moe.TestE60Accounting.test_design_table) ... ok
+test_aux_loss_is_added_and_logged (tests.test_moe.TestMoE.test_aux_loss_is_added_and_logged) ... /mnt/c/Users/mreca/Desktop/Gogeta-0/gogeta/train.py:218: UserWarning: CUDA is not available or torch_xla is imported. Disabling autocast.
+  with torch.autocast("cuda", dtype=torch.bfloat16):
+ok
+test_balance_and_z_loss_normalisation (tests.test_moe.TestMoE.test_balance_and_z_loss_normalisation) ... ok
+test_causality (tests.test_moe.TestMoE.test_causality)
+Perturbing tokens t+1..T-1 leaves logits at positions <= t unchanged (MoE on, dropless token routing). ... ok
+test_frozen_router (tests.test_moe.TestMoE.test_frozen_router) ... ok
+test_gather_equals_dense_impl (tests.test_moe.TestMoE.test_gather_equals_dense_impl) ... ok
+test_init_and_guards (tests.test_moe.TestMoE.test_init_and_guards) ... ok
+test_looped_aux_uses_grad_calls_only (tests.test_moe.TestMoE.test_looped_aux_uses_grad_calls_only) ... ok
+test_moe_layer_matches_manual_topk_mixture (tests.test_moe.TestMoE.test_moe_layer_matches_manual_topk_mixture) ... ok
+
+----------------------------------------------------------------------
+Ran 28 tests in 9.193s
+
+OK (skipped=1)
+== post_training.test_hf (venv gogeta-rl) 2026-11-23T02:21:38-05:00 commit 5e72d80 + uncommitted MoE patch
+test_config_roundtrip (post_training.test_hf.TestWrapper.test_config_roundtrip) ... ok
+test_export_checkpoint_roundtrip (post_training.test_hf.TestWrapper.test_export_checkpoint_roundtrip) ... ok
+test_generate_greedy_matches_manual_loop (post_training.test_hf.TestWrapper.test_generate_greedy_matches_manual_loop) ... ok
+test_left_padding_is_exact (post_training.test_hf.TestWrapper.test_left_padding_is_exact) ... ok
+test_logits_match_fusiondance (post_training.test_hf.TestWrapper.test_logits_match_fusiondance) ... ok
+test_loss_matches_shifted_fusiondance (post_training.test_hf.TestWrapper.test_loss_matches_shifted_fusiondance) ... ok
+test_mask_with_hole_rejected (post_training.test_hf.TestWrapper.test_mask_with_hole_rejected) ... ok
+test_save_pretrained_roundtrip (post_training.test_hf.TestWrapper.test_save_pretrained_roundtrip) ... Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 298.06it/s]
+Loading weights:   0%|          | 0/29 [00:00<?, ?it/s]Loading weights: 100%|██████████| 29/29 [00:00<00:00, 8492.87it/s]
+ok
+test_tokenizer (post_training.test_hf.TestWrapper.test_tokenizer) ... ok
+test_trl_fused_lm_head_logprobs (post_training.test_hf.TestWrapper.test_trl_fused_lm_head_logprobs)
+TRL's GRPO/DPO compute log-probs through add_fused_lm_head (base_model + output ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.744s
+
+OK
+== evals.test_wiring (venv gogeta-eval) 2026-11-23T02:21:42-05:00 commit 5e72d80 + uncommitted MoE patch
+`pretrained` model kwarg is not of type `str`. Many other model arguments may be ignored. Please do not launch via accelerate or use `parallelize=True` if passing an existing model this way.
+Passed an already-initialized model through `pretrained`, assuming single-process call to evaluate() or custom distributed integration
+test_loglikelihood_pair (evals.test_wiring.TestHarnessNumbers.test_loglikelihood_pair) ... Tokenizing inputs:   0%|          | 0/1 [00:00<?, ?it/s]Tokenizing inputs: 100%|██████████| 1/1 [00:00<00:00, 287.10it/s]
+Running loglikelihood requests:   0%|          | 0/1 [00:00<?, ?it/s]Running loglikelihood requests: 100%|██████████| 1/1 [00:00<00:00, 72.95it/s]
+ok
+test_rolling_long_doc_two_windows (evals.test_wiring.TestHarnessNumbers.test_rolling_long_doc_two_windows) ... [transformers] Token indices sequence length is longer than the specified maximum sequence length for this model (3112 > 1024). Running this sequence through the model will result in indexing errors
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00, 400.30it/s]
+Running loglikelihood requests:   0%|          | 0/4 [00:00<?, ?it/s]Running loglikelihood requests:  25%|██▌       | 1/4 [00:00<00:00,  4.11it/s]Running loglikelihood requests: 100%|██████████| 4/4 [00:00<00:00, 14.74it/s]
+ok
+test_rolling_short_doc (evals.test_wiring.TestHarnessNumbers.test_rolling_short_doc) ...   0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00, 7281.78it/s]
+Running loglikelihood requests:   0%|          | 0/1 [00:00<?, ?it/s]Running loglikelihood requests: 100%|██████████| 1/1 [00:00<00:00, 225.25it/s]
+ok
+test_builtin_tasks_refused (evals.test_wiring.TestPieces.test_builtin_tasks_refused) ... usage: python -m unittest [-h]
+                          (--checkpoint CHECKPOINT | --random-init RANDOM_INIT)
+                          [--tier TIER] [--tasks TASKS] [--limit LIMIT]
+                          [--device {cpu,cuda}] [--batch-size BATCH_SIZE]
+                          [--threads THREADS] [--loops LOOPS] [--seed SEED]
+                          [--no-exec] [--name NAME] [--log-samples]
+python -m unittest: error: only evals/tasks gogeta_* tasks are allowed (lm-eval built-ins may exec code in-process): ['humaneval']
+ok
+test_pass_at_k (evals.test_wiring.TestPieces.test_pass_at_k) ... ok
+test_sandbox_self_test (evals.test_wiring.TestPieces.test_sandbox_self_test) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 3.049s
+
+OK

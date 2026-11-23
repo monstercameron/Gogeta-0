@@ -18,6 +18,38 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.95: Claim audit 2026-11-23-0209: 48 claims, 17 non-SOLID; C200, C1, C131 downgraded to PARTIAL; C5 qualifier
+*2026-11-23*
+
+**Claim audit 2026-11-23-0209:** 8 Codex GPT-6 Luna auditors reviewed 48 due claims (79 are in cool-down). All 8 batches ran.
+- **Verdicts:** 31 SOLID, 10 WEAK, 7 NEEDS-EVIDENCE.
+- **Every non-SOLID verdict was checked by the main agent** against the ledger, the evidence files and `notes/statistics-policy.md`.
+
+**Downgrades (confirmed):**
+- **C200** (dedup is worth 1.6%): VERIFIED → **PARTIAL**. All arms ran at one LR (tuned on v1), with no LR robustness shown (policy §2(3)). This is the same rule applied to C199 in v0.4.89.
+- **C1** (the GDN kernel matches the reference on the N1X): VERIFIED → **PARTIAL**. The N1X numbers exist only as a notebook transcription; the machine-readable rerun is on an RTX 5090.
+- **C131** ("any random split leaks"): VERIFIED → **PARTIAL**. SQ225 shows overlap varies by source (52.3% vs 22.9%), so the universal is an inference.
+
+**Qualifier corrections:**
+- **C7:** [exploratory n=1] added.
+- **C6:** the stale "E9 pending" note is replaced; E9 and the clean80 re-score exist, still one run each.
+- **C5 (partly accepted):** it stays **REFUTED by its registered rule** ("REFUTED if mean(E1) ≥ mean(E10)"), because changing a registered rule after the fact would be a forking path. Its qualifier now states that both CIs include 0 (N1X n = 3, 5090 n = 7): no difference detected, not "E1 is worse".
+
+**Limitations added:**
+- C104: the primary paper text is not archived.
+- C109: an unarchived upstream read.
+- C18: n = 2, no CI.
+- C128: the sm_120a clause is narrowed.
+- C83: fork-bomb resistance is unverified (now in SQ61).
+- C129: SQ71 does not test it.
+- C91: the stale "replay pending" note is replaced by the observed 101-step replay.
+
+**Evidence gaps closed:** C80 and C100 cited pass counts only in prose. Their test suites were re-run and saved to `experiments/checks/results/test-runs/2026-11-23-C100-C80.txt`: `post_training.test_hf` 10/10 and `evals.test_wiring` 6/6.
+
+**Agreed, no change:** C28 stays UNVERIFIED.
+
+---
+
 ## v0.4.94: C197 VERIFIED (4 seeds); the lever is unique params, not depth (SQ282); dedup alone is worth 1.6% (SQ238, C200 VERIFIED)
 *2026-11-23*
 

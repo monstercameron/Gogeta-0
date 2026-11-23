@@ -18,6 +18,29 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.99: Outside review 02:37: init-matched F2 check (SQ326), context-truncation intervention (SQ327); data-order pairing confirmed by code read
+*2026-11-23*
+
+**Outside review 02:37 (Haiku), triaged:**
+- **SQ326, init-matched factorial sensitivity:** accepted. The gogeta init costs 6-block attention about 3.5% (SQ200) but helps the 14-block hybrid about 7% (SQ308). F2's cells use the default gogeta init, so its main effects may be init-dependent. To be registered before running.
+- **SQ327:** causal context truncation at eval (1024 → 512 → 256 visible tokens) on the 7+7 checkpoints. It is an intervention test of GDN state beyond the SWA window.
+- **SQ328:** LR-column robustness of the F2 interaction, descriptive (n = 1 per column).
+- **SQ329:** an eval-time re-injection gain sweep on E2, testing the over-looping failure (C7).
+- **Merges:** the continuous overlap regression goes into SQ323, and SQ321 is a duplicate of SQ215.
+- **Rejected, the data-order pairing doubt:** `TokenData` draws batches from its own generator seeded only by the train seed (`gogeta/train.py:61`). Same-seed arms therefore see identical batches, and the paired CIs are paired.
+
+**Quick review 02:35 (code-model practitioner):**
+- SQ325: an import-context ablation on source-disjoint files.
+- Q14 (the standard code benchmarks) stays human-gated, because it needs dataset downloads and eval installs (AGENTS §0a).
+
+**E60 first GPU runs:** the LR grid is running on w4-6.
+- E60a's in-training val loss at 20M: 0.991 / **0.979** / 1.013 at lr 3e-3 / 6e-3 / 1.2e-2.
+- E60b: 0.994 / **0.980** / 1.033.
+- The registered choice uses clean80 after scoring.
+- MoE runs cost about 0.55 min per 20M run in steady state (the first run, 0.81 min, included compile).
+
+---
+
 ## v0.4.98: Docs refresh (hourly); F2 audits: inputs reconciled, estimator validated, seed-robust, wall-clock caveat (C201)
 *2026-11-23*
 

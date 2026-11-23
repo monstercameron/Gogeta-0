@@ -530,3 +530,16 @@ This executes only stages registered in v0.4.40 (`experiments/design/power-cost.
   - Rented RTX 5090s only. Estimated about 4 GPU-h, about $2.5.
 - **Analysis (unchanged, as registered):** `experiments/design/factorial_analysis.py` on clean80 bpc (log scale): the interaction I, its 95% CI and power, plus the registered prediction **I = +0.5% ± 1.5%; P(I ≤ −1%) = 10%; P(|I| < 1%) = 55%; P(I ≥ +1%) = 35%; full fusion the worst of the cells**.
 - **Disclosure:** the sample size changed after the pilot's variance was seen, as the design intended. No pilot *means* enter the sizing.
+
+## Registered SQ188 byte LR sweep + SQ189 probe (2026-11-22 ~23:15, committed before any byte run; drafted by the Byte Quest prep subagent, reviewed by the main agent)
+- **Question:** does the K7 value lr 6e-3 (tuned for BPE E1; the byte configs' default) transfer to byte-level patched models, or does a neighbour beat it? Needed before the E13 sweep so the arms are not confounded by an untuned LR.
+- **Design:** `e13b_p4_r1_20m.json` (sha256[:16] `3d247fd4104acbb1`, v0.4.69 binding), lr in {3e-3, 6e-3, 1.2e-2} via `--lr`, seed 0, 20M bytes (153 steps of B=32 x T=4,096, warmup 8), `--compile`, one RTX 5090 box (never pooled with N1X runs). Jobs `SQ188_e13b_lr*` in `experiments/byte_model/wave4_jobs.txt`.
+- **Metric:** final full-val `val_loss` of the run (bits/byte = loss / ln 2; same text for all three arms, so raw loss is comparable). Tuning only: no claim, no ledger status change, status exploratory (n = 1 seed, 20M bytes).
+- **Predictions:**
+  - **L1:** the loss minimum is at 6e-3 or 1.2e-2, not 3e-3 (the byte configs inherit K7's E1 value; a 256-way head and 4-byte patches give a noisier, lower-entropy target that should tolerate at least that LR).
+  - **L2:** the 3e-3 / 6e-3 gap is at most 2% of the loss; 1.2e-2 is within 3% of the best (a flat basin, as in K7). No arm diverges (non-finite loss or loss above the lr 3e-3 arm by > 10%).
+- **Decision rule (before any result):** the E13 sweep and the 200M runs use the lr with the lowest val_loss, except that if 6e-3 is within 0.5% of the best, keep 6e-3 (the configs' registered default, no change). If the best lr is 1.2e-2 or 3e-3 by more than 0.5%, use it for all E13 arms (`--lr`), recorded in each run config. If the best arm sits at the grid edge (3e-3 or 1.2e-2) by more than 2%, add one extension point (1.8e-2 or 1.5e-3) before E13; no other re-tuning for E13 to E16.
+- **Caveat:** single seed and 153 steps; the optimum at 200M bytes (1,526 steps) may be lower, so this is a transfer check, not a tuned optimum (K7 used 20M tokens, same horizon caveat).
+
+- **SQ189 (memory/throughput probe):** 50-step `--bench` runs of e13b, e14b, e14c, e15b and e13a on one RTX 5090. It is informational: it replaces the flops-table time estimates and its peak memory gates E13a. No prediction is scored.
+- **SQ221 (byte-dataset determinism):** `cockpit/remote/fetch_bytes.sh` rebuilds `code-py-v1-bytes` on the box and must print `BYTES OK` against the committed `dataset-bytes.manifest.json`. A mismatch blocks every byte run.

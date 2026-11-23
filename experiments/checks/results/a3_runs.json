@@ -3,6 +3,23 @@
  "source": "pulled fleet run summary.json + doclevel clean80",
  "runs": [
   {
+   "run": "A2s-20261123-192853-s5",
+   "arm": "A2s",
+   "seed": 5,
+   "lr": 0.012,
+   "tokens": 200015872.0,
+   "clean80": 0.2836742872320863,
+   "val_loss": 1.1261311362771427,
+   "tokens_per_s": 347372.0689182712,
+   "wall_min": 9.596620353062947,
+   "flops": 3.785384544278938e+16,
+   "params_non_embedding": 15085360,
+   "params_total": 18231088,
+   "git": "4c716bdce13d70575a14d9e3b8ca1f440fb05e3a",
+   "git_describe": "v0.5.16",
+   "dataset": "code-py-v2"
+  },
+  {
    "run": "A3mx-20261123-180722-s5",
    "arm": "A3mx",
    "seed": 5,
@@ -34,6 +51,23 @@
    "params_total": 25318192,
    "git": "767455da9fcd3d3b21ddbea9f0f47f993a26fd84",
    "git_describe": "v0.5.10",
+   "dataset": "code-py-v2"
+  },
+  {
+   "run": "A3mx-20261123-193847-s5",
+   "arm": "A3mx",
+   "seed": 5,
+   "lr": 0.012,
+   "tokens": 200015872.0,
+   "clean80": 0.25792827177651334,
+   "val_loss": 1.0520111504723044,
+   "tokens_per_s": 299288.0027641394,
+   "wall_min": 11.138427988688152,
+   "flops": 3.78759655981056e+16,
+   "params_non_embedding": 22172464,
+   "params_total": 25318192,
+   "git": "4c716bdce13d70575a14d9e3b8ca1f440fb05e3a",
+   "git_describe": "v0.5.16",
    "dataset": "code-py-v2"
   },
   {

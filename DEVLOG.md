@@ -18,6 +18,24 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.23: A3 LR bracket passes (A2s and A3mx robust at 6e-3): C206-C208 back to VERIFIED; sandbox /proc gap confirmed and filed (SQ61)
+*2026-11-23*
+
+**A3 LR bracket passes: C206-C208 return to VERIFIED. The sandbox's /proc gap is confirmed and filed.**
+
+- **A3 amendment 1, final** (registered v0.5.18; seed 5, 200M tokens, clean80; `experiments/checks/results/a3_assembled.json`, key `A3_amendment1_lr_bracket`):
+
+  | Arm | 3e-3 | 6e-3 | 1.2e-2 | Best | 6e-3 vs best |
+  |---|---|---|---|---|---|
+  | A2s | 0.27291 | 0.27449 | 0.28367 | 3e-3 | +0.58% |
+  | A3mx | 0.25333 | **0.25176** | 0.25793 | 6e-3 | 0 |
+
+  Both arms are LR-robust at 6e-3 by the registered rule (within 1% of the best), so **C206 (ternary MoE core -3.3%), C207 (ternary cost splits evenly) and C208 (all-parts model's standing) return to VERIFIED**. A3mx is at its best LR, so its +4.35% gap to the tuned E24 is not an LR artifact. A limitation is added: A2s's 3e-3 is 0.58% better, so effects against A2s may be overstated by up to about 0.6 points, and no decision changes.
+- **Still running on the last box:** A3 amendment 2 (A2f at 3e-3 / 1.2e-2), then A2 amendment 3 (E27 at 221.6M tokens, seeds 2-4).
+- **Quick review 14:47 (safety/sandbox):** its `/proc` question was checked directly. Under the sandbox's `unshare -rnm`, a child sees all 32 host processes and can read every cmdline (no PID namespace). Filed as an SQ61 extension: `unshare -rnmpf --mount-proc` plus a fail-closed probe, with env/fd sentinel tests. C106's "not a security boundary" limitation stands. No model-generated code has been executed at scale, and Q14 stays human-blocked.
+
+---
+
 ## v0.5.22: Outside review 14:41: compute-matched E27 for the A2 headline and an A2f LR bracket registered and queued; expenses reconciled ($42.75 total); erratum: A2 headline not at matched FLOPs
 *2026-11-23*
 

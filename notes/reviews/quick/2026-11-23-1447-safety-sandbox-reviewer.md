@@ -1,0 +1,12 @@
+# Quick review 2026-11-23-1447 - safety/sandbox reviewer (Codex GPT-6 Luna high)
+
+- **Observation:** C106 is marked VERIFIED, but its limitation says the eval sandbox is not a security boundary because world-readable files remain accessible. Keep that scope explicit anywhere the sandbox is described. (`experiments/claims-status.md`, C106; `evals/sandbox.py`)
+- **Observation:** The sandbox self-test checks that `/proc` is visible, but the listed probes do not establish what process or host metadata an evaluated program can read through it. (`evals/sandbox.py`)
+- **Observation:** The queue has no pickable GPU item while E8 runs, and Q14 requires human input; that eval is intended to use the sandbox. Make sure its human-blocked status does not lead to treating sandboxed evaluation as already completed. (`experiments/QUEUE.md`; `DEVLOG.md`, v0.5.22)
+
+- **Idea [speculation]:** Audit inheritance at the sandbox boundary. **Hypothesis:** A child may see a parent-provided environment sentinel or inherited file descriptor despite the documented restricted environment. **Cheapest test:** 1–2 CPU minutes at 13M scale; pass a harmless sentinel variable and open descriptor into a sandbox probe, then check whether generated code can observe them. **Change the plan if:** either is visible—tighten environment and descriptor handling, then rerun the self-test before using code-eval results.
+
+- **Question for the main agent:** Is access to host process metadata through `/proc` within the intended sandbox scope, or should the self-test explicitly probe and document it?
+## Triage
+- Inheritance audit (env sentinel, inherited fd): merged into SQ61 as a self-test extension. `evals/sandbox.py` already passes a PATH/LANG-only environment, and Python's `subprocess` closes inherited fds by default. The new probes turn both into tests that fail closed, so a regression cannot slip through.
+- Question (is host process metadata via `/proc` in scope?): no, and it is a gap. The child runs under `unshare -rnm` (user + network + mount namespaces) with no PID namespace, so `/proc` lists host processes, and their cmdlines are readable. The self-test currently checks only that `/proc` exists. SQ61's extension adds `-pf --mount-proc` and a probe that fails if any outside PID is visible. Until then, C106's limitation ("not a security boundary") stands. The sandbox has only been used on our own test code (no model-generated code has been executed at scale), and Q14 stays human-blocked, so no sandboxed eval is treated as done.

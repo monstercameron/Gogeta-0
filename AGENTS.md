@@ -186,6 +186,24 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
 - **No lingering stopgaps:** a one-off script written as a stopgap is folded into the cockpit within the same session, or listed in the backlog.
 - **Backlog:** `cockpit/BACKLOG.md` lists known gaps and limits, plus requests agents hit but did not fix, with the reason. Read it before adding features so work isn't duplicated; `brief()` shows the top items.
 
+## 0h. Cloud GPUs: alive only while work is queued (the human's rule, 2026-11-22)
+
+**We pay by the hour, so an idle rented box is pure waste. Kill every rented instance unless work is queued up for it. When there is no more work, pull it down immediately.**
+
+- **Budget, set by the human:** the standing approval is **$30 total / 12 h**. Renting within it is allowed; anything above it needs the human again (§0a).
+- **Rent just in time:**
+  - Rent only when there is a concrete job list for the box: registered configs, a pushed commit, predictions committed.
+  - Size the fleet to the queue: one box per independent job stream, never "spare" boxes.
+- **Kill on empty:**
+  - The moment a box's last job finishes, **pull its results** (logs, run dirs, scores) and **destroy it**, unless more queued work is assigned to it right away.
+  - "Might need it later" is not queued work.
+  - A box with no running job for more than **10 minutes** is destroyed: no exceptions while it is idle.
+- **Batch to amortise:** each new box pays a fixed setup (~76 s env plus the data fetch) and a ~1 min cold compile. Put several runs on one box instead of one box per run. Prefer the cheapest SKU that fits the job by measured $/token (`experiments/devlogs/SQ220.md`).
+- **One SKU per comparison:** all arms of a comparison run on the same GPU type, and never pool them with N1X runs unless a bridge run shows the loss transfers (§5, `notes/compute-rental.md`).
+- **Every status update (§0c) lists live instances:** id, GPU, $/hr, uptime, current job, and spend vs the budget. Flag any idle box.
+- **Through the cockpit (§0e):** rent, set up, run, pull and destroy via the cockpit's cloud tools (MCP/TUI). The remote setup is `cockpit/remote/bootstrap.sh` and the dataset fetch `cockpit/remote/fetch_data.sh`. Only destroy instances we labelled (`gogeta-cockpit-*`).
+- **Secrets:** the provider API key lives only in the provider CLI's config and `Desktop\shared\api keys.md`. It never goes in the repo, logs or a Codex brief. The SSH private key never leaves this machine.
+
 ## 1. Devlog = commits = versions
 
 - **Every devlog entry is exactly one commit and exactly one git tag.** No entry without a commit, and no tagged commit without an entry.

@@ -45,7 +45,8 @@ PY
 if verify >/dev/null 2>&1; then echo "DATA OK (already present and verified)"; exit 0; fi
 
 echo "== rebuild from Hugging Face ($(nproc) CPUs)"
-python tools/prepare_data.py --steps download,filter,tokenize || { echo "DATA FAILED: prepare_data error"; exit 1; }
+# -P: don't put tools/ on sys.path, where tools/queue.py would shadow the stdlib `queue` (pyarrow imports it)
+python -P tools/prepare_data.py --steps download,filter,tokenize || { echo "DATA FAILED: prepare_data error"; exit 1; }
 echo "== verify against $MAN"
 if ! verify; then echo "DATA MISMATCH: see above; use the sha256-checked upload instead"; exit 3; fi
 if [ -n "$(git status --porcelain)" ]; then git status --porcelain; echo "DATA MISMATCH: repo assets changed"; exit 3; fi

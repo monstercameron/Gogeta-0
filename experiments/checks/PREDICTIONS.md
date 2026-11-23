@@ -444,3 +444,8 @@ The predictions registered in v0.4.68 apply to exactly these staged configs (sha
   - **5-P2:** steady-state tokens/s on the 5090 ≥ 1.25× the 3090's for E1 (3090: 254.5k) and ≥ 1.10× for E10 (3090: 272.5k). At 13.8M params the runs look overhead-bound, so the 5090's ~1.9× bandwidth won't fully show.
   - **5-P3:** cost per 1M training tokens on the 5090 is within ±30% of the 3090's.
 - **Config binding** (sha256, first 16 hex): `e1_w64_20m.json` `afa384e4fee34fff`, `e1_w256_20m.json` `3827c59a85eef8c9`, `e1_w1024_20m.json` `cd39fde744e58807`.
+- **Pre-run amendment, 2026-11-22 20:50** (before any SQ214 run started; outside review 20:40 idea E):
+  - Seeds go from {0, 1} to **{0, 1, 2, 3}** per arm, so 12 runs.
+  - The seed spread in the decision rule becomes the sd across the 4 seeds of each arm (pooled over arms).
+  - W1–W3 are unchanged. The 20M-token seed sd and its CI are reported as a by-product (SQ216).
+  - **Scoring caveat (SQ226):** docs longer than 1,024 tokens are scored in chunks, which restarts the recurrent state. The primary metric is unchanged, but any window effect is read with that caveat until SQ226 runs.

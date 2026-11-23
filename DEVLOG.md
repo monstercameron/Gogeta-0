@@ -17,6 +17,38 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.72: Outside review 20:40; cloud kill-on-empty rule (AGENTS 0h); on-box dataset rebuild verified byte-identical
+*2026-11-22*
+
+**Outside review 20:40 (Haiku), triaged** (`notes/reviews/2026-11-22-2040-review.md`, footer):
+- **SQ226 (top pick, CPU): reset-matched scoring control.** C193's > 1,200-token reversal sits exactly where the scorer switches to chunked 1,024/512 windows, which restarts GDN state, so the "length effect" may be a scorer artifact.
+- **SQ227:** document-boundary carry-over.
+- **SQ228:** in-document repetition vs length as the covariate.
+- **SQ229:** schedule robustness of the E1-vs-E10 order.
+- **Idea E adopted before any SQ214 run.** The window sweep goes from 2 to **4 seeds per arm** as a pre-run amendment in `experiments/checks/PREDICTIONS.md`, with W1–W3 unchanged and a scoring caveat pointing to SQ226.
+- **Rejected:** moving the Phase 2b verdict to the frozen test split (a post-registration change of the confirmatory set is a forking path; it stays an extra check, SQ218).
+
+**Quick review 20:40 (ML theorist):** SQ230 (a loop-pass representation probe on E2) is accepted.
+
+**New rule, AGENTS §0h (the human, 2026-11-22: "kill them unless we have no work queued up... if there is no more work pull down"):**
+- Rented GPUs live only while work is queued: rent just in time, size the fleet to the queue.
+- When a box's last job ends, pull its results and destroy it. A box idle for more than 10 min is destroyed.
+- Batch runs per box to amortise setup.
+- Status updates list every live box with its spend vs the $30 / 12 h budget.
+- Applied right away: the 3090 pilot (instance 62070434) was destroyed when its work was done, after about 40 min, roughly $0.15.
+
+**The setup is now clean end to end:**
+- `cockpit/remote/fetch_data.sh` rebuilt the whole `code-py-v1` dataset on a fresh RTX 5090 from the public Hugging Face source (2.79 GB in about 40 s on the box's link) in **46 s** of build time.
+- All four files match `experiments/data_integrity/dataset.manifest.json` byte for byte: `train.bin` `db61140a…`, `val.bin` `32e4b0ed…`, `docs_val.jsonl` `f821d119…`, `tokenizer.json` `0e75f39f…`. The builder is deterministic on a different machine.
+- `bootstrap.sh` from scratch took 76 s on the 5090.
+- From rent to ready, nothing is uploaded from the operator's machine (the 3090 pilot spent 494 s uploading).
+- **Two fixes:**
+  - `python -P`, because `tools/queue.py` shadowed the stdlib `queue` that pyarrow imports;
+  - an inline comment had swallowed the script's error handler.
+- **Live:** RTX 5090 instance 62073471 ($0.523/hr) is running SQ220 part 2 (bridge) and the SQ214 sweep (12 runs plus clean-val scoring); results come in the next entry.
+
+---
+
 ## v0.4.71: Cloud pilot: the 3090 reproduces N1X losses; claim audit 2005 integrated; SQ214 window sweep registered
 *2026-11-22*
 

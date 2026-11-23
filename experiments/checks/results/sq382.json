@@ -1,0 +1,502 @@
+{
+ "check": "SQ382",
+ "git": "bff657c",
+ "status": "descriptive, not registered",
+ "sample": "32 x 512 tokens of concatenated clean80 val docs",
+ "models": {
+  "A3m_s5": {
+   "n_moe_modules": 6,
+   "E": 4,
+   "k": 2,
+   "passes_recorded_per_module": 2,
+   "load_by_pass_mean_over_blocks": [
+    [
+     0.2470550537109375,
+     0.2544148862361908,
+     0.2519022524356842,
+     0.2466278076171875
+    ],
+    [
+     0.2517547607421875,
+     0.2521820068359375,
+     0.2481587678194046,
+     0.2479044646024704
+    ]
+   ],
+   "load_entropy_bits_by_pass": [
+    1.999875545501709,
+    1.9999549388885498
+   ],
+   "load_max_share_by_pass": [
+    0.2544148862361908,
+    0.2521820068359375
+   ],
+   "load_max_share_any_block_pass": 0.27197265625,
+   "top1_agreement_consecutive_by_pass_pair_mean_over_blocks": [
+    0.7200825810432434
+   ],
+   "top2_overlap_consecutive_by_pass_pair_mean_over_blocks": [
+    0.8015543818473816
+   ],
+   "top1_chance_consecutive_by_pass_pair_mean_over_blocks": [
+    0.250383198261261
+   ],
+   "first_vs_last_pass_top1_and_top2overlap_by_block": [
+    [
+     0.5865478515625,
+     0.7186279296875
+    ],
+    [
+     0.6654052734375,
+     0.769012451171875
+    ],
+    [
+     0.6767578125,
+     0.76959228515625
+    ],
+    [
+     0.74212646484375,
+     0.81341552734375
+    ],
+    [
+     0.8035888671875,
+     0.859893798828125
+    ],
+    [
+     0.8460693359375,
+     0.8787841796875
+    ]
+   ],
+   "mean_consecutive_top1_agreement": 0.7200825810432434,
+   "mean_consecutive_top2_overlap": 0.8015543818473816,
+   "mean_consecutive_top1_chance": 0.250383198261261,
+   "top1_agreement_adjacent_blocks_same_pass_mean": 0.27988892793655396,
+   "run": "A3m-20261123-180754-s5"
+  },
+  "A3m_s6": {
+   "n_moe_modules": 6,
+   "E": 4,
+   "k": 2,
+   "passes_recorded_per_module": 2,
+   "load_by_pass_mean_over_blocks": [
+    [
+     0.2486317902803421,
+     0.2486114501953125,
+     0.2518106997013092,
+     0.250946044921875
+    ],
+    [
+     0.2496083527803421,
+     0.2466634064912796,
+     0.2468159943819046,
+     0.2569122314453125
+    ]
+   ],
+   "load_entropy_bits_by_pass": [
+    1.9999771118164062,
+    1.9998011589050293
+   ],
+   "load_max_share_by_pass": [
+    0.2518106997013092,
+    0.2569122314453125
+   ],
+   "load_max_share_any_block_pass": 0.265045166015625,
+   "top1_agreement_consecutive_by_pass_pair_mean_over_blocks": [
+    0.7488200068473816
+   ],
+   "top2_overlap_consecutive_by_pass_pair_mean_over_blocks": [
+    0.8215586543083191
+   ],
+   "top1_chance_consecutive_by_pass_pair_mean_over_blocks": [
+    0.2502477169036865
+   ],
+   "first_vs_last_pass_top1_and_top2overlap_by_block": [
+    [
+     0.60345458984375,
+     0.738006591796875
+    ],
+    [
+     0.6846923828125,
+     0.79168701171875
+    ],
+    [
+     0.71630859375,
+     0.8018798828125
+    ],
+    [
+     0.795166015625,
+     0.84466552734375
+    ],
+    [
+     0.84423828125,
+     0.87255859375
+    ],
+    [
+     0.84906005859375,
+     0.88055419921875
+    ]
+   ],
+   "mean_consecutive_top1_agreement": 0.7488200068473816,
+   "mean_consecutive_top2_overlap": 0.8215586543083191,
+   "mean_consecutive_top1_chance": 0.2502477169036865,
+   "top1_agreement_adjacent_blocks_same_pass_mean": 0.212554931640625,
+   "run": "A3m-20261123-182025-s6"
+  },
+  "A3m_s7": {
+   "n_moe_modules": 6,
+   "E": 4,
+   "k": 2,
+   "passes_recorded_per_module": 2,
+   "load_by_pass_mean_over_blocks": [
+    [
+     0.2485097199678421,
+     0.2580210268497467,
+     0.249267578125,
+     0.24420166015625
+    ],
+    [
+     0.2488505095243454,
+     0.2520751953125,
+     0.2527974545955658,
+     0.24627685546875
+    ]
+   ],
+   "load_entropy_bits_by_pass": [
+    1.9997105598449707,
+    1.999921202659607
+   ],
+   "load_max_share_by_pass": [
+    0.2580210268497467,
+    0.2527974545955658
+   ],
+   "load_max_share_any_block_pass": 0.27410888671875,
+   "top1_agreement_consecutive_by_pass_pair_mean_over_blocks": [
+    0.7288920283317566
+   ],
+   "top2_overlap_consecutive_by_pass_pair_mean_over_blocks": [
+    0.8105112910270691
+   ],
+   "top1_chance_consecutive_by_pass_pair_mean_over_blocks": [
+    0.2504132091999054
+   ],
+   "first_vs_last_pass_top1_and_top2overlap_by_block": [
+    [
+     0.5919189453125,
+     0.747314453125
+    ],
+    [
+     0.63934326171875,
+     0.7667236328125
+    ],
+    [
+     0.68621826171875,
+     0.7867431640625
+    ],
+    [
+     0.81121826171875,
+     0.841278076171875
+    ],
+    [
+     0.79986572265625,
+     0.852020263671875
+    ],
+    [
+     0.84478759765625,
+     0.868988037109375
+    ]
+   ],
+   "mean_consecutive_top1_agreement": 0.7288920283317566,
+   "mean_consecutive_top2_overlap": 0.8105112910270691,
+   "mean_consecutive_top1_chance": 0.2504132091999054,
+   "top1_agreement_adjacent_blocks_same_pass_mean": 0.21942749619483948,
+   "run": "A3m-20261123-184710-s7"
+  },
+  "A3mx_s5": {
+   "n_moe_modules": 6,
+   "E": 4,
+   "k": 2,
+   "passes_recorded_per_module": 2,
+   "load_by_pass_mean_over_blocks": [
+    [
+     0.2524668276309967,
+     0.25103759765625,
+     0.2508951723575592,
+     0.2456003874540329
+    ],
+    [
+     0.2501729428768158,
+     0.2489115446805954,
+     0.2501119077205658,
+     0.2508036196231842
+    ]
+   ],
+   "load_entropy_bits_by_pass": [
+    1.9999208450317383,
+    1.9999947547912598
+   ],
+   "load_max_share_by_pass": [
+    0.2524668276309967,
+    0.2508036196231842
+   ],
+   "load_max_share_any_block_pass": 0.276275634765625,
+   "top1_agreement_consecutive_by_pass_pair_mean_over_blocks": [
+    0.7098490595817566
+   ],
+   "top2_overlap_consecutive_by_pass_pair_mean_over_blocks": [
+    0.8045552372932434
+   ],
+   "top1_chance_consecutive_by_pass_pair_mean_over_blocks": [
+    0.2502790689468384
+   ],
+   "first_vs_last_pass_top1_and_top2overlap_by_block": [
+    [
+     0.5489501953125,
+     0.72442626953125
+    ],
+    [
+     0.67120361328125,
+     0.779388427734375
+    ],
+    [
+     0.693603515625,
+     0.7950439453125
+    ],
+    [
+     0.74114990234375,
+     0.82403564453125
+    ],
+    [
+     0.77154541015625,
+     0.84088134765625
+    ],
+    [
+     0.8326416015625,
+     0.863555908203125
+    ]
+   ],
+   "mean_consecutive_top1_agreement": 0.7098490595817566,
+   "mean_consecutive_top2_overlap": 0.8045552372932434,
+   "mean_consecutive_top1_chance": 0.2502790689468384,
+   "top1_agreement_adjacent_blocks_same_pass_mean": 0.2503418028354645,
+   "run": "A3mx-20261123-180722-s5"
+  },
+  "A3mx_s6": {
+   "n_moe_modules": 6,
+   "E": 4,
+   "k": 2,
+   "passes_recorded_per_module": 2,
+   "load_by_pass_mean_over_blocks": [
+    [
+     0.2458292692899704,
+     0.24505615234375,
+     0.2568003237247467,
+     0.2523142397403717
+    ],
+    [
+     0.246826171875,
+     0.2480977326631546,
+     0.2516123354434967,
+     0.2534637451171875
+    ]
+   ],
+   "load_entropy_bits_by_pass": [
+    1.9997309446334839,
+    1.9999183416366577
+   ],
+   "load_max_share_by_pass": [
+    0.2568003237247467,
+    0.2534637451171875
+   ],
+   "load_max_share_any_block_pass": 0.268707275390625,
+   "top1_agreement_consecutive_by_pass_pair_mean_over_blocks": [
+    0.7173869013786316
+   ],
+   "top2_overlap_consecutive_by_pass_pair_mean_over_blocks": [
+    0.8049367070198059
+   ],
+   "top1_chance_consecutive_by_pass_pair_mean_over_blocks": [
+    0.2504115402698517
+   ],
+   "first_vs_last_pass_top1_and_top2overlap_by_block": [
+    [
+     0.5850830078125,
+     0.72882080078125
+    ],
+    [
+     0.67864990234375,
+     0.78106689453125
+    ],
+    [
+     0.70184326171875,
+     0.79547119140625
+    ],
+    [
+     0.75543212890625,
+     0.8231201171875
+    ],
+    [
+     0.79058837890625,
+     0.85260009765625
+    ],
+    [
+     0.792724609375,
+     0.848541259765625
+    ]
+   ],
+   "mean_consecutive_top1_agreement": 0.7173869013786316,
+   "mean_consecutive_top2_overlap": 0.8049367070198059,
+   "mean_consecutive_top1_chance": 0.2504115402698517,
+   "top1_agreement_adjacent_blocks_same_pass_mean": 0.23359985649585724,
+   "run": "A3mx-20261123-181942-s6"
+  },
+  "A3mx_s7": {
+   "n_moe_modules": 6,
+   "E": 4,
+   "k": 2,
+   "passes_recorded_per_module": 2,
+   "load_by_pass_mean_over_blocks": [
+    [
+     0.2534027099609375,
+     0.2519785463809967,
+     0.2481791228055954,
+     0.2464396208524704
+    ],
+    [
+     0.2504781186580658,
+     0.2503407895565033,
+     0.255828857421875,
+     0.2433522492647171
+    ]
+   ],
+   "load_entropy_bits_by_pass": [
+    1.9999091625213623,
+    1.9997730255126953
+   ],
+   "load_max_share_by_pass": [
+    0.2534027099609375,
+    0.255828857421875
+   ],
+   "load_max_share_any_block_pass": 0.2744140625,
+   "top1_agreement_consecutive_by_pass_pair_mean_over_blocks": [
+    0.70733642578125
+   ],
+   "top2_overlap_consecutive_by_pass_pair_mean_over_blocks": [
+    0.799560546875
+   ],
+   "top1_chance_consecutive_by_pass_pair_mean_over_blocks": [
+    0.25041821599006653
+   ],
+   "first_vs_last_pass_top1_and_top2overlap_by_block": [
+    [
+     0.52508544921875,
+     0.7076416015625
+    ],
+    [
+     0.68841552734375,
+     0.783172607421875
+    ],
+    [
+     0.68121337890625,
+     0.785064697265625
+    ],
+    [
+     0.7730712890625,
+     0.827178955078125
+    ],
+    [
+     0.76922607421875,
+     0.83514404296875
+    ],
+    [
+     0.8070068359375,
+     0.859161376953125
+    ]
+   ],
+   "mean_consecutive_top1_agreement": 0.70733642578125,
+   "mean_consecutive_top2_overlap": 0.799560546875,
+   "mean_consecutive_top1_chance": 0.25041821599006653,
+   "top1_agreement_adjacent_blocks_same_pass_mean": 0.23055419325828552,
+   "run": "A3mx-20261123-183536-s7"
+  }
+ },
+ "summary": {
+  "A3m": {
+   "n": 3,
+   "mean_consecutive_top1_agreement": {
+    "mean": 0.7325982054074606,
+    "sd": 0.014722829953831628,
+    "n": 3,
+    "ci95": [
+     0.696021716418515,
+     0.7691746943964062
+    ]
+   },
+   "mean_consecutive_top2_overlap": {
+    "mean": 0.8112081090609232,
+    "sd": 0.010020324131587955,
+    "n": 3,
+    "ci95": [
+     0.7863142349610387,
+     0.8361019831608077
+    ]
+   },
+   "mean_consecutive_top1_chance": {
+    "mean": 0.250348041454951,
+    "sd": 8.816986899949898e-05,
+    "n": 3,
+    "ci95": [
+     0.25012899768057273,
+     0.25056708522932924
+    ]
+   },
+   "top1_agreement_adjacent_blocks_same_pass_mean": {
+    "mean": 0.23729045192400613,
+    "sd": 0.03705105470606296,
+    "n": 3,
+    "ci95": [
+     0.14524310105906973,
+     0.32933780278894254
+    ]
+   }
+  },
+  "A3mx": {
+   "n": 3,
+   "mean_consecutive_top1_agreement": {
+    "mean": 0.7115241289138794,
+    "sd": 0.005230430946294432,
+    "n": 3,
+    "ci95": [
+     0.6985299694680053,
+     0.7245182883597535
+    ]
+   },
+   "mean_consecutive_top2_overlap": {
+    "mean": 0.8030174970626831,
+    "sd": 0.0029998763704797253,
+    "n": 3,
+    "ci95": [
+     0.7955647895752551,
+     0.8104702045501111
+    ]
+   },
+   "mean_consecutive_top1_chance": {
+    "mean": 0.2503696084022522,
+    "sd": 7.848048196889351e-05,
+    "n": 3,
+    "ci95": [
+     0.25017463634228926,
+     0.25056458046221514
+    ]
+   },
+   "top1_agreement_adjacent_blocks_same_pass_mean": {
+    "mean": 0.23816528419653574,
+    "sd": 0.010654563377365967,
+    "n": 3,
+    "ci95": [
+     0.21169574530514695,
+     0.2646348230879245
+    ]
+   }
+  }
+ }
+}

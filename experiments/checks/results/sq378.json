@@ -1,0 +1,29 @@
+{
+ "check": "SQ378",
+ "git": "bff657c",
+ "status": "descriptive, not registered",
+ "runs": {
+  "A2s_s2": {
+   "run": "A2s-20261123-170724-s2",
+   "n_bitlinear_layers": 36,
+   "n_ternary_weights": 11206656,
+   "model_pt_bytes": 72955757,
+   "packed_file_bytes": 30943363,
+   "ternary_fp32_bytes": 44826624,
+   "ternary_packed_bytes": 2801808,
+   "ternary_ratio_fp32_over_packed": 15.999177673844889,
+   "ternary_bf16_bytes": 22413312,
+   "ternary_entropy_bytes_log2_3": 2220266.1898102183,
+   "other_params_fp32_bytes": 40680640,
+   "total_params_fp32_bytes": 72924352,
+   "resident_packed_tensors_bytes": 2801664,
+   "file_over_model_pt": 0.42413874205979385,
+   "file_over_total_params_fp32": 0.42432139815243064,
+   "max_abs_logit_diff": 0.24869465827941895,
+   "argmax_agreement": 0.998242199420929,
+   "clean80_300_bpc_fakequant": 0.2817409571734518,
+   "clean80_300_bpc_packed_reload": 0.28172863037888646,
+   "clean80_300_bpc_naive_dequant_reload_through_stock_BitLinear": 0.5830574008324488
+  }
+ }
+}

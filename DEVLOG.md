@@ -18,6 +18,40 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.26: Worker results: ternary and loop costs nearly vanish out of corpus while the assembly gain survives (SQ379, hypothesis C213; SQ400 registered follow-up); coda attention carries long-range copy (SQ383); ternary loops not contractive (SQ353); packed ternary 16x (SQ378)
+*2026-11-23*
+
+**Worker results: out of corpus, the ternary and loop costs nearly vanish while the assembly gain survives (SQ379, hypothesis C213). The coda's full attention carries copy-at-distance (SQ383). Ternary loops are not contractive (SQ353). Packed ternary works (SQ378).**
+
+All six are descriptive side quests by the Sonnet worker, with no registered predictions. The main agent spot-checked the headline numbers against the result files (`experiments/checks/results/sq3xx.json`; devlogs `experiments/devlogs/SQ3xx.md`).
+
+- **SQ379, A2 out of corpus** (330 SQ99 files, 31 packages; seeds 2-4; package-clustered 95% CIs, which do not include seed variance):
+
+  | Comparison | Out of corpus | clean80 |
+  |---|---|---|
+  | A2s vs E27 (assembly) | -11.26% [-12.02, -10.56] | -16.7% |
+  | A2s vs A2f (ternary cost) | +0.22% | +9.5% |
+  | A2f vs E24 (loops vs unshared) | -0.41% [-0.69, -0.13] (n 2) | +3.2% |
+  | A2f vs E20 (vs dense) | +1.65% [+1.21, +2.15] | -0.9% |
+  | E27 vs E20 (full fusion) | +14.8% | +28.7% |
+
+  **The assembly gain survives out of corpus. The two costs, ternary and loops' unique-parameter deficit, nearly vanish, and dense parity does not hold.** This is recorded as **hypothesis C213** (UNVERIFIED): the costs are mostly in-distribution memorisation capacity. **SQ400 (top pick)** is its registered out-of-corpus replication with seed variance, adding A3mx.
+- **SQ383, coda attention and copy-at-distance** (A2s, seeds 2-4): with the coda's full attention swapped for a 256-token window, second-copy NLL changes 0.0% at gap 128, **+41.9% [+34.9, +48.9] at gap 256** and +13.3% [+7.8, +18.8] at gap 512, back to the no-copy level, while bits/char moves only +2.76%. The one full-attention layer outside the loop carries long-range copy, so the design keeps it.
+- **SQ353, loop stability** (55 looped checkpoints plus 8 E24):
+  - Full-precision loops are contractive: relative perturbation gain 0.45-0.85 (E22), 0.57/0.74 (A2f).
+  - Ternary loops are not: gain at eps 1e-2 is 1.17-0.92 for E27 and 1.59/1.10 for A2s. At eps 1e-3 the gain is about 8.6x larger, which is quantiser-flip noise.
+  - Adjacent-pass CKA is 0.92-0.995 in every loop, vs 0.77 between adjacent unshared E24 blocks.
+  This is a mechanism for the ternary cost inside loops, and it supports the full-precision mixer fix (C207).
+- **SQ378, ternary packing** (A2s s2): the 36 BitLinear layers (11.2M weights) pack 16.0x (44.8 MB fp32 -> 2.80 MB), and the whole file is 0.42x the checkpoint. Packed reload gives -0.004% bits/char vs fake-quant: 99.82% argmax agreement, not bit-identical. **A naive dequant through stock BitLinear gives +107%**, a trap documented in the devlog. This makes C208's 1.58-bit memory figures measured for A2s's ternary layers.
+- **SQ382, MoE routing across passes** (A3m, A3mx, 3 seeds): top-1 expert agreement between pass 1 and pass 2 is 0.73 / 0.71 (chance 0.25), top-2 overlap 0.80. Load is balanced (max share about 0.27). Each pass partly reuses its experts.
+- **SQ376, data gate:** in-training val loss still falls 22.0% (E1) and 19.9% (E10) from 100M to 197M tokens, confounded by the cosine schedule ending at 200M. The data budget is not saturated.
+- **Also:**
+  - the 15:04 quick review (ML theorist) is triaged: SQ399 adds bracket-depth extrapolation for goal 2;
+  - the worker's log is updated;
+  - SQ377 (block duplication) is still running.
+
+---
+
 ## v0.5.25: Claim audit 2026-11-23-1502: C210/C211 to UNVERIFIED until the byte decoder's clean80 score (SQ387); C209 LR objection rejected (A2s bracket exists); C212 SOLID
 *2026-11-23*
 

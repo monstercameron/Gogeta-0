@@ -594,3 +594,21 @@ This executes only stages registered in v0.4.40 (`experiments/design/power-cost.
 - **Decision rule:**
   - If I1 fails (E0-flat within ±0.5% of E0-gogeta), the E0 handicap is not the init. SQ240/SQ234-adjacent items (RoPE layout, eps) become next.
   - All four configs double as the GPU smoke test for the new `init` option. Any rc ≠ 0 stops the wave.
+
+## Fleet wave 6, part 3 (2026-11-23 ~00:20, before dispatch): Inkling-2-Mini loop ingredients, config-only (SQ266, SQ271)
+Source: `notes/research-inkling2-mini.md`, from the research agent's cited primary sources; the main agent has not independently verified every fact. Everything runs at 20M tokens, lr 6e-3, seeds 0–2, on an RTX 5090. Primary metric: clean80 bpc, plus the L(r) curve from in-training eval at r = 1…12.
+- **Configs:** `experiments/staged-configs/inkling/`:
+  - e2_uniform [05dd8ce02798d5a0]: the registered E2, r ~ U{1..7};
+  - e9 [2a20bac0d684deda];
+  - e2_fixed_r2 [71296d7ae90fa1e1];
+  - e2_fixed_r3 [c2374ebb2111d555];
+  - e2_fixed_r4 [29cef12f74aa97fd];
+  - thick_pre [b9b343718a305a81];
+  - thick_coda [812a052a942e35af].
+- **SQ266 (fixed r):**
+  - **K1:** e2_fixed_r4 beats e2_uniform by 0.5–1.5%.
+  - **K2:** among the fixed-r arms, loss at the trained r decreases with r (r4 < r3 < r2), but every fixed-r arm degrades beyond its trained r (as C7 found).
+  - **K3:** e9 still beats every looped arm at 20M. That is the C6 direction; a looped arm beating E9 by more than 2× the seed sd would be the first evidence for loops.
+- **SQ271 (thick outer layers):** both variants have E2's unique-parameter count (12,606,488), with 13 block visits at fixed r = 5.
+  - **K4:** thick_pre and thick_coda are each within ±1% of e2_fixed_r4 (14 visits), with thick_pre the better of the two (Inkling and 2610.40325 favour looping the middle).
+- **Seeds and MDE:** 3 seeds per arm, so the MDE is about 1–1.5% at the 20M seed sd (0.4–1.2%). Smaller differences are ties.

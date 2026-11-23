@@ -1,0 +1,52 @@
+{
+  "experiment": "INK_thick_pre",
+  "description": "SQ271 thick outer layers: prelude [swa,gdn], core [gdn,swa] x5 (fixed), coda [attn] = 13 block visits; compare with e2_fixed_r4 (14 visits).",
+  "model": {
+    "vocab_size": 8192,
+    "d_model": 384,
+    "n_heads": 6,
+    "mlp_hidden": 1024,
+    "prelude": [
+      "swa",
+      "gdn"
+    ],
+    "core": [
+      "gdn",
+      "swa"
+    ],
+    "coda": [
+      "attn"
+    ],
+    "loops": 5,
+    "loops_min": 5,
+    "loops_max": 5,
+    "bptt_loops": 5,
+    "window": 256,
+    "max_seq_len": 1024,
+    "ternary": false
+  },
+  "train": {
+    "dataset": "code-py-v1",
+    "seq_len": 1024,
+    "batch_size": 32,
+    "max_tokens": 20000000,
+    "lr": 0.006,
+    "min_lr_frac": 0.1,
+    "warmup_steps": 300,
+    "weight_decay": 0.1,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "grad_clip": 1.0,
+    "eval_every": 250,
+    "eval_seqs": 128,
+    "seed": 0,
+    "eval_loops": [
+      1,
+      2,
+      4,
+      6,
+      8,
+      12
+    ]
+  }
+}

@@ -118,6 +118,15 @@ PAPERS = {
          "Removing Ouro's loop-boundary norm: from-scratch 19M models extrapolate better without it (16 seeds)"),
         ("2603.08391", "Adaptive Loops and Memory",
          "Per-layer PonderNet-style halting + learnable loop scales (init ~identity) + memory banks; ~200M, 14B tokens"),
+        ("2603.15031", "Attention Residuals (Kimi)",
+         "Softmax depth-attention over earlier (block) outputs instead of a running residual sum; Inkling 2 Mini's "
+         "residual stream and cross-pass message reader (notes/research-inkling2-mini.md)"),
+        ("2610.40325", "How to Loop Your Transformer",
+         "Looped LMs to 1B: full-stack loops best per param, middle-stack per training FLOP; per-loop low-rank adapters; "
+         "loops saturate/reverse at low tokens-per-param"),
+        ("2607.16051", "Loop the Loopies (Loopie)",
+         "Open looped MoE (20B-A2B, 6B-A0.6B), layer-loop R=2 from scratch, beats wall-clock-matched 30B-A3B; "
+         "largest marginal gain at R=2"),
     ]),
     "13-activations": ("Activation functions (notes: notes/research-activations.md)", [
         ("2002.05202", "GLU Variants Improve Transformer",

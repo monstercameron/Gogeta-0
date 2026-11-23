@@ -416,3 +416,31 @@ The predictions registered in v0.4.68 apply to exactly these staged configs (sha
 | `e16a_p4_r2_looped_global_20m.json` | `832992308bf8e547` |
 | `e16b_p4_r2_ternary_global.json` | `6d83780a6e24029e` |
 | `e16b_p4_r2_ternary_global_20m.json` | `65d10e883b2f4580` |
+
+## Registered SQ214 window-sweep and SQ220 part-2 (RTX 5090) predictions (2026-11-22 20:38, committed in v0.4.71 before any 5090 run exists)
+
+### SQ214: E1 sliding-window sweep (configs `experiments/staged-configs/sq214/e1_w{64,256,1024}_20m.json`)
+- **Question:** is E1's SWA window of 256 what costs it long documents (C193: −3.86% on ≤ 300-token docs, +1.09% on > 1,200 tokens vs E0)?
+- **Design:**
+  - E1 with both SWA layers' window ∈ {64, 256, 1024 (= T, full causal)}; everything else identical. E1 already has one global full-attention layer (the last), so the effects should be small.
+  - Seeds 0 and 1, 20M tokens, lr 6e-3 (E1's K7 best), `--compile`.
+  - **One SKU:** all six runs on the same rented RTX 5090. The comparison is never pooled with N1X runs.
+  - **Compute:** every arm does the same arithmetic, because the SWA mask is dense O(T²), C12. Analytic FLOPs differ only in bookkeeping (`min(window, T/2)`), so the comparison is at matched wall-clock compute.
+- **Primary metric:** clean-val doc-level bits/char (`val_clean80`, `experiments/stats/score_doclevel.py`), with the mean over 2 seeds. Secondary: in-training val_loss (contaminated val, labelled so).
+- **Status:** **exploratory** (n = 2 seeds at 20M tokens). Per `notes/statistics-policy.md` §4 it never changes a claim status; it only creates queue items.
+- **Predictions:**
+  - **W1:** |bpc(w1024) − bpc(w256)| ≤ 1.0% (relative). The global layer already gives full context.
+  - **W2:** bpc(w64) is worse than bpc(w256) by 0.3–2.0%.
+  - **W3:** the ordering w1024 ≤ w256 ≤ w64 holds in the 2-seed means.
+- **Decision rule:**
+  - If w1024 beats w256 by more than 2× the seed spread (|s0 − s1| averaged over the arms), register a 200M-token confirmatory run, plus length-binned scoring (SQ214's binned part, which needs per-doc NLL), before any claim.
+  - If not, C193's window explanation loses support, and SQ219 (context-removal) becomes the next test.
+
+### SQ220 part 2: the RTX 5090 bridge (same protocol as the 3090 part, `experiments/devlogs/SQ220.md`)
+- **Runs:** E10 and E1 at seed 0, lr 3e-3, 20M tokens, `--compile`, the same as the N1X's K7 runs and the 3090.
+- **Throughput metric:** the median of per-step tokens/s from step 100 on. The whole-run tokens/s mixes in the cold-box compile and autotune cost, which is reported separately.
+- **Predictions:**
+  - **5-P1:** |val_loss(5090) − val_loss(N1X)| ≤ 0.004 for both.
+  - **5-P2:** steady-state tokens/s on the 5090 ≥ 1.25× the 3090's for E1 (3090: 254.5k) and ≥ 1.10× for E10 (3090: 272.5k). At 13.8M params the runs look overhead-bound, so the 5090's ~1.9× bandwidth won't fully show.
+  - **5-P3:** cost per 1M training tokens on the 5090 is within ±30% of the 3090's.
+- **Config binding** (sha256, first 16 hex): `e1_w64_20m.json` `afa384e4fee34fff`, `e1_w256_20m.json` `3827c59a85eef8c9`, `e1_w1024_20m.json` `cd39fde744e58807`.

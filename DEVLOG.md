@@ -17,6 +17,54 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.71: Cloud pilot: the 3090 reproduces N1X losses; claim audit 2005 integrated; SQ214 window sweep registered
+*2026-11-22*
+
+**What:** the first rented GPU run (SQ220, 1x RTX 3090 on Vast.ai, approved by the human: "get 1 working first", $30 / 12 h cap). Also the 20:05 claim-audit verifier's findings, three quick reviews, and the SQ214 window sweep registered for a rented RTX 5090.
+
+**SQ220, the 3090 part** (`experiments/devlogs/SQ220.md`):
+- **Setup:** the same commit (`9712842`, clean clone, `--require-clean`), the same sha256-verified data and the same software stack as the N1X, with K7's bridge runs at seed 0, lr 3e-3, 20M tokens.
+- **Loss transfers:**
+  - E10: 1.0306 vs the N1X's 1.0286 (Δ +0.0020);
+  - E1: 1.0078 vs 1.0071 (Δ +0.0007).
+
+  Both are within the provisional ±0.004 reproduction tolerance (P1 passes, `STATISTICAL`). E1 < E10 holds on both GPUs.
+- **Speed (steady-state median tokens/s):**
+  - E10: 272.5k vs 202.0k, **1.35×**;
+  - E1: 254.5k vs 138.0k, **1.84×**.
+
+  The registered 2–3× (P3) is a partial miss: at 13.8M params the runs look overhead-bound, not bandwidth-bound.
+- **Whole-run throughput on a fresh box misleads:** E1 was 0.94× because of the cold Triton/fla autotune cache, about 1 min of fixed cost per box.
+- **Incidents:**
+  - the `pytorch/pytorch` image has no C compiler, so Inductor failed (fixed with apt build-essential);
+  - the 525 MB dataset took 494 s over the operator's link.
+
+**Making the next rental quick (the human asked: "make this easier for the next time"):**
+- `cockpit/remote/bootstrap.sh`: a one-shot, idempotent box setup. It runs apt (compiler, git), uv, the pinned Python 3.12 venv (torch 2.14.1+cu130, triton 3.8.0, fla 0.6.0, plus transformers 5.24.0 and einops 0.8.2, which `requirements.txt` omits), the clone at the exact commit, and a `torch.compile` GPU smoke test. Verified on the 3090: a re-run takes 19 s and ends in `ENV OK`.
+- `cockpit/remote/fetch_data.sh`: rebuilds the dataset on the box from the public Hugging Face source with the committed tokenizer, and verifies it file by file against `experiments/data_integrity/dataset.manifest.json`. A mismatch falls back to the sha256-checked upload and is never used for training. The live rebuild test was still running at commit time; its result goes in the next entry.
+- The cockpit's provider-pluggable fleet tooling (Vast first, MCP-driven, budget-guarded) is being built by a subagent and lands separately.
+
+**Claim audit 2005, checked by the main agent:**
+- **C192 PARTIAL → REFUTED.** The registered pooled criterion refutes it, and the earlier move to PARTIAL rested on a post-hoc length cut, which `notes/statistics-policy.md:49` says can never change a status. The length finding stays in C193.
+- **C71 is superseded by C194**, the same KDA decode claim without the contrast with GDN that our own data contradicts.
+- **C16 UNVERIFIED → INCONCLUSIVE.** K3 ran but its validity gate failed (an invalid control is INCONCLUSIVE per the ledger README).
+- Limitations were added to C193, C121, C125 and C93, and evidence pointers to C67, C68 and C69.
+- Three auditor verdicts were rejected after checking the PDFs (C30, C35, C76).
+
+**Quick reviews:**
+- 20:20 cheapest-experiment hunter: rejected.
+- 20:24 statistician: SQ224, leave-one-seed-pair-out fragility.
+- 20:32 data engineer: SQ225, source-config mix audit.
+- The 20:10 safety review (SQ223) is filed.
+
+**Registered (before any run):**
+- SQ214 window sweep: E1 with SWA window 64/256/1024, seeds 0–1, 20M tokens, on one rented RTX 5090. It is exploratory, with clean-val bpc as the primary metric. Predictions W1–W3, configs hash-bound in `experiments/checks/PREDICTIONS.md`.
+- SQ220 part 2 (5090 bridge): 5-P1 to 5-P3.
+
+**Docs refresh (hourly):** README and sketch were updated with the C192/C193/C16 states and the Byte Quest registration facts. The refresh agent's "no instance rented" line was corrected by the main agent.
+
+---
+
 ## v0.4.70: Outside review 20:37: E1's headline lead over E0 may be a baseline artifact
 *2026-11-22*
 

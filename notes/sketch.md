@@ -42,15 +42,20 @@ The nice part is that looping costs extra compute and BitNet makes compute cheap
 - **2026-11-22 (v0.4.61):** First hourly claim audit: 48 claims checked; VERIFIED fell 23 to 18. C15 is superseded by C190. Audited claims get a 6-hour cool-down.
 - **2026-11-22 (v0.4.63, corrected v0.4.65):** SQ99 out-of-corpus: E1's in-corpus advantage does not transfer (+0.42% worse, exploratory). The cluster-robust bootstrap includes 0, so "E1 is worse out of corpus" is withdrawn; the non-transfer verdict stands.
 - **2026-11-22 (v0.4.65):** Byte Quest becomes a main-quest arc: E12-E16 (patch granularity x refinement loops), with predictions registered before any run.
+- **2026-11-22 (v0.4.66):** SQ99 length re-analysis: the out-of-corpus pattern tracks document length (E1 ahead on short files, behind on files over ~1,200 tokens). Recorded as C193 (PARTIAL, exploratory, n=1, length confounded with file type). C192 stays REFUTED under its registered pooled test.
+- **2026-11-22 (v0.4.68-69):** Byte Quest E12-E16 predictions registered before any byte run (`experiments/checks/PREDICTIONS.md`); the 30 staged configs are hashed into that file.
+- **2026-11-22 (v0.4.69):** Vast.ai CLI installed; no instance rented. Each rental needs the human's explicit go-ahead (AGENTS §0a). SQ220 stayed parked until the human approved the pilot later that evening ("get 1 working first", $30 / 12 h cap).
+- **2026-11-22 (v0.4.70):** Outside review (20:37): E1's lead over E0 may be largely a baseline artifact (E0 trails E10 at identical shapes). Recorded as a C5 limitation event. Phase 2b's comparison stays E1 vs E10.
 
-## Status (2026-11-22, v0.4.65)
+## Status (2026-11-22, v0.4.70)
 
-- Results so far: E1 beats E0 by 3.6% at an untuned LR, one seed (C5 partial). It does not transfer out of corpus (SQ99, exploratory; cluster CI -0.13% to +1.03%). Looping (E2) does not pay yet (C6/C7 partial).
-- Baseline: E10 (HF Llama, E0's exact shapes) reads 0.5822 / 0.5854 on seeds 0/1 vs E0's 0.6063 (contaminated val). Seed 2 is not yet in the repo. Possible E0 init handicap (SQ200).
-- Claims: 18 VERIFIED, 20 PARTIAL, 7 REFUTED, 2 WRONG FOR OUR CODE, 72 UNVERIFIED, 1 SUPERSEDED (120 claims, `experiments/claims-status.md`).
-- Running (per `experiments/QUEUE.md`, 19:24): Q7 (E10 x3 seeds). Then Q8 (E1 x3), E11, E9, and E2 at the tuned LR. Clean-val re-score pending (K9).
-- Byte Quest (E12-E16) is planned, with predictions to be registered first.
-- Next queued: K8 re-check (Q11), benchmark tier 1 (Q14, needs human approval), K3 redesign (Q15), looped neg-eig parity (Q18), E3 ternary at tuned LR, SQ200 init swap.
+- Results so far: E1 beats E0 by 3.6% at an untuned LR, one seed (C5 partial). The outside review (v0.4.70) suggests this lead may be largely a baseline artifact: E0 trails E10 at identical shapes by about 3.7%. Out of corpus, the registered pooled test does not show transfer (SQ99, exploratory: +0.42%, cluster CI -0.13% to +1.03%; C192 REFUTED). The length re-analysis (C193, PARTIAL) finds E1 ahead on short files and behind on files over ~1,200 tokens. Looping (E2) does not pay yet (C6/C7 partial).
+- Baseline: E10 seeds 0/1 read 0.5822 / 0.5854 vs E0's 0.6063 (decisions log, v0.4.59; contaminated val). DEVLOG v0.4.70 reports a 3-seed E10 mean of 0.5845, but `experiments/INDEX.md` still lists E10 as planned. Reconcile before citing either number.
+- Claims (`experiments/claims-status.md`): 18 VERIFIED, 21 PARTIAL, 7 REFUTED, 2 WRONG FOR OUR CODE, 1 INCONCLUSIVE (C16: K3 control invalid), 71 UNVERIFIED, 2 SUPERSEDED (122 claims).
+- Running (per `experiments/QUEUE.md`, 19:24): Q7 (E10 x3 seeds). Queued: Q8 (E1 x3), E9, Q10 (E2 at the tuned LR), E11, Q15 (K3 redesign), Q18 (looped neg-eig parity). Clean-val re-score pending (K9); loss numbers remain provisional.
+- Cloud: SQ220 pilot (1x RTX 3090 on Vast.ai) running since 2026-11-22 ~20:05 after the human's go-ahead (`experiments/devlogs/SQ220.md`).
+- Byte Quest (E12-E16): staged and predicted, not run.
+- Next CPU item: SQ61 (reward sandbox hardening, C105); it must precede any GRPO run.
 
 ---
 

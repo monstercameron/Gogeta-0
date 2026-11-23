@@ -336,6 +336,342 @@
    "batch_file": "notes/reviews/claims/2026-11-22-1902-b8.md",
    "verdict": "WEAK",
    "note": "ISA facts vs compiler/kernel compatibility not separated"
+  },
+  {
+   "id": "C192",
+   "ts": "2026-11-22T20:17:01-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b1.md",
+   "verdict": "WEAK",
+   "note": "post-hoc length cut changed status; registered pooled criterion refutes"
+  },
+  {
+   "id": "C122",
+   "ts": "2026-11-22T20:17:01-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b1.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ77 idea, no result"
+  },
+  {
+   "id": "C114",
+   "ts": "2026-11-22T20:17:01-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b1.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ71 idea; GB10-only source"
+  },
+  {
+   "id": "C75",
+   "ts": "2026-11-22T20:17:01-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b1.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "paper Table 1 values, no local pointer"
+  },
+  {
+   "id": "C42",
+   "ts": "2026-11-22T20:17:01-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b1.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "K5/E9 do not test paper BPB figures"
+  },
+  {
+   "id": "C34",
+   "ts": "2026-11-22T20:17:01-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b1.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ17 idea; inference from Ouro"
+  },
+  {
+   "id": "C193",
+   "ts": "2026-11-22T20:17:01-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b2.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "length bins not stored in sq_99.json"
+  },
+  {
+   "id": "C121",
+   "ts": "2026-11-22T20:17:01-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b2.md",
+   "verdict": "WEAK",
+   "note": "refutation field states the pass condition"
+  },
+  {
+   "id": "C113",
+   "ts": "2026-11-22T20:17:01-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b2.md",
+   "verdict": "SOLID",
+   "note": "SQ71 idea; UNVERIFIED right"
+  },
+  {
+   "id": "C74",
+   "ts": "2026-11-22T20:17:01-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b2.md",
+   "verdict": "SOLID",
+   "note": "SQ52 idea; UNVERIFIED right"
+  },
+  {
+   "id": "C41",
+   "ts": "2026-11-22T20:17:01-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b2.md",
+   "verdict": "SOLID",
+   "note": "E5/E8 not run"
+  },
+  {
+   "id": "C33",
+   "ts": "2026-11-22T20:17:01-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b2.md",
+   "verdict": "SOLID",
+   "note": "SQ19 idea; compound claim"
+  },
+  {
+   "id": "C191",
+   "ts": "2026-11-22T20:17:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b3.md",
+   "verdict": "SOLID",
+   "note": "K9 overlap plus exact-dedup pipeline"
+  },
+  {
+   "id": "C120",
+   "ts": "2026-11-22T20:17:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b3.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "K2 eager only; SQ76 not run"
+  },
+  {
+   "id": "C112",
+   "ts": "2026-11-22T20:17:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b3.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ71 queued, no result"
+  },
+  {
+   "id": "C73",
+   "ts": "2026-11-22T20:17:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b3.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "no local pointer for Kimi figures; SQ51 missing"
+  },
+  {
+   "id": "C40",
+   "ts": "2026-11-22T20:17:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b3.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ14 not registered or run"
+  },
+  {
+   "id": "C32",
+   "ts": "2026-11-22T20:17:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b3.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ14/SQ16 plans only"
+  },
+  {
+   "id": "C190",
+   "ts": "2026-11-22T20:17:03-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b4.md",
+   "verdict": "SOLID",
+   "note": "K1 fixed state; activation memory caveat kept"
+  },
+  {
+   "id": "C119",
+   "ts": "2026-11-22T20:17:03-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b4.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ75 proposed only, no profile"
+  },
+  {
+   "id": "C102",
+   "ts": "2026-11-22T20:17:03-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b4.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "no local source artifact for HumanEval figures"
+  },
+  {
+   "id": "C72",
+   "ts": "2026-11-22T20:17:03-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b4.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ50 timed out"
+  },
+  {
+   "id": "C39",
+   "ts": "2026-11-22T20:17:03-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b4.md",
+   "verdict": "SOLID",
+   "note": "K6 global norms; per-token caveat kept"
+  },
+  {
+   "id": "C31",
+   "ts": "2026-11-22T20:17:03-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b4.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ15 proposed; paper-reported only"
+  },
+  {
+   "id": "C126",
+   "ts": "2026-11-22T20:17:14-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b5.md",
+   "verdict": "SOLID",
+   "note": "SQ79 idea; one cooldown only"
+  },
+  {
+   "id": "C118",
+   "ts": "2026-11-22T20:17:14-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b5.md",
+   "verdict": "SOLID",
+   "note": "SQ74 idea; no throughput result"
+  },
+  {
+   "id": "C79",
+   "ts": "2026-11-22T20:17:14-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b5.md",
+   "verdict": "SOLID",
+   "note": "Kimi 5.3 and Table 2 match"
+  },
+  {
+   "id": "C71",
+   "ts": "2026-11-22T20:17:14-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b5.md",
+   "verdict": "WEAK",
+   "note": "GDN contrast contradicted by SQ70 keyword-arg pass"
+  },
+  {
+   "id": "C38",
+   "ts": "2026-11-22T20:17:14-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b5.md",
+   "verdict": "SOLID",
+   "note": "LT2/CHASE support examples; novelty unverified"
+  },
+  {
+   "id": "C30",
+   "ts": "2026-11-22T20:17:14-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b5.md",
+   "verdict": "WRONG",
+   "note": "auditor reads OlympiadBench T=4 as 71.85"
+  },
+  {
+   "id": "C125",
+   "ts": "2026-11-22T20:17:15-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b6.md",
+   "verdict": "WEAK",
+   "note": "K7 campaign sample, not an SQ79 result"
+  },
+  {
+   "id": "C117",
+   "ts": "2026-11-22T20:17:15-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b6.md",
+   "verdict": "SOLID",
+   "note": "SQ73 not run"
+  },
+  {
+   "id": "C78",
+   "ts": "2026-11-22T20:17:15-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b6.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "K1 pointer unrelated; paper pages not cited"
+  },
+  {
+   "id": "C70",
+   "ts": "2026-11-22T20:17:15-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b6.md",
+   "verdict": "SOLID",
+   "note": "SQ50 timed out; CPU reference only"
+  },
+  {
+   "id": "C37",
+   "ts": "2026-11-22T20:17:15-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b6.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ18/SQ31 artifacts absent"
+  },
+  {
+   "id": "C69",
+   "ts": "2026-11-22T20:17:15-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b6.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "no concrete header/blog pointer"
+  },
+  {
+   "id": "C124",
+   "ts": "2026-11-22T20:17:15-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b7.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ78 idea; patch only"
+  },
+  {
+   "id": "C116",
+   "ts": "2026-11-22T20:17:15-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b7.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ72 idea; no benchmark"
+  },
+  {
+   "id": "C77",
+   "ts": "2026-11-22T20:17:15-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b7.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "E1 is not a conv ablation"
+  },
+  {
+   "id": "C16",
+   "ts": "2026-11-22T20:17:15-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b7.md",
+   "verdict": "SOLID",
+   "note": "K3 control invalid; Mamba-2 untested"
+  },
+  {
+   "id": "C36",
+   "ts": "2026-11-22T20:17:15-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b7.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "local SQ21/E2 do not give the percentages"
+  },
+  {
+   "id": "C68",
+   "ts": "2026-11-22T20:17:15-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b7.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "no reproducible FLOP calculation"
+  },
+  {
+   "id": "C123",
+   "ts": "2026-11-22T20:17:34-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b8.md",
+   "verdict": "SOLID",
+   "note": "SQ77 idea"
+  },
+  {
+   "id": "C115",
+   "ts": "2026-11-22T20:17:34-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b8.md",
+   "verdict": "SOLID",
+   "note": "SQ72 gate; K1 dense mask only"
+  },
+  {
+   "id": "C76",
+   "ts": "2026-11-22T20:17:34-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b8.md",
+   "verdict": "WEAK",
+   "note": "not qualified as paper-reported"
+  },
+  {
+   "id": "C93",
+   "ts": "2026-11-22T20:17:34-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b8.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "no replicated seeds; contaminated val"
+  },
+  {
+   "id": "C35",
+   "ts": "2026-11-22T20:17:34-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b8.md",
+   "verdict": "WEAK",
+   "note": "generalises beyond the paper setup"
+  },
+  {
+   "id": "C67",
+   "ts": "2026-11-22T20:17:34-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-2005-b8.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "2608.18230 not in refs; no calculation file"
   }
  ]
 }

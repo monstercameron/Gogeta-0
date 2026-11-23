@@ -847,3 +847,9 @@ Prompted by outside review 2026-11-23 12:10 (`notes/reviews/2026-11-23-1210-revi
 - **Runs:** A2s and A3mx at lr 3e-3 and 1.2e-2, seed 5, 200M tokens of code-py-v2 (4 runs; configs `a2/a2s.json`, `a3/a3mx.json`), on the A3/A4 fleet.
 - **Rule:** an arm is **LR-robust at 6e-3** if its seed-5 clean80 at 6e-3 is within 1% of the best of {3e-3, 6e-3, 1.2e-2}. If both A2s and A3mx pass, C206-C208 return to VERIFIED on their registered results. If either fails, the affected A3 comparisons are re-run at the better LR (seeds 5-7) before any upgrade.
 - **Prediction:** both pass (6e-3 within 1% of the best), because E27's family optimum sits at 6e-3 and the A arms share its recipe.
+
+## SQ392 positional control for the long-context result (2026-11-23 ~14:15 EST, before running; outside review 14:09, I-b)
+- **Setup:** SQ351's 200M checkpoints of cell 000 (dense, RoPE, trained at 1,024 tokens) and cell 100 (GDN hybrid), 3 seeds, on the same long clean80 files SQ351 used, scored at 2,048 tokens beyond position 1,024. Dense is scored with and without linear RoPE position interpolation (scale 1/2 for 2,048; positions divided by 2); the hybrid is scored as in SQ351. Eval only, no training.
+- **Estimand:** the hybrid's advantage over dense past 1,024 tokens (log NLL ratio, paired by seed), without vs with interpolation on the dense arm.
+- **Prediction:** interpolation removes about half of the dense arm's post-1,024 degradation, so the advantage shrinks from -60.7% to about -30% (range -45% to -10%).
+- **Rule:** if the advantage with interpolation is still beyond -50%, the long-context result stands as stated. If it falls inside -30%, it is restated as "vs unscaled RoPE", and the README's long-context bullet is rewritten before it is cited again.

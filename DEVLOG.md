@@ -18,6 +18,25 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.43: Evidence refreshed: C106 sandbox 16/16 checks + 6/6 gate tests; C3 causality and SWA cutoff exact-zero witness; SQ419 queued ahead of SQ75
+*2026-11-23*
+
+**Evidence refreshed for two VERIFIED claims (C106 sandbox: 16/16 self-test checks and 6/6 gate tests; C3 causality: an exact-zero witness). SQ419 is queued ahead of SQ75.**
+
+- **C106** (quick review 17:44): the saved self-test artifact had 12 checks, older than the current 16. A re-run at HEAD passes all 16 (adding home listing, venv invisibility, the negative control and /proc visibility), and `tests.test_sandbox_gate` passes 6/6, including the fail-closed gate (`test_failing_self_test_blocks_every_child`). Saved as `test-runs/2026-11-23-sandbox-selftest-1745.txt`. Scope unchanged: a process sandbox, not a security boundary.
+- **C3** (quick review 17:54): `tests/test_model.py` needs CUDA, so a new CPU witness (`experiments/checks/c3_window_witness.py` -> `results/c3_window_witness.json`) runs GDN through the torch reference recurrence.
+  - Every block type (attn, swa, gdn, looped hybrid) shows max |logit diff| exactly 0.0 before a perturbed token.
+  - A window-8 SWA layer moves positions >= 8 by exactly 0.0.
+  - This closes C3's "no saved output" limitation for the cutoff wording.
+- **Queue:** SQ419 (the F-6 parameter-matched control) is added ahead of SQ75 (quick review 17:49). It is HUMAN because GPU spend waits for the go-ahead, and NOT READY until its config, prediction and readout hash are committed.
+- **Quick reviews:**
+  - 17:39: a failure-type breakdown is added to SQ4.
+  - 17:44: C106 refreshed.
+  - 17:49: queue fixed; the final-model gate is answered.
+  - 17:54: C3 witness.
+
+---
+
 ## v0.5.42: Outside review 17:37: A2 headline not parameter-matched (15.1M vs 9.5M unique params); C209 caveat; 'mostly the assembly' withdrawn; SQ419 F-6 control is the next GPU pick
 *2026-11-23*
 

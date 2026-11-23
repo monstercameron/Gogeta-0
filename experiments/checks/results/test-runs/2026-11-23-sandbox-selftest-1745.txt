@@ -1,0 +1,33 @@
+== evals/sandbox.py self_test 2026-11-23T17:47:24-05:00 HEAD 7479a83
+{
+ "ok": true,
+ "checks": {
+  "linux_and_unshare": true,
+  "pass_and_fail_scored": true,
+  "repo_not_visible": true,
+  "repo_not_writable": true,
+  "windows_drive_hidden": true,
+  "home_not_writable": true,
+  "home_listdir_raises": true,
+  "home_venvs_invisible": true,
+  "negative_control_fails": true,
+  "positive_control_proc_visible": true,
+  "shared_tmp_private": true,
+  "cannot_unmount_private_view": true,
+  "network_blocked": true,
+  "timeout_kills": true,
+  "memory_capped": true,
+  "runs_as_nobody": true
+ },
+ "child_python": "/usr/bin/python3.12",
+ "platform": "linux"
+}
+== tests.test_sandbox_gate
+gogeta_utils._exec_metrics (what lm-eval's exec tasks call) uses sandbox.run_tests: a failed self-test ... ok
+test_failing_self_test_blocks_every_child (tests.test_sandbox_gate.TestFailClosed.test_failing_self_test_blocks_every_child) ... ok
+Load the gogeta exec tasks directly through lm-eval's TaskManager (no run_suite.py), score one doc with ... gogeta_heldout_exec: Custom kwargs can be passed to `--metadata` in console (as json string) or to the TaskManager.
+test_self_test_runs_once_per_process (tests.test_sandbox_gate.TestFailClosed.test_self_test_runs_once_per_process) ... ok
+test_probes_discriminate (tests.test_sandbox_gate.TestHomeProbes.test_probes_discriminate) ... ok
+test_self_test_includes_home_probes_and_passes (tests.test_sandbox_gate.TestHomeProbes.test_self_test_includes_home_probes_and_passes) ... ok
+Ran 6 tests in 8.185s
+OK

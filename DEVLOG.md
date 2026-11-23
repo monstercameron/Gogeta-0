@@ -18,6 +18,40 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.87: Outside review 23:39: C198's d=256 result is noisy and LR-confounded (SQ301 registered); README scale caveat; SQ300-SQ304
+*2026-11-22*
+
+**Outside review 23:39 (Haiku), triaged.** Fact-checked against `experiments/checks/results/sq243_sq241.json`.
+- **C198's d = 256 endpoint is weak:**
+  - E10's four seeds have sd 0.0021, against 0.0003 for E1 (7×).
+  - E1 does beat E10 on all four seeds, so the review's "driven by three seeds" is an overstatement; but the size of the gap rests on E10's noise.
+  - The LRs were never re-tuned per width.
+  - E1 also uses FusionDance's init and E10 uses HF's. SQ200, running now, measures that confound at d = 384.
+- **SQ301 registered and queued** (`experiments/checks/PREDICTIONS.md`): an LR-fair re-test at d = 256.
+  - E1 and E10 at lr {3e-3, 6e-3, 1.2e-2} × seeds 0–1, reusing the existing cells: 8 new runs.
+  - **W1:** E10's best LR is ≥ 6e-3.
+  - **W2:** the best-vs-best gap lies in [−1.0%, +0.25%].
+  - **Rule:** a gap within ±0.5% refutes C198.
+- **README:** the "scale looks like the lever" sentence now carries the E34 caveat from v0.4.84 (a wide 5-block model at E32's parameters and FLOPs is 14% worse, so the lever may be distinct depth).
+- **New side quests:**
+  - SQ302: LR transfer across width (muP-style), which feeds the final-model LR;
+  - SQ303: grow unique depth onto a trained E1;
+  - SQ304: per-seed loss-curve diagnosis.
+- **Rejected:** EMA as a power tool (SQ217 covers EMA, and a headline-metric change needs its own registration), and an E32/E2 redundancy probe (covered by SQ248 and SQ265).
+
+**Quick review 23:39 (code-model practitioner, Codex):**
+- SQ300, a patch-repair pilot: a capability gate for the final model, gated on `generate()`.
+- The identifier reuse-distance idea is merged into SQ209.
+- The whitespace probe is rejected as a duplicate of SQ194.
+
+**Fleet:**
+- The SQ238 dedup-control dataset `code-py-v1sub` is built on w4-1: 698,714 docs, 196.5M tokens, 179,069 v1-val-linked docs excluded, train.bin sha256 `7e0f15f1...`, built in 43 s.
+- Its 4 seeds are training.
+- Its manifest is committed only after a second box reproduces it byte for byte.
+- 136 jobs are queued (wave 6 remainder, SQ238 arm B, F2 stage 1).
+
+---
+
 ## v0.4.86: Docs refresh (hourly); date errata (v0.4.85 and wave-6 headers); SQ299 from quick review
 *2026-11-22*
 

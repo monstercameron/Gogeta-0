@@ -629,3 +629,16 @@ Source: outside review 2026-11-23 00:10. C197's limitation (event 4): E34, which
 - The headers "Fleet wave 6, part 3 (2026-11-23 ~00:20 ...)" and "part 4 (2026-11-23 ~00:30 ...)" carry wrong times. The git commits that added them are `2526428` (2026-11-22 23:11 EST) and `9b78441` (23:12 EST); the outside review they cite was written at about 23:10 EST (its file `notes/reviews/2026-11-23-0010-review.md` is misnamed). The cloud boxes log in UTC, which is the likely source of the confusion.
 - Both commits precede every SQ266/SQ271/SQ282/SQ283 dispatch (wave-6 jobs started after 23:17 EST, box logs 04:17 UTC and later), so "registered before dispatch" holds by git. The header text is left as registered.
 
+## SQ301 (2026-11-22 ~23:50 EST, before dispatch): LR-fair re-test of C198 at d = 256
+- **Why:** C198 (E1 1.24% better than E10 at d = 256) used E1 6e-3 and E10 3e-3 at every width (registered limitation). E10's d = 256 seeds are also 7× noisier than E1's (sd 0.0021 vs 0.0003, `experiments/checks/results/sq243_sq241.json`). Outside review 2026-11-22 23:39, idea 1.
+- **Arms:** the SQ243 configs, unchanged (`e1_d256` [a898c7d0a2d380b5], `e10_d256` [29a5563361330ffa]; 99M / 96M tokens), each at lr {3e-3, 6e-3, 1.2e-2}, seeds 0 and 1. The existing SQ243 cells (E1 6e-3 and E10 3e-3, seeds 0–3) are reused; **8 new runs**. RTX 5090, clean80 bpc.
+- **Best LR per arm:** the lowest 2-seed (s0, s1) mean clean80 across the three LRs.
+- **Predictions:**
+  - **W1:** E10's best LR at d = 256 is 6e-3 or 1.2e-2, not 3e-3 (smaller models tolerate higher LRs).
+  - **W2:** at each arm's best LR, the paired (s0, s1) gap E1 − E10 lies in [−1.0%, +0.25%], i.e. the d = 256 advantage shrinks.
+- **Decision rule for C198:**
+  - Gap at best LRs within ±0.5% → C198 REFUTED (an LR artifact) and the README's d = 256 line is withdrawn.
+  - Gap ≤ −1.0% at best LRs, both seeds the same sign → C198 keeps PARTIAL with this as evidence (still n = 2, and the init confound remains, see below).
+  - Anything else → C198 stays PARTIAL, marked inconclusive at 2 seeds.
+- **Known remaining confound:** E1 uses FusionDance's init and E10 HF's. SQ200 (running, d = 384) measures the init effect; it is not re-tested here.
+

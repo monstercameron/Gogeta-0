@@ -17,11 +17,17 @@
   <a href="https://monstercameron.github.io/Gogeta-0/devlog.html">Devlog page</a> ·
   <a href="https://monstercameron.github.io/Gogeta-0/learn.html">Learn</a> ·
   <a href="https://monstercameron.github.io/Gogeta-0/architecture.html">3D architecture</a> ·
+  <a href="#byte-quest-bytes-are-a-main-quest-now">Byte Quest</a> ·
   <a href="experiments/INDEX.md">Experiment index</a> ·
   <a href="experiments/QUEUE.md">Queue</a> ·
   <a href="experiments/claims.md">Claims ledger</a> ·
   <a href="DEVLOG.md">DEVLOG.md</a> ·
   <a href="https://github.com/monstercameron/Gogeta-0/tags">Releases / tags</a>
+</p>
+
+<p align="center">
+  <b>Start here:</b> this README (the pitch and current status) → <a href="experiments/claims-status.md"><code>experiments/claims-status.md</code></a> (<b>the authoritative current state of every claim</b>; this README summarises it and may lag) → <a href="experiments/INDEX.md"><code>experiments/INDEX.md</code></a> (what each experiment asked and found) → <a href="experiments/QUEUE.md"><code>experiments/QUEUE.md</code></a> (what runs next) → <a href="DEVLOG.md"><code>DEVLOG.md</code></a> (versioned history).<br>
+  <b>If the README and the ledger disagree, the ledger (<code>experiments/claims/</code>) wins.</b>
 </p>
 
 <p align="center">
@@ -38,7 +44,7 @@
 
 **Gogeta-0** is a small causal language model for Python code, and the first model built on **FusionDance**: an architecture that fuses three separate answers to the three big costs of modern LLMs. It's an open, laptop-scale research project, and every experiment is written up honestly, failures included.
 
-> **Status: v0.4.65. First models trained.** On 200M tokens of Python, swapping five of six attention layers for linear-time layers gave **3.6% lower loss than the standard transformer**, in **one seed at an untuned learning rate** (ledger C5: partial). The looped version **doesn't pay off yet** (C6/C7: partial). A 3-seed replication at the tuned learning rates (E10 3e-3, E1 6e-3, from the K7 sweep) has started: E10 first, E1 queued. The recurrent decode kernel for Gated DeltaNet now works (C2 verified; the earlier NaN was our call-site bug, C110). **Caveat (K9, v0.4.33):** 41.7% of our validation documents turned out to be near-duplicates of training text, because the corpus repeats many problems, so every loss number so far is inflated. All loss numbers are provisional until the clean-validation re-score; all checkpoints will be re-scored on that cleaned set before any claim is settled. See [Results](#results-so-far) and the [claims list](experiments/claims-status.md). **Early warning (SQ99, exploratory):** on Python files from outside the training corpus, E1's advantage over E0 disappears (E1 is 0.4% worse there, 3.4% better on our own cleaned validation set); the tuned, replicated checkpoints will be re-checked.
+> **Status: v0.4.65. First models trained.** On 200M tokens of Python, swapping five of six attention layers for linear-time layers gave **3.6% lower loss than the standard transformer**, in **one seed at an untuned learning rate** (ledger C5: partial). The looped version **doesn't pay off yet** (C6/C7: partial). A 3-seed replication at the tuned learning rates (E10 3e-3, E1 6e-3, from the K7 sweep) has started: E10 first, E1 queued. The recurrent decode kernel for Gated DeltaNet now works (C2 verified; the earlier NaN was our call-site bug, C110). **Caveat (K9, v0.4.33):** 41.7% of our validation documents turned out to be near-duplicates of training text, because the corpus repeats many problems, so every loss number so far is inflated. All loss numbers are provisional until the clean-validation re-score; all checkpoints will be re-scored on that cleaned set before any claim is settled. See [Results](#results-so-far) and the [claims list](experiments/claims-status.md). **Early warning (SQ99, exploratory):** on Python from outside the training corpus we see no evidence of E1's in-corpus advantage (3.4% on our cleaned validation set): the out-of-corpus gap is +0.4% with a package-clustered 95% CI of −0.1% to +1.0%. The tuned, replicated checkpoints will be re-checked.
 
 ## The pitch
 
@@ -68,6 +74,34 @@ flowchart LR
 ```
 
 **The one rule: nothing quadratic lives inside the loop.** Anything inside the loop is paid *r* times, so the only full-attention layer sits outside it and runs once. It's also the only layer whose memory grows with the length of the input.
+
+The diagram above is the **token-level** model that E0–E11 train. A second, planned architecture, the **coarse-to-fine byte model**, keeps the same stack but changes *what* it runs on and *where* the loop sits: see [Byte Quest](#byte-quest-bytes-are-a-main-quest-now) below. It is a design concept, not a trained model.
+
+## Byte Quest: bytes are a main quest now
+
+<p align="center">
+  <img src="docs/assets/byte-quest-c2f.svg" alt="Coarse-to-fine byte model: raw bytes, a narrow byte encoder, patches of P bytes, an E1-style global stack on patches, expansion back to bytes with a one-patch causal shift, a shared-weight byte refinement loop run r times with raw bytes re-injected, and a 256-way byte head. Design concept, not trained." width="640">
+</p>
+
+**Why bytes.** No tokenizer to train or ship; exact characters (identifiers, digits, indentation) instead of opaque token ids; robustness to odd spellings and unseen text; and an 8,192-way output head (21% of E1's per-token compute) replaced by a 256-way one.
+
+**The coarse-to-fine idea: depth where the information is, iteration where the errors are.** A narrow byte encoder pools every *P* bytes into a patch. The E1-style global stack runs once, on patches only (1/*P* as many positions). Its output is shifted by **one patch** so a byte never sees its own patch's summary (the causal fix from MegaByte), expanded back to byte positions, and then a small **shared-weight byte refinement loop** runs *r* times at byte resolution, with the raw bytes re-injected each pass and a loss on every pass. The skeleton (encoder → global patches → decoder) is known work (MegaByte, BLT, H-Net); the hypothesis worth testing is the narrower one, that *shared* byte refinement beats an unshared decoder of equal FLOPs. Design: [`notes/analysis-coarse-to-fine.md`](notes/analysis-coarse-to-fine.md).
+
+**Estimated cost** (estimates from that note, not measurements): at P = 4 the design costs about 1.04× / 1.19× / 1.48× E1's training FLOPs per token of text at r = 1 / 2 / 4, versus about 3.6× for a flat byte-level E1.
+
+| Experiment | Question (planned, not run) |
+|---|---|
+| [E12: flat byte-level E1](experiments/cards/E12.md) | Is a flat byte model (vocab 256, T = 4,096 bytes, E1's mixers) competitive with BPE-E1 at matched FLOPs and at matched bytes? |
+| [E13: patch granularity sweep](experiments/cards/E13.md) | How does patch size (P = 2 / 4 / 8) trade quality against cost with a single-pass byte decoder? |
+| [E14: byte refinement loop sweep](experiments/cards/E14.md) | At matched FLOPs, does a shared-weight refinement loop (r = 1 / 2 / 4, gated, per-pass loss) beat a single-pass decoder and an equal-FLOP unshared decoder? |
+| [E15: parallel-then-refine decoding](experiments/cards/E15.md) | Can predicting all P bytes of the next patch at once and refining over r < P passes match byte-autoregressive quality? |
+| [E16: byte quest × FusionDance](experiments/cards/E16.md) | Does the best byte decoder combine with a looped global core (E2-style) and a ternary global core? |
+
+All five are **planned** (arc "Byte Quest (granularity x loops)" in [`experiments/experiments.json`](experiments/experiments.json)); no prediction is registered and nothing has been run.
+
+**The honest caveat.** The literature says byte models trail BPE below roughly 4B parameters on code ([`notes/research-byte-level-2025-26.md`](notes/research-byte-level-2025-26.md)), so "beats BPE-E1" is *not* the claim. The arc's claims are about **granularity and loops**: how patch size trades quality for cost, and whether shared byte-level refinement buys anything over equal-FLOP unshared depth (E2's loop did not pay at token level, ledger C6). If all byte variants trail BPE but the loop beats its control, that is still a result.
+
+Explore it: the [3D architecture page](https://monstercameron.github.io/Gogeta-0/architecture.html?model=c2f_byte) has a "C2F-byte (concept)" model with a patch-size slider and the loops slider; the [site section](https://monstercameron.github.io/Gogeta-0/#bytes) has the same diagram.
 
 ## Goals
 

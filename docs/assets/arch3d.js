@@ -25,7 +25,7 @@ const BICONE_R0 = 0.28;   // bicone radius at d; widens linearly with hidden/d
 const GAP = 0.5;
 const GROUND_Y = -2.6;
 const BYTES = 2;          // bf16
-const COL = { attn: 0x3987e5, swa: 0x199e70, gdn: 0xd95926, mlp: 0xc98500, inj: 0x9a8fc8, emb: 0x6f7bb8, gold: 0xffd23f, orange: 0xff8a1f };
+const COL = { attn: 0x3987e5, swa: 0x199e70, gdn: 0xd95926, mlp: 0xc98500, inj: 0x9a8fc8, emb: 0x6f7bb8, gold: 0xffd23f, orange: 0xff8a1f, byte: 0x1fb5c9, byte2: 0x8fdce8 };
 const KIND = {
   attn: { name: "Full attention", short: "ATTN", css: "#3987e5" },
   swa: { name: "Sliding-window attention", short: "SWA", css: "#199e70" },
@@ -42,6 +42,11 @@ const PLAIN = {
   ring: "The looped core: one set of blocks stored once and run r times. Same weights, extra compute.",
   inj: "Mixes the original input e back in at the start of every loop, so the loop never forgets the prompt.",
   head: "Turns the final vector into scores for the next token.",
+  byteenc: "Concept: a narrow local encoder over raw bytes (vocab 256, no tokenizer). Width d = 192, half the global d = 384.",
+  patch: "Concept: P consecutive bytes are pooled into one patch position; the global stack only ever sees patches.",
+  expand: "Concept: patch states are spread back to byte positions, shifted by ONE patch so a byte never sees its own patch's summary (the causal fix).",
+  brefine: "Concept: a shared-weight local block run r times at byte resolution. Same weights, extra compute, applied where the character-level errors are.",
+  bytehead: "Concept: a 256-way next-byte head instead of an 8,192-way token head.",
 };
 const REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $ = (id) => document.getElementById(id);
@@ -52,7 +57,8 @@ const ctxLabel = (n) => (n >= 1024 ? n / 1024 + "k" : String(n));
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 // ------------------------------------------------------------------ state
-const S = { a: null, b: null, compare: false, ctxIdx: 2, loops: 4, unroll: true, motion: !REDUCED };
+const S = { a: null, b: null, compare: false, ctxIdx: 2, loops: 4, unroll: true, motion: !REDUCED, P: 4 };
+const P_OPTS = [2, 4, 8];
 let DATA = null, CTX = [1024, 2048, 4096, 8192, 16384, 32768];
 let renderer, labelRenderer, scene, camera, controls, stage, raycaster;
 let models = [];           // built model objects currently in the scene
@@ -89,6 +95,14 @@ async function init() {
   if (!res.ok) throw new Error("architectures.json: HTTP " + res.status);
   DATA = await res.json();
   CTX = DATA.ctx_stops || CTX;
+  try {
+    // Hand-written concept entry (not produced by export_arch.py); optional, the page works without it.
+    const rb = await fetch("data/architectures-bytes.json", { cache: "no-cache" });
+    if (rb.ok) {
+      const bj = await rb.json(), e1 = DATA.models.find((m) => m.name === (bj.models[0] || {}).global_from);
+      if (e1) for (const c of bj.models) DATA.models.push(makeConcept(c, e1, bj.disclaimer));
+    }
+  } catch (e) { console.warn("architectures-bytes.json not loaded", e); }
   try { const tr = await fetch("data/token-trace.json", { cache: "no-cache" }); if (tr.ok) TRACE = await tr.json(); } catch (e) { TRACE = null; }
   $("stamp").textContent = `${DATA.generated_at} · ${DATA.git}`;
 
@@ -152,6 +166,7 @@ async function init() {
   $("rngLoops").value = S.loops;
   $("rngCtx").value = S.ctxIdx;
 
+  $("rngP").addEventListener("input", () => { S.P = P_OPTS[+$("rngP").value] || 4; rebuild(false); });
   $("selA").addEventListener("change", () => { S.a = $("selA").value; syncLoopsDefault(S.a); rebuild(true); fusion(); });
   $("selB").addEventListener("change", () => { S.b = $("selB").value; rebuild(true); fusion(); });
   $("chkCompare").addEventListener("change", () => { S.compare = $("chkCompare").checked; $("ctlB").hidden = !S.compare; rebuild(true); if (S.compare) fusion(); });
@@ -182,7 +197,7 @@ async function init() {
 
 function syncLoopsDefault(name) {
   const m = DATA.models.find((x) => x.name === name);
-  if (m && m.looped) { S.loops = m.loops; $("rngLoops").value = S.loops; }
+  if (m && m.looped) { $("rngLoops").max = 12; S.loops = m.loops; $("rngLoops").value = S.loops; }
 }
 
 function resize() {
@@ -343,8 +358,9 @@ function tipWeights(d, b, copy) {
   return h;
 }
 function tipShape(d, b, copy) {
-  const n = ctxN(), c = d.config, W = c.window, dm = c.d_model;
+  const n = d.ctxDiv ? Math.max(1, Math.round(ctxN() / d.ctxDiv)) : ctxN(), c = d.config, W = c.window, dm = c.d_model;
   let h = blockTitle(b, d, copy);
+  if (d.ctxDiv) h += `<span class="sub">Global stack: runs on patch positions, ${fmt(n)} patches for ${fmt(ctxN())} bytes at P = ${d.ctxDiv}.</span>`;
   if (b.kind === "attn") {
     const cells = (n * (n + 1)) / 2;
     h += row("context n", fmt(n)) + row("score cells n(n+1)/2", fmt(cells)) + row("KV cache", fmtB(2 * dm * n * BYTES) + " (2·d·n·2B)");
@@ -642,6 +658,207 @@ function buildModel(d, slotLoops) {
   return M;
 }
 
+// ================================================================== C2F-byte (concept): coarse-to-fine byte model
+// A DESIGN CONCEPT, not a trained model. Data: data/architectures-bytes.json (hand-written) + E1's real blocks from architectures.json.
+// Every number is an estimate from notes/analysis-coarse-to-fine.md (see cost_model in the JSON).
+function makeConcept(c, e1, disclaimer) {
+  const scaleBlock = (b, f, sec, idx) => {
+    const k = (o) => Math.round(o * f);
+    return { ...b, section: sec, index: idx, params: { mixer: k(b.params.mixer), mlp: k(b.params.mlp), norms: k(b.params.norms), total: k(b.params.total) },
+      mixer_parts: b.mixer_parts.map((p) => ({ ...p, params: k(p.params) })), mlp_parts: b.mlp_parts.map((p) => ({ ...p, params: k(p.params) })),
+      mlp: { ...b.mlp, d_in: c.d_local, hidden: Math.round((b.mlp.hidden * c.d_local) / c.d_global) },
+      state_elems: b.state_elems ? k(b.state_elems) : b.state_elems, state_note: b.state_note ? "illustrative: E1's state scaled by (192/384)^2" : b.state_note };
+  };
+  const all = e1.sections.flatMap((s) => s.blocks);
+  const global = all.map((b, i) => ({ ...b, section: "global", index: i }));
+  const local = c.local_block_kinds.map((kind, i) => scaleBlock(all.find((b) => b.kind === kind), c.local_block_scale, "byte-refine", i));
+  return { ...c, e1, disclaimer, looped: true, loops: c.r_default, loops_range: [c.r_min, c.r_max], ternary: { enabled: false },
+    sections: [{ name: "global", blocks: global }, { name: "byte-refine", blocks: local }], globalBlocks: global, localBlocks: local, val_loss: null,
+    notes: [disclaimer] };
+}
+const conceptMflops = (d, P, r) => d.cost_model.global_term / P + d.cost_model.local_base + d.cost_model.per_pass * (r - 1);
+function conceptBody(M, bigN) {
+  const d = M.d, P = M.P, r = M.r, ratio = conceptMflops(d, P, r) / d.e1_train_mflops_per_token;
+  const note = P === 4 ? "P = 4 matches the note's table (95 / 108 / 135 M)." : `P = ${P} is our 1/P extrapolation of the global term; the note only tabulates P = 4.`;
+  return `
+      <div class="name"><span>${esc(d.experiment)} · ${esc(d.name)}</span><span class="status">${esc(d.status)}</span></div>
+      <div class="big" data-big>${fmt(bigN)}</div>
+      <div class="gag">ESTIMATED MFLOPs per BPE-token-equivalent of text · ×${ratio.toFixed(2)} of E1 (${d.e1_train_mflops_per_token} M)</div>
+      <dl>
+        <dt>patch size P</dt><dd>${P} bytes</dd>
+        <dt>global positions</dt><dd>${fmt(ctxN() / P)} patches for ${fmt(ctxN())} bytes</dd>
+        <dt>byte refinement passes</dt><dd>r = ${r} (shared weights)</dd>
+        <dt>widths</dt><dd>local ${d.d_local} · global ${d.d_global}</dd>
+        <dt>output head</dt><dd>${d.byte_vocab}-way (E1: 8,192)</dd>
+        <dt>bytes per BPE token</dt><dd>${d.bytes_per_bpe_token} (measured on val)</dd>
+        <dt>parameters</dt><dd>not estimated here</dd>
+        <dt>val loss</dt><dd>not run (concept)</dd>
+      </dl>
+      <div class="note"><b>Design concept:</b> ${esc(d.disclaimer.replace(/^design concept: /, ""))}.</div>
+      <div class="note">${esc(note)}</div>
+      <div class="note">Literature prior: bytes trail BPE below about 4B parameters on code, so the arc tests granularity and loops, not a win over BPE-E1.</div>`;
+}
+
+function buildC2F(d, slotLoops) {
+  const P = S.P, r = Math.max(d.r_min, Math.min(d.r_max, slotLoops));
+  const M = { d, P, grp: new THREE.Group(), wedges: [], pick: [], gdnSites: [], r, ringR: 0, height: 0, ghostTiles: 0, realTiles: 0, pl: { pre: [], core: [], coda: [] }, spin: [] };
+  const g = M.grp, e1 = d.e1;
+  const dG = { ...e1, name: d.name, ctxDiv: P, ternary: { enabled: false } };
+  const dL = { ...e1, name: d.name, config: { ...e1.config, d_model: d.d_local, window: d.local_window_bytes }, ternary: { enabled: false } };
+  const NB = 16, DX = 0.42, W = NB * DX, x0 = -(W - DX) / 2, NP = NB / P;
+  const bx = (i) => x0 + i * DX, pcx = (k) => x0 + (k * P + (P - 1) / 2) * DX;
+  const note = (txt, cls, x, y, z, css) => { const l = label(txt, cls, new THREE.Vector3(x, y, z), css); g.add(l); return l; };
+  const reg = (mesh, tip, css, leg) => { mesh.userData.tip = tip; mesh.userData.color = css; mesh.userData.leg = leg; mesh.userData.plain = PLAIN[leg] || ""; g.add(mesh); M.pick.push(mesh); return mesh; };
+  const segs = (arr, hex, leg, dashed, opacity) => {
+    const geom = new THREE.BufferGeometry().setFromPoints(arr);
+    const m = dashed ? new THREE.LineDashedMaterial({ color: hex, dashSize: 0.16, gapSize: 0.1, transparent: true, opacity }) : new THREE.LineBasicMaterial({ color: hex, transparent: true, opacity });
+    const l = new THREE.LineSegments(geom, m);
+    if (dashed) l.computeLineDistances();
+    l.userData.leg = leg; g.add(l); return l;
+  };
+  const box = (w, h, dp, x, y, z, hex) => { const m = new THREE.Mesh(unitBox(), mat(hex)); m.scale.set(w, h, dp); m.position.set(x, y, z); withEdges(m, false); return m; };
+  const V = (x, y, z) => new THREE.Vector3(x, y, z);
+  const byteRow = (y, leg, tipFn) => { for (let i = 0; i < NB; i++) { const k = Math.floor(i / P); reg(box(0.3, 0.3, 0.3, bx(i), y, 0, k % 2 ? COL.byte2 : COL.byte), () => tipFn(i, k), "#1fb5c9", leg); } };
+
+  // 1. raw bytes + narrow byte encoder
+  byteRow(0.15, "byteenc", (i, k) => `<b>Byte ${i + 1} of ${NB} drawn</b> · in patch ${k + 1} of ${NP}<br>${row("vocab", "256 (raw bytes, no tokenizer)")}<span class="sub">Real contexts are thousands of bytes (T = 4,096 in E12); 16 are drawn. Alternating tints only mark patch groups: the dashed boundary lines carry the meaning.</span>`);
+  const enc = box(W, 0.35, 0.8, 0, 0.68, 0, COL.byte);
+  reg(enc, () => `<b>Byte encoder</b> (concept)<br>${row("width", `d = ${d.d_local} (narrow)`)}${row("runs at", "byte resolution")}<span class="sub">Local GDN + short-window mixers. The raw bytes also bypass it and are re-injected into every refinement pass. Slab size is illustrative, not a parameter count.</span>`, "#1fb5c9", "byteenc");
+  note("RAW BYTES · vocab 256", "sect", 0, -0.55, 1.2);
+  note(`BYTE ENCODER · d=${d.d_local} (narrow)`, "kind", W / 2 + 0.2, 0.68, 0.9, "#1fb5c9");
+
+  // 2. patch boundaries + patch tiles + funnel
+  const bd = [];
+  for (let k = 0; k <= NP; k++) { const xx = x0 - DX / 2 + k * P * DX; bd.push(V(xx, -0.2, 0), V(xx, 2.45, 0)); }
+  segs(bd, 0xcfd6ff, "patch", true, 0.55);
+  for (let k = 0; k < NP; k++) reg(box(P * DX * 0.84, 0.3, 0.8, pcx(k), 2.15, 0, COL.byte), () => `<b>Patch tile ${k + 1} of ${NP}</b> (concept)<br>${row("covers", `bytes ${k * P + 1}-${k * P + P} of the ${NB} drawn`)}${row("P", `${P} bytes → 1 global position`)}<span class="sub">At P = 4 a patch is about 1.07 BPE tokens of text (3.735 bytes per token), so the global stack costs about what E1's body costs.</span>`, "#1fb5c9", "patch");
+  const fun = [];
+  for (let i = 0; i < NB; i++) fun.push(V(bx(i), 0.86, 0), V(pcx(Math.floor(i / P)), 2.0, 0));
+  segs(fun, COL.byte, "patch", false, 0.5);
+  note(`PATCHES · P = ${P} bytes each`, "sect", -(W / 2 + 1.0), 2.15, 0);
+
+  // 3. global stack on patches: E1's real blocks
+  let y = 3.5;
+  const yStackBase = y;
+  const toStack = [];
+  for (let k = 0; k < NP; k++) toStack.push(V(pcx(k), 2.3, 0), V(0, yStackBase - 0.1, 0));
+  segs(toStack, COL.byte, "patch", false, 0.5);
+  for (const b of d.globalBlocks) {
+    const t = buildTile(dG, b, false, null);
+    t.wedges.forEach((w) => (w.div = P));
+    t.group.position.set(0, y, 0); g.add(t.group);
+    M.wedges.push(...t.wedges); M.pick.push(...t.pick);
+    if (t.gdn) M.gdnSites.push(V(0, y + t.gdn.y, 0));
+    M.realTiles++;
+    y += t.height + GAP;
+  }
+  note("GLOBAL STACK ON PATCHES (E1-style)", "sect", -(PLINTH + 1.9), yStackBase + 0.6, 0);
+  const yT = y - GAP + 0.1;
+
+  // 4. expansion with the one-patch shift
+  const yA = yT + 1.1, yBb = yA + 2.6;
+  const out = [];
+  for (let k = 0; k < NP; k++) out.push(V(0, yT + 0.05, 0), V(pcx(k), yA - 0.15, 0));
+  segs(out, COL.emb, "expand", false, 0.5);
+  for (let k = 0; k < NP; k++) reg(box(P * DX * 0.84, 0.3, 0.8, pcx(k), yA, 0, COL.emb), () => `<b>Patch state ${k + 1}</b> (global output)<br><span class="sub">${k < NP - 1 ? `Feeds only the bytes of patch ${k + 2}, never its own patch.` : "The last drawn patch: its state feeds the NEXT patch, which is not decoded yet."}</span>`, "#6f7bb8", "expand");
+  const bosX = x0 - DX / 2 - 0.9;
+  reg(box(0.7, 0.3, 0.8, bosX, yA, 0, COL.emb), () => `<b>BOS state</b><br><span class="sub">A learned start state: the bytes of the first patch have no earlier patch to read.</span>`, "#6f7bb8", "expand");
+  note("BOS", "kind", bosX, yA - 0.5, 0, "#6f7bb8");
+  byteRow(yBb, "expand", (i, k) => `<b>Byte position ${i + 1}</b> · patch ${k + 1}<br><span class="sub">${k === 0 ? "Reads the learned BOS state." : `Reads the global state of patch ${k} (the previous one).`} Then it adds its own byte embedding and offset inside the patch. Causal local mixers handle bytes before it in its own patch.</span>`);
+  const sh = [];
+  for (let k = 0; k < NP; k++) for (let j = 0; j < P; j++) { const i = k * P + j; sh.push(k === 0 ? V(bosX, yA + 0.15, 0) : V(pcx(k - 1), yA + 0.15, 0), V(bx(i), yBb - 0.15, 0)); }
+  segs(sh, COL.orange, "expand", true, 0.95);
+  const lp = pcx(NP - 1), st = [V(lp, yA + 0.15, 0), V(lp, yA + 0.75, 0), V(lp - 0.15, yA + 0.6, 0), V(lp, yA + 0.75, 0), V(lp + 0.15, yA + 0.6, 0), V(lp, yA + 0.75, 0)];
+  segs(st, COL.orange, "expand", false, 0.95);
+  note("EXPANSION · ONE-PATCH SHIFT", "shared", 0, yA + 1.3, 1.1);
+  note("→ next patch", "kind", lp + 0.9, yA + 0.8, 0, "#ff8a1f");
+
+  // 5. byte refinement loop x r (the looped-core ring and ghosts, at byte resolution)
+  const core = d.localBlocks, n = core.length, R = Math.max(3, 1.1 * n + 1), base = yBb + 1.1;
+  M.ringR = R;
+  const phi = (i) => Math.PI / n + (2 * Math.PI * i) / n;
+  const built = core.map((b) => buildTile(dL, b, false, null));
+  const tH = Math.max(...built.map((t) => t.height)), pitch = tH + 0.55;
+  built.forEach((t, i) => {
+    const a = phi(i);
+    t.group.position.set(R * Math.cos(a), base, R * Math.sin(a)); t.group.rotation.y = -a; g.add(t.group);
+    M.wedges.push(...t.wedges); M.pick.push(...t.pick);
+    if (t.gdn) M.gdnSites.push(V(R * Math.cos(a), base + t.gdn.y, R * Math.sin(a)));
+    M.realTiles++;
+  });
+  const ring = new THREE.Mesh(geo(`ring${R.toFixed(2)}`, () => new THREE.TorusGeometry(R, 0.07, 10, 96)), new THREE.MeshBasicMaterial({ color: COL.byte }));
+  ring.rotation.x = Math.PI / 2; ring.position.y = base - 0.02;
+  reg(ring, () => `<b>Byte refinement loop</b> (concept)<br>${row("blocks stored", `${n} (${core.map((b) => KIND[b.kind].short).join(" · ")}) at d = ${d.d_local}`)}${row("passes r", r)}${row("per extra pass", `+${d.cost_model.per_pass} MFLOPs per BPE-token-equivalent (est.)`)}<span class="sub">The same local weights run r times at byte resolution; the raw bytes are re-injected each pass and every pass gets a loss. A gated update is planned to keep the hidden-state norm from growing (the E2 lesson, K6).</span>`, "#1fb5c9", "brefine");
+  const floor = new THREE.Mesh(geo(`floor${R.toFixed(2)}`, () => new THREE.CircleGeometry(R, 64)), new THREE.MeshBasicMaterial({ color: COL.byte, transparent: true, opacity: 0.08, side: THREE.DoubleSide, depthWrite: false }));
+  floor.rotation.x = -Math.PI / 2; floor.position.y = base - 0.03; floor.userData.leg = "brefine"; g.add(floor);
+  const aura = sprite(COL.byte, R * 4.4, 0.3); aura.position.set(0, base + tH * 0.4, 0); aura.userData.leg = "aura"; g.add(aura); M.aura = aura;
+  const hI = 0.3;
+  const injM = new THREE.Mesh(geo(`inj${hI.toFixed(2)}`, () => new THREE.CylinderGeometry(0.3, 0.6, hI, 24)), mat(COL.inj));
+  injM.position.set(0, base + hI / 2, 0); withEdges(injM, false);
+  reg(injM, () => `<b>Re-inject</b> (every pass)<br><span class="sub">The raw byte embeddings are mixed back in at the start of each refinement pass. A patch encoder is lossy; refinement cannot recover what it threw away unless the raw bytes bypass it.</span>`, "#9a8fc8", "inj");
+  note("RE-INJECT", "kind", 0, base + hI + 0.4, 0, "#9a8fc8");
+  const bxs = -(W / 2 + 0.9);
+  const beam = new THREE.Line(new THREE.BufferGeometry().setFromPoints([V(bxs, 0.15, 0), V(bxs, base + 0.2, 0), V(-0.45, base + 0.2, 0)]), new THREE.LineDashedMaterial({ color: COL.inj, dashSize: 0.22, gapSize: 0.14 }));
+  beam.computeLineDistances(); beam.userData.leg = "beam"; g.add(beam);
+  note("raw bytes skip the patch path", "kind", bxs - 0.2, (base + 0.2) / 2, 0, "#9a8fc8");
+  let top = base + tH;
+  const unroll = S.unroll && r > 1;
+  if (unroll) {
+    for (let k = 1; k < r; k++) core.forEach((b, i) => {
+      const t = buildTile(dL, b, true, { k, r }), a = phi(i);
+      t.group.position.set(R * Math.cos(a), base + k * pitch, R * Math.sin(a)); t.group.rotation.y = -a; g.add(t.group);
+      M.wedges.push(...t.wedges); M.pick.push(...t.pick); M.ghostTiles++;
+    });
+    top = base + (r - 1) * pitch + tH;
+    core.forEach((b, i) => {
+      const a = phi(i), rr = R + 1.0;
+      const ln = new THREE.Line(new THREE.BufferGeometry().setFromPoints([V(rr * Math.cos(a), base, rr * Math.sin(a)), V(rr * Math.cos(a), top, rr * Math.sin(a))]), new THREE.LineDashedMaterial({ color: COL.gold, dashSize: 0.18, gapSize: 0.12, transparent: true, opacity: 0.8 }));
+      ln.computeLineDistances(); ln.userData.leg = "same"; g.add(ln);
+    });
+    const a0 = phi(0), rr = R + 1.0;
+    note(`SAME WEIGHTS × ${r}  ·  0 new params`, "shared", rr * Math.cos(a0), (base + top) / 2, rr * Math.sin(a0));
+    const hp = [], M2 = 48;
+    for (let k = 0; k < r; k++) for (let j = 0; j <= M2; j++) { const ang = (2 * Math.PI * (k * M2 + j)) / M2; hp.push(V(R * Math.cos(ang), base + 0.35 + (k + j / M2) * pitch, R * Math.sin(ang))); }
+    const tube = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(hp), r * 64, 0.03, 6, false), new THREE.MeshBasicMaterial({ color: COL.orange, transparent: true, opacity: 0.55 }));
+    tube.userData.leg = "helix"; g.add(tube);
+  }
+  note(`BYTE REFINEMENT × ${r}`, "loop", -(R + 1.4), base + tH / 2, 0);
+  for (let q = 0; q < 3; q++) { const sp = sprite(COL.byte, 0.9, 0.9); sp.userData.leg = "brefine"; g.add(sp); M.spin.push({ sp, R, y: base - 0.02, off: (q * 2 * Math.PI) / 3 }); }
+  y = top + 0.7;
+
+  // 6. 256-way byte head
+  const hH = 0.5;
+  const head = new THREE.Mesh(geo("head", () => new THREE.CylinderGeometry(0.3, 1.0, hH, 24)), mat(COL.byte));
+  head.position.y = y + hH / 2; withEdges(head, false);
+  reg(head, () => `<b>Byte head</b> (concept)<br>${row("outputs", "256 next-byte scores")}${row("weights", `256 × ${d.d_local} = ${fmt(256 * d.d_local)} if untied`)}<span class="sub">E1's 8,192-way head is 8,192 × 384 = ${fmt(8192 * 384)} weights and about ${d.e1_head_mflops} MFLOPs per token (21% of E1). Dropping it pays for the byte path.</span>`, "#1fb5c9", "bytehead");
+  note("NEXT BYTE · 256-way head", "sect", 0, y + hH + 0.45, 0);
+  y += hH; M.height = y;
+  note(`${d.experiment} · ${d.title}`, "title", 0, y + 1.4, 0);
+  note("DESIGN CONCEPT · estimates, not trained", "badge", 0, y + 2.3, 0);
+  const big = sprite(COL.orange, Math.max(y * 1.1, 8), 0.14); big.position.set(0, y * 0.5, 0); big.userData.leg = "aura"; g.add(big); M.big = big;
+
+  // ki particles: bytes up the patch path, around the byte ring, out the head
+  const pts = [V(0, 0.15, 0), V(0, 0.68, 0), V(0, 2.15, 0), V(0, yStackBase, 0), V(0, yT, 0), V(0, yA, 0), V(0, yBb, 0), V(0, base + 0.35, 0), V(R, base + 0.35, 0)];
+  const Mseg = 48;
+  for (let k = 0; k < r; k++) for (let j = 1; j <= Mseg; j++) { const ang = (2 * Math.PI * j) / Mseg; pts.push(V(R * Math.cos(ang), base + 0.35 + (unroll ? (k + j / Mseg) * pitch : 0), R * Math.sin(ang))); }
+  pts.push(V(0, base + 0.35 + (unroll ? r * pitch : 0), 0), V(0, y + 0.2, 0));
+  M.path = makePath(pts); M.trip = 12 + 1.1 * r;
+  const N = 70, pg = new THREE.BufferGeometry();
+  pg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(N * 3), 3));
+  M.ki = new THREE.Points(pg, new THREE.PointsMaterial({ size: 0.32, map: glowTex, color: 0xffe27a, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false, sizeAttenuation: true }));
+  M.ki.renderOrder = 3; M.ki.frustumCulled = false; M.ki.userData.leg = "ki"; g.add(M.ki); M.kiN = N;
+  if (M.gdnSites.length) {
+    const per = 8, fg = new THREE.BufferGeometry();
+    fg.setAttribute("position", new THREE.BufferAttribute(new Float32Array(M.gdnSites.length * per * 3), 3));
+    M.feed = new THREE.Points(fg, new THREE.PointsMaterial({ size: 0.2, map: glowTex, color: 0xff9a50, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false }));
+    M.feed.renderOrder = 3; M.feed.frustumCulled = false; M.feedPer = per; M.feed.userData.leg = "feed"; g.add(M.feed);
+  }
+  M.hasCtx = true;
+  M.halfW = Math.max(W / 2 + 2.4, R + 1.5, PLINTH);
+  tickParticles(M, 0);
+  return M;
+}
+
 function makePath(pts) {
   const cum = [0];
   for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + pts[i].distanceTo(pts[i - 1]));
@@ -690,12 +907,19 @@ function rebuild(refit) {
   clearModels();
   for (const name of visibleNames()) {
     const d = DATA.models.find((m) => m.name === name);
-    const M = buildModel(d, S.loops);
+    const M = d.concept ? buildC2F(d, S.loops) : buildModel(d, S.loops);
     scene.add(M.grp);
     models.push(M);
     pickables.push(...M.pick);
   }
   const anyLoop = models.some((m) => m.d.looped);
+  const anyC = models.some((m) => m.d.concept), allC = models.every((m) => m.d.concept);
+  $("rngLoops").max = allC ? models[0].d.r_max : 12;
+  if (S.loops > +$("rngLoops").max) { S.loops = +$("rngLoops").max; $("rngLoops").value = S.loops; }
+  $("ctlP").hidden = !anyC;
+  $("rngP").value = P_OPTS.indexOf(S.P); $("pVal").textContent = String(S.P);
+  $("conceptNote").hidden = !anyC;
+  $("ctxUnit").textContent = allC ? "bytes" : anyC ? "tokens (bytes for the concept)" : "tokens";
   $("rngLoops").disabled = !anyLoop;
   $("chkUnroll").disabled = !anyLoop;
   $("loopVal").textContent = anyLoop ? String(S.loops) : "n/a";
@@ -711,7 +935,7 @@ function rebuild(refit) {
 
 function layoutX() {
   const n = ctxN();
-  const hw = models.map((M) => Math.max(M.halfW, M.hasCtx ? wedgeSide(n) / 2 + 0.6 : 0));
+  const hw = models.map((M) => Math.max(M.halfW, M.hasCtx ? wedgeSide(M.d.concept ? n / M.P : n) / 2 + 0.6 : 0));
   if (models.length === 1) models[0].grp.position.x = 0;
   else { models[0].grp.position.x = -(hw[0] + 0.8); models[1].grp.position.x = hw[1] + 0.8; }
   return hw;
@@ -721,10 +945,11 @@ function applyCtx() {
   const n = ctxN(), L = wedgeSide(n);
   $("ctxVal").textContent = ctxLabel(n);
   for (const M of models) for (const w of M.wedges) {
-    if (w.type === "attn") w.mesh.scale.set(L, 1, L);
+    const Lw = w.div ? wedgeSide(n / w.div) : L; // concept model: the global stack runs on n / P patch positions
+    if (w.type === "attn") w.mesh.scale.set(Lw, 1, Lw);
     else {
       const bw = Math.max(0.07, wedgeSide(w.window)); // band width: fixed (window), independent of n
-      w.mesh.scale.set(bw, 1, L * Math.SQRT2);
+      w.mesh.scale.set(bw, 1, Lw * Math.SQRT2);
     }
   }
   layoutX();
@@ -938,10 +1163,11 @@ function renderPower(light) {
     light = false;
   }
   models.forEach((M, i) => {
-    const d = M.d, s = stats(M), el = host.children[i];
-    const body = `
+    const d = M.d, s = d.concept ? null : stats(M), el = host.children[i];
+    const bigN = d.concept ? Math.round(conceptMflops(d, M.P, M.r)) : s.total;
+    const body = d.concept ? conceptBody(M, bigN) : `
       <div class="name"><span>${esc(d.experiment || "")} · ${esc(d.name)}</span>${d.status ? `<span class="status">${esc(d.status)}</span>` : ""}</div>
-      <div class="big" data-big>${fmt(s.total)}</div>
+      <div class="big" data-big>${fmt(bigN)}</div>
       <div class="gag">PARAMETERS · over 9,000? yes, ×${(s.total / 9000).toFixed(0)}</div>
       <dl>
         <dt>non-embedding</dt><dd>${fmt(s.nonEmb)}</dd>
@@ -969,7 +1195,7 @@ function renderPower(light) {
     } else {
       el.innerHTML = body;
       el.dataset.sig = d.name;
-      countTo(el.querySelector("[data-big]"), s.total);
+      countTo(el.querySelector("[data-big]"), bigN);
     }
   });
 }
@@ -977,6 +1203,7 @@ function renderPower(light) {
 function renderSummary() {
   $("a11y-summary").innerHTML = models.map((M) => {
     const d = M.d;
+    if (d.concept) return `<li>${esc(d.title)}: design concept, not trained. Raw bytes are encoded by a narrow local encoder, pooled into patches of ${M.P} bytes, processed by a global stack of ${d.sections[0].blocks.length} blocks on patches with a one-patch causal shift, expanded back to byte positions, refined by a shared-weight local block run ${M.r} times, and read out by a 256-way byte head. Numbers are estimates from notes/analysis-coarse-to-fine.md.</li>`;
     const parts = d.sections.map((s) => `${s.name}${s.name === "core" ? ` (run ${M.r} times)` : ""}: ${s.blocks.map((b) => KIND[b.kind].name).join(", ")}`).join("; ");
     return `<li>${esc(d.name)}: ${fmt(d.params.total)} parameters. ${esc(parts)}.${d.ternary.enabled ? " Ternary weights." : ""}</li>`;
   }).join("");
@@ -1007,6 +1234,7 @@ function exposeTestHook() {
     setLoops: (r) => fire("rngLoops", r, "input"),
     setModel: (name) => fire("selA", name, "change"),
     setModelB: (name) => fire("selB", name, "change"),
+    setPIndex: (i) => fire("rngP", i, "input"),
     setCompare: (on) => fire("chkCompare", on, "change"),
     setUnroll: (on) => fire("chkUnroll", on, "change"),
     reset: () => fitCamera(false),
@@ -1167,6 +1395,7 @@ function setPlayEnabled(on, msg) {
 function playReset() {
   PLAY = null; $("outRow").hidden = true; $("outStrip").innerHTML = ""; $("ptip").hidden = true;
   const M = models[0];
+  if (M && M.d.concept) { $("playStage").innerHTML = ""; setPlayEnabled(false, "Play is not available for the concept model: there is no trained checkpoint to trace. Pick another model to see real tokens flow."); renderPlayInfo(null); renderLegend(); return; }
   if (!TRACE || !M) { setPlayEnabled(false, "Play needs data/token-trace.json (generate it with experiments/viz/export_trace.py)."); renderPlayInfo(null); renderLegend(); return; }
   PLAY = buildPlay(M);
   setPlayEnabled(true);
@@ -1388,16 +1617,21 @@ const LEGEND = [
   { key: "gdn", icon: "cube", c: COL.gdn, name: "Gated DeltaNet: state cube", meaning: "Edge ∝ cube root of the state size (heads × d × d); constant at any context. " + PLAIN.gdn, has: (d) => hasKind(d, "gdn") },
   { key: "mlp", icon: "hex", c: COL.mlp, name: "MLP: hexagonal bicone", meaning: "Height = MLP parameters; width ratio = hidden/d. " + PLAIN.mlp, has: () => true },
   { key: "plinth", icon: "plinth", c: COL.emb, name: "Plinth: mixer weights", meaning: "Height = mixer parameters (1M = 1 unit). Coloured by block kind.", has: () => true },
-  { key: "emb", icon: "cyl", c: COL.emb, name: "Embedding + scale-break rings", meaning: "Height = embedding parameters, capped at 1.6 units; the dark rings mean the true height is cut. Tied with the output head.", has: () => true },
+  { key: "emb", icon: "cyl", c: COL.emb, name: "Embedding + scale-break rings", meaning: "Height = embedding parameters, capped at 1.6 units; the dark rings mean the true height is cut. Tied with the output head.", has: (d) => !d.concept },
   { key: "inj", icon: "disc", c: COL.inj, name: "Re-inject disc", meaning: "Height = injection parameters (2d → d). " + PLAIN.inj, has: (d) => d.looped },
   { key: "beam", icon: "dash", c: COL.inj, name: "Violet dashed beam", meaning: "Carries the original input e from the embedding to the re-inject disc.", has: (d) => d.looped },
+  { key: "byteenc", icon: "bytebar", c: COL.byte, name: "Byte encoder: narrow slab + byte cubes", meaning: "Concept. Each small cube is one raw byte (vocab 256, no tokenizer); the slab is the local encoder at byte resolution, width d = 192 (half the global d = 384). Size is illustrative.", has: (d) => !!d.concept },
+  { key: "patch", icon: "patch", c: COL.byte, name: "Patch tiles + boundaries", meaning: "Concept. Dashed vertical lines mark patch boundaries; each group of P bytes funnels (thin lines) into one tile. The global stack above sees only these tiles: 1 / P as many positions as bytes. Slide P (2, 4, 8).", has: (d) => !!d.concept },
+  { key: "expand", icon: "fan", c: COL.orange, name: "Expansion + one-patch shift", meaning: "Concept. Patch states fan back out to byte positions, shifted by one patch: dashed lines run from patch k to the bytes of patch k + 1, so no byte sees its own patch's summary. The first patch gets a learned BOS state.", has: (d) => !!d.concept },
+  { key: "brefine", icon: "ring", c: COL.byte, name: "Byte refinement loop × r", meaning: "Concept. A shared-weight local block (GDN + sliding window) run r times at byte resolution, with the raw bytes re-injected each pass and a loss at every pass. Same ring and ghost-pillar language as the looped core, but at byte level.", has: (d) => !!d.concept },
+  { key: "bytehead", icon: "head", c: COL.byte, name: "Byte head: 256-way", meaning: "Concept. Scores over 256 byte values instead of E1's 8,192 token ids.", has: (d) => !!d.concept },
   { key: "prelude", icon: "tag", c: COL.gold, name: "Prelude (PRELUDE tag)", meaning: "Blocks that run once, before the loop. Stack height = their parameters.", has: (d) => hasSec(d, "prelude") },
-  { key: "ring", icon: "ring", c: COL.gold, name: "Core ring: CORE × r", meaning: "The looped blocks stored once; r on the label = loop count; the orbiting glows spin faster as r grows. " + PLAIN.ring, has: (d) => d.looped },
+  { key: "ring", icon: "ring", c: COL.gold, name: "Core ring: CORE × r", meaning: "The looped blocks stored once; r on the label = loop count; the orbiting glows spin faster as r grows. " + PLAIN.ring, has: (d) => d.looped && !d.concept },
   { key: "ghost", icon: "ghost", c: COL.gold, name: "Ghost loop pillars", meaning: "Translucent copies, one per extra loop: 0 new parameters, one more pass of compute each.", has: (d) => d.looped && S.unroll && S.loops > 1 },
   { key: "helix", icon: "helix", c: COL.orange, name: "Helix path", meaning: "The route of the computation: one turn per loop, climbing one pitch each time.", has: (d) => d.looped && S.unroll && S.loops > 1 },
   { key: "same", icon: "dash", c: COL.gold, name: "“same weights” lines", meaning: "Dashed gold lines tie each real block to its ghost copies (shared weights).", has: (d) => d.looped && S.unroll && S.loops > 1 },
   { key: "coda", icon: "tag", c: COL.gold, name: "Coda (CODA tag)", meaning: "Blocks that run once, after the loop.", has: (d) => hasSec(d, "coda") },
-  { key: "head", icon: "head", c: COL.emb, name: "Output head", meaning: "Vector → next-token scores. Tied to the embedding, so 0 extra parameters. " + PLAIN.head, has: () => true },
+  { key: "head", icon: "head", c: COL.emb, name: "Output head", meaning: "Vector → next-token scores. Tied to the embedding, so 0 extra parameters. " + PLAIN.head, has: (d) => !d.concept },
   { key: "tern", icon: "tern", c: 0x4a90ff, name: "Ternary speckle + 1.58-bit badge", meaning: "A −1/0/+1 texture marks BitLinear layers; the gold badge gives the % of weights that are ternary.", has: (d) => d.ternary.enabled },
   { key: "ki", icon: "ki", c: COL.gold, name: "Gold ki particles", meaning: "Data flow: up the prelude, around the core r times, out the coda. Speed is decorative; the order is real.", has: () => true },
   { key: "feed", icon: "ki2", c: COL.orange, name: "Orange feed particles", meaning: "Tokens being written into a GDN memory cube.", has: (d) => hasKind(d, "gdn") },
@@ -1483,7 +1717,7 @@ function initUI2() {
     else if (e.key === "r" || e.key === "R") { playRestart(); fitCamera(true); }
     else if (e.key === "Escape") { fitCamera(true); clearHalos(); }
     else if (e.key === "?") { KEYS.open = !KEYS.open; }
-    else if (/^[1-7]$/.test(e.key)) { const n = DATA.models[+e.key - 1]; if (n) { $("selA").value = n.name; $("selA").dispatchEvent(new Event("change", { bubbles: true })); } }
+    else if (/^[1-8]$/.test(e.key)) { const n = DATA.models[+e.key - 1]; if (n) { $("selA").value = n.name; $("selA").dispatchEvent(new Event("change", { bubbles: true })); } }
   });
 }
 
@@ -1497,6 +1731,12 @@ window.__arch3dSelfTest = async function (rounds = 20) {
   for (let i = 0; i < rounds; i++) {
     for (const n of A.names) { A.setModel(n); renderer.render(scene, camera); }
     A.setModel(start.model); A.setCompare(true); A.setModelB(A.names[(i + 1) % A.names.length]); A.setCompare(false);
+    if (A.names.includes("c2f_byte")) {
+      A.setModel("c2f_byte");
+      for (const pi of [0, 1, 2, 1]) { A.setPIndex(pi); for (let r = 1; r <= 4; r++) A.setLoops(r); }
+      A.setCompare(true); A.setModelB("e1_hybrid"); A.setCompare(false);
+      A.setModel(start.model);
+    }
     for (let r = 1; r <= 12; r++) A.setLoops(r);
     for (let r = 11; r >= start.loops; r--) A.setLoops(r);
     for (let c = 0; c <= 5; c++) A.setCtxIndex(c);

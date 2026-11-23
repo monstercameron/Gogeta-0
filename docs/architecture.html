@@ -55,12 +55,16 @@
       <select id="selB" aria-label="Model B"></select>
     </label>
     <label class="ctl range">
-      <span>Context <b id="ctxVal" class="val">4k</b> tokens</span>
+      <span>Context <b id="ctxVal" class="val">4k</b> <span id="ctxUnit">tokens</span></span>
       <input type="range" id="rngCtx" min="0" max="5" step="1" value="2" aria-label="Context length, 1k to 32k tokens">
     </label>
     <label class="ctl range">
       <span>Loops r <b id="loopVal" class="val">4</b></span>
       <input type="range" id="rngLoops" min="1" max="12" step="1" value="4" aria-label="Loop count r, 1 to 12">
+    </label>
+    <label class="ctl range" id="ctlP" hidden>
+      <span>Patch size P <b id="pVal" class="val">4</b> bytes</span>
+      <input type="range" id="rngP" min="0" max="2" step="1" value="1" aria-label="Patch size P in bytes: 2, 4 or 8">
     </label>
     <label class="ctl chk">
       <input type="checkbox" id="chkUnroll" checked> <span>Unroll loops</span>
@@ -71,6 +75,8 @@
       <button type="button" class="btn small" id="btnShot" title="Save the 3D canvas as a PNG (labels are HTML and not included)">Save PNG</button>
     </div>
   </div>
+
+  <p class="conceptnote" id="conceptNote" hidden><b>Design concept:</b> numbers are estimates from <code>notes/analysis-coarse-to-fine.md</code>, not a trained model. This is the planned <a href="./#bytes">Byte Quest</a> (E12&ndash;E16). The global stack is E1's real block list, run on patches; the byte-level blocks are E1's blocks scaled down for illustration. Loops r are limited to 1&ndash;4 here, and Play mode is off (no checkpoint to trace).</p>
 
   <div class="playbar" id="playbar" role="group" aria-label="Play: animate the real tokens of the prompt through the model">
     <div class="pb-btns">
@@ -84,7 +90,7 @@
     <div class="pb-stage" id="playStage" aria-live="polite"></div>
     <div class="pb-detail" id="playDetail" role="status">Loading the token trace&hellip;</div>
     <details class="keys" id="keysPanel"><summary>Keyboard shortcuts</summary>
-      <p><kbd>Space</kbd> play / pause &nbsp; <kbd>&rarr;</kbd> step &nbsp; <kbd>&larr;</kbd> step back &nbsp; <kbd>R</kbd> restart + reset camera &nbsp; <kbd>1</kbd>&ndash;<kbd>7</kbd> pick model &nbsp; <kbd>Esc</kbd> leave focus &nbsp; <kbd>?</kbd> this list. Click a block to zoom to it.</p></details>
+      <p><kbd>Space</kbd> play / pause &nbsp; <kbd>&rarr;</kbd> step &nbsp; <kbd>&larr;</kbd> step back &nbsp; <kbd>R</kbd> restart + reset camera &nbsp; <kbd>1</kbd>&ndash;<kbd>8</kbd> pick model &nbsp; <kbd>Esc</kbd> leave focus &nbsp; <kbd>?</kbd> this list. Click a block to zoom to it.</p></details>
   </div>
 
   <div class="stage-grid">
@@ -123,7 +129,7 @@
 
   <ol class="sr-only" id="a11y-summary" aria-label="Text summary of the displayed architecture"></ol>
 
-  <p class="fine">Numbers come from <code>data/architectures.json</code>, exported from the real model code by <code>tools/viz/export_arch.py</code>. Snapshot: <span id="stamp">…</span>. FLOPs are per training token at sequence length 1024. Memory assumes bf16 (2 bytes per value); ternary models are shown 2-bit packed.</p>
+  <p class="fine">Numbers come from <code>data/architectures.json</code>, exported from the real model code by <code>tools/viz/export_arch.py</code>; the C2F-byte concept model comes from the hand-written <code>data/architectures-bytes.json</code> (estimates, not exported from code). Snapshot: <span id="stamp">…</span>. FLOPs are per training token at sequence length 1024. Memory assumes bf16 (2 bytes per value); ternary models are shown 2-bit packed.</p>
 </main>
 
 <footer><div class="wrap">

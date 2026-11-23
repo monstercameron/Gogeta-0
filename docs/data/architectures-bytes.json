@@ -1,0 +1,52 @@
+{
+  "schema": 1,
+  "hand_written": true,
+  "note": "Hand-written. Not produced by tools/viz/export_arch.py and not a trained model. Loaded by assets/arch3d.js next to the generated architectures.json.",
+  "source": "notes/analysis-coarse-to-fine.md",
+  "disclaimer": "design concept: numbers are estimates from notes/analysis-coarse-to-fine.md, not a trained model",
+  "models": [
+    {
+      "name": "c2f_byte",
+      "experiment": "E12-E16",
+      "title": "C2F-byte (concept)",
+      "status": "design concept",
+      "concept": true,
+      "arch": "coarse-to-fine-byte",
+      "description": "Byte encoder, fixed patches of P bytes, E1-style global stack on patches with a one-patch causal shift, expansion back to byte positions, a shared-weight byte refinement loop x r, and a 256-way byte head.",
+      "global_from": "e1_hybrid",
+      "d_local": 192,
+      "d_global": 384,
+      "local_block_kinds": ["gdn", "swa"],
+      "local_block_scale": 0.25,
+      "local_window_bytes": 64,
+      "p_options": [2, 4, 8],
+      "p_default": 4,
+      "r_min": 1,
+      "r_max": 4,
+      "r_default": 2,
+      "byte_vocab": 256,
+      "bytes_per_bpe_token": 3.735,
+      "e1_train_mflops_per_token": 91.03,
+      "e1_head_mflops": 18.9,
+      "cost_model": {
+        "formula": "mflops_per_bpe_token_equivalent(P, r) = global_term / P + local_base + per_pass * (r - 1)",
+        "global_term": 269.4,
+        "global_term_derivation": "E1 body = 91.03 - 18.9 head = 72.13 MFLOPs per token; one patch is costed like one E1 token; one BPE token = 3.735 bytes, so 72.13 * 3.735 = 269.4",
+        "local_base": 27.7,
+        "local_base_derivation": "note table, P=4, r=1: 95 M total, minus 269.4 / 4 = 67.35 M global",
+        "per_pass": 13.5,
+        "per_pass_derivation": "note: each extra refinement pass costs about 13 M (d_local = 192)",
+        "note_table_P4": { "1": 95, "2": 108, "4": 135 },
+        "extrapolation_warning": "Only the P = 4 row (95 / 108 / 135 M, 1.04 / 1.19 / 1.48 x E1) is in the note. P = 2 and P = 8 are our 1/P extrapolation of the global term, not a measurement and not in the note."
+      },
+      "estimate_notes": [
+        "Design concept: nothing here has been trained. FLOP figures are estimates (6 x active params per position; attention-score terms ignored).",
+        "Global stack = E1's six blocks (swa, gdn, gdn, swa, gdn, attn) run on patch positions, not on bytes.",
+        "Byte-level blocks (encoder and refinement) are E1's gdn and swa blocks scaled by (192/384)^2 = 0.25 for parameters; their size here is illustrative, not a parameter count from the byte model.",
+        "The byte-level SWA window of 64 bytes is a drawing assumption (the note only says 'small-window').",
+        "Parameter totals are not estimated here. See notes/byte-quest.md when the byte model lands.",
+        "Literature prior: byte models trail BPE below about 4B parameters on code, so the arc's claims are about granularity and loops, not beating BPE-E1."
+      ]
+    }
+  ]
+}

@@ -17,6 +17,34 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.67: Byte Quest on the site and README: diagram, 3D concept model, Start-here path
+*2026-11-22*
+
+**What** (the human: "update the uarch graphics and documentation in the gh pages site and the readme, byte level tokens are a thing now"; a subagent built it, the main agent verified it):
+- **README:** a "Byte Quest: bytes are a main quest now" section, covering:
+  - the new SVG diagram `docs/assets/byte-quest-c2f.svg`: byte encoder → patches → global stack → **causal one-patch shift** → byte refinement loop × r → 256-way head; transparent and mid-tone, for GitHub light and dark mode;
+  - why bytes, the coarse-to-fine idea and its estimated cost;
+  - the E12–E16 table linked to the cards;
+  - the honest caveat (bytes trail BPE at our scale; the claims are about granularity and loops).
+
+  Also from the newcomer review: the **stale SQ99 sentence is replaced** ("no evidence of E1's in-corpus advantage out of corpus; CI −0.1%..+1.0%"), and there's a **"Start here" path** with "if the README and the ledger disagree, the ledger wins".
+- **Landing page:** a `#bytes` section with the diagram, the E12–E16 table, and links to cards, devlogs and the 3D page.
+- **3D explorer:** a **"C2F-byte (concept)" model** (key 8, `?model=c2f_byte`): byte cubes, encoder, patch tiles, E1's real global stack on patches, the shift lines, a raw-byte re-inject skip, a byte refinement ring with ghost pillars per extra pass, and the 256-way head. It has a **P slider (2/4/8)**, r limited to 1–4, 5 new legend rows and a "design concept: estimates, not a trained model" banner. The power-level readout reproduces the analysis table at P = 4 (95/108/135 M = 1.04/1.19/1.48× E1); P = 2/8 are labelled extrapolations.
+- The site build lists E12–E16 automatically (experiment pages E12–E16.html).
+- The Learn page is generated from `site-src/learn.md`, so the "Bytes vs tokens" explainer is the unapplied patch `notes/patches/site-bytes-learn.patch`.
+
+**Verified by the main agent** (browser pane):
+- **labels stay at 22 → 22** across full sweeps of every slider and the self-test;
+- `__arch3dSelfTest(3)` passes;
+- a second run is perfectly flat (geometries 45 → 45, textures 3 → 3); the first-run +5 is a one-time cache fill;
+- no console errors;
+- the scene renders as designed (screenshot checked).
+
+The subagent reports 375 px width with no horizontal scroll.
+**Not verified**: the SVG on a pure white background; the 3D visuals at P = 2/8.
+
+---
+
 ## v0.4.66: SQ99 reversed: E1's advantage is length-dependent, not corpus-specific; outside review 20:07
 *2026-11-22*
 

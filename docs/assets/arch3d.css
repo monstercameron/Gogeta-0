@@ -207,3 +207,10 @@ button.lrow.off { opacity: .5; cursor: default; }
 
 .pb-speed.chk { margin-left: 0; } .pb-speed.chk input { width: 18px; height: 18px; accent-color: var(--orange); }
 .pb-speed.chk + .pb-speed { margin-left: auto; }
+
+/* Byte Quest concept model */
+.conceptnote { margin: 0 0 14px; padding: 10px 14px; border: 1px dashed #1fb5c9; border-radius: 10px; background: rgba(31, 181, 201, .08); font-size: .88rem; color: var(--text); }
+.conceptnote[hidden] { display: none; }
+.sw.bytebar { height: 12px; margin-top: 15px; border-radius: 2px; background: repeating-linear-gradient(90deg, var(--c) 0 6px, transparent 6px 8px); }
+.sw.patch { height: 18px; margin-top: 8px; border-radius: 3px; background: none; border: 2px solid var(--c); border-left-style: dashed; border-right-style: dashed; }
+.sw.fan { background: none; height: 0; margin-top: 17px; border-top: 3px dashed var(--c); transform: skewX(-35deg); }

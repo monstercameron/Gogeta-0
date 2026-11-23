@@ -1,0 +1,20 @@
+--- a/site-src/learn.md
++++ b/site-src/learn.md
+@@ -37,6 +37,17 @@
+ ### 3. Ternary weights
+ Store every parameter as just **−1, 0 or +1** instead of a precise 16-bit number. The model's layers become about **7.8× smaller** to store (the whole model about **3.1×**, because the word table stays 16-bit; computed, not yet measured on a packed file). With special ternary kernels, multiplications could become additions, but our code only simulates the rounding, so it isn't faster yet. The open question is how much quality that costs.
+ 
++## Bytes vs tokens (a planned main quest)
++
++Everything above uses **tokens**: our tokenizer chops code into 8,192 kinds of pieces, about 3.7 characters each. The **Byte Quest** (experiments E12 to E16, planned and not run yet) asks what happens if the model reads and writes **raw bytes** (one character of plain code is one byte) and there is no tokenizer at all.
++
++- **Why try it:** no tokenizer to build, every character is visible to the model (long variable names, digits, indentation), and odd spellings are not a problem.
++- **The catch:** a byte sequence is about 3.7 times longer than a token sequence, so doing it naively would cost about 3.6 times as much. And the research literature says byte models usually *trail* token models at our size.
++- **Our idea, "coarse to fine":** chop the bytes into small groups (patches of 2, 4 or 8), let the big part of the model work on the groups, then run a small shared block several times over the individual bytes to fix spelling and digits. Depth where the information is, repeating where the errors are. A design estimate says that costs only about 1.04 to 1.5 times E1, depending on how many repeats. These are estimates, not measurements, and nothing has been trained.
++- **What we are really testing:** not "bytes beat tokens" (we expect they will not at this size), but how group size trades quality for cost, and whether repeating a small block beats using the same compute on a block that is not repeated.
++
++See the diagram and the planned experiments in the [Byte Quest section](./#bytes) and the [3D model](architecture.html?model=c2f_byte).
++
+ ## What we've found so far
+ 
+ > **1. The cheaper memory layers work, and actually beat the standard design.** Swapping 5 of 6 attention layers for running-notes and recent-lines layers made the model **3.6% better** with slightly less computation ([E1](experiments/E1.html) vs [E0](experiments/E0.html)).

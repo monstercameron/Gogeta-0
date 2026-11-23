@@ -21,7 +21,7 @@
       <a href="#fighters">Fighters</a>
       <a href="#fusion">Fusion</a>
       <a href="architecture.html">3D Model</a>
-      <a href="architecture.html">3D Model</a>
+      <a href="#bytes">Byte Quest</a>
       <a href="#ideas">Ideas</a>
       <a href="devlog.html">Devlog</a>
     </div>
@@ -181,6 +181,44 @@
         <p class="cta" style="margin-top: 22px"><a class="btn primary" href="architecture.html">Explore the model in 3D ⚡</a></p>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ============ BYTE QUEST ============ -->
+<section id="bytes" class="alt">
+  <div class="wrap">
+    <p class="kicker">Main quest</p>
+    <h2>Byte Quest: <span class="hl">granularity &times; loops</span></h2>
+    <p class="section-lede">Bytes are a main quest now. <b>Design concept, not a trained model:</b> every number on this page is an estimate from <a href="https://github.com/monstercameron/Gogeta-0/blob/main/notes/analysis-coarse-to-fine.md">the design note</a>, and experiments E12&ndash;E16 are planned, not run.</p>
+    <div class="fusion">
+      <img class="diagram" src="assets/byte-quest-c2f.svg" width="760" height="930" alt="Coarse-to-fine byte model: raw bytes, a narrow byte encoder, patches of P bytes, an E1-style global stack on patches, expansion back to bytes with a one-patch causal shift, a shared-weight byte refinement loop run r times with raw bytes re-injected, and a 256-way byte head. Design concept, not trained." style="background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px; max-width: 100%; height: auto;">
+      <div>
+        <div class="rule">
+          <p class="kicker">The idea</p>
+          <p><b>Depth where the information is, iteration where the errors are.</b> The heavy E1-style stack runs once, on patches of <i>P</i> bytes. A small shared-weight block then loops <i>r</i> times at byte resolution to fix spelling, digits and syntax.</p>
+        </div>
+        <ul class="legend">
+          <li style="--c: var(--blue)"><span><b>Why bytes:</b> no tokenizer, exact characters, robustness to odd spellings, and a 256-way head instead of an 8,192-way one.</span></li>
+          <li style="--c: var(--gold)"><span><b>Causality:</b> global states are shifted by one patch, so a byte never sees its own patch's summary.</span></li>
+          <li style="--c: var(--green)"><span><b>Estimated cost</b> at P = 4: about 1.04&times; / 1.19&times; / 1.48&times; E1 for r = 1 / 2 / 4 (a flat byte model would be about 3.6&times;).</span></li>
+          <li style="--c: var(--red)"><span><b>Honest caveat:</b> the literature says bytes trail BPE below roughly 4B parameters on code. The claims here are about granularity and loops, not beating BPE-E1.</span></li>
+        </ul>
+        <p class="cta" style="margin-top: 22px"><a class="btn primary" href="architecture.html?model=c2f_byte">Explore the byte model in 3D &#9889;</a> <a class="btn" href="https://github.com/monstercameron/Gogeta-0#byte-quest-bytes-are-a-main-quest-now">README section</a></p>
+      </div>
+    </div>
+    <div class="table-wrap" style="margin-top: 26px">
+      <table>
+        <thead><tr><th>Experiment (planned)</th><th>Question</th><th>On GitHub</th></tr></thead>
+        <tbody>
+          <tr><td><a href="experiments/E12.html"><strong>E12</strong></a> Flat byte-level E1</td><td>Is a flat byte model (vocab 256, T = 4,096 bytes) competitive with BPE-E1 at matched FLOPs and at matched bytes?</td><td><a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/cards/E12.md">card</a> &middot; <a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/devlogs/E12.md">micro devlog</a></td></tr>
+          <tr><td><a href="experiments/E13.html"><strong>E13</strong></a> Patch granularity sweep</td><td>How does patch size (P = 2 / 4 / 8) trade quality against cost with a single-pass byte decoder?</td><td><a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/cards/E13.md">card</a> &middot; <a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/devlogs/E13.md">micro devlog</a></td></tr>
+          <tr><td><a href="experiments/E14.html"><strong>E14</strong></a> Byte refinement loop sweep</td><td>At matched FLOPs, does a shared-weight refinement loop (r = 1 / 2 / 4) beat a single-pass decoder and an equal-FLOP unshared one?</td><td><a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/cards/E14.md">card</a> &middot; <a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/devlogs/E14.md">micro devlog</a></td></tr>
+          <tr><td><a href="experiments/E15.html"><strong>E15</strong></a> Parallel-then-refine</td><td>Can predicting a whole patch at once and refining over r &lt; P passes match byte-by-byte quality?</td><td><a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/cards/E15.md">card</a> &middot; <a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/devlogs/E15.md">micro devlog</a></td></tr>
+          <tr><td><a href="experiments/E16.html"><strong>E16</strong></a> Byte quest &times; FusionDance</td><td>Does the best byte decoder combine with a looped global core and a ternary global core?</td><td><a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/cards/E16.md">card</a> &middot; <a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/devlogs/E16.md">micro devlog</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted small">Statuses update live in the <a href="#roadmap">roadmap</a> below and on the <a href="devlog.html#experiments-section">experiment log</a>.</p>
   </div>
 </section>
 

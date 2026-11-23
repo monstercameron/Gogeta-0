@@ -484,3 +484,4 @@ Nothing new is predicted here. This executes items registered in v0.4.40 (sectio
 - **H2:** horizon check stage A at 200M, seed 0: E1 at 3e-3, E10 at 6e-3, E10 at 2e-3. H3 runs only if its registered condition holds.
 - **A3 matched arms** at 200M, seed 0, at their file LRs: E30, E31, E32, E33, E34. Registered design: "1 seed each".
 - **Blocked:** everything on code-py-v2 (E20–E27, E35, E36, E40–E53 except E50/E51). The builder is in progress, and the v2 items wait for its manifest. E42–E45 also need the GDN-flags patch.
+- **Erratum (timestamps):** the wave-2 heading's "~21:45" was an estimate. The section was written and committed at about 21:22 local (v0.4.75), still before any wave-2 dispatch. The wave-1 "~21:20" heading is consistent with v0.4.74's commit time.

@@ -17,6 +17,39 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.76: code-py-v2 builder (deterministic dedup); CPU analyses SQ225, SQ228, SQ233
+*2026-11-22*
+
+**code-py-v2 builder** (`experiments/data_integrity/build_v2.py`, `notes/data-v2.md`; subagent, tests re-run by the main agent: 7/7 pass).
+- **Families:** 64-perm MinHash over token 8-grams, est. Jaccard ≥ 0.5, single linkage over train and val.
+- **Train** keeps one doc per family.
+- **Val** is redrawn: the v1 val docs first, then seeded train singletons, each with under 30% of its 13-grams in train. Every val doc's whole family leaves train, and so does any train doc sharing a rare def/class name with a val doc (one hop).
+- **Checks:** the build asserts the final overlap and family audit.
+- **Determinism:** a 1-worker build is byte-identical to a 3-worker build.
+- **Status:** it unblocks most of A3 (E20–E27, E35, E36, E40–E53). The full build runs next on a rented 5090's CPU, twice on two boxes, to prove the manifests match. v2 val numbers are not comparable with v1 val (it is redrawn).
+
+**CPU analyses (subagent; numbers spot-checked by the main agent):**
+- **SQ225, source mix:**
+  - The val/train config mix matches (algorithmic_corpus 63.9% vs 62.9%, chi2 1.70).
+  - The K9 near-duplicate overlap is concentrated by source: 52.3% of algorithmic val docs vs 22.9% of synthetic (+29.3 pts, CI 26.6–32.2). So clean-val results lean toward synthetic_code_snippet.
+  - **C131:** limitation added.
+- **SQ228, repetition vs length** (330 out-of-corpus files, package-clustered bootstrap):
+  - 8-gram repeat share correlates 0.48 with log length.
+  - Jointly, it absorbs about 27% of the length coefficient (1.55 → 1.13 per SD). Length survives.
+  - **C193:** evidence added, no status change (exploratory).
+- **SQ233, C1/C3:**
+  - C3's attention and SWA causality checks were re-run on CPU and pass (past-token diff 0.0).
+  - C1 and the GDN/looped parts of C3 need fla's Triton GPU kernels. Their JSON stores the recorded values, labelled `recorded`.
+  - Next: a GPU re-run on a rented 5090.
+
+**Quick review 21:26 (skeptical peer reviewer):**
+- **Accepted:** queue reconciliation at the end of each fleet wave.
+- **Rejected:** E1 vs E10 at matched FLOPs, because the token-matched comparison is already conservative against E1 (91.0M vs 96.8M FLOPs/token) and E31 covers the dense side.
+
+**PREDICTIONS erratum:** the wave-2 heading's "~21:45" was an estimate. It was actually written at about 21:22, still before dispatch.
+
+---
+
 ## v0.4.75: Fleet wave 1 dispatched on 8x RTX 5090; wave 2 (registered A3/HPO items on v1) pinned to one SKU
 *2026-11-22*
 

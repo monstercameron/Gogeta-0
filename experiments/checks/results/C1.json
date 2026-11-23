@@ -1,0 +1,39 @@
+{
+  "claim": "C1",
+  "date": "2026-11-22T21:23:02-05:00",
+  "git_commit": "8441ad0",
+  "git_dirty": false,
+  "device": "cpu (CUDA_VISIBLE_DEVICES empty)",
+  "torch": "2.14.1+cu130",
+  "command": "CUDA_VISIBLE_DEVICES= python experiments/checks/c1_c3_rerun.py",
+  "rerun": false,
+  "rerun_error": "RuntimeError: 0 active drivers ([]). There should only be one.",
+  "status": "not_rerun_needs_gpu",
+  "setup": {
+    "B": 2,
+    "T": 300,
+    "H": 4,
+    "K": 64,
+    "V": 64,
+    "seed": 0,
+    "reference": "float32 loop in tests/test_gdn_kernels.py"
+  },
+  "tolerances": {
+    "fp32_fwd": 0.002,
+    "fp32_bwd_rel": 0.02,
+    "bf16_fwd": 0.03,
+    "bf16_bwd_rel": 0.3
+  },
+  "recorded": {
+    "source": "notes/LABNOTEBOOK.md:47 and notes/hardware-spark.md:58 (transcription of GPU printout; not measured in this run)",
+    "fp32": {
+      "fwd_max_abs": 0.00022,
+      "bwd_max_rel": 0.0021
+    },
+    "bf16": {
+      "fwd_max_abs": 0.0008,
+      "bwd_max_rel": 0.0074
+    }
+  },
+  "note": "chunk_gated_delta_rule is a Triton kernel; no CPU path (no active Triton driver). Not reproduced; status untouched. Requires a GPU rerun (python tests/test_gdn_kernels.py) to produce a measured artifact."
+}

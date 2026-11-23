@@ -1,0 +1,81 @@
+{
+  "sq": "SQ225",
+  "date": "2026-11-22T21:23:35-05:00",
+  "git_commit": "8441ad0",
+  "command": "python experiments/checks/sq_225_source_mix.py",
+  "seed": 0,
+  "inputs": {
+    "train": "/root/fusiondance-data/datasets/code-py-v1/docs_train.jsonl (src counted per line)",
+    "val": "/root/fusiondance-data/datasets/code-py-v1/docs_val.jsonl",
+    "k9": "experiments/checks/results/K9.json data.val_per_doc_overlap"
+  },
+  "n_train_docs": 987154,
+  "n_val_docs": 4000,
+  "configs": [
+    "algorithmic_corpus",
+    "synthetic_code_snippet"
+  ],
+  "mix": {
+    "algorithmic_corpus": {
+      "train_docs": 620949,
+      "train_frac": 0.6290295131256116,
+      "val_docs": 2556,
+      "val_frac": 0.639,
+      "expected_val_docs": 2516.1180525024465,
+      "val_se": 0.007637921588078913,
+      "z": 1.3053926725236478,
+      "train_mean_line_bytes": 696.4056581136293,
+      "val_mean_chars": 629.6643192488262
+    },
+    "synthetic_code_snippet": {
+      "train_docs": 366205,
+      "train_frac": 0.3709704868743884,
+      "val_docs": 1444,
+      "val_frac": 0.361,
+      "expected_val_docs": 1483.8819474975535,
+      "val_se": 0.007637921588078913,
+      "z": -1.3053926725236478,
+      "train_mean_line_bytes": 1694.5231632555535,
+      "val_mean_chars": 1613.1308864265927
+    }
+  },
+  "mix_chi2": 1.7040500294784227,
+  "mix_df": 1,
+  "mix_p": 0.19175917219655847,
+  "k9_by_config": {
+    "algorithmic_corpus": {
+      "n": 2556,
+      "frac_ge80": 0.5226917057902973,
+      "ge80_wilson_se": 0.009879657070046713,
+      "n_ge80": 1336,
+      "frac_ge50": 0.7824726134585289,
+      "frac_ge95": 0.30007824726134585,
+      "mean_overlap": 0.7283985133020344,
+      "median_overlap": 0.82035
+    },
+    "synthetic_code_snippet": {
+      "n": 1444,
+      "frac_ge80": 0.22922437673130194,
+      "ge80_wilson_se": 0.011061417618252172,
+      "n_ge80": 331,
+      "frac_ge50": 0.5720221606648199,
+      "frac_ge95": 0.07756232686980609,
+      "mean_overlap": 0.5540759695290859,
+      "median_overlap": 0.5701
+    }
+  },
+  "k9_aggregate_frac_ge80": 0.41675,
+  "k9_aggregate_recorded": 0.41675,
+  "k9_frac_ge80_if_val_had_train_mix": 0.4138239878475555,
+  "k9_ge80_diff": {
+    "a": "algorithmic_corpus",
+    "b": "synthetic_code_snippet",
+    "diff_a_minus_b": 0.2934673290589954,
+    "boot_ci95": [
+      0.2656223583421118,
+      0.3221298048370246
+    ],
+    "perm_p": 0.0
+  },
+  "not_done": "Phase 2b clean-val scores stratified by config (the sensitivity table) not computed here: per-doc NLL of the Phase 2b runs was out of scope; use val index -> src from this file's inputs."
+}

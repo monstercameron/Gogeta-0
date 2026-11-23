@@ -543,3 +543,14 @@ This executes only stages registered in v0.4.40 (`experiments/design/power-cost.
 
 - **SQ189 (memory/throughput probe):** 50-step `--bench` runs of e13b, e14b, e14c, e15b and e13a on one RTX 5090. It is informational: it replaces the flops-table time estimates and its peak memory gates E13a. No prediction is scored.
 - **SQ221 (byte-dataset determinism):** `cockpit/remote/fetch_bytes.sh` rebuilds `code-py-v1-bytes` on the box and must print `BYTES OK` against the committed `dataset-bytes.manifest.json`. A mismatch blocks every byte run.
+
+### Wave-5 amendment (2026-11-22 ~23:30, before any F2 run; outside review 23:10, ideas A/B)
+- **Seed blocking:** every cell's seed s uses the same data order, since the order is set by the train seed and all five cells train on code-py-v2 with T = 1,024.
+  - On the 15 pilot runs, a common seed effect explains 35% of the residual SS; the seed-blocked log-sd is 0.0082 (df 8) vs 0.0090 unblocked (df 10).
+  - **The primary F2 analysis is the seed-blocked factorial contrast**: a seed fixed effect plus cell effects, on log clean80 bpc. The unblocked analysis is the registered sensitivity.
+- **Blinded variance re-estimation:**
+  - F2 runs in two stages. Stage 1 is the first 120 queued runs (interleaved across cells).
+  - Then sigma is re-estimated from **within-cell, seed-blocked residuals only**: no cell means, contrasts or interaction estimates are computed or looked at.
+  - Stage 2's size is set so the final N gives 80% power for |I| = 1%, capped at the registered N = 246.
+  - If stage 1 already reaches that N, F2 stops.
+  - Because the re-estimation is blinded, the alpha of the final test is unchanged (Kieser & Friede 2003). The stage-1 sigma and the stage-2 size are recorded in the devlog before stage 2 dispatches.

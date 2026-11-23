@@ -77,6 +77,7 @@ class GogetaConfig(PreTrainedConfig):
     conv_size: int = 4
     ternary: bool = False
     gdn_neg_eigval: bool = False  # v0.4.7 (E11): beta in (0, 2) via the kernel's 2*sigmoid
+    init: str = "gogeta"          # ModelConfig.init: "gogeta" (scaled residual-output init) | "flat"
     tie_word_embeddings: bool = True
     # HF / generation fields (ids match gogeta/assets/tokenizer-code-py-v1.json)
     eos_token_id: int | None = 0
@@ -194,7 +195,8 @@ class GogetaForCausalLM(PreTrainedModel, GenerationMixin):
             init.copy_(module.sin, freqs.sin()[None, None].to(module.sin.device))
         elif isinstance(module, nn.Linear):
             depth = self.model.effective_depth() if hasattr(self, "model") else 1
-            std = 0.02 / (2 * max(1, depth)) ** 0.5 if getattr(module, "is_residual_out", False) else 0.02
+            scaled = getattr(module, "is_residual_out", False) and self.config.init != "flat"
+            std = 0.02 / (2 * max(1, depth)) ** 0.5 if scaled else 0.02
             init.normal_(module.weight, mean=0.0, std=std)
             if module.bias is not None:
                 init.zeros_(module.bias)

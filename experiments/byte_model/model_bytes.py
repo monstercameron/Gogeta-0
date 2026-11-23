@@ -55,6 +55,9 @@ class ModelConfig:
     gdn_neg_eigval: bool = False  # GDN write strength beta in (0, 2) instead of (0, 1): negative eigenvalues (SQ2/E11)
     ternary: bool = False
     tie_embeddings: bool = True
+    # mirrors gogeta.model.ModelConfig.init (SQ234/SQ200; must stay identical, see test_config_dict_identical).
+    # The byte model's own init path is unchanged; only "gogeta" is honoured here.
+    init: str = "gogeta"
 
     @property
     def head_dim(self) -> int:

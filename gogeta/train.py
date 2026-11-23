@@ -14,6 +14,12 @@ Architectures (top-level config key "arch", default "fusiondance"):
 
 --lr overrides train.lr (used by the K7 LR sweep); the effective value is what the run config
 records under "train", and every CLI override is listed under "cli_overrides".
+
+Opt-in options (all OFF by default; defaults are bit-identical to the pre-option code):
+  model.init            "gogeta" (default) | "flat" (FusionDance); for arch hf_llama: "hf" (default, HF's own
+                        init) | "gogeta" (std 0.02, residual outputs o_proj/down_proj scaled by 1/sqrt(2*layers))
+  train.schedule        "cosine" (default) | "wsd" (warmup, constant, linear decay over the last train.decay_frac)
+  train.micro_batch     default = batch_size (no accumulation); else gradient accumulation, --micro-batch overrides
 """
 from __future__ import annotations
 
@@ -81,15 +87,33 @@ class HFLlama(torch.nn.Module):
         from transformers import LlamaConfig, LlamaForCausalLM
 
         kw = {**model_cfg, "vocab_size": vocab_size, "use_cache": False}
+        init = kw.pop("init", "hf")   # not a LlamaConfig field: "hf" (HF's own init, default) | "gogeta" | "flat"
+        if init not in ("hf", "gogeta", "flat"):
+            raise ValueError(f"unknown hf_llama init {init!r} (hf | gogeta | flat)")
         self.hf_config = LlamaConfig(**kw)
         if self.hf_config.max_position_embeddings < seq_len:
             raise ValueError(f"max_position_embeddings {self.hf_config.max_position_embeddings} < seq_len {seq_len}")
         self.lm = LlamaForCausalLM(self.hf_config)
+        self.init = init
+        if init == "gogeta":
+            self._gogeta_init()
         self.core = torch.nn.ModuleList()   # never looped
         self.cfg = SimpleNamespace(max_seq_len=seq_len, to_dict=self.config_dict)
 
+    @torch.no_grad()
+    def _gogeta_init(self):
+        """FusionDance's scheme on HF Llama: std 0.02 for every Linear/Embedding, and the residual-output
+        projections (attention o_proj, MLP down_proj) at 0.02 / sqrt(2 * num_hidden_layers). HF's own init is
+        already std 0.02 (initializer_range), so this only adds the residual scaling. Tied head follows the embedding."""
+        std_res = 0.02 / math.sqrt(2 * max(1, self.hf_config.num_hidden_layers))
+        for name, m in self.lm.named_modules():
+            if isinstance(m, torch.nn.Linear):
+                torch.nn.init.normal_(m.weight, std=std_res if name.endswith(("o_proj", "down_proj")) else 0.02)
+            elif isinstance(m, torch.nn.Embedding):
+                torch.nn.init.normal_(m.weight, std=0.02)
+
     def config_dict(self) -> dict:
-        return {"arch": "hf_llama", **self.hf_config.to_dict()}
+        return {"arch": "hf_llama", **self.hf_config.to_dict(), **({"init": self.init} if self.init != "hf" else {})}
 
     def forward(self, idx: torch.Tensor, targets: torch.Tensor | None = None, loops: int | None = None):
         logits = self.lm(input_ids=idx, use_cache=False).logits
@@ -130,10 +154,46 @@ def build_model(cfg: dict, vocab_size: int, seq_len: int):
 
 # ----------------------------------------------------------------------------- helpers
 def lr_at(step: int, total: int, tc: dict) -> float:
+    """LR at `step`. Linear warmup, then tc["schedule"]: "cosine" (default) decays to lr*min_lr_frac;
+    "wsd" holds lr constant, then decays linearly to lr*min_lr_frac over the final tc["decay_frac"] (0.2) of steps."""
     if step < tc["warmup_steps"]:
         return tc["lr"] * (step + 1) / tc["warmup_steps"]
+    sched = tc.get("schedule", "cosine")
+    if sched == "wsd":
+        decay_start = total - int(round(tc.get("decay_frac", 0.2) * total))
+        p = min(1.0, max(0.0, (step - decay_start) / max(1, total - decay_start)))
+        return tc["lr"] * (1 - (1 - tc["min_lr_frac"]) * p)
+    if sched != "cosine":
+        raise ValueError(f"unknown schedule {sched!r} (cosine | wsd)")
     p = (step - tc["warmup_steps"]) / max(1, total - tc["warmup_steps"])
     return tc["lr"] * (tc["min_lr_frac"] + (1 - tc["min_lr_frac"]) * 0.5 * (1 + math.cos(math.pi * min(1.0, p))))
+
+
+def micro_batches(tc: dict) -> tuple[int, int]:
+    """(micro_batch, n_micro) from train.micro_batch (default batch_size = no accumulation)."""
+    B = tc["batch_size"]
+    mb = tc.get("micro_batch") or B
+    assert mb > 0 and B % mb == 0, f"batch_size {B} must be divisible by micro_batch {mb}"
+    return mb, B // mb
+
+
+def forward_backward(fwd_model, x, y, r, n_micro: int = 1):
+    """Forward + backward on one optimizer step's batch; returns the (mean) loss.
+    n_micro == 1 is the plain full-batch step. Otherwise the same batch is split into n_micro equal row
+    chunks, each backpropagated with loss/n_micro, so the summed gradient equals the full-batch mean-loss
+    gradient (equal token counts per chunk) up to float associativity; same data order, same effective batch."""
+    if n_micro == 1:
+        with torch.autocast("cuda", dtype=torch.bfloat16):
+            _, loss = fwd_model(x, y, loops=r)
+        loss.backward()
+        return loss
+    total = 0.0
+    for xs, ys in zip(x.chunk(n_micro), y.chunk(n_micro)):
+        with torch.autocast("cuda", dtype=torch.bfloat16):
+            _, loss = fwd_model(xs, ys, loops=r)
+        (loss / n_micro).backward()
+        total = total + loss.detach() / n_micro
+    return total
 
 
 @torch.no_grad()
@@ -176,6 +236,7 @@ def main():
     ap.add_argument("--max-tokens", type=int, help="override train.max_tokens")
     ap.add_argument("--seed", type=int, help="override train.seed")
     ap.add_argument("--lr", type=float, help="override train.lr (peak LR; recorded in the run config)")
+    ap.add_argument("--micro-batch", type=int, help="override train.micro_batch (gradient accumulation; batch_size % micro == 0)")
     ap.add_argument("--require-clean", action="store_true", help="refuse to run with uncommitted changes")
     ap.add_argument("--compile", action="store_true", help="torch.compile the model")
     ap.add_argument("--bench", type=int, default=0, help="only time N steps, no tracking/eval/ckpt")
@@ -191,8 +252,11 @@ def main():
         tc["seed"] = args.seed
     if args.lr is not None:
         tc["lr"] = args.lr
+    if args.micro_batch is not None:
+        tc["micro_batch"] = args.micro_batch
+    micro_batches(tc)   # validate early
     overrides = {k: v for k, v in (("max_tokens", args.max_tokens or None), ("seed", args.seed),
-                                   ("lr", args.lr)) if v is not None}
+                                   ("lr", args.lr), ("micro_batch", args.micro_batch)) if v is not None}
     device = "cuda"
     torch.manual_seed(tc["seed"])
     torch.backends.cuda.matmul.allow_tf32 = True
@@ -236,9 +300,7 @@ def main():
                 gp["lr"] = lr
             r = loop_rng.randint(mc.loops_min, mc.loops_max) if looped else None
             x, y = data.batch(tc["batch_size"], device)
-            with torch.autocast("cuda", dtype=torch.bfloat16):
-                _, loss = fwd_model(x, y, loops=r)
-            loss.backward()
+            loss = forward_backward(fwd_model, x, y, r, micro_batches(tc)[1])
             gnorm = torch.nn.utils.clip_grad_norm_(model.parameters(), tc["grad_clip"])
             opt.step()
             opt.zero_grad(set_to_none=True)

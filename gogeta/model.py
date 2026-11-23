@@ -55,6 +55,10 @@ class ModelConfig:
     gdn_neg_eigval: bool = False  # GDN write strength beta in (0, 2) instead of (0, 1): negative eigenvalues (SQ2/E11)
     ternary: bool = False
     tie_embeddings: bool = True
+    # weight init (SQ234/SQ200). "gogeta": std 0.02, residual-output projections scaled by
+    # 1/sqrt(2 * effective_depth). "flat": std 0.02 everywhere, no residual scaling (HF Llama's
+    # initializer_range). Default "gogeta" is the pre-existing behaviour, bit-identical.
+    init: str = "gogeta"
 
     @property
     def head_dim(self) -> int:
@@ -244,7 +248,9 @@ class FusionDance(nn.Module):
         return len(self.prelude) + len(self.coda) + r * len(self.core)
 
     def _init_weights(self):
-        std_res = 0.02 / math.sqrt(2 * max(1, self.effective_depth()))
+        if self.cfg.init not in ("gogeta", "flat"):
+            raise ValueError(f"unknown init {self.cfg.init!r} (gogeta | flat)")
+        std_res = 0.02 if self.cfg.init == "flat" else 0.02 / math.sqrt(2 * max(1, self.effective_depth()))
         for m in self.modules():
             if isinstance(m, nn.Linear):
                 nn.init.normal_(m.weight, std=std_res if getattr(m, "is_residual_out", False) else 0.02)

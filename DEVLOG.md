@@ -17,6 +17,30 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.82: Opt-in training options (init, LR schedule, gradient accumulation), defaults bit-identical; SQ238 dedup control registered
+*2026-11-22*
+
+**Three opt-in training options for wave 6**, each OFF by default, with **defaults bit-identical** to the previous code (subagent; tests re-run by the main agent):
+- **`model.init`:**
+  - FusionDance gets `"gogeta"` (default: the scaled residual-output init) or `"flat"` (std 0.02 everywhere, HF Llama's scheme).
+  - The HF Llama arm (E10) gets `"hf"` (default) or `"gogeta"`/`"flat"`.
+  - Unblocks SQ234 (E1 under E10's init) and the SQ200 init 2×2.
+- **`train.schedule`:** `"cosine"` (default) or `"wsd"` (warmup, constant, then linear decay over the last `decay_frac`). Unblocks SQ229.
+- **`train.micro_batch` / `--micro-batch`:** gradient accumulation at the same effective batch and data order. Gradients match full-batch to 1e-5 relative. Unblocks SQ231.
+- **Proof:**
+  - A reference captured from the pre-change code (initial state_dict sha256 + 8 training losses as float hex) matches the new code exactly.
+  - `tests/test_options.py`: 12 ok, 1 skipped (GDN needs CUDA).
+  - The byte model's mirrored `ModelConfig` gets the same field (`test_byte_model` 24/24).
+  - The post-training CPU suites pass.
+- **GPU verification still to do** (wave-6 smoke): a GDN config with `init: flat` and `--micro-batch` under bf16 autocast; `schedule: wsd` on real data.
+
+**Also in this version:**
+- **SQ238** (dedup-only control) is registered and committed in WIP `e449672`: the v1-subset builder (tests 7/7), the config, and predictions D1–D3.
+- **Quick review 22:56 (ML theorist):** SQ265, per-pass gradient interference in the shared loop core, the mechanistic test of C197.
+- **Research agents running:** Code-MoE (the human's proposal → an E-series item) and "Inkling 2 mini" recurrent design (the human's request).
+
+---
+
 ## v0.4.81: Outside review 23:10; waves 4-5 registered and wave 4 running; F2 made seed-blocked with blinded re-estimation; AGENTS 0h pipeline rule
 *2026-11-22*
 

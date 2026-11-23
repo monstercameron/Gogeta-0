@@ -1,0 +1,44 @@
+== C80 re-run 2026-11-23T14:57:01-05:00, HEAD 6eb7c6a + the v0.5.24 hf.py fix (GogetaConfig assembly fields; hidden() delegates to FusionDance.forward(return_hidden=True)) + one new test; other uncommitted tracked file: experiments/checks/sq339_cpu.py (unrelated worker edit)
+== post_training/test_hf.py (venv gogeta-rl, CPU)
+test_assembled_logits_match_fusiondance (post_training.test_hf.TestAssembledConfig.test_assembled_logits_match_fusiondance) ... ok
+test_config_roundtrip (post_training.test_hf.TestWrapper.test_config_roundtrip) ... ok
+test_export_checkpoint_roundtrip (post_training.test_hf.TestWrapper.test_export_checkpoint_roundtrip) ... ok
+test_generate_greedy_matches_manual_loop (post_training.test_hf.TestWrapper.test_generate_greedy_matches_manual_loop) ... ok
+test_left_padding_is_exact (post_training.test_hf.TestWrapper.test_left_padding_is_exact) ... ok
+test_logits_match_fusiondance (post_training.test_hf.TestWrapper.test_logits_match_fusiondance) ... ok
+test_loss_matches_shifted_fusiondance (post_training.test_hf.TestWrapper.test_loss_matches_shifted_fusiondance) ... ok
+test_mask_with_hole_rejected (post_training.test_hf.TestWrapper.test_mask_with_hole_rejected) ... ok
+Loading weights:   0%|          | 0/29 [00:00<?, ?it/s]Loading weights: 100%|██████████| 29/29 [00:00<00:00, 1232.54it/s]
+ok
+test_tokenizer (post_training.test_hf.TestWrapper.test_tokenizer) ... ok
+test_trl_fused_lm_head_logprobs (post_training.test_hf.TestWrapper.test_trl_fused_lm_head_logprobs)
+TRL's GRPO/DPO compute log-probs through add_fused_lm_head (base_model + output ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 4.934s
+
+OK
+exit 0
+== evals/test_wiring.py (venv gogeta-eval, CPU)
+`pretrained` model kwarg is not of type `str`. Many other model arguments may be ignored. Please do not launch via accelerate or use `parallelize=True` if passing an existing model this way.
+Passed an already-initialized model through `pretrained`, assuming single-process call to evaluate() or custom distributed integration
+Tokenizing inputs:   0%|          | 0/1 [00:00<?, ?it/s]Tokenizing inputs: 100%|██████████| 1/1 [00:00<00:00, 303.74it/s]
+Running loglikelihood requests:   0%|          | 0/1 [00:00<?, ?it/s]Running loglikelihood requests: 100%|██████████| 1/1 [00:00<00:00,  6.92it/s]Running loglikelihood requests: 100%|██████████| 1/1 [00:00<00:00,  6.90it/s]
+.[transformers] Token indices sequence length is longer than the specified maximum sequence length for this model (3112 > 1024). Running this sequence through the model will result in indexing errors
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00, 217.21it/s]
+Running loglikelihood requests:   0%|          | 0/4 [00:00<?, ?it/s]Running loglikelihood requests:  25%|██▌       | 1/4 [00:00<00:01,  2.26it/s]Running loglikelihood requests: 100%|██████████| 4/4 [00:00<00:00,  8.12it/s]
+.  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00, 6721.64it/s]
+Running loglikelihood requests:   0%|          | 0/1 [00:00<?, ?it/s]Running loglikelihood requests: 100%|██████████| 1/1 [00:00<00:00,  8.47it/s]Running loglikelihood requests: 100%|██████████| 1/1 [00:00<00:00,  8.45it/s]
+.usage: test_wiring.py [-h]
+                      (--checkpoint CHECKPOINT | --random-init RANDOM_INIT)
+                      [--tier TIER] [--tasks TASKS] [--limit LIMIT]
+                      [--device {cpu,cuda}] [--batch-size BATCH_SIZE]
+                      [--threads THREADS] [--loops LOOPS] [--seed SEED]
+                      [--no-exec] [--name NAME] [--log-samples]
+test_wiring.py: error: only evals/tasks gogeta_* tasks are allowed (lm-eval built-ins may exec code in-process): ['humaneval']
+...
+----------------------------------------------------------------------
+Ran 6 tests in 5.534s
+
+OK
+exit 0

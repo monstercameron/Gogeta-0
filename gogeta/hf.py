@@ -36,7 +36,6 @@ from __future__ import annotations
 
 import dataclasses
 import pathlib
-from contextlib import nullcontext
 from dataclasses import field
 
 import torch
@@ -87,6 +86,16 @@ class GogetaConfig(PreTrainedConfig):
     moe_zloss_coef: float = 0.001
     moe_router_frozen: bool = False
     moe_impl: str = "gather"
+    # ModelConfig assembly switches (v0.5.x; gogeta.model._ASSEMBLY_DEFAULTS); defaults = off, equal to ModelConfig's,
+    # because to_dict() omits them when they are at their defaults.
+    loop_embed: bool = False
+    inject_contractive: bool = False
+    ternary_acts: bool = True
+    ternary_fp_ends: bool = False
+    loop_adapter_rank: int = 0
+    ternary_mixer: bool = True
+    ternary_ffn: bool = True
+    moe_core_only: bool = False
     tie_word_embeddings: bool = True
     # HF / generation fields (ids match gogeta/assets/tokenizer-code-py-v1.json)
     eos_token_id: int | None = 0
@@ -130,22 +139,10 @@ class FusionDanceBackbone(FusionDance):
         if idx.size(1) > self.cfg.max_seq_len:
             raise ValueError(f"sequence length {idx.size(1)} > max_seq_len {self.cfg.max_seq_len} "
                              "(RoPE table size); shorten prompt + completion")
-        x = self.embed(idx)
-        for b in self.prelude:
-            x = b(x)
-        if self.core:
-            r = loops if loops is not None else self.cfg.loops
-            n_nograd = max(0, r - self.cfg.bptt_loops) if self.training else 0
-            e, h = x, x
-            for i in range(r):
-                with torch.no_grad() if i < n_nograd else nullcontext():
-                    h = h + self.inject(torch.cat([self.inj_norm_h(h), self.inj_norm_e(e)], dim=-1))
-                    for b in self.core:
-                        h = b(h)
-            x = h
-        for b in self.coda:
-            x = b(x)
-        return self.norm_out(x)
+        # v0.5.24: delegate to FusionDance.forward's return_hidden path (v0.5.12) instead of a hand-written mirror,
+        # so every ModelConfig switch (loop_embed, contractive inject, adapters, MoE, ternary scope) is honoured.
+        # The mirror predated those switches and would have silently ignored them.
+        return FusionDance.forward(self, idx, loops=loops, return_hidden=True)
 
     def forward(self, input_ids: torch.Tensor, attention_mask: torch.Tensor | None = None,
                 loops: int | None = None, **kwargs) -> BaseModelOutput:

@@ -18,6 +18,25 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.24: Fix: Hugging Face wrapper broken since v0.5.0 (missing assembly fields; hidden() mirror ignored them); C80 re-verified with saved output (11/11, 6/6)
+*2026-11-23*
+
+**Fix: the Hugging Face wrapper (`gogeta/hf.py`) could not build any model from v0.5.0 to v0.5.23. C80 records the break and is re-verified with saved test output.**
+
+- **Found by** quick review 14:54 (reproducibility), which asked for C80's saved test output. The re-run at v0.5.23 failed at setUpClass with `GogetaConfig is missing ModelConfig field 'loop_embed'`.
+  - v0.5.0 (36acccc) added the eight assembly switches to `ModelConfig` but not to the wrapper's config. The wrapper's guard failed loudly, so nothing diverged silently.
+  - No training or evaluation result used the wrapper; it is the post-training (TRL/GRPO) entry point.
+  - The wrapper's `FusionDanceBackbone.hidden()` was also a hand-written mirror of `FusionDance.forward`. It would have ignored loop_embed, contractive injection, adapters and the ternary scope even once the config built.
+- **Fix:**
+  - `GogetaConfig` gains the eight fields, with defaults equal to `_ASSEMBLY_DEFAULTS`.
+  - `hidden()` now delegates to `FusionDance.forward(..., return_hidden=True)` (the v0.5.12 hook), so the mirror can no longer drift.
+  - New test `TestAssembledConfig` checks exact logit equality (max diff 0.0) for a config with loop_embed, contractive inject, rank-4 adapters, ternary_fp_ends and ternary_mixer=False.
+- **Saved evidence** (`experiments/checks/results/test-runs/2026-11-23-C80.txt`): `post_training/test_hf.py` 11/11 OK (venv gogeta-rl, including TRL's fused-head test); `evals/test_wiring.py` 6/6 OK (venv gogeta-eval).
+- **Ledger:** C80 goes PARTIAL ("true at v0.4.25; broken v0.5.0-v0.5.23"), then VERIFIED on the saved run. Its prose-only limitation is resolved; "GDN through the wrapper on CUDA untested" stays.
+- **Process lesson:** SQ274 gains an extension. The release lint should re-run implementation claims' tests, not only check that their evidence pointers exist. C80 stayed VERIFIED for 23 versions while its test could not build the model.
+
+---
+
 ## v0.5.23: A3 LR bracket passes (A2s and A3mx robust at 6e-3): C206-C208 back to VERIFIED; sandbox /proc gap confirmed and filed (SQ61)
 *2026-11-23*
 

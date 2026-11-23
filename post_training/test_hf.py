@@ -130,5 +130,25 @@ class TestWrapper(unittest.TestCase):
         self.assertEqual(self.tok.decode(self.tok(s).input_ids), s)
 
 
+class TestAssembledConfig(unittest.TestCase):
+    """v0.5.24: the wrapper must honour the assembly switches (loop_embed, contractive inject, per-pass adapters,
+    ternary scope). Before v0.5.24 GogetaConfig lacked these fields and hidden() was a hand-written mirror of
+    FusionDance.forward that ignored them."""
+
+    def test_assembled_logits_match_fusiondance(self):
+        cfg = dict(TINY, loop_embed=True, inject_contractive=True, loop_adapter_rank=4, ternary=True,
+                   ternary_fp_ends=True, ternary_mixer=False)
+        torch.manual_seed(1)
+        fd = FusionDance(ModelConfig(**cfg)).eval()
+        ckpt = {"model": fd.state_dict(), "model_config": fd.cfg.to_dict(), "train": {}}
+        m = from_gogeta_checkpoint(ckpt).eval()
+        self.assertEqual(m.config.to_model_config(), ModelConfig(**cfg))
+        x = torch.randint(2, 8192, (2, 24))
+        with torch.no_grad():
+            ref, _ = fd(x)
+            out = m(input_ids=x).logits
+        self.assertEqual((out - ref).abs().max().item(), 0.0)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

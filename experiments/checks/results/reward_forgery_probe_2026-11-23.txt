@@ -1,0 +1,13 @@
+# reward_forgery_probe, 2026-11-23 ~12:22 EST
+## committed rewards.py (HEAD 197faef)
+control_honest_fail {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+exec_noop {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+compile_noop {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+assertionerror_swallow {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+sys_exit0 {'ran': False, 'passed': 0, 'total': 1, 'error': 'no result (exit code 0)'}
+## working-tree rewards.py (with the worker's uncommitted SQ61 changes)
+control_honest_fail {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+exec_noop {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+compile_noop {'ran': True, 'passed': 1, 'total': 1, 'error': None}
+assertionerror_swallow {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+sys_exit0 {'ran': False, 'passed': 0, 'total': 1, 'error': 'no result (exit code 0)'}

@@ -765,3 +765,9 @@ Prompted by outside review 2026-11-23 12:10 (`notes/reviews/2026-11-23-1210-revi
   - The assembled model is **competitive per FLOP** if A2s or A2f lies within 5% of E20.
   - **Per weight-memory** (ternary core at 1.58 bits/param, everything else at 16 bits) and **per wall-clock** (measured tokens/s) are reported next to it as registered secondary readouts.
   - A2a replaces A2s as the base only if P5's CI lies below 0.
+
+### A2 amendment 1 (2026-11-23 ~12:28 EST, before these runs; quick review 12:24): confirm A1's best single compensation on fresh seeds
+- **Added arm:** A1e (ternary core only, `experiments/staged-configs/a1/a1e.json` [26d96983d6d349ba]) at seeds 2, 3, 4, lr 6e-3, 200M tokens. It is paired with the A2 wave's E27 references at the same seeds (seed 2 from SQ263, seeds 3-4 run in this wave).
+- **Prediction:** A1e vs E27 = -6% (range -9% to -3%), shrunk from the screen's -8.3% for winner's curse.
+- **Rule:** the single compensation is **confirmed** if the paired 95% CI (df 2) lies below 0 and the effect is <= -1%. Otherwise A1's A1e result stays an unconfirmed screen. This is one registered comparison, not a family.
+- **A3 rule (added now, applied when A3 is registered):** A3's leave-one-out contrasts form one family, Holm-adjusted. A component is attributed only if its Holm-adjusted interval excludes 0 and clears 1%.

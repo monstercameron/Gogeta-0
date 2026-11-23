@@ -18,6 +18,21 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.7: Reward forgery confirmed in the test harness (C83, SQ373: GRPO blocked); A2 amendment 1 (A1e on fresh seeds) registered
+*2026-11-23*
+
+**Reward forgery found and blocking GRPO; A2 amendment 1 registered; quick reviews 12:14, 12:19 and 12:24 triaged.**
+
+- **Reward forgery (C83):** `experiments/checks/reward_forgery_probe.py` (output in `results/reward_forgery_probe_2026-11-23.txt`) shows that solution code which sets `builtins.exec` or `builtins.compile` to a no-op scores **1/1 on a failing test**, in both the committed harness and the working tree. The honest control scores 0/1. Swallowing AssertionError and `os._exit(0)` do not forge.
+  - C83 gains this evidence and a limitation.
+  - The fix is SQ373: high priority, owned by the side-quest worker. Bind the real exec/compile before the solution runs, use a fresh namespace per test and an unreachable reporting channel, with the probe cases as must-score-0 tests.
+  - **GRPO stays blocked until SQ373 passes.** `evals/sandbox.py` uses the same harness, so exec-based pass@k is forgeable in principle. No model has been trained against this reward, so existing pass@k numbers are not affected.
+- **A2 amendment 1** (registered before these runs): A1e (ternary core only) is confirmed or rejected on fresh seeds 2-4, paired with the E27 references already in the A2 wave. Prediction -6% (range -9% to -3%), shrunk for winner's curse. A3's leave-one-out contrasts will be Holm-adjusted as one family.
+- **First A2 numbers** (not yet analysed; registered analysis when the wave completes): A2f seed 2, the full-precision assembled GDN + loops model, scores clean80 0.2501. Dense E20 seed 2 scores 0.2506 and E24 seed 2 scores 0.2412.
+- **Quick reviews:** 12:14 (newcomer) gives a glossary and cold-start check task for the next docs refresh. 12:19 (safety) is the forgery above. 12:24 (statistician) is the A1e confirmation and the Holm rule for A3.
+
+---
+
 ## v0.5.6: Outside review 12:15: A3 leave-one-out ladder planned; SQ369-SQ372; A2 fleet: one box failed setup, jobs requeued
 *2026-11-23*
 

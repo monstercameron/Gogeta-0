@@ -107,6 +107,24 @@
    "purpose": "Assembly ladder A1-A4 under the human's 5090-or-better grant (v0.5.0), within the agent's self-imposed $25 cap",
    "evidence": "provider credit 57.25 at 14:45 vs 69.82 at 08:24",
    "note": "final: all a3 boxes destroyed 15:46 (ALL A3 BOXES DESTROYED); amount = provider total 43.27 at 15:47 minus 30.18 at 08:24; includes the A3 LR bracket, A3 amendment 2 and A2 amendment 3 runs"
+  },
+  {
+   "id": "X7",
+   "date": "2026-11-23T16:55:00-05:00",
+   "type": "compute",
+   "provider": "vast.ai",
+   "amount": 0.74,
+   "estimated": false,
+   "resource": "1x RTX 5090 (gogeta-cockpit-b1-1, $0.658/h incl. storage), about 1.0 h; destroyed 16:55 (ALL B1 BOXES DESTROYED)",
+   "experiments": [
+    "SQ401",
+    "SQ402",
+    "SQ404",
+    "SQ350"
+   ],
+   "purpose": "GPU batch B1 (25 runs at 20M tokens); human: 'Yes, rent one'",
+   "evidence": "provider total 44.006 at 16:56 minus 43.271 at 15:47",
+   "note": "controller est_cost 0.65 + boot/storage"
   }
  ],
  "reconciliations": [
@@ -148,6 +166,14 @@
    "credit_left": 56.7293,
    "provider_total_spend": 43.2707,
    "note": "0 instances; assembly fleet (a1-a3) fully destroyed at 15:46",
+   "by": "main-agent"
+  },
+  {
+   "ts": "2026-11-23T16:56:00-0500",
+   "provider": "vast.ai",
+   "credit_left": 55.994,
+   "provider_total_spend": 44.006,
+   "note": "0 instances after B1",
    "by": "main-agent"
   }
  ]

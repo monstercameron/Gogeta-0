@@ -18,6 +18,38 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.36: GPU batch B1 read out: MoE core matches dense-2048 at 31% fewer FLOPs; learned GDN beta not needed; loop cost not an LR artifact; unique params beat a second pass ~2.4x per FLOP (20M screens)
+*2026-11-23*
+
+**GPU batch B1 read out (20M screens, registered). The MoE core matches a dense FFN of equal width at 31% fewer FLOPs. GDN's learned write strength is not needed. The loop cost is not a learning-rate artifact. Per FLOP, unique parameters beat a second loop pass about 2.4x. No Holm gate opens.**
+
+`experiments/checks/b1_readout.py` -> `results/b1_readout.json`. 25 runs, 20M tokens of code-py-v2, clean80 paired by seed, provenance OK (907065f for the 23 registered jobs, c384e67 for SQ350). Same-seed replay floor 0.2-0.3% (SQ232). Every contrast is an exploratory screen (B1 amendment 2).
+
+| Contrast | Seeds | Result [95% CI] | Predicted | Reading |
+|---|---|---|---|---|
+| SQ401: A3m (ternary MoE core) vs A2s | 3 | -1.01% [-1.83, -0.18] | -3% (-5 to -1) | in range (edge); C206's direction at 20M |
+| **G1** SQ401: dense core FFN 2048 vs A3m | 3 | +0.15% [-0.88, +1.20] | -1% (-3 to +1) | a tie, but dense uses **45% more FLOPs** (5.49e15 vs 3.79e15): the MoE buys equal-width capacity per FLOP |
+| SQ402: GDN beta fixed 1.0 vs learned | 2 | -0.47% | +1.5% (0 to +4) | **out of range**: no cost |
+| SQ402: beta fixed 0.5 vs learned | 2 | -0.06% | +1% (-0.5 to +3) | in range; both within 0.5%, so the learned write strength is not needed at 20M |
+| SQ404: A2f vs E24 (loop cost at 20M) | 2 | +1.80% | +2% (0 to +5) | in range |
+| **G2** SQ404: best core LR (x0.5) vs x1 | 2 | -0.16% | closes < half | closes **9%** of the gap (x2: +7.19%), so the loop cost is not an LR artifact and there is no 200M re-run |
+| **G3** SQ350: A2f 6x2 vs 6x1 (equal params) | 2 | -1.33% [-3.59, +0.99] | -4% (-8 to -1) | in range (edge); E24 is about -3.1% vs 6x1 for the same extra FLOPs, so unique params buy about 2.4x more per FLOP |
+
+- **Holm (G1-G3, m = 3):** no gate rejects (p 0.09 / 0.51 / 0.59), as expected at df 1-2. No ledger status changes.
+- **Ledger evidence:** C206 (MoE vs dense capacity) and C197 (unique params beat loops per FLOP, now on the assembled shape too).
+- **Disclosure:** SQ404's seed-0 runs had finished on the box (unread) before B1 amendment 3 was pushed at 16:40. That amendment changed only the reading, not the rule.
+- **Design implications:**
+  - Loops' cost is a unique-parameter cost, as C197 says, not an optimizer artifact. The remaining levers are pass identity (SQ408), capacity in the core (the MoE already pays its way per FLOP), and the horizon (SQ380).
+  - A fixed GDN beta is a candidate simplification, pending a 200M check.
+- **Fleet:** one box for 1.0 h, destroyed at 16:55; 0 instances. X7 = $0.74, total spend $44.01.
+- **Quick reviews:**
+  - 16:39: target workflow stays prefix completion; distractor NLL added to SQ385.
+  - 16:44: **SQ411 blocks GRPO**, closing the documented `__eq__` reward-forgery route; SQ412 adds a cockpit spend readout.
+  - 16:49: gradient interference is already SQ265, now extended to A2f/A2s.
+  - 16:54: the B1 bundle's provenance is described in the triage footer.
+
+---
+
 ## v0.5.35: Outside review 16:37: SQ404's larger-step premise withdrawn (AdamW scale-invariant; clipping never fires), B1 amendment 3 before any SQ404 result; SQ410 overlap dose-response
 *2026-11-23*
 

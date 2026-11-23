@@ -216,6 +216,19 @@ class GatedDeltaNet(nn.Module):
         # so (I - beta k k^T) can flip sign. fla only allows this with the sigmoid applied inside the kernel.
         self.neg_eigval = cfg.gdn_neg_eigval
 
+    # CUDA caps grid dims y/z at 65535. fla's chunk kernels put batch x heads on such a dim, so the byte model's
+    # per-patch refine (B * n_groups sequences of length P) can exceed it ("Triton Error [CUDA]: invalid argument",
+    # E15b on a 5090, 2026-11-23). Sequences are independent, so splitting the batch is exact.
+    MAX_BH = 65535
+
+    def _run_kernel(self, q, k, v, g, beta, **kw):
+        B = q.shape[0]
+        step = max(1, self.MAX_BH // self.H)
+        if not q.is_cuda or B <= step:
+            return self._kernel(q, k, v, g, beta, **kw)[0]
+        return torch.cat([self._kernel(q[i:i + step], k[i:i + step], v[i:i + step], g[i:i + step],
+                                       beta[i:i + step], **kw)[0] for i in range(0, B, step)], dim=0)
+
     def forward(self, x):
         B, T, _ = x.shape
         H, hd = self.H, self.hd
@@ -226,11 +239,11 @@ class GatedDeltaNet(nn.Module):
         dtype = torch.bfloat16 if x.is_cuda else x.dtype
         if self.neg_eigval:
             raw = self.b(x).float()  # logits; the kernel applies 2*sigmoid
-            o, _ = self._kernel(q.to(dtype), k.to(dtype), v.to(dtype), g, raw.to(dtype), scale=hd ** -0.5,
-                                use_beta_sigmoid_in_kernel=True, allow_neg_eigval=True)
+            o = self._run_kernel(q.to(dtype), k.to(dtype), v.to(dtype), g, raw.to(dtype), scale=hd ** -0.5,
+                                 use_beta_sigmoid_in_kernel=True, allow_neg_eigval=True)
         else:
             beta = torch.sigmoid(self.b(x).float())
-            o, _ = self._kernel(q.to(dtype), k.to(dtype), v.to(dtype), g, beta.to(dtype), scale=hd ** -0.5)
+            o = self._run_kernel(q.to(dtype), k.to(dtype), v.to(dtype), g, beta.to(dtype), scale=hd ** -0.5)
         o = self.out_norm(o.to(x.dtype)) * F.silu(self.gate(x).view(B, T, H, hd))
         return self.o(o.reshape(B, T, H * hd))
 

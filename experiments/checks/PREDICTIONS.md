@@ -669,3 +669,16 @@ Source: outside review 2026-11-23 00:10. C197's limitation (event 4): E34, which
   - The flat-init gap is within ±1% while the gogeta gap is ≥ 3% → the C197 lever is an init artifact. C197 gets a limitation, and the README's scale wording is withdrawn.
   - Anything else → inconclusive, reported as such.
 - **Limitation:** this runs at 20M tokens, whereas C197 is a 200M result. LRs are not re-tuned per init.
+
+## SQ263 (2026-11-23 ~01:45 EST, before dispatch): 200M gate on the five F2 factorial cells
+- **Why:** F2 (the registered factorial) runs at 20M tokens, at LRs chosen at 20M. At 200M, E10 at 6e-3 was 3.0% worse than at 2e-3 (H2), so the 20M LR choice and the 20M interaction may not transfer to the registered 200M horizon. Outside review 2026-11-22 ~23:10, C.
+- **Arms:** code-py-v2, 200M tokens (`--max-tokens 200000000`), seeds 0–2, RTX 5090, clean80 bpc (sha256-16 in brackets):
+  - E20 `e20_fact000` [11ce08abb096e0db] at 3e-3;
+  - E24 `e24_fact100` [b9864df4d62a9978] at 3e-3;
+  - E21 `e21_fact001` [b8bb3c560919bf67], E22 `e22_fact010` [4d2348d0ab3b6a9b] and E27 `e27_fact111` [e7953eabf8f62475], each at **both** 6e-3 (their F0/G3 LR) and 2e-3.
+  - 24 runs in total.
+- **Predictions:**
+  - **H2':** in at least 2 of the 3 six-e-3 cells, the 2e-3 arm beats the 6e-3 arm at 200M by ≥ 0.5% (3-seed means).
+  - **H3'** (descriptive): the 200M interaction contrast, computed at each cell's better LR, is reported with its CI. At n = 3 it is underpowered and is not a confirmatory test.
+- **Decision rule:** if H2' holds, F2's 20M interaction is conditional on 20M-selected LRs, and any 200M statement must use the per-cell best LR. F2's registered 20M analysis is unchanged either way.
+- **Blinding:** SQ263 results are not analysed or looked at until F2's registered analysis has been run and recorded. The monitor redacts these runs too, because they carry E2x names.

@@ -497,3 +497,25 @@ This executes only stages registered in v0.4.40 (`experiments/design/power-cost.
   - **E1 decomposition, minimal tier, runnable arms:** E40, E41, E46, E47, E48, plus the E1 control (e53 at 20M) at 6e-3: 6 runs. E42–E45 wait for the GDN-flags patch.
   - **H5 dedup bridge:** E52 (E10) and E53 (E1) at 200M: 2 runs.
 - **Waits for wave 3a:** F1, F2 and F3's seeds use the LRs chosen in F0/F3 by the registered G3 rule, so they are dispatched only after F0/F3 results exist.
+
+## Fleet wave 4 (2026-11-22 ~22:50, before dispatch): SQ243 two-size check + SQ241 param-matched E1, RTX 5090
+- **Power (SQ253):** in Phase 2b-5090 the paired E1−E10 difference has an sd of about 0.0012 bpc at 200M, about 0.45% (computed from `phase2b_5090.json`'s paired CI). With **4 seeds per arm**, the 95% half-width is about 0.0019 (0.7%), and the 80%-power detectable effect is about 0.0025 (0.9%). Assumption: the same sd at other widths.
+- **Primary metric:** clean80 bpc on v1 val (same as Phase 2b). All runs on RTX 5090, compared only with RTX 5090 runs.
+
+### SQ243: two-size check (configs `experiments/staged-configs/sq243/`, sha256-16 in brackets)
+- **Arms:**
+  - E1 at d = 256 (`e1_d256` [a898c7d0a2d380b5]; 7.06M total, 99M tokens) and d = 512 (`e1_d512` [789ef80f3507bd30]; 24.0M, 337M tokens);
+  - E10 at hidden 256 (`e10_d256` [29a5563361330ffa]; 6.84M, 96M tokens) and 512 (`e10_d512` [7bc8aba3ab274330]; 23.2M, 326M tokens).
+- **Tokens:** 14.05 tokens per total param, the same ratio as the d = 384 Phase 2b runs (outside review 22:30, idea E).
+- **Seeds:** 0–3 per arm, 16 runs. The d = 384 point is Phase 2b-5090 (7 + 7 seeds).
+- **LRs:** E1 6e-3 and E10 3e-3 at every width, not re-tuned. That is a limitation: if an arm's 20M optimum shifts with width, the comparison is confounded.
+- **Predictions:**
+  - **S1:** at d = 512, E1 − E10 is within ±1% (the tie persists).
+  - **S2:** at d = 256, within ±1%.
+  - **S3** (exploratory): the gap's trend across 256/384/512 is reported. Only a gap beyond the 0.9% MDE at an end point is called a scaling effect.
+
+### SQ241: param-matched E1 (`experiments/staged-configs/sq241/e1_parammatch.json` [0b99bffe757efaed])
+- **Arm:** E1 with mlp_hidden 952, so non-embedding params are 10,622,052 against E10's 10,621,824. 200M tokens, lr 6e-3, seeds 0–3.
+- **Predictions:**
+  - **P1:** E1-parammatch vs E10 (7-seed 5090 mean) is within ±1% (still a tie).
+  - **P2:** it is no more than 0.5% worse than full E1 (the 7-seed mean).

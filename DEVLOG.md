@@ -17,6 +17,31 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.59: Outside review 19:37: E0 may be a handicapped yardstick (init differs from Llama)
+*2026-11-22*
+
+### Outside review 2026-11-22 19:37 (Haiku, AGENTS §0d)
+`notes/reviews/2026-11-22-1937-review.md`, with the main agent's triage.
+**Key finding:** E0 may be a handicapped yardstick.
+- E10 (HF Llama) has E0's exact params and FLOPs, the same step-0 loss and the same LR (3e-3), yet gets **0.5822 / 0.5854 vs E0's 0.6063** (seeds 0/1; contaminated val).
+- **Verified in code:** E0 uses GPT-2-style scaled residual-output init (std 0.02/√(2·depth), `gogeta/model.py:246-248`); HF Llama uses a flat 0.02. Init is a plausible cause, not yet the established one.
+- The E0-parity criterion is evaluated in Q12 on E10's 3-seed mean and clean val; it isn't due yet.
+- Phase 2b's confirmatory comparison (H1) uses E10, not E0, so it's protected.
+- **SQ99's baseline is E0;** it'll be re-run with the E10 checkpoint.
+
+**Accepted** (new review range SQ200+):
+- **SQ200 (top pick): an init-matched 2×2 swap of E0/E10 inits** (~15–20 GPU-min);
+- SQ201: E1-vs-E10 horizon curve at a matched LR. E1 leads by 2.1% at 20M, and E10 leads by 0.4% at 200M (seed 0, contaminated);
+- SQ202: mixer-conversion test;
+- SQ203: per-token gain decomposition;
+- SQ204: an n-gram copy floor on the near-dup band (CPU).
+
+**Ordering adopted:** SQ200 and SQ204 run right after Phase 2b, before the Q12 verdicts are written up. **Rejected:** "Q9 wrongly marked done". Its condition (LR_E10 ≠ 3e-3) is false, so skipping was correct.
+### Quick review 19:09 (reproducibility auditor, Codex)
+**Provenance audit done:** K9's and SQ70's lint FAILs are lookup gaps (predictions were committed in their scripts before the results). **K7-parity is a genuine pre-registration lapse:** its script and results were first committed together in v0.4.12, so it's treated as exploratory. The fix is SQ205; the lint report gets regenerated with each science version.
+
+---
+
 ## v0.4.58: Claims ledger v2: immutable definitions + append-only events
 *2026-11-22*
 

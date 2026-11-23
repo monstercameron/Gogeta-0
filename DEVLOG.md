@@ -17,6 +17,38 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.81: Outside review 23:10; waves 4-5 registered and wave 4 running; F2 made seed-blocked with blinded re-estimation; AGENTS 0h pipeline rule
+*2026-11-22*
+
+**Outside review 23:10 (Haiku), triaged:**
+- **Ideas A/B adopted before any F2 run.** Seeds share the data order across cells, so F2's primary analysis is now **seed-blocked**: a common seed effect explains 35% of the pilot's residual SS, and the blocked sd is 0.0082 vs 0.0090.
+- **F2 sizing critique adopted.** The pilot sigma rests on 10 df, so N could plausibly be 80–500. F2 now runs in **two stages with a blinded variance re-estimation** after 120 runs (Kieser & Friede: no alpha inflation), capped at N = 246. Registered in `experiments/checks/PREDICTIONS.md`, wave-5 amendment.
+- **New queue items:** SQ263 (a 200M gate on the factorial cells) and SQ264 (reading the factorial per FLOP and per bit).
+- **Accepted as a limitation:** SQ243's 4-seed MDE (0.9%) can't resolve a 0.2% gap, so a tie is the expected registered outcome.
+
+**Registered and committed before dispatch** (WIP commits a79b1de…4895120):
+- AGENTS §0h **pipeline rule** (the human: "queue the next wave up before the current wave ends");
+- **wave 4:** SQ243 two-size check (E1/E10 at d 256 and 512, tokens per param matched, 4 seeds) and SQ241 param-matched E1 (4 seeds); power from SQ253 (MDE about 0.9%);
+- the wave-4 inference scripts: per-doc NLL, layer knockout (SQ248), logit ensemble (SQ249);
+- Byte Quest stage 1: the SQ188 LR sweep, SQ189 probe and SQ221 determinism via the new `cockpit/remote/fetch_bytes.sh`;
+- **wave 5:** factorial F2, re-sized from the pilot (sigma 0.009 → N up to 246), now seed-blocked and two-stage.
+
+**Fleet:**
+- Wave 4 is running on 6 rented RTX 5090s ($0.50–0.62/hr).
+- Two slow hosts delayed setup: Hugging Face downloads at about 200 MB/min, and a 6-min bootstrap. The next rental needs a higher download floor.
+- Stage 1 of F2, the inference jobs and Byte Quest stage 1 queue onto boxes as they free up, with no teardown in between.
+
+**Wave 6 in preparation (subagents):**
+- opt-in training options with bit-identical defaults: init (SQ234/SQ200), schedule (SQ229), gradient accumulation (SQ231);
+- the v1-subset builder for the dedup-only control SQ238;
+- a Code-MoE research review that becomes an E-series item (the human's proposal).
+
+**Hourly docs refresh** (README, sketch, campaigns README) reflects v0.4.79–v0.4.80. Spot-checked by the main agent.
+
+**Quick reviews:** 22:48 data engineer gave SQ262 (family-clustered doc-level CIs).
+
+---
+
 ## v0.4.80: Fleet waves 1-3b done (106 runs on 8x RTX 5090, $6.54); claim audit 2203; outside review 22:30; C197 (scale is the lever)
 *2026-11-22*
 

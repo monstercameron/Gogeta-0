@@ -1,0 +1,978 @@
+{
+  "check": "REPLICATION-stats",
+  "claims": [
+    "C5",
+    "C6",
+    "C92",
+    "C93",
+    "E10 control",
+    "E11",
+    "C150",
+    "C151"
+  ],
+  "prediction": "Written before Phase 2b results (addendum in PREDICTIONS.md). The registered decision rules are unchanged; this adds paired CIs, TOST and Holm. Expected, not scored: E1 beats E10 on clean-val bits/char with a paired 95% CI excluding 0 if the true gap is >= ~2%; E11 vs E1 TOST equivalent if the seed sd is <= ~0.002 (clean bpc units scale accordingly); the memorisation gap (near-dup minus clean bits/char) is negative for every model.",
+  "criterion": "Primary decision rule: PREDICTIONS.md 'Replication protocol' criteria 1-5, applied to clean-val bits/char (< 80% overlap). Confirmatory family (Holm, alpha 0.05): H1 E1 vs E10 paired-seed t (two-sided); H2 E11 vs E1 TOST (margin max(1%, 2 x pooled sd)). Everything else is exploratory (BH q 0.10) or descriptive. A hypothesis is 'supported' only if its Holm-adjusted p < 0.05; the original rule decides the claim status either way.",
+  "verdicts": {
+    "C5[clean80_bpc]": "REFUTED: E10 0.2672 - E1 0.2677 = -0.0005 (-0.18%) vs 2 x pooled sd 0.0020 [fail]; max(E1) 0.2687 < min(E10) 0.2662 [fail]",
+    "E11[clean80_bpc]": "INCOMPLETE: missing/non-qualifying runs: E11 seed 0, E11 seed 1, E11 seed 2",
+    "C5[clean50_bpc]": "REFUTED: E10 0.3349 - E1 0.3358 = -0.0008 (-0.25%) vs 2 x pooled sd 0.0029 [fail]; max(E1) 0.3370 < min(E10) 0.3337 [fail]",
+    "E11[clean50_bpc]": "INCOMPLETE: missing/non-qualifying runs: E11 seed 0, E11 seed 1, E11 seed 2",
+    "C5[val_loss]": "REFUTED: E10 0.5845 - E1 0.5854 = -0.0008 (-0.14%) vs 2 x pooled sd 0.0037 [fail]; max(E1) 0.5866 < min(E10) 0.5822 [fail]",
+    "E11[val_loss]": "INCOMPLETE: missing/non-qualifying runs: E11 seed 0, E11 seed 1, E11 seed 2",
+    "confirmatory_holm": "INCOMPLETE: need both H1 and H2 p-values (planned m=2 is fixed; a missing member is NOT dropped)",
+    "memorisation_confound_flag": "False"
+  },
+  "data": {
+    "metrics": {
+      "clean80_bpc": {
+        "role": "primary",
+        "E1_vs_E10": {
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "paired": {
+            "test": "paired t (df = n-1)",
+            "n": 3,
+            "mean_a": 0.2676759303838598,
+            "mean_b": 0.2671965788892141,
+            "diffs": [
+              0.0001669302463433442,
+              0.00031872581785657994,
+              0.0009523984197370994
+            ],
+            "mean_diff": 0.0004793514946456745,
+            "rel_gap_pct": 0.17940031142555338,
+            "conf": 0.95,
+            "sd_diff": 0.0004166419552644651,
+            "se": 0.00024054834502763097,
+            "df": 2,
+            "t_crit": 4.302652729749473,
+            "t": 1.992744928636333,
+            "p": 0.18449430078958362,
+            "ci": [
+              -0.0005556444987241801,
+              0.0015143474880155291
+            ],
+            "ci_rel_pct": [
+              -0.20795344799476764,
+              0.5667540708458744
+            ],
+            "ci_excludes_0": false,
+            "dz": 1.1505118209744485,
+            "hedges_gz": 0.6574353262711133,
+            "pearson_r_ab": 0.9655079446131511
+          },
+          "welch": {
+            "test": "Welch t (Satterthwaite df)",
+            "n_a": 3,
+            "n_b": 3,
+            "mean_a": 0.2676759303838598,
+            "mean_b": 0.2671965788892141,
+            "mean_diff": 0.0004793514946456745,
+            "rel_gap_pct": 0.17940031142555338,
+            "conf": 0.95,
+            "se": 0.000824688154658015,
+            "df": 3.6296184673033243,
+            "t_crit": 2.891831076059698,
+            "t": 0.5812518246299463,
+            "p": 0.5952358977232992,
+            "ci": [
+              -0.0019055073390526994,
+              0.0028642103283440484
+            ],
+            "ci_rel_pct": [
+              -0.7131481050297306,
+              1.0719487278808373
+            ],
+            "ci_excludes_0": false,
+            "effect": {
+              "d": 0.47459012746835333,
+              "hedges_g": 0.3796721019746827,
+              "pooled_sd": 0.0010100325879147975,
+              "df": 4,
+              "se_approx": 0.827910813890926
+            }
+          },
+          "sign_flip": {
+            "test": "sign-flip permutation (two-sided, mean statistic)",
+            "n": 3,
+            "mode": "exact",
+            "n_perm": 8,
+            "p": 0.25,
+            "min_attainable_p": 0.25,
+            "can_reach_0.05": false
+          },
+          "protocol": "E1 at LR_E1 vs E10 at LR_E10, 200M tokens, same seed index = same data order (init differs by architecture); a - b < 0 means E1 better (lower loss/bpc)"
+        },
+        "E11_vs_E1": {
+          "verdict": "INCOMPLETE",
+          "note": "need >= 2 paired seeds, have 0"
+        },
+        "E2_vs_E9": {
+          "verdict": "INCOMPLETE",
+          "note": "need E2 and E9 seed 0"
+        },
+        "E0_vs_E10": {
+          "verdict": "INCOMPLETE",
+          "note": "need E0 seed 0 and >= 2 E10 seeds (E0 only runs if LR_E10 != 3e-3)"
+        },
+        "variance_decomposition_seed_x_model": {
+          "verdict": "INCOMPLETE"
+        },
+        "variance_decomposition_E10_E1_data_order_only": {
+          "models": [
+            "E10",
+            "E1"
+          ],
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "design": "two-way random effects, no replication",
+          "rows": 3,
+          "cols": 2,
+          "df": {
+            "rows": 2,
+            "cols": 1,
+            "resid": 2
+          },
+          "var_rows": 9.333705692066495e-07,
+          "var_cols": 8.595717456178309e-08,
+          "var_resid": 8.679525944321387e-08,
+          "sd_rows": 0.0009661110542823995,
+          "sd_cols": 0.0002931845401138728,
+          "sd_resid": 0.0002946103518941822,
+          "icc_rows": 0.8438216785082605,
+          "truncated_negative": false,
+          "ms": {
+            "rows": 1.9535363978565127e-06,
+            "cols": 3.4466678312856314e-07,
+            "resid": 8.679525944321387e-08
+          },
+          "caveat": "few df: indicative only; the pairing question is whether icc_rows is clearly > 0",
+          "reading": "E10 and E1 share ONLY the data order at a seed (different init): var_rows = data-order variance, var_resid = init + architecture-specific response + GPU noise (2 columns, 2 df: indicative only)"
+        },
+        "mde_n3": {
+          "observed_pooled_sd": 0.0010100325879147975,
+          "two_sample_alpha_0.05": {
+            "design": "two_sample",
+            "n": 3,
+            "df": 4,
+            "sd": 0.0010100325879147975,
+            "alpha": 0.05,
+            "power": 0.8,
+            "se": 0.000824688154658015,
+            "mde": 0.0031017026177512655,
+            "mde_in_sd": 3.0708936076554725,
+            "approx_mde": 0.0030657037311134657,
+            "mde_pct_of_ref": 1.1608317107373232
+          },
+          "two_sample_alpha_0.025_holm_m2": {
+            "design": "two_sample",
+            "n": 3,
+            "df": 4,
+            "sd": 0.0010100325879147975,
+            "alpha": 0.025,
+            "power": 0.8,
+            "se": 0.000824688154658015,
+            "mde": 0.0037803354969494106,
+            "mde_in_sd": 3.7427856706622475,
+            "approx_mde": 0.0036586222090662815,
+            "mde_pct_of_ref": 1.414814333576039
+          }
+        }
+      },
+      "clean50_bpc": {
+        "role": "sensitivity",
+        "E1_vs_E10": {
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "paired": {
+            "test": "paired t (df = n-1)",
+            "n": 3,
+            "mean_a": 0.33577242043685646,
+            "mean_b": 0.3349245241636518,
+            "diffs": [
+              3.491873447009075e-05,
+              0.0007735995771269155,
+              0.001735170508017081
+            ],
+            "mean_diff": 0.0008478962732046957,
+            "rel_gap_pct": 0.25316040242857646,
+            "conf": 0.95,
+            "sd_diff": 0.0008525573427333067,
+            "se": 0.0004922242113266667,
+            "df": 2,
+            "t_crit": 4.302652729749473,
+            "t": 1.7225814043551504,
+            "p": 0.22710563448818188,
+            "ci": [
+              -0.0012699735733087683,
+              0.0029657661197181598
+            ],
+            "ci_rel_pct": [
+              -0.3791820191370131,
+              0.8855028239941659
+            ],
+            "ci_excludes_0": false,
+            "dz": 0.9945328375054896,
+            "hedges_gz": 0.5683044785745655,
+            "pearson_r_ab": 0.9350182807904612
+          },
+          "welch": {
+            "test": "Welch t (Satterthwaite df)",
+            "n_a": 3,
+            "n_b": 3,
+            "mean_a": 0.33577242043685646,
+            "mean_b": 0.3349245241636518,
+            "mean_diff": 0.0008478962732046402,
+            "rel_gap_pct": 0.25316040242855986,
+            "conf": 0.95,
+            "se": 0.001195415841997192,
+            "df": 3.302628280560328,
+            "t_crit": 3.023668121659523,
+            "t": 0.709289808129071,
+            "p": 0.5249646078905652,
+            "ci": [
+              -0.002766644500369047,
+              0.004462437046778327
+            ],
+            "ci_rel_pct": [
+              -0.8260501398868005,
+              1.3323709447439203
+            ],
+            "ci_excludes_0": false,
+            "effect": {
+              "d": 0.5791327032242694,
+              "hedges_g": 0.4633061625794155,
+              "pooled_sd": 0.0014640794216663191,
+              "df": 4,
+              "se_approx": 0.833436394690873
+            }
+          },
+          "sign_flip": {
+            "test": "sign-flip permutation (two-sided, mean statistic)",
+            "n": 3,
+            "mode": "exact",
+            "n_perm": 8,
+            "p": 0.25,
+            "min_attainable_p": 0.25,
+            "can_reach_0.05": false
+          },
+          "protocol": "E1 at LR_E1 vs E10 at LR_E10, 200M tokens, same seed index = same data order (init differs by architecture); a - b < 0 means E1 better (lower loss/bpc)"
+        },
+        "E11_vs_E1": {
+          "verdict": "INCOMPLETE",
+          "note": "need >= 2 paired seeds, have 0"
+        },
+        "E2_vs_E9": {
+          "verdict": "INCOMPLETE",
+          "note": "need E2 and E9 seed 0"
+        },
+        "E0_vs_E10": {
+          "verdict": "INCOMPLETE",
+          "note": "need E0 seed 0 and >= 2 E10 seeds (E0 only runs if LR_E10 != 3e-3)"
+        },
+        "variance_decomposition_seed_x_model": {
+          "verdict": "INCOMPLETE"
+        },
+        "variance_decomposition_E10_E1_data_order_only": {
+          "models": [
+            "E10",
+            "E1"
+          ],
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "design": "two-way random effects, no replication",
+          "rows": 3,
+          "cols": 2,
+          "df": {
+            "rows": 2,
+            "cols": 1,
+            "resid": 2
+          },
+          "var_rows": 1.7801015416225545e-06,
+          "var_cols": 2.3832170794907083e-07,
+          "var_resid": 3.6342701132426436e-07,
+          "sd_rows": 0.0013342044602018667,
+          "sd_cols": 0.0004881820438617861,
+          "sd_resid": 0.0006028490783971262,
+          "icc_rows": 0.7473608105628781,
+          "truncated_negative": false,
+          "ms": {
+            "rows": 3.923630094569373e-06,
+            "cols": 1.0783921351714768e-06,
+            "resid": 3.6342701132426436e-07
+          },
+          "caveat": "few df: indicative only; the pairing question is whether icc_rows is clearly > 0",
+          "reading": "E10 and E1 share ONLY the data order at a seed (different init): var_rows = data-order variance, var_resid = init + architecture-specific response + GPU noise (2 columns, 2 df: indicative only)"
+        },
+        "mde_n3": {
+          "observed_pooled_sd": 0.001464079421666319,
+          "two_sample_alpha_0.05": {
+            "design": "two_sample",
+            "n": 3,
+            "df": 4,
+            "sd": 0.001464079421666319,
+            "alpha": 0.05,
+            "power": 0.8,
+            "se": 0.0011954158419971918,
+            "mde": 0.00449603213709502,
+            "mde_in_sd": 3.0708936076554725,
+            "approx_mde": 0.004443850425574096,
+            "mde_pct_of_ref": 1.3424015898274906
+          },
+          "two_sample_alpha_0.025_holm_m2": {
+            "design": "two_sample",
+            "n": 3,
+            "df": 4,
+            "sd": 0.001464079421666319,
+            "alpha": 0.025,
+            "power": 0.8,
+            "se": 0.0011954158419971918,
+            "mde": 0.005479735480124168,
+            "mde_in_sd": 3.742785670662247,
+            "approx_mde": 0.005303307588326216,
+            "mde_pct_of_ref": 1.6361105517154197
+          }
+        }
+      },
+      "val_loss": {
+        "role": "secondary (contaminated val)",
+        "E1_vs_E10": {
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "paired": {
+            "test": "paired t (df = n-1)",
+            "n": 3,
+            "mean_a": 0.5853584649715017,
+            "mean_b": 0.5845210252463011,
+            "diffs": [
+              0.0013425330590003393,
+              0.0004610261326832843,
+              0.0007087599839186165
+            ],
+            "mean_diff": 0.0008374397252007467,
+            "rel_gap_pct": 0.14326939306381198,
+            "conf": 0.95,
+            "sd_diff": 0.0004546234399462509,
+            "se": 0.00026247696543288163,
+            "df": 2,
+            "t_crit": 4.302652729749473,
+            "t": 3.1905265432325707,
+            "p": 0.08578498035054083,
+            "ci": [
+              -0.0002919075066153996,
+              0.001966786957016893
+            ],
+            "ci_rel_pct": [
+              -0.04993960764583238,
+              0.3364783937734563
+            ],
+            "ci_excludes_0": false,
+            "dz": 1.8420513585919709,
+            "hedges_gz": 1.052600776338269,
+            "pearson_r_ab": 0.994161667958943
+          },
+          "welch": {
+            "test": "Welch t (Satterthwaite df)",
+            "n_a": 3,
+            "n_b": 3,
+            "mean_a": 0.5853584649715017,
+            "mean_b": 0.5845210252463011,
+            "mean_diff": 0.0008374397252005616,
+            "rel_gap_pct": 0.1432693930637803,
+            "conf": 0.95,
+            "se": 0.0015016949608350383,
+            "df": 3.812803593326329,
+            "t_crit": 2.8310400369489788,
+            "t": 0.5576630054980618,
+            "p": 0.6081843974404482,
+            "ci": [
+              -0.0034139188322079607,
+              0.005088798282609084
+            ],
+            "ci_rel_pct": [
+              -0.5840540690164958,
+              0.8705928551440565
+            ],
+            "ci_excludes_0": false,
+            "effect": {
+              "d": 0.45532993729904714,
+              "hedges_g": 0.3642639498392377,
+              "pooled_sd": 0.0018391932016773064,
+              "df": 4,
+              "se_approx": 0.8270089354515642
+            }
+          },
+          "sign_flip": {
+            "test": "sign-flip permutation (two-sided, mean statistic)",
+            "n": 3,
+            "mode": "exact",
+            "n_perm": 8,
+            "p": 0.25,
+            "min_attainable_p": 0.25,
+            "can_reach_0.05": false
+          },
+          "protocol": "E1 at LR_E1 vs E10 at LR_E10, 200M tokens, same seed index = same data order (init differs by architecture); a - b < 0 means E1 better (lower loss/bpc)"
+        },
+        "E11_vs_E1": {
+          "verdict": "INCOMPLETE",
+          "note": "need >= 2 paired seeds, have 0"
+        },
+        "E2_vs_E9": {
+          "verdict": "INCOMPLETE",
+          "note": "need E2 and E9 seed 0"
+        },
+        "E0_vs_E10": {
+          "E0": 0.60634146057199,
+          "E10_mean": 0.5845210252463011,
+          "E10_sd": 0.002032768607208638,
+          "n_E10": 3,
+          "df": 2,
+          "prediction_interval_95": [
+            0.5744216709334428,
+            0.5946203795591595
+          ],
+          "inside_prediction_interval": false,
+          "note": "95% prediction interval for ONE new run from E10's seeds (descriptive; the registered parity band is unchanged)"
+        },
+        "variance_decomposition_seed_x_model": {
+          "verdict": "INCOMPLETE"
+        },
+        "variance_decomposition_E10_E1_data_order_only": {
+          "models": [
+            "E10",
+            "E1"
+          ],
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "design": "two-way random effects, no replication",
+          "rows": 3,
+          "cols": 2,
+          "df": {
+            "rows": 2,
+            "cols": 1,
+            "resid": 2
+          },
+          "var_rows": 3.2792903970219355e-06,
+          "var_cols": 3.162055679805955e-07,
+          "var_resid": 1.0334123607420179e-07,
+          "sd_rows": 0.0018108811106811887,
+          "sd_cols": 0.0005623215876885713,
+          "sd_resid": 0.00032146731727222567,
+          "icc_rows": 0.8865733252783693,
+          "truncated_negative": false,
+          "ms": {
+            "rows": 6.661922030118072e-06,
+            "cols": 1.0519579400159883e-06,
+            "resid": 1.0334123607420179e-07
+          },
+          "caveat": "few df: indicative only; the pairing question is whether icc_rows is clearly > 0",
+          "reading": "E10 and E1 share ONLY the data order at a seed (different init): var_rows = data-order variance, var_resid = init + architecture-specific response + GPU noise (2 columns, 2 df: indicative only)"
+        },
+        "mde_n3": {
+          "observed_pooled_sd": 0.0018391932016773064,
+          "two_sample_alpha_0.05": {
+            "design": "two_sample",
+            "n": 3,
+            "df": 4,
+            "sd": 0.0018391932016773064,
+            "alpha": 0.05,
+            "power": 0.8,
+            "se": 0.0015016949608350383,
+            "mde": 0.005647966646274242,
+            "mde_in_sd": 3.0708936076554725,
+            "approx_mde": 0.005582415387468938,
+            "mde_pct_of_ref": 0.9662555155983215
+          },
+          "two_sample_alpha_0.025_holm_m2": {
+            "design": "two_sample",
+            "n": 3,
+            "df": 4,
+            "sd": 0.0018391932016773064,
+            "alpha": 0.025,
+            "power": 0.8,
+            "se": 0.0015016949608350383,
+            "mde": 0.006883705960817243,
+            "mde_in_sd": 3.742785670662247,
+            "approx_mde": 0.006662075238891143,
+            "mde_pct_of_ref": 1.1776660998492976
+          }
+        }
+      }
+    },
+    "lrs": {
+      "E10": 0.003,
+      "E1": 0.006
+    },
+    "included": {
+      "E0/s0": "E0-20261122-122059-s0",
+      "E1/s0": "E1-20261122-191828-s0",
+      "E1/s1": "E1-20261122-194523-s1",
+      "E1/s2": "E1-20261122-201556-s2",
+      "E10/s0": "E10-20261122-181334-s0",
+      "E10/s1": "E10-20261122-183258-s1",
+      "E10/s2": "E10-20261122-185531-s2"
+    },
+    "excluded": [
+      {
+        "run": "E1-20261122-124440-s0",
+        "reason": "lr 0.003 != tuned 0.006"
+      },
+      {
+        "run": "E1-20261122-174549-s0",
+        "reason": "not full budget (max_tokens 20000000)"
+      },
+      {
+        "run": "E1-20261122-175030-s0",
+        "reason": "not full budget (max_tokens 20000000)"
+      },
+      {
+        "run": "E1-20261122-175440-s0",
+        "reason": "not full budget (max_tokens 20000000)"
+      },
+      {
+        "run": "E1-20261122-175844-s0",
+        "reason": "not full budget (max_tokens 20000000)"
+      },
+      {
+        "run": "E1-20261122-180627-s0",
+        "reason": "not full budget (max_tokens 20000000)"
+      },
+      {
+        "run": "E1-20261122-205353-s0",
+        "reason": "status no summary (running/killed)"
+      },
+      {
+        "run": "E10-20261122-172534-s0",
+        "reason": "not full budget (max_tokens 20000000)"
+      },
+      {
+        "run": "E10-20261122-173601-s0",
+        "reason": "not full budget (max_tokens 20000000)"
+      },
+      {
+        "run": "E10-20261122-173914-s0",
+        "reason": "not full budget (max_tokens 20000000)"
+      },
+      {
+        "run": "E10-20261122-174231-s0",
+        "reason": "not full budget (max_tokens 20000000)"
+      },
+      {
+        "run": "E11-20261122-204510-s0",
+        "reason": "status no summary (running/killed)"
+      },
+      {
+        "run": "E2-20261122-132340-s0",
+        "reason": "lr 0.003 != tuned 0.006"
+      },
+      {
+        "run": "E2-20261122-152151-s1",
+        "reason": "status no summary (running/killed)"
+      },
+      {
+        "run": "E9-20261122-152151-s0",
+        "reason": "status no summary (running/killed)"
+      },
+      {
+        "run": "smoke-20261122-115558-s0",
+        "reason": "experiment not part of the replication"
+      },
+      {
+        "run": "smoke-20261122-115609-s0",
+        "reason": "experiment not part of the replication"
+      }
+    ],
+    "registered_rules_by_metric": {
+      "clean80_bpc": {
+        "C5": {
+          "verdict": "REFUTED",
+          "text": "REFUTED: E10 0.2672 - E1 0.2677 = -0.0005 (-0.18%) vs 2 x pooled sd 0.0020 [fail]; max(E1) 0.2687 < min(E10) 0.2662 [fail]"
+        },
+        "E0_parity": {
+          "verdict": "INCOMPLETE",
+          "text": "INCOMPLETE: missing/non-qualifying runs: E0 seed 0"
+        },
+        "loop_E9_vs_E2": {
+          "verdict": "INCOMPLETE",
+          "text": "INCOMPLETE: missing/non-qualifying runs: E9 seed 0, E2 seed 0"
+        },
+        "E11": {
+          "verdict": "INCOMPLETE",
+          "text": "INCOMPLETE: missing/non-qualifying runs: E11 seed 0, E11 seed 1, E11 seed 2"
+        }
+      },
+      "clean50_bpc": {
+        "C5": {
+          "verdict": "REFUTED",
+          "text": "REFUTED: E10 0.3349 - E1 0.3358 = -0.0008 (-0.25%) vs 2 x pooled sd 0.0029 [fail]; max(E1) 0.3370 < min(E10) 0.3337 [fail]"
+        },
+        "E0_parity": {
+          "verdict": "INCOMPLETE",
+          "text": "INCOMPLETE: missing/non-qualifying runs: E0 seed 0"
+        },
+        "loop_E9_vs_E2": {
+          "verdict": "INCOMPLETE",
+          "text": "INCOMPLETE: missing/non-qualifying runs: E9 seed 0, E2 seed 0"
+        },
+        "E11": {
+          "verdict": "INCOMPLETE",
+          "text": "INCOMPLETE: missing/non-qualifying runs: E11 seed 0, E11 seed 1, E11 seed 2"
+        }
+      },
+      "val_loss": {
+        "C5": {
+          "verdict": "REFUTED",
+          "text": "REFUTED: E10 0.5845 - E1 0.5854 = -0.0008 (-0.14%) vs 2 x pooled sd 0.0037 [fail]; max(E1) 0.5866 < min(E10) 0.5822 [fail]"
+        },
+        "E0_parity": {
+          "verdict": "FAIL",
+          "text": "FAIL: E0 0.6063 vs E10 mean 0.5845 +- max(3 s_E10 = 0.0061, 0.5% = 0.0029) = [0.5784, 0.5906]"
+        },
+        "loop_E9_vs_E2": {
+          "verdict": "INCOMPLETE",
+          "text": "INCOMPLETE: missing/non-qualifying runs: E9 seed 0, E2 seed 0"
+        },
+        "E11": {
+          "verdict": "INCOMPLETE",
+          "text": "INCOMPLETE: missing/non-qualifying runs: E11 seed 0, E11 seed 1, E11 seed 2"
+        }
+      }
+    },
+    "registered_rules_note": "Same code and thresholds as replication_analysis.py; metric = clean80_bpc (PRIMARY), clean50_bpc (sensitivity), val_loss (training-time, contaminated val: secondary/descriptive). Registry-value checks (E10 scorecard, E1 reproducibility) are val_loss-specific and stay in REPLICATION.json.",
+    "memorisation_gap": {
+      "80": {
+        "per_model": {
+          "E10": {
+            "0": {
+              "gap": -0.1702424329871653,
+              "ratio": 0.3605576698378812,
+              "dup_bpc": 0.09599335553813215,
+              "clean_bpc": 0.26623578852529745
+            },
+            "1": {
+              "gap": -0.17075898981255427,
+              "ratio": 0.3619656454667611,
+              "dup_bpc": 0.09687391835188915,
+              "clean_bpc": 0.2676329081644434
+            },
+            "2": {
+              "gap": -0.17079657503428008,
+              "ratio": 0.36203529222664693,
+              "dup_bpc": 0.09692446494362139,
+              "clean_bpc": 0.2677210399779015
+            }
+          },
+          "E1": {
+            "0": {
+              "gap": -0.17020851121856037,
+              "ratio": 0.361085682595971,
+              "dup_bpc": 0.09619420755308042,
+              "clean_bpc": 0.2664027187716408
+            },
+            "1": {
+              "gap": -0.17122292086912785,
+              "ratio": 0.3609931825217446,
+              "dup_bpc": 0.09672871311317213,
+              "clean_bpc": 0.2679516339823
+            },
+            "2": {
+              "gap": -0.17219038551975852,
+              "ratio": 0.35910901149478147,
+              "dup_bpc": 0.09648305287788006,
+              "clean_bpc": 0.2686734383976386
+            }
+          }
+        },
+        "definition": "gap = bits/char on docs with >= 80% overlap minus bits/char on docs with < 80% overlap (more negative = repeated docs are much easier = more memorisation/recall benefit)",
+        "E1_vs_E10_gap": {
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "paired": {
+            "test": "paired t (df = n-1)",
+            "n": 3,
+            "mean_a": -0.17120727253581558,
+            "mean_b": -0.17059933261133323,
+            "diffs": [
+              3.392176860492202e-05,
+              -0.0004639310565735799,
+              -0.0013938104854784306
+            ],
+            "mean_diff": -0.0006079399244823628,
+            "rel_gap_pct": 0.3563553943481114,
+            "conf": 0.95,
+            "sd_diff": 0.0007246783858131548,
+            "se": 0.00041839326112512844,
+            "df": 2,
+            "t_crit": 4.302652729749473,
+            "t": -1.4530346947929136,
+            "p": 0.2833850217797622,
+            "ci": [
+              -0.002408140831571181,
+              0.0011922609826064555
+            ],
+            "ci_rel_pct": [
+              1.4115769356832781,
+              -0.6988661469870553
+            ],
+            "ci_excludes_0": false,
+            "dz": -0.8389099721805544,
+            "hedges_gz": -0.47937712696031676,
+            "pearson_r_ab": 0.9007958140689782
+          },
+          "paired_log_ratio": {
+            "test": "paired t (df = n-1)",
+            "n": 3,
+            "mean_a": -1.0205551633692618,
+            "mean_b": -1.0174409721650723,
+            "diffs": [
+              0.0014633623396769213,
+              -0.0026902321235262594,
+              -0.008115703828719179
+            ],
+            "mean_diff": -0.0031141912041895057,
+            "rel_gap_pct": 0.30608077415662116,
+            "conf": 0.95,
+            "sd_diff": 0.004803585446433248,
+            "se": 0.0027733513505736047,
+            "df": 2,
+            "t_crit": 4.302652729749473,
+            "t": -1.1228981872583168,
+            "p": 0.3781700756566617,
+            "ci": [
+              -0.015046958963289416,
+              0.008818576554910404
+            ],
+            "ci_rel_pct": [
+              1.4789024007230718,
+              -0.8667408524098296
+            ],
+            "ci_excludes_0": false,
+            "dz": -0.6483055706861321,
+            "hedges_gz": -0.3704603261063612,
+            "pearson_r_ab": -0.5701256867299686
+          }
+        }
+      },
+      "50": {
+        "per_model": {
+          "E10": {
+            "0": {
+              "gap": -0.19491756928309517,
+              "ratio": 0.415913768751901,
+              "dup_bpc": 0.13879611690770488,
+              "clean_bpc": 0.33371368619080005
+            },
+            "1": {
+              "gap": -0.1962373103857351,
+              "ratio": 0.41556506453835296,
+              "dup_bpc": 0.13953541379394901,
+              "clean_bpc": 0.3357727241796841
+            },
+            "2": {
+              "gap": -0.19534281416337546,
+              "ratio": 0.4173865383691986,
+              "dup_bpc": 0.13994434795709576,
+              "clean_bpc": 0.3352871621204712
+            }
+          },
+          "E1": {
+            "0": {
+              "gap": -0.19468966697923515,
+              "ratio": 0.4166577354747948,
+              "dup_bpc": 0.139058937946035,
+              "clean_bpc": 0.33374860492527014
+            },
+            "1": {
+              "gap": -0.19719971957897997,
+              "ratio": 0.4140488079689237,
+              "dup_bpc": 0.13934660417783107,
+              "clean_bpc": 0.33654632375681104
+            },
+            "2": {
+              "gap": -0.19730533146380008,
+              "ratio": 0.4145630352594563,
+              "dup_bpc": 0.13971700116468821,
+              "clean_bpc": 0.3370223326284883
+            }
+          }
+        },
+        "definition": "gap = bits/char on docs with >= 50% overlap minus bits/char on docs with < 50% overlap (more negative = repeated docs are much easier = more memorisation/recall benefit)",
+        "E1_vs_E10_gap": {
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "paired": {
+            "test": "paired t (df = n-1)",
+            "n": 3,
+            "mean_a": -0.19639823934067172,
+            "mean_b": -0.1954992312774019,
+            "diffs": [
+              0.00022790230386002253,
+              -0.000962409193244862,
+              -0.0019625173004246266
+            ],
+            "mean_diff": -0.000899008063269822,
+            "rel_gap_pct": 0.45985247992826245,
+            "conf": 0.95,
+            "sd_diff": 0.0010965852854065723,
+            "se": 0.0006331138097188671,
+            "df": 2,
+            "t_crit": 4.302652729749473,
+            "t": -1.4199786033241397,
+            "p": 0.29145635607438836,
+            "ci": [
+              -0.003623076924898794,
+              0.0018250607983591504
+            ],
+            "ci_rel_pct": [
+              1.8532435658316535,
+              -0.9335386059751287
+            ],
+            "ci_excludes_0": false,
+            "dz": -0.8198250288727008,
+            "hedges_gz": -0.46847144507011473,
+            "pearson_r_ab": 0.7236341476696013
+          },
+          "paired_log_ratio": {
+            "test": "paired t (df = n-1)",
+            "n": 3,
+            "mean_a": -0.87926394381978,
+            "mean_b": -0.8763786488218249,
+            "diffs": [
+              0.0017871544176834009,
+              -0.0036553348683322495,
+              -0.006787704543216422
+            ],
+            "mean_diff": -0.00288529499795509,
+            "rel_gap_pct": 0.32922926657717955,
+            "conf": 0.95,
+            "sd_diff": 0.0043389828994026755,
+            "se": 0.0025051129449793178,
+            "df": 2,
+            "t_crit": 4.302652729749473,
+            "t": -1.1517624399880746,
+            "p": 0.3685115009735287,
+            "ci": [
+              -0.013663926049001095,
+              0.007893336053090914
+            ],
+            "ci_rel_pct": [
+              1.5591349774860939,
+              -0.9006764443317349
+            ],
+            "ci_excludes_0": false,
+            "dz": -0.6649703547696151,
+            "hedges_gz": -0.37998305986835146,
+            "pearson_r_ab": -0.15365820582274292
+          }
+        }
+      }
+    },
+    "memorisation_confound_flag": false,
+    "memorisation_confound_note": "If True (paired 95% CI of the gap difference excludes 0), the E1-vs-E10 result must be reported with the caveat 'differs in recall of repeated docs' and the < 50% sensitivity subset next to it. It never changes the registered verdict mechanically.",
+    "confirmatory_family": {
+      "alpha": 0.05,
+      "m_planned": 2,
+      "members_planned": [
+        "H1 E1 vs E10",
+        "H2 E11 vs E1 (TOST)"
+      ],
+      "holm": "INCOMPLETE: need both H1 and H2 p-values (planned m=2 is fixed; a missing member is NOT dropped)"
+    },
+    "exploratory_family": {
+      "q": 0.1,
+      "label": "exploratory: hypothesis-generating, no claim status changes",
+      "bh": [
+        {
+          "hypothesis": "E1 vs E10, memorisation gap (clean<80)",
+          "p_raw": 0.2833850217797622,
+          "p_bh": 0.2833850217797622,
+          "flag": false
+        },
+        {
+          "hypothesis": "E1 vs E10, clean<50 sensitivity",
+          "p_raw": 0.22710563448818188,
+          "p_bh": 0.2833850217797622,
+          "flag": false
+        },
+        {
+          "hypothesis": "E1 vs E10, val_loss (contaminated)",
+          "p_raw": 0.08578498035054083,
+          "p_bh": 0.2573549410516225,
+          "flag": false
+        }
+      ]
+    },
+    "power_design": {
+      "planning_sd_val_loss": 0.004,
+      "two_sample_n3_alpha_0.05": {
+        "design": "two_sample",
+        "n": 3,
+        "df": 4,
+        "sd": 0.004,
+        "alpha": 0.05,
+        "power": 0.8,
+        "se": 0.0032659863237109042,
+        "mde": 0.01228357443062189,
+        "mde_in_sd": 3.0708936076554725,
+        "approx_mde": 0.012141009182456504,
+        "mde_pct_of_ref": 2.0472624051036483
+      },
+      "two_sample_n3_alpha_0.025": {
+        "design": "two_sample",
+        "n": 3,
+        "df": 4,
+        "sd": 0.004,
+        "alpha": 0.025,
+        "power": 0.8,
+        "se": 0.0032659863237109042,
+        "mde": 0.014971142682648991,
+        "mde_in_sd": 3.7427856706622475,
+        "approx_mde": 0.014489125411763087,
+        "mde_pct_of_ref": 2.495190447108165
+      },
+      "power_at_registered_gap_range_1.5_to_4pct_alpha_0.05": {
+        "1.5%": 0.5509579866911668,
+        "2.0%": 0.782554065554894,
+        "3.0%": 0.9792306305530358,
+        "4.0%": 0.9994198771460522
+      },
+      "note": "val_loss units, sd = registered 0.004; recompute with the observed sd in metrics.*.mde_n3"
+    },
+    "notes": [
+      "The original criteria (REPLICATION.json / PREDICTIONS.md) remain the primary decision rule; this file adds estimation and multiplicity context only.",
+      "With n=3 the paired t has df=2 (t_crit 4.30) and the sign-flip test cannot go below p=0.25; both are reported, the CI is the interpretable object.",
+      "Welch (df~4) is shown as a sensitivity analysis: if pairing buys nothing it is the more powerful test.",
+      "A single-seed E2 vs E9 is never given a p-value."
+    ]
+  },
+  "ran_at": "2026-11-22T21:42:12",
+  "runtime_s": 9.6,
+  "git_commit": "1f3884c23ef6b13445cfdea397992fb38175a6df",
+  "git_describe": "",
+  "torch": "2.14.1+cu130",
+  "device": "cpu"
+}

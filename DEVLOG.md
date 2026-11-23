@@ -17,6 +17,43 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.78: C5 REFUTED on the registered primary metric: E1 is 0.18% worse than the E10 control; outside review 21:40
+*2026-11-22*
+
+**The registered Phase 2b test (Q12) is in, and C5 is REFUTED.**
+- **Inputs:** clean80 doc-level bits/char, the pre-registered primary metric (Addendum A2), on the six N1X Phase 2b checkpoints at tuned LRs (E10 3e-3, E1 6e-3; 3 seeds each). Scoring ran on a rented RTX 5090 so the laptop stayed cool.
+- **Scores:**
+  - E10: 0.2662, 0.2676, 0.2677; mean **0.2672**;
+  - E1: 0.2664, 0.2680, 0.2687; mean **0.2677**.
+- **Registered C5 rule:** REFUTED.
+  - E1 is **0.18% worse**.
+  - The paired difference (n = 3, df 2) is +0.00048 bpc, 95% CI [−0.00056, +0.00151], p = 0.18.
+  - Neither condition holds: the gap vs 2 × pooled sd 0.0020 fails, and max(E1) 0.2687 > min(E10) 0.2662.
+- **The secondary val_loss verdict agrees:** REFUTED, −0.14%.
+- **The memorisation-confound flag is False.**
+- **Status:** recorded as **REFUTED** (qualified "vs E10 at tuned LRs, clean80, 3 seeds, N1X"; ledger event 9), per A2: the primary-metric verdict is the status.
+- **Why the headline flipped:** the earlier "E1 is 3.6% better" was against our own E0, which is handicapped (the E0-parity rule fails: E0 0.6063 vs E10 0.5845). The outside reviews of 20:37 and 21:40 suspected exactly this.
+- **Still open:** the confirmatory Holm family stays INCOMPLETE on the N1X (E11 never ran there). The independent Phase 2b-5090 replication at 7 seeds per arm, running now, is the second check.
+- **Early 5090 clean80 scores** (not yet a test): E1 s0, s1, s3, s4 0.2667 / 0.2677 / 0.2684 / 0.2686; E10 s0, s4, s5 0.2660 / 0.2670 / 0.2677.
+- **README:** the headline, the results table (an E10 control row added) and the "in plain English" bullet are rewritten to the E10 comparison.
+
+**Outside review 21:40 (Haiku), triaged:**
+- **Critiques accepted:**
+  - 1: the headline used the wrong control (now fixed).
+  - 2: E10 also differs in RoPE layout and eps (a limitation).
+  - 3–4: param-matching and size (SQ241, SQ243).
+  - 5–7: R1 is weak as registered, so it is reported with its CI and never called a confirmation; the clean80 sd is now measured.
+  - 8: source reweighting (SQ239).
+  - 9: LSH recall (SQ245).
+  - 10–12: the v2 val is novelty-selected and longer, and coverage is confounded. **No v1-vs-v2 comparison is read before the dedup-only control SQ238.**
+  - 13: LR picks below the 20M seed sd are ties.
+  - 14: copy probe (SQ240).
+- **New queue items:** SQ238–SQ245.
+
+**Quick review 21:37 (code-model practitioner):** executable pass@1 is already battery family F, and it can't resolve differences at 13M.
+
+---
+
 ## v0.4.77: code-py-v2 built and verified byte-identical on two machines; docs refresh (hourly)
 *2026-11-22*
 

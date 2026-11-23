@@ -17,6 +17,30 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.65: Byte Quest becomes a main quest (E12-E16); SQ99 cluster-robust re-analysis
+*2026-11-22*
+
+### Byte Quest: a main-quest arc (the human: "add byte level tokens as a main quest, let's experiment with its granularity and loops")
+**Registered** in `experiments/experiments.json` (arc "Byte Quest (granularity x loops)"), with cards and micro devlogs:
+- **E12** flat byte-level E1 (vocab 256, T = 4,096 bytes);
+- **E13** patch-granularity sweep, P = 2/4/8, single-pass byte decoder;
+- **E14** byte refinement-loop sweep, r = 1/2/4 shared vs an equal-FLOP unshared control (H-C2F);
+- **E15** parallel-then-refine decoding within a patch (r < P);
+- **E16** the best decoder × looped global core × ternary global core.
+
+**Design**: `notes/analysis-coarse-to-fine.md`. The primary metric is clean-val doc-level bits/char, plus exact-span accuracy (SQ209).
+**Prerequisites**: the SQ206 causality test, the SQ189 throughput probe, the flex-attention SWA patch (C12) and SQ207 (speller on frozen E1).
+**In progress:** a subagent is building the byte model family as staged patches (Phase 2b is running, so code paths can't change): byte dataset `code-py-v1-bytes`, causality tests, param/FLOP accounting, staged configs and `notes/byte-quest.md` with draft predictions. **Predictions are registered before any run.**
+### SQ99 re-analysis (quick review 19:25, skeptical peer reviewer, Codex)
+The per-doc bootstrap ignored package clustering. From the saved per-doc NLL:
+- **by-source cluster bootstrap 95% CI −0.13% to +1.03% (includes 0);**
+- leave-one-source-out +0.26% to +0.56% (the sign never flips);
+- E1 better on 14/31 sources.
+
+**The verdict DOES NOT TRANSFER stands** (no evidence the in-corpus advantage carries out of corpus), **but "E1 is worse out of corpus" is withdrawn.** Recorded as a C192 limitation event; SQ213 done.
+
+---
+
 ## v0.4.64: README carries the SQ99 warning (correction to v0.4.63)
 *2026-11-22*
 

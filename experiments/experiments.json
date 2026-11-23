@@ -1,293 +1,405 @@
 [
-  {
-    "id": "E0",
-    "arc": "Base Form",
-    "title": "Dense transformer baseline",
-    "question": "What does a plain ~10M-param causal transformer reach on TinyStories at our compute budget? Every later arc is measured against this.",
-    "prediction": "Written 2026-11-22 before the run. After 200M tokens of Python (code-py-v1), full-val loss lands in 0.90-1.30 nats/token (about 0.35-0.50 bits/char). Throughput about 170k tok/s compiled, about 20 min. Samples are syntactically plausible Python with coherent short functions but frequent logic errors.",
-    "ingredients": [
-      "full attention",
-      "bf16"
-    ],
-    "metrics": [
-      "val loss",
-      "tokens/sec",
-      "peak memory"
-    ],
-    "status": "done",
-    "version": "v0.3.0",
-    "config": "configs/e0_dense.json",
-    "results": {
-      "val_loss": 0.6063,
-      "val_bits_per_char": 0.2351,
-      "params_non_embedding": 10621824,
-      "flops": "1.935e+16",
-      "wall_min": 23.2983,
-      "tokens_per_s": 143083.4734,
-      "peak_mem_gb": 4.7517,
-      "run": "E0-20261122-122059-s0"
-    },
-    "notes": "Run E0-20261122-122059-s0 (commit 0dc7491, seed 0, 200M tokens). Prediction check: loss range MISSED (0.606 vs predicted 0.90-1.30; the curated corpus is far more predictable than assumed). Samples: plausible Python, palindrome prompt solved with correct asserts, but fibonacci degenerated into repeated 'else:' lines."
+ {
+  "id": "E0",
+  "arc": "Base Form",
+  "title": "Dense transformer baseline",
+  "question": "What does a plain ~10M-param causal transformer reach on TinyStories at our compute budget? Every later arc is measured against this.",
+  "prediction": "Written 2026-11-22 before the run. After 200M tokens of Python (code-py-v1), full-val loss lands in 0.90-1.30 nats/token (about 0.35-0.50 bits/char). Throughput about 170k tok/s compiled, about 20 min. Samples are syntactically plausible Python with coherent short functions but frequent logic errors.",
+  "ingredients": [
+   "full attention",
+   "bf16"
+  ],
+  "metrics": [
+   "val loss",
+   "tokens/sec",
+   "peak memory"
+  ],
+  "status": "done",
+  "version": "v0.3.0",
+  "config": "configs/e0_dense.json",
+  "results": {
+   "val_loss": 0.6063,
+   "val_bits_per_char": 0.2351,
+   "params_non_embedding": 10621824,
+   "flops": "1.935e+16",
+   "wall_min": 23.2983,
+   "tokens_per_s": 143083.4734,
+   "peak_mem_gb": 4.7517,
+   "run": "E0-20261122-122059-s0"
   },
-  {
-    "id": "E1",
-    "arc": "Ki Control",
-    "title": "Linear-time mixers",
-    "question": "Can Gated DeltaNet (vs Mamba-2 vs sliding-window only) plus one global attention layer match the baseline, while memory stops growing with context?",
-    "prediction": "Written 2026-11-22 before the run. Same depth, about the same params as E0, but only one full-attention layer. Val loss within +-2% of E0 and more likely slightly better (hybrids tend to win at short context; the 100-step bench was already lower: 2.58 vs 2.84). About 1.7x slower wall-clock than E0 because of the GDN kernels (100k vs 173k tok/s). If it is worse than E0 by >3%, suspect the GDN parametrisation or the SWA window.",
-    "ingredients": [
-      "Gated DeltaNet",
-      "Mamba-2",
-      "sliding-window attn"
-    ],
-    "metrics": [
-      "val loss",
-      "MQAR recall",
-      "memory vs context length"
-    ],
-    "status": "done",
-    "version": "v0.3.0",
-    "config": "configs/e1_hybrid.json",
-    "results": {
-      "val_loss": 0.5846,
-      "val_bits_per_char": 0.2267,
-      "params_non_embedding": 11092068,
-      "flops": "1.821e+16",
-      "wall_min": 38.6129,
-      "tokens_per_s": 86333.8013,
-      "peak_mem_gb": 7.1041,
-      "run": "E1-20261122-124440-s0"
-    },
-    "notes": "Run E1-20261122-124440-s0. Prediction check: direction right, magnitude MISSED: -3.6% vs E0 (predicted within +-2%). Led E0 at every eval checkpoint. Wall-clock 1.66x E0 (predicted ~1.7x). Best model so far, with one full-attention layer out of six."
+  "notes": "Run E0-20261122-122059-s0 (commit 0dc7491, seed 0, 200M tokens). Prediction check: loss range MISSED (0.606 vs predicted 0.90-1.30; the curated corpus is far more predictable than assumed). Samples: plausible Python, palindrome prompt solved with correct asserts, but fibonacci degenerated into repeated 'else:' lines."
+ },
+ {
+  "id": "E1",
+  "arc": "Ki Control",
+  "title": "Linear-time mixers",
+  "question": "Can Gated DeltaNet (vs Mamba-2 vs sliding-window only) plus one global attention layer match the baseline, while memory stops growing with context?",
+  "prediction": "Written 2026-11-22 before the run. Same depth, about the same params as E0, but only one full-attention layer. Val loss within +-2% of E0 and more likely slightly better (hybrids tend to win at short context; the 100-step bench was already lower: 2.58 vs 2.84). About 1.7x slower wall-clock than E0 because of the GDN kernels (100k vs 173k tok/s). If it is worse than E0 by >3%, suspect the GDN parametrisation or the SWA window.",
+  "ingredients": [
+   "Gated DeltaNet",
+   "Mamba-2",
+   "sliding-window attn"
+  ],
+  "metrics": [
+   "val loss",
+   "MQAR recall",
+   "memory vs context length"
+  ],
+  "status": "done",
+  "version": "v0.3.0",
+  "config": "configs/e1_hybrid.json",
+  "results": {
+   "val_loss": 0.5846,
+   "val_bits_per_char": 0.2267,
+   "params_non_embedding": 11092068,
+   "flops": "1.821e+16",
+   "wall_min": 38.6129,
+   "tokens_per_s": 86333.8013,
+   "peak_mem_gb": 7.1041,
+   "run": "E1-20261122-124440-s0"
   },
-  {
-    "id": "E2",
-    "arc": "Time Chamber",
-    "title": "Looped core block",
-    "question": "Does one shared core block looped r times match a deeper unshared model with far fewer parameters? Does quality keep improving when r at test time exceeds r in training?",
-    "prediction": "Written 2026-11-22 before the run. At r=4 (about 2x E0's FLOPs/token, 11% fewer non-emb params), val loss matches E0 within +-3%, so we expect no win per token yet; the claim to test is the r curve. Predicted shape: r=1 clearly worse (> +10% vs r=4); r=2 < r=1; r=4 about r=6 (flat); r=8 about the same or slightly better than r=4; r=12 (beyond the trained max of 7) flat or slightly worse, not a collapse. Training is stable (no loss spikes > 0.5 after warmup).",
-    "ingredients": [
-      "shared core",
-      "random r in training",
-      "input re-injection"
-    ],
-    "metrics": [
-      "val loss vs r",
-      "arithmetic length generalization"
-    ],
-    "status": "done",
-    "version": "v0.3.0",
-    "config": "configs/e2_looped.json",
-    "results": {
-      "val_loss": 0.6186,
-      "val_bits_per_char": 0.2398,
-      "val_loss_r1": 0.6694,
-      "val_loss_r2": 0.6272,
-      "val_loss_r4": 0.6186,
-      "val_loss_r6": 0.6239,
-      "val_loss_r8": 0.6328,
-      "val_loss_r12": 0.654,
-      "params_non_embedding": 9460760,
-      "flops": "3.869e+16",
-      "wall_min": 80.2673,
-      "tokens_per_s": 41531.1845,
-      "peak_mem_gb": 12.0715,
-      "run": "E2-20261122-132340-s0"
-    },
-    "notes": "Run E2-20261122-132340-s0. Prediction check: r=4 within 3% of E0 (+2.0%) HIT; r=1 > +10% MISSED (+8.2%); r=2 < r=1 HIT; r=4 ~ r=6 HIT (+0.9%); r=8 <= r=4 MISSED (+2.3%); r=12 no collapse HIT but worse than 'slightly' (+5.7%); stability HIT (no spikes, max grad-norm 0.67). The loss is best at r=4 (= mean training r) and degrades when extrapolating: the loops don't converge to a fixed point. At 2.1x E1's FLOPs it is 5.8% worse than E1: no win per token or per FLOP at this scale."
+  "notes": "Run E1-20261122-124440-s0. Prediction check: direction right, magnitude MISSED: -3.6% vs E0 (predicted within +-2%). Led E0 at every eval checkpoint. Wall-clock 1.66x E0 (predicted ~1.7x). Best model so far, with one full-attention layer out of six."
+ },
+ {
+  "id": "E2",
+  "arc": "Time Chamber",
+  "title": "Looped core block",
+  "question": "Does one shared core block looped r times match a deeper unshared model with far fewer parameters? Does quality keep improving when r at test time exceeds r in training?",
+  "prediction": "Written 2026-11-22 before the run. At r=4 (about 2x E0's FLOPs/token, 11% fewer non-emb params), val loss matches E0 within +-3%, so we expect no win per token yet; the claim to test is the r curve. Predicted shape: r=1 clearly worse (> +10% vs r=4); r=2 < r=1; r=4 about r=6 (flat); r=8 about the same or slightly better than r=4; r=12 (beyond the trained max of 7) flat or slightly worse, not a collapse. Training is stable (no loss spikes > 0.5 after warmup).",
+  "ingredients": [
+   "shared core",
+   "random r in training",
+   "input re-injection"
+  ],
+  "metrics": [
+   "val loss vs r",
+   "arithmetic length generalization"
+  ],
+  "status": "done",
+  "version": "v0.3.0",
+  "config": "configs/e2_looped.json",
+  "results": {
+   "val_loss": 0.6186,
+   "val_bits_per_char": 0.2398,
+   "val_loss_r1": 0.6694,
+   "val_loss_r2": 0.6272,
+   "val_loss_r4": 0.6186,
+   "val_loss_r6": 0.6239,
+   "val_loss_r8": 0.6328,
+   "val_loss_r12": 0.654,
+   "params_non_embedding": 9460760,
+   "flops": "3.869e+16",
+   "wall_min": 80.2673,
+   "tokens_per_s": 41531.1845,
+   "peak_mem_gb": 12.0715,
+   "run": "E2-20261122-132340-s0"
   },
-  {
-    "id": "E3",
-    "arc": "Weighted Clothing",
-    "title": "Ternary weights on the E1 stack",
-    "question": "How much quality does BitNet b1.58 ternary weights (-1, 0, +1) cost at our tiny scale? E1's exact layout and recipe, with only the weights changed, so any gap is down to ternary alone. (Ternary + loops, i.e. whether rounding error piles up across passes, is tested in E4.)",
-    "prediction": "Written 2026-11-22, before any run. Full-val loss 0.605-0.645, i.e. +3.5% to +10% worse than E1 (0.5846), most likely around +6% (~0.62): roughly E0/E2 territory, so ternary gives back about all of E1's gain over dense. Reason: BitNet b1.58's own Table 1 shows a perplexity gap of +4.4% (loss +1.7%) at 700M that closes only at 3B; we are ~60x smaller than 700M, so the gap should be bigger. Training stays stable (no loss spikes > 0.5 after warmup) but runs 10-25% slower per token than E1, because the quantization is simulated in floating point (no ternary kernels). Payoff: weights 28.5 MB -> ~9.1 MB (2-bit packed); the non-embedding body 22.2 MB -> 2.8 MB (7.8x).",
-    "ingredients": [
-      "E1 layout",
-      "BitNet b1.58 BitLinear",
-      "absmean ternary weights",
-      "8-bit activations",
-      "STE"
-    ],
-    "metrics": [
-      "val loss vs E1",
-      "weight memory (MB)",
-      "loss per bit of weight memory",
-      "tokens/sec vs E1"
-    ],
-    "status": "planned",
-    "version": null,
-    "config": "configs/e3_ternary.json",
-    "results": {},
-    "notes": "Designed 2026-11-22 (v0.3.4). Not run: training paused by the human. 33 BitLinear modules, 11.06M of 11.09M non-embedding params ternary. Deliberate deviations from the BitNet 2B4T recipe (no SubLN, SwiGLU not ReLU^2, single-stage schedule) keep it a one-ingredient change vs E1; the BitNet recipe is a possible follow-up if the gap is large."
-  },
-  {
-    "id": "E4",
-    "arc": "The Dance",
-    "title": "Full fusion",
-    "question": "Linear mixers + loops + ternary together: do they stack, or does the fusion fail? Success here is v1.0.0.",
-    "prediction": "",
-    "ingredients": [
-      "everything above"
-    ],
-    "metrics": [
-      "quality per bit",
-      "quality per FLOP",
-      "scaling with context"
-    ],
-    "status": "planned",
-    "version": null,
-    "config": null,
-    "results": {},
-    "notes": ""
-  },
-  {
-    "id": "E5",
-    "arc": "Power Up on Demand",
-    "title": "Adaptive loops per token",
-    "question": "Can a learned halting signal spend more loops on hard tokens and fewer on easy ones, at equal quality?",
-    "prediction": "",
-    "ingredients": [
-      "halting head",
-      "per-loop state fallback"
-    ],
-    "metrics": [
-      "mean loops used",
-      "loss at equal compute"
-    ],
-    "status": "planned",
-    "version": null,
-    "config": null,
-    "results": {},
-    "notes": ""
-  },
-  {
-    "id": "E6",
-    "arc": "Rival Loop",
-    "title": "Critique → fix inside the recurrence",
-    "question": "Do per-loop supervision, a grounded critic head, and adversarial damage-and-repair make loops actually fix their own errors?",
-    "prediction": "",
-    "ingredients": [
-      "deep supervision",
-      "critic head",
-      "latent PGD noise"
-    ],
-    "metrics": [
-      "monotonic loss vs r",
-      "error-repair rate"
-    ],
-    "status": "planned",
-    "version": null,
-    "config": null,
-    "results": {},
-    "notes": ""
-  },
-  {
-    "id": "E7",
-    "arc": "Silent Technique",
-    "title": "Loops vs chain-of-thought",
-    "question": "How much written-out reasoning can silent latent loops replace? Same task, looped-no-CoT vs plain-with-CoT, matched compute.",
-    "prediction": "",
-    "ingredients": [
-      "latent loops",
-      "chain-of-thought baseline"
-    ],
-    "metrics": [
-      "accuracy",
-      "tokens generated",
-      "memory used"
-    ],
-    "status": "planned",
-    "version": null,
-    "config": null,
-    "results": {},
-    "notes": ""
-  },
-  {
-    "id": "E8",
-    "arc": "Instant Transmission",
-    "title": "Self-speculative decoding",
-    "question": "Draft with 1–2 loops, verify with full r: what is the acceptance rate, and the real speedup on the laptop?",
-    "prediction": "",
-    "ingredients": [
-      "exit head drafter",
-      "state checkpoints"
-    ],
-    "metrics": [
-      "acceptance rate",
-      "decode tokens/sec"
-    ],
-    "status": "planned",
-    "version": null,
-    "config": null,
-    "results": {},
-    "notes": ""
-  },
-  {
-    "id": "E9",
-    "arc": "Shadow Clone",
-    "title": "Unlooped control for E2",
-    "question": "Same 5 blocks as E2 ([SWA] [GDN, GDN, SWA] [attn]) trained once, without weight sharing or loops. Is weight sharing plus ~4 passes better than one pass of the same blocks? This separates the effect of looping from depth and parameter count.",
-    "prediction": "Written 2026-11-22 before the run. E9 (5 unshared blocks, 9.17M non-emb, 0.079 GFLOP/token) lands at val loss 0.590-0.610: a bit worse than E1 (one fewer block) and about equal to E0. That would mean it BEATS E2 at r=4 (0.619) with 41% of the FLOPs, so at this scale looping the same blocks 4x is worse than running them once, untied. If instead E9 > 0.619, looping is genuinely buying something and E2 just pays for it in compute.",
-    "ingredients": [
-      "E2 layout",
-      "r=1",
-      "no sharing"
-    ],
-    "metrics": [
-      "val loss",
-      "loss per FLOP vs E2"
-    ],
-    "status": "planned",
-    "version": null,
-    "config": "configs/e9_unlooped.json",
-    "results": {},
-    "notes": "Added 2026-11-22 after E2. First attempt (run E9-20261122-152151-s0, commit eecdaeb) was interrupted at step 600/6104 when the agent session ended: no result. On hold while training is paused. Phase 2 plan (2026-11-22): E9 seed 0 runs at E1's K7-tuned LR (campaign phase2b-replication), which may differ from the lr 3e-3 its committed prediction assumed. The prediction is left unedited and is scored as written, with the LR difference stated; E2 is re-run at the same LR if it is not 3e-3."
-  },
-  {
-    "id": "E10",
-    "arc": "Scouter Calibration",
-    "title": "Reference control: Hugging Face Llama at E0's size",
-    "question": "Is our own dense baseline (E0) a fair yardstick? Hugging Face's unmodified LlamaForCausalLM at exactly E0's size (13.77M params, 10.62M non-embedding, same FLOPs), trained with the same data and loop at its own tuned learning rate and 3 seeds, becomes the control every other model is compared to.",
-    "prediction": "Written 2026-11-22, before any E10 run. E10 = transformers 5.24.0 LlamaForCausalLM at E0's shapes: 13,767,552 total / 10,621,824 non-embedding params and 96.76M train FLOPs/token, all identical to E0 (computed, check k7_e10_parity.py). (1) At its K7-tuned LR, 200M tokens, seeds 0/1/2: mean full-val loss 0.595-0.615 (most likely ~0.603), seed std <= 0.004. (2) Implementation parity: E0 at the same LR lands within E10's mean +- max(3 x std, 0.5%), i.e. HF's init (std 0.02 everywhere, no residual-output scaling), half-split RoPE and eps 1e-6 change little. (3) E1 at its own tuned LR still beats E10: mean(E1) < mean(E10) by 1.5-4% (the 3.6% gap vs untuned E0 shrinks but survives tuning). (4) Compiled throughput within +-20% of E0 (about 170-250k tok/s steady). (5) Stable: no train-loss jumps > 0.5 after warmup. Pass criteria: experiments/checks/PREDICTIONS.md (K7, replication).",
-    "ingredients": [
-      "HF LlamaForCausalLM (transformers 5.24.0)",
-      "full attention",
-      "E0 shapes",
-      "tuned LR",
-      "3 seeds"
-    ],
-    "metrics": [
-      "val loss (mean and std over 3 seeds)",
-      "parity with E0",
-      "tokens/sec"
-    ],
-    "status": "planned",
-    "version": null,
-    "config": "configs/e10_llama_ref.json",
-    "results": {},
-    "notes": "Designed 2026-11-22 (science-gaps fix: untuned, single-seed control). The config keeps lr 3e-3 as its default; every Phase 2 run passes its LR with --lr (K7 sweep, then the tuned LR), and the effective LR is recorded in each run's config (train.lr, cli_overrides). Matched params and tokens with E0; analytic FLOPs identical."
-  },
-  {
-    "id": "E11",
-    "arc": "Reverse Kamehameha",
-    "title": "Negative-eigenvalue Gated DeltaNet for language modelling",
-    "question": "Does letting GDN's write strength go negative (beta in (0, 2), i.e. negative eigenvalues) cost or help language modelling? E1's exact layout and recipe with one change (gdn_neg_eigval). Motivated by SQ6 arm (e): 100% parity in one pass and length generalisation, vs 97.9%/61.2% for looping (ledger C43).",
-    "prediction": "Written 2026-11-22, before any run. Runs at E1's tuned LR (from K7), 3 seeds, same as E1's replication. Prediction: no language-modelling cost: mean full-val loss within +-1.0% of E1's mean, most likely within +-0.5%; training stable (no loss spikes > 0.5 after warmup; max grad-norm <= 1.5x E1's). Basis: the negative-eigenvalue paper (Grazzi et al., reported, not verified here) finds LM perplexity roughly unchanged while state tracking improves; our SQ6 shows the state-tracking gain at our scale. Criteria: 'free for LM' if |mean(E11) - mean(E1)| <= max(1%, 2x pooled seed std); 'helps LM' if mean(E11) < mean(E1) by more than 2x pooled std; 'hurts LM' if worse by more than 2x pooled std. If it is free or helps, the next step is neg-eig GDN inside the looped core (does it fix or replace what the loop was for?).",
-    "ingredients": [
-      "E1 layout",
-      "GDN beta in (0,2)",
-      "allow_neg_eigval (fla)"
-    ],
-    "metrics": [
-      "val loss vs E1 (3 seeds)",
-      "loss spikes / grad-norm",
-      "parity probe (optional)"
-    ],
-    "status": "planned",
-    "version": null,
-    "config": "configs/e11_negeig.json",
-    "results": {},
-    "notes": "Registered 2026-11-22 after SQ6/SQ2. Depends on K7 (E1's tuned LR) so both run with the same recipe."
-  }
+  "notes": "Run E2-20261122-132340-s0. Prediction check: r=4 within 3% of E0 (+2.0%) HIT; r=1 > +10% MISSED (+8.2%); r=2 < r=1 HIT; r=4 ~ r=6 HIT (+0.9%); r=8 <= r=4 MISSED (+2.3%); r=12 no collapse HIT but worse than 'slightly' (+5.7%); stability HIT (no spikes, max grad-norm 0.67). The loss is best at r=4 (= mean training r) and degrades when extrapolating: the loops don't converge to a fixed point. At 2.1x E1's FLOPs it is 5.8% worse than E1: no win per token or per FLOP at this scale."
+ },
+ {
+  "id": "E3",
+  "arc": "Weighted Clothing",
+  "title": "Ternary weights on the E1 stack",
+  "question": "How much quality does BitNet b1.58 ternary weights (-1, 0, +1) cost at our tiny scale? E1's exact layout and recipe, with only the weights changed, so any gap is down to ternary alone. (Ternary + loops, i.e. whether rounding error piles up across passes, is tested in E4.)",
+  "prediction": "Written 2026-11-22, before any run. Full-val loss 0.605-0.645, i.e. +3.5% to +10% worse than E1 (0.5846), most likely around +6% (~0.62): roughly E0/E2 territory, so ternary gives back about all of E1's gain over dense. Reason: BitNet b1.58's own Table 1 shows a perplexity gap of +4.4% (loss +1.7%) at 700M that closes only at 3B; we are ~60x smaller than 700M, so the gap should be bigger. Training stays stable (no loss spikes > 0.5 after warmup) but runs 10-25% slower per token than E1, because the quantization is simulated in floating point (no ternary kernels). Payoff: weights 28.5 MB -> ~9.1 MB (2-bit packed); the non-embedding body 22.2 MB -> 2.8 MB (7.8x).",
+  "ingredients": [
+   "E1 layout",
+   "BitNet b1.58 BitLinear",
+   "absmean ternary weights",
+   "8-bit activations",
+   "STE"
+  ],
+  "metrics": [
+   "val loss vs E1",
+   "weight memory (MB)",
+   "loss per bit of weight memory",
+   "tokens/sec vs E1"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e3_ternary.json",
+  "results": {},
+  "notes": "Designed 2026-11-22 (v0.3.4). Not run: training paused by the human. 33 BitLinear modules, 11.06M of 11.09M non-embedding params ternary. Deliberate deviations from the BitNet 2B4T recipe (no SubLN, SwiGLU not ReLU^2, single-stage schedule) keep it a one-ingredient change vs E1; the BitNet recipe is a possible follow-up if the gap is large."
+ },
+ {
+  "id": "E4",
+  "arc": "The Dance",
+  "title": "Full fusion",
+  "question": "Linear mixers + loops + ternary together: do they stack, or does the fusion fail? Success here is v1.0.0.",
+  "prediction": "",
+  "ingredients": [
+   "everything above"
+  ],
+  "metrics": [
+   "quality per bit",
+   "quality per FLOP",
+   "scaling with context"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": null,
+  "results": {},
+  "notes": ""
+ },
+ {
+  "id": "E5",
+  "arc": "Power Up on Demand",
+  "title": "Adaptive loops per token",
+  "question": "Can a learned halting signal spend more loops on hard tokens and fewer on easy ones, at equal quality?",
+  "prediction": "",
+  "ingredients": [
+   "halting head",
+   "per-loop state fallback"
+  ],
+  "metrics": [
+   "mean loops used",
+   "loss at equal compute"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": null,
+  "results": {},
+  "notes": ""
+ },
+ {
+  "id": "E6",
+  "arc": "Rival Loop",
+  "title": "Critique → fix inside the recurrence",
+  "question": "Do per-loop supervision, a grounded critic head, and adversarial damage-and-repair make loops actually fix their own errors?",
+  "prediction": "",
+  "ingredients": [
+   "deep supervision",
+   "critic head",
+   "latent PGD noise"
+  ],
+  "metrics": [
+   "monotonic loss vs r",
+   "error-repair rate"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": null,
+  "results": {},
+  "notes": ""
+ },
+ {
+  "id": "E7",
+  "arc": "Silent Technique",
+  "title": "Loops vs chain-of-thought",
+  "question": "How much written-out reasoning can silent latent loops replace? Same task, looped-no-CoT vs plain-with-CoT, matched compute.",
+  "prediction": "",
+  "ingredients": [
+   "latent loops",
+   "chain-of-thought baseline"
+  ],
+  "metrics": [
+   "accuracy",
+   "tokens generated",
+   "memory used"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": null,
+  "results": {},
+  "notes": ""
+ },
+ {
+  "id": "E8",
+  "arc": "Instant Transmission",
+  "title": "Self-speculative decoding",
+  "question": "Draft with 1–2 loops, verify with full r: what is the acceptance rate, and the real speedup on the laptop?",
+  "prediction": "",
+  "ingredients": [
+   "exit head drafter",
+   "state checkpoints"
+  ],
+  "metrics": [
+   "acceptance rate",
+   "decode tokens/sec"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": null,
+  "results": {},
+  "notes": ""
+ },
+ {
+  "id": "E9",
+  "arc": "Shadow Clone",
+  "title": "Unlooped control for E2",
+  "question": "Same 5 blocks as E2 ([SWA] [GDN, GDN, SWA] [attn]) trained once, without weight sharing or loops. Is weight sharing plus ~4 passes better than one pass of the same blocks? This separates the effect of looping from depth and parameter count.",
+  "prediction": "Written 2026-11-22 before the run. E9 (5 unshared blocks, 9.17M non-emb, 0.079 GFLOP/token) lands at val loss 0.590-0.610: a bit worse than E1 (one fewer block) and about equal to E0. That would mean it BEATS E2 at r=4 (0.619) with 41% of the FLOPs, so at this scale looping the same blocks 4x is worse than running them once, untied. If instead E9 > 0.619, looping is genuinely buying something and E2 just pays for it in compute.",
+  "ingredients": [
+   "E2 layout",
+   "r=1",
+   "no sharing"
+  ],
+  "metrics": [
+   "val loss",
+   "loss per FLOP vs E2"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e9_unlooped.json",
+  "results": {},
+  "notes": "Added 2026-11-22 after E2. First attempt (run E9-20261122-152151-s0, commit eecdaeb) was interrupted at step 600/6104 when the agent session ended: no result. On hold while training is paused. Phase 2 plan (2026-11-22): E9 seed 0 runs at E1's K7-tuned LR (campaign phase2b-replication), which may differ from the lr 3e-3 its committed prediction assumed. The prediction is left unedited and is scored as written, with the LR difference stated; E2 is re-run at the same LR if it is not 3e-3."
+ },
+ {
+  "id": "E10",
+  "arc": "Scouter Calibration",
+  "title": "Reference control: Hugging Face Llama at E0's size",
+  "question": "Is our own dense baseline (E0) a fair yardstick? Hugging Face's unmodified LlamaForCausalLM at exactly E0's size (13.77M params, 10.62M non-embedding, same FLOPs), trained with the same data and loop at its own tuned learning rate and 3 seeds, becomes the control every other model is compared to.",
+  "prediction": "Written 2026-11-22, before any E10 run. E10 = transformers 5.24.0 LlamaForCausalLM at E0's shapes: 13,767,552 total / 10,621,824 non-embedding params and 96.76M train FLOPs/token, all identical to E0 (computed, check k7_e10_parity.py). (1) At its K7-tuned LR, 200M tokens, seeds 0/1/2: mean full-val loss 0.595-0.615 (most likely ~0.603), seed std <= 0.004. (2) Implementation parity: E0 at the same LR lands within E10's mean +- max(3 x std, 0.5%), i.e. HF's init (std 0.02 everywhere, no residual-output scaling), half-split RoPE and eps 1e-6 change little. (3) E1 at its own tuned LR still beats E10: mean(E1) < mean(E10) by 1.5-4% (the 3.6% gap vs untuned E0 shrinks but survives tuning). (4) Compiled throughput within +-20% of E0 (about 170-250k tok/s steady). (5) Stable: no train-loss jumps > 0.5 after warmup. Pass criteria: experiments/checks/PREDICTIONS.md (K7, replication).",
+  "ingredients": [
+   "HF LlamaForCausalLM (transformers 5.24.0)",
+   "full attention",
+   "E0 shapes",
+   "tuned LR",
+   "3 seeds"
+  ],
+  "metrics": [
+   "val loss (mean and std over 3 seeds)",
+   "parity with E0",
+   "tokens/sec"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e10_llama_ref.json",
+  "results": {},
+  "notes": "Designed 2026-11-22 (science-gaps fix: untuned, single-seed control). The config keeps lr 3e-3 as its default; every Phase 2 run passes its LR with --lr (K7 sweep, then the tuned LR), and the effective LR is recorded in each run's config (train.lr, cli_overrides). Matched params and tokens with E0; analytic FLOPs identical."
+ },
+ {
+  "id": "E11",
+  "arc": "Reverse Kamehameha",
+  "title": "Negative-eigenvalue Gated DeltaNet for language modelling",
+  "question": "Does letting GDN's write strength go negative (beta in (0, 2), i.e. negative eigenvalues) cost or help language modelling? E1's exact layout and recipe with one change (gdn_neg_eigval). Motivated by SQ6 arm (e): 100% parity in one pass and length generalisation, vs 97.9%/61.2% for looping (ledger C43).",
+  "prediction": "Written 2026-11-22, before any run. Runs at E1's tuned LR (from K7), 3 seeds, same as E1's replication. Prediction: no language-modelling cost: mean full-val loss within +-1.0% of E1's mean, most likely within +-0.5%; training stable (no loss spikes > 0.5 after warmup; max grad-norm <= 1.5x E1's). Basis: the negative-eigenvalue paper (Grazzi et al., reported, not verified here) finds LM perplexity roughly unchanged while state tracking improves; our SQ6 shows the state-tracking gain at our scale. Criteria: 'free for LM' if |mean(E11) - mean(E1)| <= max(1%, 2x pooled seed std); 'helps LM' if mean(E11) < mean(E1) by more than 2x pooled std; 'hurts LM' if worse by more than 2x pooled std. If it is free or helps, the next step is neg-eig GDN inside the looped core (does it fix or replace what the loop was for?).",
+  "ingredients": [
+   "E1 layout",
+   "GDN beta in (0,2)",
+   "allow_neg_eigval (fla)"
+  ],
+  "metrics": [
+   "val loss vs E1 (3 seeds)",
+   "loss spikes / grad-norm",
+   "parity probe (optional)"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "configs/e11_negeig.json",
+  "results": {},
+  "notes": "Registered 2026-11-22 after SQ6/SQ2. Depends on K7 (E1's tuned LR) so both run with the same recipe."
+ },
+ {
+  "id": "E12",
+  "arc": "Byte Quest (granularity x loops)",
+  "title": "Flat byte-level E1",
+  "question": "Is a flat byte-level model (vocab 256, T=4,096 bytes, E1's mixers) competitive with BPE-E1 at our scale, at matched FLOPs and at matched bytes?",
+  "prediction": "Not yet registered: draft predictions are being written in notes/byte-quest.md and will be registered (committed to experiments/checks/PREDICTIONS.md) before any run.",
+  "ingredients": [
+   "vocab 256",
+   "T=4096 bytes",
+   "E1 mixers"
+  ],
+  "metrics": [
+   "clean-val bits/char vs E1",
+   "exact-span accuracy",
+   "throughput"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "experiments/staged-configs/byte/ (staged; E12)",
+  "results": {},
+  "notes": "Main quest added 2026-11-22 on the human's request ('add byte level tokens as a main quest, lets experiment with its granularity and loops'). Design: notes/analysis-coarse-to-fine.md; plan: notes/byte-quest.md (in progress). Prerequisites: SQ206 causality test, SQ189 throughput probe, flex-attention SWA patch (C12), SQ207 speller on frozen E1. Configs staged in experiments/staged-configs/byte/ until moved into configs/ between campaigns. Primary metric: doc-level bits/char on val_clean80 (K9/A1); exact-span accuracy (SQ209)."
+ },
+ {
+  "id": "E13",
+  "arc": "Byte Quest (granularity x loops)",
+  "title": "Patch granularity sweep (BLT-lite, P = 2/4/8)",
+  "question": "How does fixed patch size trade quality against cost in a patch-global/byte-local model with a single-pass AR byte decoder?",
+  "prediction": "Not yet registered: draft predictions are being written in notes/byte-quest.md and will be registered (committed to experiments/checks/PREDICTIONS.md) before any run.",
+  "ingredients": [
+   "byte encoder",
+   "fixed patches P in {2,4,8}",
+   "E1-style global on patches",
+   "1-pass byte decoder"
+  ],
+  "metrics": [
+   "clean-val bits/char per P",
+   "loss by position within patch (patch lag)",
+   "FLOPs and wall-clock per byte"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "experiments/staged-configs/byte/ (staged; E13)",
+  "results": {},
+  "notes": "Main quest added 2026-11-22 on the human's request ('add byte level tokens as a main quest, lets experiment with its granularity and loops'). Design: notes/analysis-coarse-to-fine.md; plan: notes/byte-quest.md (in progress). Prerequisites: SQ206 causality test, SQ189 throughput probe, flex-attention SWA patch (C12), SQ207 speller on frozen E1. Configs staged in experiments/staged-configs/byte/ until moved into configs/ between campaigns. Primary metric: doc-level bits/char on val_clean80 (K9/A1); exact-span accuracy (SQ209)."
+ },
+ {
+  "id": "E14",
+  "arc": "Byte Quest (granularity x loops)",
+  "title": "Byte refinement loop sweep (H-C2F)",
+  "question": "At matched FLOPs, does a shared-weight byte refinement loop (r = 1/2/4, gated, per-pass loss) beat a single-pass decoder and an equal-FLOP unshared decoder?",
+  "prediction": "Not yet registered: draft predictions are being written in notes/byte-quest.md and will be registered (committed to experiments/checks/PREDICTIONS.md) before any run.",
+  "ingredients": [
+   "E13 best P",
+   "shared refinement x r",
+   "gated/contractive updates",
+   "per-pass loss",
+   "pass embedding"
+  ],
+  "metrics": [
+   "clean-val bits/char",
+   "exact-span accuracy",
+   "L(r) curve",
+   "pass-to-pass norm ratio"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "experiments/staged-configs/byte/ (staged; E14)",
+  "results": {},
+  "notes": "Main quest added 2026-11-22 on the human's request ('add byte level tokens as a main quest, lets experiment with its granularity and loops'). Design: notes/analysis-coarse-to-fine.md; plan: notes/byte-quest.md (in progress). Prerequisites: SQ206 causality test, SQ189 throughput probe, flex-attention SWA patch (C12), SQ207 speller on frozen E1. Configs staged in experiments/staged-configs/byte/ until moved into configs/ between campaigns. Primary metric: doc-level bits/char on val_clean80 (K9/A1); exact-span accuracy (SQ209)."
+ },
+ {
+  "id": "E15",
+  "arc": "Byte Quest (granularity x loops)",
+  "title": "Parallel-then-refine byte decoding",
+  "question": "Can predicting all P bytes of the next patch at once and refining them over r < P passes match byte-autoregressive quality (and so decode faster)?",
+  "prediction": "Not yet registered: draft predictions are being written in notes/byte-quest.md and will be registered (committed to experiments/checks/PREDICTIONS.md) before any run.",
+  "ingredients": [
+   "parallel patch prediction",
+   "r-pass refinement within patch"
+  ],
+  "metrics": [
+   "clean-val bits/char vs AR",
+   "decode steps per byte",
+   "exact-span accuracy"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "experiments/staged-configs/byte/ (staged; E15)",
+  "results": {},
+  "notes": "Main quest added 2026-11-22 on the human's request ('add byte level tokens as a main quest, lets experiment with its granularity and loops'). Design: notes/analysis-coarse-to-fine.md; plan: notes/byte-quest.md (in progress). Prerequisites: SQ206 causality test, SQ189 throughput probe, flex-attention SWA patch (C12), SQ207 speller on frozen E1. Configs staged in experiments/staged-configs/byte/ until moved into configs/ between campaigns. Primary metric: doc-level bits/char on val_clean80 (K9/A1); exact-span accuracy (SQ209)."
+ },
+ {
+  "id": "E16",
+  "arc": "Byte Quest (granularity x loops)",
+  "title": "Byte quest x FusionDance ingredients",
+  "question": "Does the best byte decoder combine with a looped global core (E2-style) and a ternary global core?",
+  "prediction": "Not yet registered: draft predictions are being written in notes/byte-quest.md and will be registered (committed to experiments/checks/PREDICTIONS.md) before any run.",
+  "ingredients": [
+   "E14 winner",
+   "looped global core",
+   "ternary global core (local layers bf16)"
+  ],
+  "metrics": [
+   "clean-val bits/char",
+   "interaction vs E14"
+  ],
+  "status": "planned",
+  "version": null,
+  "config": "experiments/staged-configs/byte/ (staged; E16)",
+  "results": {},
+  "notes": "Main quest added 2026-11-22 on the human's request ('add byte level tokens as a main quest, lets experiment with its granularity and loops'). Design: notes/analysis-coarse-to-fine.md; plan: notes/byte-quest.md (in progress). Prerequisites: SQ206 causality test, SQ189 throughput probe, flex-attention SWA patch (C12), SQ207 speller on frozen E1. Configs staged in experiments/staged-configs/byte/ until moved into configs/ between campaigns. Primary metric: doc-level bits/char on val_clean80 (K9/A1); exact-span accuracy (SQ209)."
+ }
 ]

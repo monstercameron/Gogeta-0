@@ -18,6 +18,29 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.102: Outside review 03:08: GDN memory horizon, init-vs-data seed split, dynamic eval (SQ330-SQ334); SQ222 promoted; README first-run path
+*2026-11-23*
+
+**Outside review 03:08 (Haiku), triaged:**
+- **SQ330:** the GDN memory horizon, from learned decay half-lives (CPU). If most heads forget within 256 tokens, the long-memory reading of C18/C43 needs qualifying.
+- **SQ331:** dynamic evaluation (per-document online adaptation), E1 vs E10.
+- **SQ332:** an init-seed × data-seed variance split at d = 256. It needs a `--data-seed` option, because one seed drives both today.
+- **SQ333:** an exploratory pairwise reading of C201 from the existing 2-ingredient cells.
+- **SQ334:** a binding probe at distance.
+- **SQ222** (fp32 vs bf16 recurrence) is promoted, since C197/C201 have no precision check.
+- **Flags answered:**
+  - C201's 5-cell estimand is the registered design.
+  - The log scale is the registered metric; a raw-scale I of about −4.2% is a sensitivity number, not the test.
+
+**Quick review 03:09 (newcomer):** the README quick start now opens with a **no-download, no-GPU first check** (`tests.test_options` + `tests.test_moe` on CPU: 28 tests, about 10 s). It also adds a "start reading here" pointer to the three defining results:
+- C5: no detected hybrid advantage over a tuned Llama;
+- C197: unique parameters beat loops at matched FLOPs;
+- C201: the fusion penalties overlap.
+
+**Fleet:** E60's 200M runs are on their last seeds. The pull-and-destroy watcher takes each box down when it is idle.
+
+---
+
 ## v0.4.101: Claim audit 2026-11-23-0302: 48 claims, no downgrades; C30 'WRONG' rejected against the Ouro PDF; F2 interaction holds in every overlap stratum
 *2026-11-23*
 

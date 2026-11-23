@@ -17,6 +17,25 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.63: SQ99: E1's advantage does not transfer out of corpus (exploratory)
+*2026-11-22*
+
+### SQ99: out-of-corpus transfer (registered v0.4.54)
+**What**: `experiments/checks/sq_99_out_of_corpus.py` on the CPU (26 min, fp32, E1's GDN via the plain-PyTorch reference). It scored the v0.3.0 E0 and E1 seed-0 checkpoints on **330 local Python files** (stdlib + installed packages; mean 13-gram overlap with train 0.31%; 400k tokens) and on a **token-matched sample of 1,340 val_clean80 docs**, both through the same scorer.
+**Results** (`experiments/checks/results/sq_99.json`):
+- Out-of-corpus bits/char is **6.3–6.5×** the in-corpus value for both models (format plus content shift).
+- **The E1-vs-E0 gap is +0.42% out of corpus (E1 worse; 95% paired BCa CI +0.06% to +0.78%), vs −3.44% in corpus (CI −3.82% to −2.88%).**
+- **Verdict: DOES NOT TRANSFER.** Prediction (2), that E1 still wins out of corpus by less, failed.
+
+**Interpretation (cautious)**:
+- The hybrid's in-corpus advantage may be specific to this corpus: memorising its repeated templates (K9, A1 families).
+- **But** this is exploratory: single-seed checkpoints at an untuned LR, and **E0 may be a handicapped baseline** (its scaled residual init differs from Llama's, SQ200). The handicap would act on both sets, so it's unclear how it moves the gap. Out-of-corpus is also confounded with document format.
+- **The decisive re-run** uses the Phase 2b checkpoints (E10 as the baseline, E1 at its tuned LR, 3 seeds).
+
+**Ledger**: new claim **C192** ("E1's lower loss transfers to out-of-corpus Python") is **REFUTED** [exploratory n=1]; a limitation was added to **C5**. Card `experiments/cards/SQ99.md`, micro devlog `experiments/devlogs/SQ99.md`. README status carries the warning.
+
+---
+
 ## v0.4.62: A4 eval battery (final): MQAR fixed by a mastery curriculum; state-tracking probe; iterative suite
 *2026-11-22*
 

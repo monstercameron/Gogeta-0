@@ -18,6 +18,19 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.32: Claim audit 2026-11-23-1602: C213 gains a scale-compression confound (stays UNVERIFIED); B1 decode tests pass
+*2026-11-23*
+
+**Claim audit 2026-11-23-1602: one claim due (C213). A scale-compression confound is added; the hypothesis stays UNVERIFIED. The B1 decode tests pass.**
+
+- **Scope:** one claim was due (C213, the out-of-corpus hypothesis); the other 140 are cooling down. One Codex GPT-6 Luna auditor (`notes/reviews/claims/2026-11-23-1602-b1.md`), ok.
+- **C213 (WEAK, confirmed):** the numbers match `sq379.json`, but the causal wording "memorisation capacity" is not established. Out-of-corpus losses are 6-7x higher (1.65-1.9 bits/char), which compresses every relative effect toward 0. A limitation now records the confound. The attenuation is differential (the assembly gain keeps about two thirds of its size while the ternary cost goes to about 0), so compression alone does not explain it. No downgrade: C213 was already UNVERIFIED. SQ400 must also report absolute bits/char differences.
+- **v0.5.31's pending test:** `tests/test_decode.py` ALL PASS with the new `gdn_beta_fixed` branch. Every suite touched by B1's switches is green (assembly 16/16, moe 15/15, c2f 17/17, decode, hf 11/11).
+- **B1 fleet:** one RTX 5090 (Vast, $0.66/h with storage) rented at about 15:57 and bootstrapping at v0.5.31.
+- **Quick review 15:59 (ML theorist):** pointer chasing is added to SQ399. The screen-to-scale rule was already registered. The claim whose refutation would most change direction is C197 (unique parameters beat loops at matched FLOPs).
+
+---
+
 ## v0.5.31: GPU batch B1 registered: SQ401 (MoE core vs dense capacity), SQ402 (fixed GDN beta), SQ404 (core LR multiplier); three off-by-default switches added and tested
 *2026-11-23*
 

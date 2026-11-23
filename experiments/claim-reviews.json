@@ -2541,6 +2541,13 @@
    "batch_file": "notes/reviews/claims/2026-11-23-1502-b4.md",
    "verdict": "WEAK",
    "note": "rejected; A2s LR bracket exists (A3 amendment 1, 6e-3 within 0.58% of best); evidence added"
+  },
+  {
+   "id": "C213",
+   "ts": "2026-11-23T16:03:50-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1602-b1.md",
+   "verdict": "WEAK",
+   "note": "confirmed; scale-compression confound added as a limitation; stays UNVERIFIED (hypothesis)"
   }
  ]
 }

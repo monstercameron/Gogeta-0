@@ -1,0 +1,859 @@
+{
+ "check": "SQ351",
+ "git": "58a9ba8",
+ "status": "descriptive, not registered",
+ "window": 2048,
+ "bins": [
+  "0-512",
+  "512-1024",
+  "1024-2048"
+ ],
+ "metric": "mean NLL nats/token by target-position bin, fp32 CPU",
+ "sets": {
+  "A_clean80_gt1200": {
+   "n_docs": 3,
+   "n_tokens": 4469,
+   "docs": [
+    72,
+    860,
+    939
+   ]
+  },
+  "B_out_of_corpus_gt1200": {
+   "n_docs": 153,
+   "n_tokens": 269305,
+   "docs": [
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/accelerate/logging.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/accelerate/test_utils/scripts/test_ops.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/accelerate/utils/constants.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/accelerate/utils/transformer_engine.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/accelerate/commands/config/default.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/anyio/_core/_eventloop.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/anyio/streams/stapled.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/anyio/to_interpreter.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/anyio/_core/_subprocesses.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/anyio/streams/buffered.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/anyio/_core/_exceptions.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/anyio/lowlevel.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/datasets/formatting/__init__.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/datasets/parallel/parallel.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/datasets/utils/info_utils.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/datasets/formatting/polars_formatter.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/datasets/packaged_modules/text/text.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/datasets/utils/patching.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/fla/modules/norm/triton_ascend/l2norm.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/fla/ops/gated_delta_product/chunk_deltaproduct_o.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/fla/ops/gdn2/chunk_fwd.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/fla/ops/kda/chunk_fwd.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/fla/ops/mesa_net/decoding_one_step.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/fla/ops/mesa_net/naive.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/fla/ops/rwkv6/backends/tilelang/__init__.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/fla/ops/simple_gla/backends/triton_ascend/parallel.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/fla/ops/ttt/naive.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/fsspec/implementations/asyn_wrapper.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/fsspec/implementations/cache_metadata.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/fsspec/implementations/jupyter.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/huggingface_hub/inference/_providers/deepinfra.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/huggingface_hub/utils/_oauth_device.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/huggingface_hub/_tree_cache.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/huggingface_hub/utils/_detect_agent.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/huggingface_hub/inference/_providers/replicate.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/huggingface_hub/inference/_providers/wavespeed.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/huggingface_hub/inference/_providers/zai_org.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/huggingface_hub/utils/_git_credential.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/lm_eval/tasks/afrobench/masakhanews/utils.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/lm_eval/tasks/cnn_dailymail/utils.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/markdown_it/cli/parse.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/markdown_it/rules_core/linkify.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/markdown_it/parser_block.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/mpmath/tests/runtests.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/mpmath/tests/torture.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/mpmath/tests/test_eigen.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/mpmath/libmp/__init__.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/mpmath/tests/test_division.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/narwhals/_compliant/column.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/narwhals/_dask/group_by.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/narwhals/_sql/namespace.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/narwhals/expr_name.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/networkx/algorithms/node_classification.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/networkx/algorithms/centrality/tests/test_degree_centrality.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/networkx/algorithms/isomorphism/tests/test_isomorphism.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/networkx/algorithms/tree/recognition.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/networkx/algorithms/community/tests/test_bipartitions.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/networkx/algorithms/tree/tests/test_recognition.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/nltk/chat/util.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/nltk/classify/__init__.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/nltk/lm/smoothing.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/nltk/parse/generate.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/nltk/tree/immutable.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/nltk/treetransforms.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/numpy/_core/tests/test_item_selection.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/numpy/fft/_helper.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/numpy/_core/tests/test_conversion_utils.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/pandas/compat/_optional.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/pandas/tests/generic/test_to_xarray.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/pandas/tests/series/accessors/test_list_accessor.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/pandas/tests/tseries/offsets/test_easter.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/peft/tuners/__init__.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/peft/tuners/beft/model.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/peft/tuners/delora/model.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/peft/tuners/hra/model.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/peft/tuners/loha/model.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/peft/tuners/miss/model.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/peft/tuners/oft/model.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/pip/_internal/exceptions/hashes.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/pip/_internal/commands/completion.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/pyarrow/tests/test_misc.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/pydantic/_internal/_decorators_v1.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/pydantic/v1/datetime_parse.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/pydantic/warnings.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/pygments/lexers/jsonnet.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/pygments/lexers/qlik.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/pygments/lexers/whiley.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/pygments/styles/gruvbox.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/rich/measure.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/rich/progress_bar.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/rich/control.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/rich/__init__.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/rich/terminal_theme.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/scipy/_external/pyprima/common/_project.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/scipy/special/_ufunc_tools.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/scipy/special/tests/test_gammainc.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/setuptools/_distutils/tests/test_install_lib.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/setuptools/command/develop.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/setuptools/command/setopt.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/setuptools/warnings.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/setuptools/_distutils/tests/test_file_util.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/setuptools/_distutils/versionpredicate.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/sklearn/feature_selection/tests/test_chi2.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/sklearn/neighbors/tests/test_kd_tree.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/sklearn/tests/test_docstring_parameters_consistency.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/sklearn/tests/test_docstrings.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/sklearn/utils/_repr_html/base.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/sklearn/utils/graph.py",
+    "/usr/lib/python3.12/asyncio/windows_utils.py",
+    "/usr/lib/python3.12/cProfile.py",
+    "/usr/lib/python3.12/chunk.py",
+    "/usr/lib/python3.12/copyreg.py",
+    "/usr/lib/python3.12/ctypes/wintypes.py",
+    "/usr/lib/python3.12/email/mime/image.py",
+    "/usr/lib/python3.12/getpass.py",
+    "/usr/lib/python3.12/imghdr.py",
+    "/usr/lib/python3.12/importlib/abc.py",
+    "/usr/lib/python3.12/importlib/resources/abc.py",
+    "/usr/lib/python3.12/linecache.py",
+    "/usr/lib/python3.12/re/_constants.py",
+    "/usr/lib/python3.12/sndhdr.py",
+    "/usr/lib/python3.12/unittest/async_case.py",
+    "/usr/lib/python3.12/wsgiref/simple_server.py",
+    "/usr/lib/python3.12/wsgiref/util.py",
+    "/usr/lib/python3.12/xdrlib.py",
+    "/usr/lib/python3.12/xml/dom/__init__.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/sympy/concrete/tests/test_guess.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/sympy/utilities/tests/test_misc.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/sympy/physics/mechanics/tests/test_kane4.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/textual/_node_list.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/textual/_win_sleep.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/textual/constants.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/textual/eta.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/textual/filter.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/textual/lazy.py",
+    "/root/.venvs/gogeta-cockpit/lib/python3.12/site-packages/textual/widgets/_header.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/torch/distributions/kumaraswamy.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/torch/onnx/_internal/exporter/_exportable_module.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/torch/_export/db/case.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/torch/_inductor/shape_propagation.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/torch/distributed/algorithms/_quantization/quantization.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/torch/distributed/checkpoint/_traverse.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/torch/nn/parallel/replicate.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/torchgen/api/types/types_base.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/torchgen/api/ufunc.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/torchgen/context.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/transformers/models/conditional_detr/configuration_conditional_detr.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/transformers/models/idefics2/configuration_idefics2.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/transformers/models/zoedepth/configuration_zoedepth.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/transformers/models/imagegpt/image_processing_imagegpt.py",
+    "/root/.venvs/gogeta-eval/lib/python3.12/site-packages/triton/language/random.py",
+    "/root/.venvs/gogeta/lib/python3.12/site-packages/triton/profiler/scope.py",
+    "/root/.venvs/gogeta-rl/lib/python3.12/site-packages/trl/experimental/server_distillation/server_distillation_config.py"
+   ],
+   "sha_mismatch_or_missing": 0
+  }
+ },
+ "cells": {
+  "000": {
+   "per_seed": {
+    "0": {
+     "run": "E20-20261123-065619-s0",
+     "A_clean80_gt1200": {
+      "bins_window2048": [
+       {
+        "bin": "0-512",
+        "n_tokens": 1536,
+        "nats_per_token": 1.3289316228412982
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 1536,
+        "nats_per_token": 1.178790995999229
+       },
+       {
+        "bin": "1024-2048",
+        "n_tokens": 1397,
+        "nats_per_token": 1.520453608115852
+       }
+      ],
+      "bins_window1024_control": [
+       {
+        "bin": "0-512",
+        "n_tokens": 1536,
+        "nats_per_token": 1.3289316228412982
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 1533,
+        "nats_per_token": 1.1743467138147063
+       }
+      ],
+      "control_max_abs_token_nll_diff_first1023": 0.0
+     },
+     "B_out_of_corpus_gt1200": {
+      "bins_window2048": [
+       {
+        "bin": "0-512",
+        "n_tokens": 78336,
+        "nats_per_token": 3.9389280956945045
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 78336,
+        "nats_per_token": 3.019429210773072
+       },
+       {
+        "bin": "1024-2048",
+        "n_tokens": 112633,
+        "nats_per_token": 3.9139576808547614
+       }
+      ],
+      "bins_window1024_control": [
+       {
+        "bin": "0-512",
+        "n_tokens": 78336,
+        "nats_per_token": 3.9389280956945045
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 78183,
+        "nats_per_token": 3.020019044558168
+       }
+      ],
+      "control_max_abs_token_nll_diff_first1023": 0.0
+     }
+    },
+    "1": {
+     "run": "E20-20261123-071921-s1",
+     "A_clean80_gt1200": {
+      "bins_window2048": [
+       {
+        "bin": "0-512",
+        "n_tokens": 1536,
+        "nats_per_token": 1.3225579255602433
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 1536,
+        "nats_per_token": 1.137640907169607
+       },
+       {
+        "bin": "1024-2048",
+        "n_tokens": 1397,
+        "nats_per_token": 1.541227416005596
+       }
+      ],
+      "bins_window1024_control": [
+       {
+        "bin": "0-512",
+        "n_tokens": 1536,
+        "nats_per_token": 1.3225579255602433
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 1533,
+        "nats_per_token": 1.133573477858099
+       }
+      ],
+      "control_max_abs_token_nll_diff_first1023": 0.0
+     },
+     "B_out_of_corpus_gt1200": {
+      "bins_window2048": [
+       {
+        "bin": "0-512",
+        "n_tokens": 78336,
+        "nats_per_token": 3.9626969119782998
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 78336,
+        "nats_per_token": 3.048512338589168
+       },
+       {
+        "bin": "1024-2048",
+        "n_tokens": 112633,
+        "nats_per_token": 4.072840255688806
+       }
+      ],
+      "bins_window1024_control": [
+       {
+        "bin": "0-512",
+        "n_tokens": 78336,
+        "nats_per_token": 3.9626969119782998
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 78183,
+        "nats_per_token": 3.048921015985482
+       }
+      ],
+      "control_max_abs_token_nll_diff_first1023": 0.0
+     }
+    },
+    "2": {
+     "run": "E20-20261123-073423-s2",
+     "A_clean80_gt1200": {
+      "bins_window2048": [
+       {
+        "bin": "0-512",
+        "n_tokens": 1536,
+        "nats_per_token": 1.3144902244383962
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 1536,
+        "nats_per_token": 1.1822929140380627
+       },
+       {
+        "bin": "1024-2048",
+        "n_tokens": 1397,
+        "nats_per_token": 1.5324396419031605
+       }
+      ],
+      "bins_window1024_control": [
+       {
+        "bin": "0-512",
+        "n_tokens": 1536,
+        "nats_per_token": 1.3144902244383962
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 1533,
+        "nats_per_token": 1.1769375144610517
+       }
+      ],
+      "control_max_abs_token_nll_diff_first1023": 0.0
+     },
+     "B_out_of_corpus_gt1200": {
+      "bins_window2048": [
+       {
+        "bin": "0-512",
+        "n_tokens": 78336,
+        "nats_per_token": 3.9591743644119566
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 78336,
+        "nats_per_token": 3.025443554822407
+       },
+       {
+        "bin": "1024-2048",
+        "n_tokens": 112633,
+        "nats_per_token": 3.970625630848373
+       }
+      ],
+      "bins_window1024_control": [
+       {
+        "bin": "0-512",
+        "n_tokens": 78336,
+        "nats_per_token": 3.9591743644119566
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 78183,
+        "nats_per_token": 3.0263043221535835
+       }
+      ],
+      "control_max_abs_token_nll_diff_first1023": 0.0
+     }
+    }
+   }
+  },
+  "100": {
+   "per_seed": {
+    "0": {
+     "run": "E24-20261123-070152-s0",
+     "A_clean80_gt1200": {
+      "bins_window2048": [
+       {
+        "bin": "0-512",
+        "n_tokens": 1536,
+        "nats_per_token": 1.281150131433762
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 1536,
+        "nats_per_token": 1.2873651650596425
+       },
+       {
+        "bin": "1024-2048",
+        "n_tokens": 1397,
+        "nats_per_token": 1.1565001621892066
+       }
+      ],
+      "bins_window1024_control": [
+       {
+        "bin": "0-512",
+        "n_tokens": 1536,
+        "nats_per_token": 1.281150131433762
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 1533,
+        "nats_per_token": 1.2819891472713836
+       }
+      ],
+      "control_max_abs_token_nll_diff_first1023": 0.0
+     },
+     "B_out_of_corpus_gt1200": {
+      "bins_window2048": [
+       {
+        "bin": "0-512",
+        "n_tokens": 78336,
+        "nats_per_token": 3.9448464913969143
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 78336,
+        "nats_per_token": 3.1603724399312383
+       },
+       {
+        "bin": "1024-2048",
+        "n_tokens": 112633,
+        "nats_per_token": 3.0691640063670653
+       }
+      ],
+      "bins_window1024_control": [
+       {
+        "bin": "0-512",
+        "n_tokens": 78336,
+        "nats_per_token": 3.9448464913969143
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 78183,
+        "nats_per_token": 3.160773716717805
+       }
+      ],
+      "control_max_abs_token_nll_diff_first1023": 9.298324584960938e-06
+     }
+    },
+    "1": {
+     "run": "E24-20261123-072506-s1",
+     "A_clean80_gt1200": {
+      "bins_window2048": [
+       {
+        "bin": "0-512",
+        "n_tokens": 1536,
+        "nats_per_token": 1.3086374119517679
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 1536,
+        "nats_per_token": 1.2741765113632368
+       },
+       {
+        "bin": "1024-2048",
+        "n_tokens": 1397,
+        "nats_per_token": 1.2041280187539818
+       }
+      ],
+      "bins_window1024_control": [
+       {
+        "bin": "0-512",
+        "n_tokens": 1536,
+        "nats_per_token": 1.3086374119517679
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 1533,
+        "nats_per_token": 1.2685633181522056
+       }
+      ],
+      "control_max_abs_token_nll_diff_first1023": 0.0
+     },
+     "B_out_of_corpus_gt1200": {
+      "bins_window2048": [
+       {
+        "bin": "0-512",
+        "n_tokens": 78336,
+        "nats_per_token": 3.954584571035873
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 78336,
+        "nats_per_token": 3.145432464847343
+       },
+       {
+        "bin": "1024-2048",
+        "n_tokens": 112633,
+        "nats_per_token": 3.039831450127092
+       }
+      ],
+      "bins_window1024_control": [
+       {
+        "bin": "0-512",
+        "n_tokens": 78336,
+        "nats_per_token": 3.954584571035873
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 78183,
+        "nats_per_token": 3.1460622209154425
+       }
+      ],
+      "control_max_abs_token_nll_diff_first1023": 1.5974044799804688e-05
+     }
+    },
+    "2": {
+     "run": "E24-20261123-074008-s2",
+     "A_clean80_gt1200": {
+      "bins_window2048": [
+       {
+        "bin": "0-512",
+        "n_tokens": 1536,
+        "nats_per_token": 1.306072601750298
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 1536,
+        "nats_per_token": 1.2903503149750055
+       },
+       {
+        "bin": "1024-2048",
+        "n_tokens": 1397,
+        "nats_per_token": 1.2011155874157078
+       }
+      ],
+      "bins_window1024_control": [
+       {
+        "bin": "0-512",
+        "n_tokens": 1536,
+        "nats_per_token": 1.306072601750298
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 1533,
+        "nats_per_token": 1.2850530955191806
+       }
+      ],
+      "control_max_abs_token_nll_diff_first1023": 0.0
+     },
+     "B_out_of_corpus_gt1200": {
+      "bins_window2048": [
+       {
+        "bin": "0-512",
+        "n_tokens": 78336,
+        "nats_per_token": 3.962566432983122
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 78336,
+        "nats_per_token": 3.1590218018125547
+       },
+       {
+        "bin": "1024-2048",
+        "n_tokens": 112633,
+        "nats_per_token": 3.040099030334605
+       }
+      ],
+      "bins_window1024_control": [
+       {
+        "bin": "0-512",
+        "n_tokens": 78336,
+        "nats_per_token": 3.962566432983122
+       },
+       {
+        "bin": "512-1024",
+        "n_tokens": 78183,
+        "nats_per_token": 3.159798026845401
+       }
+      ],
+      "control_max_abs_token_nll_diff_first1023": 1.3828277587890625e-05
+     }
+    }
+   }
+  }
+ },
+ "summary": {
+  "A_clean80_gt1200": {
+   "nats_per_token_by_bin": {
+    "000": {
+     "0-512": {
+      "mean": 1.3219932576133127,
+      "sd": 0.00723723941676333,
+      "n": 3,
+      "ci95": [
+       1.3040135072074666,
+       1.3399730080191588
+      ]
+     },
+     "512-1024": {
+      "mean": 1.1662416057356328,
+      "sd": 0.02483074357195503,
+      "n": 3,
+      "ci95": [
+       1.1045536407387553,
+       1.2279295707325104
+      ]
+     },
+     "1024-2048": {
+      "mean": 1.531373555341536,
+      "sd": 0.010427855914695791,
+      "n": 3,
+      "ci95": [
+       1.5054672344617706,
+       1.5572798762213014
+      ]
+     }
+    },
+    "100": {
+     "0-512": {
+      "mean": 1.2986200483786092,
+      "sd": 0.01518364453572611,
+      "n": 3,
+      "ci95": [
+       1.2608987401169107,
+       1.3363413566403077
+      ]
+     },
+     "512-1024": {
+      "mean": 1.2839639971326282,
+      "sd": 0.00860662176866324,
+      "n": 3,
+      "ci95": [
+       1.262582237828154,
+       1.3053457564371025
+      ]
+     },
+     "1024-2048": {
+      "mean": 1.1872479227862989,
+      "sd": 0.02667090684517537,
+      "n": 3,
+      "ci95": [
+       1.1209883698602074,
+       1.2535074757123903
+      ]
+     }
+    }
+   },
+   "gdn_vs_dense_pct_by_bin": {
+    "0-512": {
+     "mean": -2.2954762410435334,
+     "sd": 2.0707077906135893,
+     "n": 3,
+     "ci95": [
+      -7.439814723536893,
+      2.848862241449826
+     ]
+    },
+    "512-1024": {
+     "mean": 12.503165513069803,
+     "sd": 1.841744539493446,
+     "n": 3,
+     "ci95": [
+      7.927649183636061,
+      17.078681842503546
+     ]
+    },
+    "1024-2048": {
+     "mean": -29.108870083245453,
+     "sd": 1.2288882788657003,
+     "n": 3,
+     "ci95": [
+      -32.16184418819175,
+      -26.055895978299155
+     ]
+    }
+   },
+   "growth_bin3_minus_bin2_nats": {
+    "000": {
+     "mean": 0.3651319496059033,
+     "sd": 0.03357171278313807,
+     "n": 3,
+     "ci95": [
+      0.28172846081990904,
+      0.4485354383918975
+     ]
+    },
+    "100": {
+     "mean": -0.09671607434632956,
+     "sd": 0.031090832931878046,
+     "n": 3,
+     "ci95": [
+      -0.17395621852757995,
+      -0.019475930165079175
+     ]
+    }
+   },
+   "growth_bin3_over_bin2_pct": {
+    "000": {
+     "mean": 44.12486477563385,
+     "sd": 4.881165381191147,
+     "n": 3,
+     "ci95": [
+      31.99839911799738,
+      56.251330433270326
+     ]
+    },
+    "100": {
+     "mean": -9.189477654474013,
+     "sd": 2.8080759433980758,
+     "n": 3,
+     "ci95": [
+      -16.165688012530392,
+      -2.2132672964176328
+     ]
+    }
+   }
+  },
+  "B_out_of_corpus_gt1200": {
+   "nats_per_token_by_bin": {
+    "000": {
+     "0-512": {
+      "mean": 3.9535997906949203,
+      "sd": 0.012827550856582336,
+      "n": 3,
+      "ci95": [
+       3.921731815982707,
+       3.9854677654071335
+      ]
+     },
+     "512-1024": {
+      "mean": 3.0311283680615486,
+      "sd": 0.015352358355144884,
+      "n": 3,
+      "ci95": [
+       2.992987917611996,
+       3.0692688185111012
+      ]
+     },
+     "1024-2048": {
+      "mean": 3.985807855797314,
+      "sd": 0.08052200390125763,
+      "n": 3,
+      "ci95": [
+       3.785763964894689,
+       4.185851746699939
+      ]
+     }
+    },
+    "100": {
+     "0-512": {
+      "mean": 3.9539991651386366,
+      "sd": 0.008874463786789756,
+      "n": 3,
+      "ci95": [
+       3.931951995674736,
+       3.976046334602537
+      ]
+     },
+     "512-1024": {
+      "mean": 3.154942235530379,
+      "sd": 0.008263344338998283,
+      "n": 3,
+      "ci95": [
+       3.1344132934604763,
+       3.1754711776002815
+      ]
+     },
+     "1024-2048": {
+      "mean": 3.049698162276254,
+      "sd": 0.01685844638208661,
+      "n": 3,
+      "ci95": [
+       3.0078160797962723,
+       3.0915802447562357
+      ]
+     }
+    }
+   },
+   "gdn_vs_dense_pct_by_bin": {
+    "0-512": {
+     "mean": 0.04180824837390166,
+     "sd": 0.7467764321618837,
+     "n": 3,
+     "ci95": [
+      -1.8134369751209647,
+      1.8970534718687682
+     ]
+    },
+    "512-1024": {
+     "mean": 13.201411395880683,
+     "sd": 2.652860900202682,
+     "n": 3,
+     "ci95": [
+      6.610807700141117,
+      19.79201509162025
+     ]
+    },
+    "1024-2048": {
+     "mean": -60.66912002414541,
+     "sd": 3.6866736905682473,
+     "n": 3,
+     "ci95": [
+      -69.82806433524311,
+      -51.510175713047694
+     ]
+    }
+   },
+   "growth_bin3_minus_bin2_nats": {
+    "000": {
+     "mean": 0.9546794877357647,
+     "sd": 0.06541884081386956,
+     "n": 3,
+     "ci95": [
+      0.7921569619576712,
+      1.1172020135138583
+     ]
+    },
+    "100": {
+     "mean": -0.10524407325412444,
+     "sd": 0.01386061639709534,
+     "n": 3,
+     "ci95": [
+      -0.1396785321603361,
+      -0.07080961434791276
+     ]
+    }
+   },
+   "growth_bin3_over_bin2_pct": {
+    "000": {
+     "mean": 160.156228966727,
+     "sd": 17.128050982942945,
+     "n": 3,
+     "ci95": [
+      117.60435747569822,
+      202.7081004577558
+     ]
+    },
+    "100": {
+     "mean": -9.983754281379909,
+     "sd": 1.247984406047426,
+     "n": 3,
+     "ci95": [
+      -13.084169624714765,
+      -6.883338938045053
+     ]
+    }
+   }
+  }
+ }
+}

@@ -11,3 +11,9 @@ exec_noop {'ran': True, 'passed': 1, 'total': 1, 'error': None}
 compile_noop {'ran': True, 'passed': 1, 'total': 1, 'error': None}
 assertionerror_swallow {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
 sys_exit0 {'ran': False, 'passed': 0, 'total': 1, 'error': 'no result (exit code 0)'}
+## after the SQ373 fix (working tree, 2026-11-23 ~13:10 EST)
+control_honest_fail {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+exec_noop {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+compile_noop {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+assertionerror_swallow {'ran': True, 'passed': 0, 'total': 1, 'error': 'AssertionError: '}
+sys_exit0 {'ran': False, 'passed': 0, 'total': 1, 'error': 'no result (exit code 0)'}

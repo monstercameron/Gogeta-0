@@ -26,8 +26,9 @@ child is `nobody`; it can read world-readable files such as /etc/passwd and syst
 packages, but cannot write outside the private tmpfs mounts). It is a process sandbox, not a
 security boundary. Use a container / nsjail for anything adversarial.
 
-`self_test()` probes all of this and run_suite.py refuses to run code tasks unless every probe
-passes.
+`self_test()` probes all of this (incl. that $HOME is unlistable and ~/.venvs invisible, with a negative control).
+run_suite.py refuses to run code tasks unless every probe passes, and `run_tests()` itself runs the self-test once per
+process and refuses to start any child if a probe fails (SQ352).
 """
 from __future__ import annotations
 
@@ -40,19 +41,13 @@ import subprocess
 import sys
 from functools import lru_cache
 
-from post_training.rewards import (IS_LINUX, NOBODY, _HARNESS, _child_python, _drop_privileges,  # noqa: F401
-                                   _limits, extract_code, score)
+from post_training import rewards
+from post_training.rewards import (HIDE, IS_LINUX, NOBODY, _HARNESS, _NS_PRELUDE as _PRELUDE,  # noqa: F401
+                                   _child_python, _drop_privileges, _limits, extract_code, score)
 
-HIDE = ("/mnt", "/tmp", "/dev/shm", "/run", "/var/tmp")  # /var/tmp added 2026-11-23: it was host-shared and writable (quick review 02:54)
-# Runs as root-in-a-new-userns (outer `unshare -rnm`), mounts the private tmpfs views, then
-# enters a NESTED user + mount namespace as uid/gid 65534 before exec'ing Python. Without the
-# nested step the child would be ns-root with CAP_SYS_ADMIN and could simply `umount /mnt`
-# (verified here: the umount works and /mnt/c reappears). After the nested step, the execve of
-# a non-root uid clears every capability (CapEff = 0, verified) and the inherited mounts are
-# locked, so the private view cannot be undone.
-_PRELUDE = ("set -e; for d in " + " ".join(HIDE) +
-            "; do mount -t tmpfs -o size=64m,mode=1777 tmpfs \"$d\" || exit 97; done; "
-            "cd /tmp; exec unshare -U -m --map-user=65534 --map-group=65534 \"$0\" -I -c \"$1\"")
+# The mount-namespace hardening itself (HIDE, the prelude, exit code 97 = fail closed) now lives in
+# post_training/rewards.py (SQ61); this module keeps the strict policy (network + filesystem isolation both REQUIRED)
+# and the self-test gate.
 
 
 @lru_cache(maxsize=1)
@@ -60,52 +55,44 @@ def _unshare() -> str | None:
     return shutil.which("unshare") if IS_LINUX else None
 
 
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_GATE: dict | None = None  # self_test() report of this process, filled once (SQ352)
+
+
+def _gate() -> None:
+    """Fail closed at the execution point (SQ352): the first run_tests() of a process runs self_test() once and
+    caches the report; if any probe failed, every run_tests() raises and no child process is started. This does not
+    depend on run_suite.py, so a direct lm-eval invocation (`--include_path evals/tasks`) is covered too."""
+    global _GATE
+    if _GATE is None:
+        _GATE = self_test(REPO_ROOT)
+    if not _GATE.get("ok"):
+        bad = sorted(k for k, v in _GATE.get("checks", {}).items() if v is not True)
+        raise RuntimeError(f"sandbox self-test failed (refusing to execute generated code): {bad}")
+
+
 def run_tests(code: str, tests: list[str], timeout: float = 5.0, mem_mb: int = 1024) -> dict:
-    """Run `code`, then each assert in `tests`, in the hardened sandbox.
+    """Run `code`, then each assert in `tests`, in the hardened sandbox, after the once-per-process self-test gate.
 
     Returns rewards.run_tests' dict: {passed, total, compiled, ran, error, timed_out,
-    network_isolated} (+ `fs_private`). Raises RuntimeError if the sandbox cannot be built.
+    network_isolated} (+ `fs_private`). Raises RuntimeError if the sandbox cannot be built or the self-test failed.
     """
-    exe = _unshare()
-    if not exe:
+    _gate()
+    return _run_tests_unchecked(code, tests, timeout, mem_mb)
+
+
+def _run_tests_unchecked(code: str, tests: list[str], timeout: float = 5.0, mem_mb: int = 1024) -> dict:
+    """run_tests without the gate; only self_test() itself may call this (it is the gate's probe)."""
+    if not _unshare():
         raise RuntimeError("code execution needs Linux with util-linux `unshare` (run inside WSL)")
-    nonce = secrets.token_hex(16)
-    kw = {"user": NOBODY, "group": NOBODY, "extra_groups": []} if _drop_privileges() else {}
-    cmd = [exe, "-rnm", "sh", "-c", _PRELUDE, _child_python(), _HARNESS]
-    stdin = nonce + "\n" + json.dumps({"code": code, "tests": list(tests),
-                                       "limits": _limits(timeout, mem_mb, None)})
-    proc = subprocess.Popen(cmd, cwd="/", env={"PATH": "/usr/bin:/bin", "LANG": "C.UTF-8"},
-                            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                            text=True, errors="replace", start_new_session=True, **kw)
-    timed_out = False
-    try:
-        out, err = proc.communicate(stdin, timeout=timeout)
-    except subprocess.TimeoutExpired:
-        timed_out = True
-        try:
-            os.killpg(proc.pid, signal.SIGKILL)
-        except (ProcessLookupError, PermissionError):
-            proc.kill()
-        out, err = proc.communicate()
-    if proc.returncode == 97:
-        raise RuntimeError(f"sandbox mount setup failed: {err.strip()[:300]}")
-    res = None
-    for line in reversed(out.splitlines()):
-        if line.startswith(nonce):
-            try:
-                res = json.loads(line[len(nonce):])
-            except json.JSONDecodeError:
-                res = None
-            break
-    if res is None:
-        res = {"compiled": None, "ran": False, "passed": 0, "total": len(tests),
-               "error": "timeout" if timed_out else f"no result (exit code {proc.returncode})"}
-    res.update(timed_out=timed_out, network_isolated=True, fs_private=True)
+    res = rewards.run_tests(code, tests, timeout=timeout, mem_mb=mem_mb, network="require_off", fs_isolation="require")
+    assert res["fs_private"] and res["network_isolated"]
     return res
 
 
 def self_test(repo_root: str) -> dict:
     """Probe the sandbox. Every entry must be True before code tasks may run."""
+    global _GATE
     tag = secrets.token_hex(4)
     probe_file = os.path.join(repo_root, f".sandbox_probe_{tag}")
     home_probe = os.path.join(os.path.expanduser("~"), f".sandbox_probe_{tag}")
@@ -114,29 +101,41 @@ def self_test(repo_root: str) -> dict:
         checks["linux_and_unshare"] = bool(_unshare())
         if not checks["linux_and_unshare"]:
             return {"ok": False, "checks": checks}
-        r = run_tests("def f(x):\n    return x + 1\n", ["assert f(1) == 2", "assert f(2) == 4"])
+        r = _run_tests_unchecked("def f(x):\n    return x + 1\n", ["assert f(1) == 2", "assert f(2) == 4"])
         checks["pass_and_fail_scored"] = (r["passed"], r["total"]) == (1, 2)
-        r = run_tests("import os\nok = not os.path.exists(%r)\n" % repo_root, ["assert ok"])
+        r = _run_tests_unchecked("import os\nok = not os.path.exists(%r)\n" % repo_root, ["assert ok"])
         checks["repo_not_visible"] = r["passed"] == 1
-        r = run_tests("open(%r, 'w').write('x')\n" % probe_file, ["assert True"])
+        r = _run_tests_unchecked("open(%r, 'w').write('x')\n" % probe_file, ["assert True"])
         checks["repo_not_writable"] = not r["ran"] and not os.path.exists(probe_file)
-        r = run_tests("import os\nok = not os.path.exists('/mnt/c')\n", ["assert ok"])
+        r = _run_tests_unchecked("import os\nok = not os.path.exists('/mnt/c')\n", ["assert ok"])
         checks["windows_drive_hidden"] = r["passed"] == 1
-        r = run_tests("open(%r, 'w').write('x')\n" % home_probe, ["assert True"])
+        r = _run_tests_unchecked("open(%r, 'w').write('x')\n" % home_probe, ["assert True"])
         checks["home_not_writable"] = not r["ran"] and not os.path.exists(home_probe)
+        home = os.path.expanduser("~")
+        listdir_probe = ("import os\ntry:\n    os.listdir(%r)\n    ok = False\nexcept OSError:\n    ok = True\nassert ok" % home)
+        r = _run_tests_unchecked("x = 1\n", [listdir_probe])
+        checks["home_listdir_raises"] = r["ran"] and r["passed"] == 1
+        r = _run_tests_unchecked("x = 1\n", ["import os\nassert not os.path.exists(%r)" % os.path.join(home, ".venvs")])
+        checks["home_venvs_invisible"] = r["ran"] and r["passed"] == 1
+        # controls for the probes above: a failing assert must score 0 (so "passed == 1" can mean something) and
+        # /proc must be visible (the sandbox is not just an empty box)
+        r = _run_tests_unchecked("x = 1\n", ["assert False"])
+        checks["negative_control_fails"] = r["ran"] and r["passed"] == 0 and r["total"] == 1
+        r = _run_tests_unchecked("x = 1\n", ["import os\nassert os.path.exists('/proc')"])
+        checks["positive_control_proc_visible"] = r["ran"] and r["passed"] == 1
         var_probe = os.path.join("/var/tmp", f".sandbox_probe_{tag}")
-        r = run_tests("open(%r, 'w').write('x')\n" % var_probe, ["assert True"])
+        r = _run_tests_unchecked("open(%r, 'w').write('x')\n" % var_probe, ["assert True"])
         checks["shared_tmp_private"] = not os.path.exists(var_probe)  # a write inside must not reach the host
-        r = run_tests("import ctypes\nlibc = ctypes.CDLL(None, use_errno=True)\n"
+        r = _run_tests_unchecked("import ctypes\nlibc = ctypes.CDLL(None, use_errno=True)\n"
                       "rc = libc.umount2(b'/mnt', 2)\nimport os\n"
                       "ok = rc != 0 and not os.path.exists('/mnt/c')\n", ["assert ok"])
         checks["cannot_unmount_private_view"] = r["passed"] == 1
-        r = run_tests("import socket\ns = socket.socket(); s.settimeout(2)\ns.connect(('1.1.1.1', 80))\n",
+        r = _run_tests_unchecked("import socket\ns = socket.socket(); s.settimeout(2)\ns.connect(('1.1.1.1', 80))\n",
                       ["assert True"], timeout=10)
         checks["network_blocked"] = not r["ran"]
-        r = run_tests("while True:\n    pass\n", ["assert True"], timeout=2)
+        r = _run_tests_unchecked("while True:\n    pass\n", ["assert True"], timeout=2)
         checks["timeout_kills"] = r["timed_out"] and not r["ran"]
-        r = run_tests("x = bytearray(2 * 1024**3)\n", ["assert True"], mem_mb=256)
+        r = _run_tests_unchecked("x = bytearray(2 * 1024**3)\n", ["assert True"], mem_mb=256)
         checks["memory_capped"] = not r["ran"]
         checks["runs_as_nobody"] = _drop_privileges()
     except Exception as e:  # any failure to build the sandbox = not ok
@@ -148,8 +147,11 @@ def self_test(repo_root: str) -> dict:
                 os.remove(f)
                 checks[key] = False
     ok = all(v is True for k, v in checks.items() if k != "error") and "error" not in checks
-    return {"ok": ok, "checks": checks, "child_python": _child_python() if IS_LINUX else None,
-            "platform": sys.platform}
+    rep = {"ok": ok, "checks": checks, "child_python": _child_python() if IS_LINUX else None,
+           "platform": sys.platform}
+    if os.path.abspath(repo_root) == REPO_ROOT:  # run_suite.py's own call also satisfies the gate for this process
+        _GATE = rep
+    return rep
 
 
 if __name__ == "__main__":

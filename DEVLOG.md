@@ -18,6 +18,30 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.11: Worker results: GDN extrapolates past 1,024 tokens (-60.7% vs dense), GDN copy deficit beyond the window, C202 not a numerics artifact; reward forgery fixed (SQ373)
+*2026-11-23*
+
+**Side-quest worker results integrated (Sonnet worker, verified by the main agent), and the reward-forgery hole is closed.**
+
+| Side quest | Result |
+|---|---|
+| **SQ351** length extrapolation (cells 000 vs 100, 3 seeds, 153 long out-of-corpus files) | beyond the 1,024-token training length, the GDN hybrid's loss is **-60.7% [-69.8, -51.5]** vs dense; dense degrades +160% past its window. This is the first measured (not analytic) evidence for the linear-time pillar. |
+| **SQ347** copy-deficit probe (registered) | prediction not met: the interaction on copying is positive but its CIs include 0 at gaps 256/512. Descriptively, **the GDN cells copy far worse than dense beyond the SWA window** (+32%/+37% at gap 256): an issue the assembled model must design around (attention inside the shared core is the candidate fix) |
+| **SQ340** fp32 vs bf16 scoring (registered) | shifts of at most 0.0035%; the 200M interaction is unchanged (+6.36 vs +6.37). C202 is not a numerics artifact; prediction held |
+| **SQ339** ternary split, post hoc | int8 activations cost +0.1% (confirms A1d). Ternary weights without QAT are catastrophic (+769% / +197%), so the trained cost (+15.8%) is a QAT-adapted weight cost |
+| **SQ341/SQ348** loop curve and per-pass lens | the 200M loop cells are best at their trained r = 4 (r = 1 +8%, r = 12 +5%), and the per-pass readout improves up to r = 4 |
+| **SQ365** ternary jitter | 5% weight noise costs ternary cells +1.4% / +2.6% vs +0.2% for full precision; 10-14% of ternary weights sit near a rounding threshold |
+
+- **Infrastructure:**
+  - **SQ373, reward forgery fixed.** The grader/worker split binds the real exec/compile before the solution runs, sends the nonce only after it finishes, and returns the result over a pipe. All forgery probes now score 0/1 (`reward_forgery_probe_2026-11-23.txt`, after-fix section); `post_training.test_rewards` is OK (30 tests incl. 11 forgery cases). Residual risks are documented in `rewards.py`. The harness-level GRPO block is lifted, but real RL should still add container isolation. Recorded on C83.
+  - **SQ61 core:** namespace hardening upstreamed into `rewards.py`, failing closed for GRPO. Resource-budget and descendant-cleanup tests are still open.
+  - **SQ346/SQ352:** the sandbox self-test probes `$HOME` and gates execution at `run_tests` (16/16 with the absolute repo path the callers use).
+  - **SQ345/SQ366:** score files carry dataset hashes, `check_compatible()` refuses mixed hashes, and `--store-nll` keeps per-doc NLL (default off).
+- **Still running in the worker:** SQ349 (syntax proxy) and SQ374 (E13 byte runs); SQ379 (A2 out of corpus) is next.
+- **A3 (the all-parts model) is training on the fleet.**
+
+---
+
 ## v0.5.10: A2 confirmed: assembled model -16.7% vs full fusion, full-precision version ties dense; human: keep all parts -> A3 (MoE core + ternary scope) registered
 *2026-11-23*
 

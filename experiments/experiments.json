@@ -508,10 +508,54 @@
       "clean80 doc-level bpc (v2 val), paired by seed vs E27",
       "tokens/s"
     ],
+    "status": "done",
+    "version": "v0.5.4",
+    "config": "experiments/staged-configs/a1/ (a1a..a1h)",
+    "results": {
+      "effects_vs_E27_paired": {
+        "A1a": -0.0524,
+        "A1b": 0.0023,
+        "A1c": -0.0162,
+        "A1d": 0.0008,
+        "A1e": -0.0831,
+        "A1f": 0.0002,
+        "A1g": -0.1162,
+        "A1h": -0.057
+      },
+      "winners": [
+        "A1a",
+        "A1c",
+        "A1e",
+        "A1g",
+        "A1h"
+      ],
+      "note": "exploratory screen, seeds 0-1; A1b/A1f seed 0 and amendment arms A1i/A1z/A1k lost (boxes destroyed mid-run) and re-run in E63's wave",
+      "evidence": "experiments/checks/results/a1_screen.json"
+    },
+    "notes": "Human goal 2026-11-23: put the model together, solve the unintuitive parts, compensate the challenges, use the new (v2) dataset, rent 5090-class GPUs."
+  },
+  {
+    "id": "E63",
+    "arc": "Assembly",
+    "title": "A2 assembled model: stacked A1 winners on fresh seeds, vs dense, GDN-unshared and full-fusion references",
+    "question": "Do the A1 winners stack, and is the assembled model (GDN hybrid + shared loop 6x2 + ternary core + contractive injection) competitive with dense and with an unshared GDN stack at matched training FLOPs?",
+    "prediction": "Registered: experiments/checks/PREDICTIONS.md, section 'A2 assembled model' (P1-P5).",
+    "ingredients": [
+      "A1g shape (core 6 x r=2)",
+      "fixed r, full backprop",
+      "ternary core only",
+      "contractive injection",
+      "(A2a) per-pass adapters"
+    ],
+    "metrics": [
+      "clean80 doc-level bpc, paired by seed",
+      "tokens/s",
+      "weight memory"
+    ],
     "status": "planned",
     "version": null,
-    "config": "experiments/staged-configs/a1/ (a1a..a1h)",
+    "config": "experiments/staged-configs/a2/ (a2s, a2f, a2a)",
     "results": {},
-    "notes": "Human goal 2026-11-23: put the model together, solve the unintuitive parts, compensate the challenges, use the new (v2) dataset, rent 5090-class GPUs."
+    "notes": "Fresh seeds 2-4; references E20, E24, E27 at seeds 2-4."
   }
 ]

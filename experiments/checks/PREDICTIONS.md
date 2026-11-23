@@ -745,3 +745,23 @@ Prompted by outside review 2026-11-23 12:10 (`notes/reviews/2026-11-23-1210-revi
   - The dense E20 (SQ263, seeds 0-1, 3e-3) is added to the table, so each arm's "share of the E27-to-dense gap closed" is a paired number.
   - Each arm's tokens/s vs E27 is reported next to its effect. A winner that costs more than 10% throughput is flagged and not stacked without a wall-clock note.
   - Multiplicity: with 10 arms and a 2-seed paired sd of about 0.55%, the -1.0% rule has a roughly 20-25% chance of at least one false winner. A1 winners therefore count only after A2 confirms them on **fresh seeds (2-4)**; A2 never reuses seeds 0-1.
+
+## A2 assembled model (2026-11-23 ~12:10 EST, before dispatch): stacked A1 winners, fresh seeds
+- **A1 outcome that this builds on** (exploratory screen; `experiments/checks/results/a1_screen.json`): the winners under the registered rule were A1g -11.6% (parameter-changed), A1e -8.3%, A1h -5.7% (parameter-changed), A1a -5.2% (+12% compute) and A1c -1.6%. A1b, A1d and A1f show no effect. A1 amendment arms (A1i, A1z, A1k) and A1b/A1f seed 0 were lost when the boxes were destroyed mid-run (orphaned teardown loop, disclosed in v0.5.4). They are re-run in this wave under their original amendment-1 registration.
+- **Arms** (200M tokens of code-py-v2, lr 6e-3, **fresh seeds 2, 3, 4**, never used for A1 selection; `experiments/staged-configs/a2/`):
+  - **A2s** [bf15dfbc94ad6b7a], the **assembled model**: E27 with a core of 6 blocks [gdn, gdn, swa, gdn, gdn, swa] x r = 2 (A1g shape), fixed r = 2 with full backprop (the A1a/A1i lever for this shape), ternary in the core only (A1e), contractive injection (A1c). 15.1M non-embedding params, 0.189 GFLOP/token training (FLOP-matched to E20 0.201 and E24 0.186, all 14 applications with gradients).
+  - **A2f** [081a9dd4a2f13d23]: A2s without ternary (full precision everywhere), the assembled GDN + loops model. It prices ternary inside the stack.
+  - **A2a** [537cbbad83647e9d]: A2s plus per-pass low-rank adapters (rank 32, SQ357).
+  - **References**, seeds 2-4, each at its F2/G3 LR (seed 2 exists from SQ263; seeds 3-4 are new): E20 dense (3e-3), E24 GDN hybrid unshared at matched FLOPs (3e-3), E27 full fusion (6e-3).
+- **Metric:** clean80 doc-level bpc, log scale. Comparisons are paired by seed (shared data order), with a 95% CI at df = 2 and the per-seed values listed.
+- **Predictions:**
+  - **P1 (stacking works, sub-additively):** A2s vs E27 = -17% (range -25% to -10%). Full log-additivity of the A1 winners would give about -24%.
+  - **P2 (competitiveness):** A2s vs dense E20 = +10% (range 0% to +18%): the assembled ternary model still trails dense per training FLOP, at about a third of its unique parameters.
+  - **P3 (ternary inside the stack):** A2s vs A2f = +7% (range +3% to +12%).
+  - **P4 (loops vs unshared at matched FLOPs):** A2f vs E24 = +6% (range +2% to +10%).
+  - **P5 (adapters):** A2a vs A2s = -1% (range -3% to +1%).
+- **Decision rules:**
+  - The stack is **confirmed** if A2s beats E27 by >= 5% with a paired 95% CI below 0. That creates a claim, while the A1 winners stay exploratory one by one.
+  - The assembled model is **competitive per FLOP** if A2s or A2f lies within 5% of E20.
+  - **Per weight-memory** (ternary core at 1.58 bits/param, everything else at 16 bits) and **per wall-clock** (measured tokens/s) are reported next to it as registered secondary readouts.
+  - A2a replaces A2s as the base only if P5's CI lies below 0.

@@ -1,0 +1,128 @@
+{
+ "reference": {
+  "E27_seeds_0_1": {
+   "0": 0.33030193150999104,
+   "1": 0.3268346820203285
+  }
+ },
+ "arms": {
+  "A1a": {
+   "n_seeds": 2,
+   "per_seed": {
+    "0": -0.056656115558158526,
+    "1": -0.048196965428745964
+   },
+   "effect": -0.05243598007523569,
+   "winner": true,
+   "prediction": -0.015,
+   "in_predicted_range": false,
+   "mean_clean80": 0.3113352746296788,
+   "tokens_per_s": 344778.9999246136,
+   "params_non_embedding": 9460760
+  },
+  "A1b": {
+   "n_seeds": 1,
+   "per_seed": {
+    "1": 0.0023191899579164676
+   },
+   "effect": 0.0023191899579164676,
+   "winner": false,
+   "prediction": -0.005,
+   "in_predicted_range": true,
+   "mean_clean80": 0.3275926737327689,
+   "tokens_per_s": 377418.31549645856,
+   "params_non_embedding": 9463448
+  },
+  "A1c": {
+   "n_seeds": 2,
+   "per_seed": {
+    "0": -0.016955669605246193,
+    "1": -0.01552833742532378
+   },
+   "effect": -0.016242262379434904,
+   "winner": true,
+   "prediction": -0.005,
+   "in_predicted_range": true,
+   "mean_clean80": 0.32323046194247573,
+   "tokens_per_s": 360812.21252074314,
+   "params_non_embedding": 9461144
+  },
+  "A1d": {
+   "n_seeds": 2,
+   "per_seed": {
+    "0": -0.0009295815710023138,
+    "1": 0.0024751802592606347
+   },
+   "effect": 0.0007713514116520728,
+   "winner": false,
+   "prediction": -0.02,
+   "in_predicted_range": false,
+   "mean_clean80": 0.32881927284744994,
+   "tokens_per_s": 342709.5433671994,
+   "params_non_embedding": 9460760
+  },
+  "A1e": {
+   "n_seeds": 2,
+   "per_seed": {
+    "0": -0.08236207455713052,
+    "1": -0.08392531842949236
+   },
+   "effect": -0.0831440296605481,
+   "winner": true,
+   "prediction": -0.03,
+   "in_predicted_range": false,
+   "mean_clean80": 0.30125127822928577,
+   "tokens_per_s": 359404.2544871767,
+   "params_non_embedding": 9460760
+  },
+  "A1f": {
+   "n_seeds": 1,
+   "per_seed": {
+    "1": 0.00023422126490846293
+   },
+   "effect": 0.00023422126490846293,
+   "winner": false,
+   "prediction": -0.03,
+   "in_predicted_range": false,
+   "mean_clean80": 0.32691123365296726,
+   "tokens_per_s": 275155.6781337256,
+   "params_non_embedding": 9460760
+  },
+  "A1g": {
+   "n_seeds": 2,
+   "per_seed": {
+    "0": -0.12247529274299962,
+    "1": -0.10989491600874557
+   },
+   "effect": -0.11620748857133142,
+   "winner": true,
+   "prediction": -0.02,
+   "in_predicted_range": false,
+   "mean_clean80": 0.2903826589228431,
+   "tokens_per_s": 331330.34369248175,
+   "params_non_embedding": 15084976
+  },
+  "A1h": {
+   "n_seeds": 2,
+   "per_seed": {
+    "0": -0.061629467989167686,
+    "1": -0.05238074699457806
+   },
+   "effect": -0.05701644627999727,
+   "winner": true,
+   "prediction": -0.01,
+   "in_predicted_range": false,
+   "mean_clean80": 0.3098302182138021,
+   "tokens_per_s": 327260.381383313,
+   "params_non_embedding": 11387748
+  }
+ },
+ "winners": [
+  "A1a",
+  "A1c",
+  "A1e",
+  "A1g",
+  "A1h"
+ ],
+ "any_arm_improves_2pct": true
+}

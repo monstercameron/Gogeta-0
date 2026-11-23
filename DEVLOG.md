@@ -18,6 +18,45 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.4: A1 results: ternary-core-only -8.3%, 6x2 loop shape -11.6%, fixed-r -5.2%; A2 assembled model registered; fleet-loss incident disclosed
+*2026-11-23*
+
+**A1 assembly screen: results (exploratory), and A2 (the assembled model) registered.**
+
+A1: each arm is one compensation on the full-fusion cell E27, 200M tokens of code-py-v2, seeds 0-1, clean80, paired by seed (`experiments/checks/a1_screen.py`; provenance OK: registered commit, clean tree, v2):
+
+| Arm | Change | Effect vs E27 | Winner rule |
+|---|---|---|---|
+| A1g | core of 6 blocks x r = 2 (+59% unique params) | **-11.6%** (-12.3, -11.0) | yes (parameter-changed); 13% slower |
+| A1e | ternary in the core only (prelude, coda, inject full precision) | **-8.3%** (-8.2, -8.4) | yes; no speed cost |
+| A1h | core of 4 blocks x r = 3 (+20% params) | -5.7% (-6.2, -5.2) | yes (parameter-changed) |
+| A1a | fixed r = 4 training | -5.2% (-5.7, -4.8) | yes, but with +12% training compute |
+| A1c | contractive injection | -1.6% (-1.7, -1.5) | yes (marginal) |
+| A1d | weight-only ternary (no int8 activations) | +0.1% | no: the int8 activations are free |
+| A1f | late ternary (full precision for the first half) | 0.0% (1 seed) | no |
+| A1b | per-pass loop embedding | +0.2% (1 seed) | no |
+
+- **Reading** (exploratory; confirmation is A2's job):
+  - Ternary's cost sits at the edges of the network: keeping the first and last blocks and the injection in full precision recovers 8%.
+  - The loop's cost is mostly a unique-parameter deficit, and more blocks with fewer passes recovers the most (C197 again).
+  - Random-r training with truncated backprop costs about 5%, part of which is the compute deficit found in v0.5.3.
+  - The predictions underestimated every winner: none was in its registered range except A1c.
+- **Lost runs (disclosure):**
+  - All 7 A1 boxes were destroyed while the amendment arms (A1i, A1z, A1k) and A1b/A1f seed 0 were running.
+  - Cause: a teardown loop stopped with TaskStop kept running in Git Bash and raced the new dispatcher. Each time a box finished, the dispatcher assigned new jobs and the orphaned loop destroyed the box (identified from `vastai show audit-logs`).
+  - All 14 completed runs had been pulled first; about 10 in-flight runs were lost.
+  - Fix: one controller loop with a kill-switch file, and a `ps` check after every TaskStop (agent memory).
+  - A1 fleet spend: about $3.4.
+- **A2, registered before dispatch** (`experiments/checks/PREDICTIONS.md` "A2 assembled model"; E63). Fresh seeds 2-4, 200M, v2.
+  - **A2s, the assembled model:** prelude SWA (full precision) -> [contractive inject -> core of 6 ternary blocks GDN, GDN, SWA, GDN, GDN, SWA] x 2, fixed, full backprop -> coda attention (full precision). It has 15.1M non-embedding params at 0.189 GFLOP/token, FLOP-matched to dense E20 and to the unshared GDN hybrid E24.
+  - **Other arms:** A2f (A2s without ternary) and A2a (A2s plus per-pass adapters).
+  - **References:** E20, E24 and E27 at seeds 2-4.
+  - **Predictions:** stack vs E27 -17%; vs dense +10%; ternary inside the stack +7%; loops vs unshared +6%; adapters -1%.
+  - **Decision rules:** the stack is confirmed if it beats E27 by >= 5% with CI below 0, and it is competitive if it lies within 5% of dense per FLOP. Weight-memory and wall-clock readouts are registered secondaries.
+  - The lost A1 amendment arms re-run in the same wave.
+
+---
+
 ## v0.5.3: Outside review 12:00: F2's loop cells were ~11% under-computed (truncated BPTT); FLOP accounting fixed; per-pass adapters (A2 candidate)
 *2026-11-23*
 

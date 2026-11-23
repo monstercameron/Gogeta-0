@@ -18,6 +18,30 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.5: Claim audit 2026-11-23-1202: 35 claims, no downgrades (C203 Holm checked, C30 WRONG rejected); A1 holds at equal wall-clock
+*2026-11-23*
+
+**Claim audit 2026-11-23-1202, plus quick reviews 12:01 (skeptical peer) and 12:04 (data engineer).**
+
+- **Audit:** 8 Codex auditors, all ok, reviewed 35 claims: 14 SOLID, 7 WEAK, 13 NEEDS-EVIDENCE, 1 WRONG. Each was checked against primary files. **No downgrades.**
+  - **C203 WEAK (Holm adjustment), rejected after computing it:** the four registered E60 comparisons have |t| = 21.0, 24.8, 10.0 and 14.2 (df 10.3, 10.0, 7.8, 5.0), so each p < 2e-4, under Holm's 0.0125 for m = 4. The t-statistics are recorded as evidence; VERIFIED stands.
+  - **C30 WRONG, rejected:** Ouro Table 13's OlympiadBench row reads 76.44 at T = 4 and 39.26 at T = 8, exactly as claimed. The auditor read SuperGPQA's row.
+  - **Confirmed, limitations added:** C93 (its stale "no multi-seed 200M model" note is updated) and C74, C35, C76, C75, C38 (paper-reported scope).
+  - The 13 NEEDS-EVIDENCE verdicts are on claims already UNVERIFIED.
+- **A1 table labels (12:01 review):** the parenthesised pairs in v0.5.4's A1 table are the two per-seed effects (seed 0, seed 1), not confidence intervals; a 2-seed screen computes none.
+- **A1 at equal wall-clock** (in-training eval loss, SQ338 method): every winner still beats E27. A1g -6.6% (equal steps -8.9%), A1e -5.2%, A1a -3.0%, A1h -2.5%. A2 keeps the 6x2 shape.
+- **Data provenance (12:04 review):** every A1/A2 box verifies v2 against the committed manifest's sha256 values before training. New side quests: SQ367 (atomic local dataset builds) and SQ368 (platform-tagged test pins).
+- **A2 wave setup:**
+  - Six of 8 RTX 5090s are training; two are still being set up.
+  - On box 2 at f85ada5: `tests/test_model.py` 12/12 and `tests/test_assembly.py` 9/9 pass on the GPU.
+  - `tests.test_moe` fails 15/15 on the x86-64 box. These are last-bit differences in pins recorded on the ARM64 host (CPU RNG and float reductions differ across architectures), not regressions; it passes 15/15 on ARM64 with the current code. Fix: SQ368.
+  - A wave-2 driver bug was found and fixed before any job ran: `drive.sh` still wrote into the A1 folder, so boxes 2 and 4 got their A2 job lists from copies.
+- **Side-quest worker:**
+  - SQ366 (per-doc NLL storage) and SQ341/SQ348 are done: the 200M loop cells are best at their trained r = 4 (r = 1 about 8% worse, r = 12 about 5% worse).
+  - These results get integrated when the worker hands back.
+
+---
+
 ## v0.5.4: A1 results: ternary-core-only -8.3%, 6x2 loop shape -11.6%, fixed-r -5.2%; A2 assembled model registered; fleet-loss incident disclosed
 *2026-11-23*
 

@@ -519,3 +519,14 @@ This executes only stages registered in v0.4.40 (`experiments/design/power-cost.
 - **Predictions:**
   - **P1:** E1-parammatch vs E10 (7-seed 5090 mean) is within ±1% (still a tie).
   - **P2:** it is no more than 0.5% worse than full E1 (the 7-seed mean).
+
+## Fleet wave 5 (2026-11-22 ~23:05, before dispatch): factorial F2 re-sized from the F1 pilot
+- **Pilot result** (F1, `experiments/checks/results/fleet_2026-11-22.json`):
+  - per-cell log-sd at 20M on v2: E20 0.0064, E21 0.0105, E22 0.0117, E24 0.0018, E27 0.0108;
+  - **pooled sigma 0.0090**.
+- **Why re-size:** the registered design (`notes/design-rigor.md` §3) planned N = 46 at sigma 0.004 and N = 127 if sigma were 0.0067; "the pilot decides before the money is spent". 0.009 is outside both pre-specified cases.
+- **F2'' (new registration, written before any F2 run):** N scales with sigma², giving **N ≈ 235** for 1% at 80% power. With the registered allocation shape kept (E20, the 000 cell, gets 2× the others), the targets are E20 = 82 seeds, E21 = E22 = E24 = E27 = 41 seeds each (N = 246). Existing seeds 0–2 count, so **231 new runs**.
+  - All at 20M tokens on code-py-v2, at the F0/G3-chosen LRs: E20 3e-3, E21 6e-3, E22 6e-3, E24 3e-3, E27 6e-3. Seeds 3…n−1.
+  - Rented RTX 5090s only. Estimated about 4 GPU-h, about $2.5.
+- **Analysis (unchanged, as registered):** `experiments/design/factorial_analysis.py` on clean80 bpc (log scale): the interaction I, its 95% CI and power, plus the registered prediction **I = +0.5% ± 1.5%; P(I ≤ −1%) = 10%; P(|I| < 1%) = 55%; P(I ≥ +1%) = 35%; full fusion the worst of the cells**.
+- **Disclosure:** the sample size changed after the pilot's variance was seen, as the design intended. No pilot *means* enter the sizing.

@@ -18,14 +18,35 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.107: Outside review 10:38: loop-cost wording tied to unique params, E9 card fixed, SQ347-SQ351; v0.4.106 entry text restored
+*2026-11-23*
+
+**Outside review 10:38 (Haiku) and quick reviews 08:44 (systems), 08:49 (cheapest experiment), 08:54 (skeptical peer) and 10:38 (data engineer), triaged.**
+
+- **Fixed:**
+  - README: "loops cost 10.6%" now says that looping at matched FLOPs also halves the unique parameters (12.3M vs 27.9M), so it is partly C197's effect. Per-FLOP figures are flagged as analytic, because sliding-window layers run as a dense-masked kernel (C12).
+  - The E9 card was stale ("planned, not run"). It now shows its v0.4.79 result (clean80 0.2773 vs E2 0.2845, n = 1) and what it controls for: parameter-matched to E2 (9.17M vs 9.46M), not FLOP-matched (0.079 vs 0.193 GFLOP/token).
+- **New side quests:**
+  - CPU, on the local 200M checkpoints: SQ347 (copy-deficit probe, the review's pick for next, prediction to register first), SQ348 (per-pass logit lens), SQ349 (syntax-validity proxy), SQ351 (length extrapolation to 2,048).
+  - GPU, needs approval: SQ350 (parameter-matched loop control).
+  - SQ342 gains a power note: about 12 seeds per cell are needed to resolve a 2-point I; the replicate must pre-register clean80 and one LR rule.
+- **Quick reviews:**
+  - Thermal drift: rejected. SQ79 covers it, and the cross-box timing spread is small next to the 1.62x gap.
+  - Wall-clock frontier: rejected. SQ310/SQ338 cover it, and truncated-cosine reads are biased.
+  - Strict held-out slice: done as SQ344 (in v0.4.106).
+  - Doc-join audit: clean; SQ345.
+- **Erratum, v0.4.106 entry:** a shell-quoting error in the version cutter blanked five inline-code spans in that entry's C109 and C106 bullets. They are restored here; the v0.4.106 tag itself is unchanged.
+
+---
+
 ## v0.4.106: Claim audit 2026-11-23-1037: 48 claims, no downgrades; C109 and C106 evidence archived, C197 R2 CI stored, C202 caveats + SQ344
 *2026-11-23*
 
 **Claim audit 2026-11-23-1037.** 8 Codex GPT-6 Luna auditors reviewed 48 claims (8 batches of 6, all 8 runs ok). Verdicts: 38 SOLID, 9 WEAK, 1 NEEDS-EVIDENCE. Each non-SOLID verdict was checked against the primary files. **No downgrades.**
 
 Confirmed and fixed with new evidence:
-- **C109:** lm-eval's  scores MBPP's 3 base asserts. The unmodified lm_eval 0.4.13 task files are archived in , with sha256 values matching the wheel's RECORD. VERIFIED stands.
-- **C106:** the sandbox hides $HOME. A probe with negative and positive controls () shows $HOME is unlistable and $HOME/.venvs is invisible inside . VERIFIED stands; SQ346 adds the probe to .
+- **C109:** lm-eval's `mbpp_plus` scores MBPP's 3 base asserts. The unmodified lm_eval 0.4.13 task files are archived in `evals/upstream/lm_eval-0.4.13/`, with sha256 values matching the wheel's RECORD. VERIFIED stands.
+- **C106:** the sandbox hides $HOME. A probe with negative and positive controls (`experiments/checks/sandbox_home_probe.py`) shows $HOME is unlistable and $HOME/.venvs is invisible inside `run_tests`. VERIFIED stands; SQ346 adds the probe to `self_test()`.
 - **C197:** R2's CI is now stored in the result JSON: -7.15%, Welch 95% CI [-7.59%, -6.71%], df 5.8. The 20M-only LR tuning is now a limitation. VERIFIED stands.
 - **C202:** limitations added (selected LR on the same seeds; SQ337 is not clean80), plus new evidence: SQ344, I by overlap stratum. The anti-synergy holds on clean50 (+5.49 log-points, every seed positive) and grows with overlap (dup80 +10.00). PARTIAL stands.
 

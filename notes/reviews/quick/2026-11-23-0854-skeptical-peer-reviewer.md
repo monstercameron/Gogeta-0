@@ -1,0 +1,12 @@
+# Quick review 2026-11-23-0854 - skeptical peer reviewer (Codex GPT-6 Luna high)
+
+- **Observation:** The fusion interaction changes sign with training horizon: −3.5% at 20M tokens, then +6.21% at 200M, with the latter’s 95% CI above zero. The result supports a horizon-specific conclusion, not a general verdict on fusion. (DEVLOG.md, C201/C202)
+- **Observation:** GDN’s 200M result depends on the budget: it leads by 3.4% per FLOP but trails by 8.2% at equal wall-clock. That distinction matters for the project’s practical training goal. (DEVLOG.md, SQ338)
+- **Observation:** C202 remains partial: only three seeds per cell, and LR coverage is incomplete for cells 000 and 100. The queue also flags pending controls and evaluation work. (experiments/claims-status.md, C202; experiments/QUEUE.md)
+
+- **Idea:** **Check whether F2’s anti-synergy survives a stricter held-out set.** **Hypothesis:** The interaction remains positive when evaluated on documents with very low training overlap. **Cheapest test:** Re-score the five existing 200M checkpoints on a source-disjoint, low-overlap slice; roughly 5–10 GPU minutes at 13M parameters if a matched-size pilot is needed. **Change the plan if:** the interaction’s sign flips or its magnitude shrinks substantially; then prioritize data and evaluation controls before treating anti-synergy as architectural.
+
+- **Question for the main agent:** Which held-out split is least entangled with the training corpus for this comparison?
+## Triage
+- Stricter held-out slice: accepted as SQ344 and run at once on CPU from the existing 200M doc-level scores (no GPU). The anti-synergy survives. On clean50 (overlap < 0.5, 1,174 docs) I = +5.49 log-points, and every seed is positive (+8.07, +3.25, +5.15), against +6.21 on clean80 and +10.00 on dup80. The full fusion is +26.6% vs dense on clean50. The interaction grows with train overlap, so part of the penalty is lost memorisation capacity (the loops and ternary cells have fewer or cheaper parameters), but most of it holds on the low-overlap docs. A source-disjoint set does not exist in-repo; the external-source evaluation is SQ314.
+- Question (which held-out split is least entangled with training?): clean50, the lowest-overlap stratum of the K9 doc-level split (the share of its 13-grams that occur in training is < 0.5; the "strict sensitivity set"). clean80 is the registered readout. Truly source-disjoint data is SQ314's external set, which is not built yet.

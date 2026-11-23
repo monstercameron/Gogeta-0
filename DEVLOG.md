@@ -18,6 +18,34 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.89: Claim audit 2026-11-23-0102: C199 downgraded to PARTIAL, C198 caveats; F2 blinding disclosure + blinded estimator committed
+*2026-11-23*
+
+**Claim audit 2026-11-23-0102** (2 claims due; 125 in their 6-hour cool-down; Codex GPT-6 Luna). Both verdicts were WEAK, and the main agent confirmed both against `notes/statistics-policy.md`:
+- **C199 is downgraded from VERIFIED to PARTIAL.**
+  - The init effects were measured at fixed LRs, and VERIFIED needs tuned or LR-robust arms (§2.3).
+  - "E1 is insensitive to init" is a no-effect claim: +0.04% [−0.23%, +0.31%] means no difference was detected, not equivalence, and no TOST was registered (§2.6).
+  - The I1/I2 effects stand at those LRs.
+- **C198 stays PARTIAL, with two limitations:**
+  - "they tie at d = 384/512" overstates what CIs spanning zero show;
+  - SQ301 picked each arm's best LR on the same two seeds it reports, which biases the gap upward.
+  - New **SQ307**: a fresh-seed confirmation at the selected LRs, plus 1.8e-2 for E1 because 1.2e-2 sat at the grid edge.
+- **Micro devlogs:** `experiments/devlogs/SQ200.md` and `experiments/devlogs/SQ243.md`.
+
+**Disclosure: F2 stage-1 blinding was breached in display.**
+- The wave-5 amendment requires that no cell means, contrasts or interaction estimates are computed or looked at before the blinded variance re-estimation.
+- The main agent's fleet monitor relayed each F2 run's final val loss and clean80 score, labelled by cell, into the session, from the first F2 runs until 01:00 EST.
+- No cell means, contrasts or interaction estimates were computed, tabulated or used for any decision. The stage-2 size will come only from the registered sigma rule.
+- The monitor now redacts F2 scores until the re-estimation.
+- The estimator, `experiments/design/f2_blinded_sigma.py`, is committed **before** it is run. It prints only counts, the seed-blocked and unblocked pooled sigma, and N_final = min(246, ⌈235·(σ/0.009)²⌉).
+- Readers should weigh the F2 interaction result knowing the per-run scores were visible during stage 1.
+
+**Fleet:**
+- F2 stage 1 is finishing on five boxes; SQ238 arm B is running on w4-3.
+- Checkpoint pulls are now incremental: about 1 min instead of several, because already-pulled checkpoints are skipped.
+
+---
+
 ## v0.4.88: SQ200: the init handicap explained (C199 VERIFIED); SQ301: E1's d=256 edge survives LR tuning; GPT-6.2 Astra feasibility review + plan errata
 *2026-11-23*
 

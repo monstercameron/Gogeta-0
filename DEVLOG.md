@@ -18,6 +18,36 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.16: A2 final: C204 (assembled recipe -16.7% vs full fusion) and C205 (ternary core only -7.6%) VERIFIED; A4 amendment 1 (A4d) fixes an aux-loss confound before any A4 run
+*2026-11-23*
+
+**A2 final (all seeds) and two new VERIFIED claims; A4 amendment 1 fixes a confound before any A4 run; outside review 13:40; queue brought up to date.**
+
+- **A2, final** (the slow box's last pair is in; `experiments/checks/results/a2_assembled.json`, provenance OK). Every registered prediction landed in its range:
+  - P1: A2s vs E27 **-16.67% [-17.74, -15.58]**;
+  - P2: A2s vs E20 +8.58% [+8.05, +9.11];
+  - P3: ternary cost in the stack +9.52% [+8.34, +10.71];
+  - **P4: A2f vs E24 +3.21% [+2.00, +4.44]** (now 3 seeds);
+  - P5: adapters -0.05% [-0.13, +0.02];
+  - A1e on fresh seeds -7.56% [-8.09, -7.02].
+- **New claims:**
+  - **C204 (VERIFIED):** the assembled recipe beats the full fusion by about 17% at matched FLOPs. It is recipe-level only, with limitations for horizon, out-of-corpus, the 3.2% gap to unshared GDN, and E27's 11% compute deficit.
+  - **C205 (VERIFIED):** a ternary core with full-precision ends improves the full fusion by 7.6%.
+- **A4 amendment 1** (outside review 13:40):
+  - A4a (shared r_b = 2) trains with the per-pass aux loss and A4b (r_b = 1) cannot, so R2 mixed "second pass" with "deep supervision".
+  - **A4d** (A4a without the aux loss) is added. R2 is split into R2' (A4d vs A4b, the second pass) and R2'' (A4a vs A4d, deep supervision) under Holm, and A4c's 4% FLOP shortfall is reported with R3.
+  - No A4 job had started.
+- **New side quests:** SQ387 (clean80 scorer for the byte decoder, before any A4 claim), SQ388 (minimum detectable effect at n = 3), SQ389 (a powered frozen-trunk byte-decoder sweep), SQ386 (rootless sandbox parity).
+- **Ledger:** C83 records that the forgery is fixed for every probed route, with the remaining risks listed.
+- **Queue:** `experiments/queue.json` / `QUEUE.md` regenerated.
+  - Running: A3, A4 and E8 (speculative decoding).
+  - Done: SQ61 (core) and SQ373.
+  - Dropped, with reasons: SQ50 (KDA, parked), the E2-era loop diagnostics (SQ14, SQ21, SQ37, Q13) and E3, all superseded by the assembly ladder.
+- **Quick reviews:** 13:24 (stop-point calibration SQ384), 13:29 (README A2 status fixed; SQ385), 13:38 (C83 reconciliation; SQ386).
+- **Fleet:** the A2 wave is fully torn down (its last box cost $0.92 at 4x slower throughput). A3 runs on 7 boxes; A4 is queued.
+
+---
+
 ## v0.5.15: Full stack: coarse-to-fine byte decoder around the all-parts backbone (tokens as patches); A4 registered; fixed byte patches +63% worse (SQ374)
 *2026-11-23*
 

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-23T03:16:05-05:00",
+  "updated": "2026-11-23T13:40:48-05:00",
   "policy": "Order = priority, highest first; `next` walks the list top to bottom and returns the first item that is queued, ready, has all dependencies done and needs no human. Ordering rule: scientific value per GPU-minute, with validity first. (1) Controls, tuning and seeds that make existing claims trustworthy: K8 leakage/arithmetic check, K7 LR sweep, tuned 3-seed E10 and E1, E9, conditional E0/E2 re-runs, replication verdicts. Every later comparison is only as good as these. (2) Cheap inference-only diagnostics on existing checkpoints (SQ50, SQ14, SQ21, SQ37, eval suite) and the K3 redesign. They cost 4-20 GPU-minutes and decide what to build next; because the campaign runner is sequential, use `next --gpu --max-minutes 10` to slot them between campaign items or while a run is cooling. (3) Thesis-critical experiments: E11 (then 3 seeds), looped neg-eig parity, E3 at the tuned LR, the loop fixes (SQ15, SQ16, loop norm) gated on SQ14, neg-eig in the looped core, SQ32. (4) Side quests (gates, KDA, NoPE, decode path, ternary x loop, computed tables, research searches). (5) Long-term: E4 full fusion, E8, Mamba-3. Compute budget (AGENTS 5): one GPU item running at a time; up to 8 CPU items alongside, thread-capped by the launcher. CPU items that can run in parallel with any GPU job: Q3, Q5 (K7 analysis), Q6, Q13, Q15, Q18, Q20 (authoring: write scripts and register predictions), Q12 (verdict writing), SQ1, SQ41. Authoring items edit experiments/checks/PREDICTIONS.md and should be done one at a time by the main agent (or by subagents given disjoint files). Items needing a registered prediction wait for Q1 (the tagged 'registered' version). New items enter via `queue.py add` and are appended at the end; reordering needs an explicit `move --reason`. Estimates come from compiled throughputs (E0 210k tok/s, E1 100k, E2 44k) plus ~2 min launch/compile overhead; they are planning numbers, not measurements. needs_human items are never picked by `next`.",
   "order_log": [
     {
@@ -202,9 +202,20 @@
       "missing": [],
       "needs_human": false,
       "launch": null,
-      "status": "queued",
+      "status": "done",
       "source": "experiments/side-quests.md SQ61; ledger C105",
-      "added": "2026-11-22T17:44:24-05:00"
+      "added": "2026-11-22T17:44:24-05:00",
+      "history": [
+        {
+          "t": "2026-11-23T13:40:39-05:00",
+          "from": "queued",
+          "to": "done",
+          "note": "core landed v0.5.11 (namespace hardening in rewards.py, fail-closed GRPO path) + SQ373 forgery fix; resource-budget and descendant-cleanup tests still open (side-quests SQ61)"
+        }
+      ],
+      "updated": "2026-11-23T13:40:39-05:00",
+      "finished": "2026-11-23T13:40:39-05:00",
+      "last_note": "core landed v0.5.11 (namespace hardening in rewards.py, fail-closed GRPO path) + SQ373 forgery fix; resource-budget and descendant-cleanup tests still open (side-quests SQ61)"
     },
     {
       "id": "Q4",
@@ -596,9 +607,20 @@
       "missing": [],
       "needs_human": false,
       "launch": null,
-      "status": "queued",
+      "status": "dropped",
       "source": "notes/research-looped.md SQ14/SQ21; notes/review-competitors.md SQ30/SQ37; extend experiments/checks/k6_loop_convergence.py",
-      "note": "Scripts: sq_14_loop_drift.py, sq_21_loop_quant.py, sq_37_repetition.py. Copy each prediction and pass rule from the notes into PREDICTIONS.md and register them in a PATCH version before running."
+      "note": "Scripts: sq_14_loop_drift.py, sq_21_loop_quant.py, sq_37_repetition.py. Copy each prediction and pass rule from the notes into PREDICTIONS.md and register them in a PATCH version before running.",
+      "history": [
+        {
+          "t": "2026-11-23T13:40:40-05:00",
+          "from": "queued",
+          "to": "dropped",
+          "note": "superseded by the assembly ladder A1-A4 (E2-era loop diagnostics; loop curves done as SQ341/SQ348 on the 200M cells)"
+        }
+      ],
+      "updated": "2026-11-23T13:40:40-05:00",
+      "finished": "2026-11-23T13:40:40-05:00",
+      "last_note": "superseded by the assembly ladder A1-A4 (E2-era loop diagnostics; loop curves done as SQ341/SQ348 on the 200M cells)"
     },
     {
       "id": "SQ50",
@@ -616,9 +638,20 @@
       "missing": [],
       "needs_human": false,
       "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_kda_kernel.py",
-      "status": "queued",
+      "status": "dropped",
       "source": "experiments/side-quests.md SQ50; notes/research-kimi-linear.md; the script has a PREDICTION constant",
-      "note": "Autotune can take ~5 min. Copy the script's prediction into PREDICTIONS.md in the registered version (Q1)."
+      "note": "Autotune can take ~5 min. Copy the script's prediction into PREDICTIONS.md in the registered version (Q1).",
+      "history": [
+        {
+          "t": "2026-11-23T13:40:39-05:00",
+          "from": "queued",
+          "to": "dropped",
+          "note": "parked v0.5.9 (decision-node pruning): KDA is off the goal-6 path; GDN decode is gogeta/decode.py"
+        }
+      ],
+      "updated": "2026-11-23T13:40:39-05:00",
+      "finished": "2026-11-23T13:40:39-05:00",
+      "last_note": "parked v0.5.9 (decision-node pruning): KDA is off the goal-6 path; GDN decode is gogeta/decode.py"
     },
     {
       "id": "SQ14",
@@ -639,8 +672,19 @@
       ],
       "needs_human": false,
       "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_14_loop_drift.py --checkpoint ~/fusiondance-data/checkpoints/E2-20261122-132340-s0/model.pt",
-      "status": "queued",
-      "source": "notes/research-looped.md SQ14; experiments/side-quests.md SQ14, SQ30"
+      "status": "dropped",
+      "source": "notes/research-looped.md SQ14; experiments/side-quests.md SQ14, SQ30",
+      "history": [
+        {
+          "t": "2026-11-23T13:40:41-05:00",
+          "from": "queued",
+          "to": "dropped",
+          "note": "superseded by the assembly ladder A1-A4 (E2-era loop diagnostics; loop curves done as SQ341/SQ348 on the 200M cells)"
+        }
+      ],
+      "updated": "2026-11-23T13:40:41-05:00",
+      "finished": "2026-11-23T13:40:41-05:00",
+      "last_note": "superseded by the assembly ladder A1-A4 (E2-era loop diagnostics; loop curves done as SQ341/SQ348 on the 200M cells)"
     },
     {
       "id": "SQ21",
@@ -661,8 +705,19 @@
       ],
       "needs_human": false,
       "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_21_loop_quant.py --checkpoint ~/fusiondance-data/checkpoints/E2-20261122-132340-s0/model.pt",
-      "status": "queued",
-      "source": "notes/research-looped.md SQ21; experiments/side-quests.md SQ21"
+      "status": "dropped",
+      "source": "notes/research-looped.md SQ21; experiments/side-quests.md SQ21",
+      "history": [
+        {
+          "t": "2026-11-23T13:40:40-05:00",
+          "from": "queued",
+          "to": "dropped",
+          "note": "superseded by the assembly ladder A1-A4 (E2-era loop diagnostics; loop curves done as SQ341/SQ348 on the 200M cells)"
+        }
+      ],
+      "updated": "2026-11-23T13:40:40-05:00",
+      "finished": "2026-11-23T13:40:40-05:00",
+      "last_note": "superseded by the assembly ladder A1-A4 (E2-era loop diagnostics; loop curves done as SQ341/SQ348 on the 200M cells)"
     },
     {
       "id": "SQ37",
@@ -684,8 +739,19 @@
       ],
       "needs_human": false,
       "launch": "bash experiments/launch/status.sh && ~/.venvs/gogeta/bin/python experiments/checks/sq_37_repetition.py",
-      "status": "queued",
-      "source": "notes/review-competitors.md SQ37; experiments/side-quests.md SQ37"
+      "status": "dropped",
+      "source": "notes/review-competitors.md SQ37; experiments/side-quests.md SQ37",
+      "history": [
+        {
+          "t": "2026-11-23T13:40:40-05:00",
+          "from": "queued",
+          "to": "dropped",
+          "note": "superseded by the assembly ladder A1-A4 (E2-era loop diagnostics; loop curves done as SQ341/SQ348 on the 200M cells)"
+        }
+      ],
+      "updated": "2026-11-23T13:40:40-05:00",
+      "finished": "2026-11-23T13:40:40-05:00",
+      "last_note": "superseded by the assembly ladder A1-A4 (E2-era loop diagnostics; loop curves done as SQ341/SQ348 on the 200M cells)"
     },
     {
       "id": "Q14",
@@ -854,9 +920,20 @@
       "missing": [],
       "needs_human": false,
       "launch": "LR_E1=$(grep '^E1 ' experiments/launch/campaigns/phase2b-replication.campaign | head -1 | sed 's/.*--lr //') && bash experiments/launch/E3.sh --seed 0 --lr $LR_E1 --wait-cool",
-      "status": "queued",
+      "status": "dropped",
       "source": "registry E3; experiments/cards/E3.md; claims C17",
-      "note": "The registered prediction (0.605-0.645 vs E1 0.5846) was written for lr 3e-3: score as written and compare with E1 at the same LR. Ternary may prefer a different LR than FP; one seed, flag it."
+      "note": "The registered prediction (0.605-0.645 vs E1 0.5846) was written for lr 3e-3: score as written and compare with E1 at the same LR. Ternary may prefer a different LR than FP; one seed, flag it.",
+      "history": [
+        {
+          "t": "2026-11-23T13:40:41-05:00",
+          "from": "queued",
+          "to": "dropped",
+          "note": "superseded: ternary was assembled and its cost measured in F2/A1/A2/A3 (A1e, A2 P3, A3x/A3y)"
+        }
+      ],
+      "updated": "2026-11-23T13:40:41-05:00",
+      "finished": "2026-11-23T13:40:41-05:00",
+      "last_note": "superseded: ternary was assembled and its cost measured in F2/A1/A2/A3 (A1e, A2 P3, A3x/A3y)"
     },
     {
       "id": "Q20",
@@ -1221,8 +1298,19 @@
       ],
       "needs_human": false,
       "launch": "bash experiments/launch/E8.sh",
-      "status": "blocked",
-      "source": "registry E8; claims C19"
+      "status": "running",
+      "source": "registry E8; claims C19",
+      "history": [
+        {
+          "t": "2026-11-23T13:40:41-05:00",
+          "from": "blocked",
+          "to": "running",
+          "note": "self-speculative decoding being built (gogeta/decode.py, builder subagent, v0.5.12); measured on A2s/A4 checkpoints"
+        }
+      ],
+      "updated": "2026-11-23T13:40:41-05:00",
+      "started": "2026-11-23T13:40:41-05:00",
+      "last_note": "self-speculative decoding being built (gogeta/decode.py, builder subagent, v0.5.12); measured on A2s/A4 checkpoints"
     },
     {
       "id": "SQ7",
@@ -1681,6 +1769,62 @@
       "started": "2026-11-22T18:57:07-05:00",
       "last_note": "DOES NOT TRANSFER: out-of-corpus gap +0.42% (CI +0.06..+0.78) vs in-corpus -3.44%; C192 REFUTED (exploratory)",
       "finished": "2026-11-22T19:24:28-05:00"
+    },
+    {
+      "id": "A3",
+      "kind": "train",
+      "title": "A3 all-parts assembly: ternary MoE core + ternary scope (A3m/A3x/A3y/A3mx) vs A2s/A2f/E20/E24, seeds 5-7",
+      "why": "human: keep every component and design around its cost (v0.5.10)",
+      "depends_on": [],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 240
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "fleet (scratchpad a3/ controller)",
+      "status": "running",
+      "source": "experiments/checks/PREDICTIONS.md 'A3 all-parts assembly'; E63 follow-up",
+      "added": "2026-11-23T13:40:48-05:00"
+    },
+    {
+      "id": "A4",
+      "kind": "train",
+      "title": "A4 full stack: coarse-to-fine byte decoder (tokens as patches) on the A3mx trunk; A4a/A4b/A4c vs A3mx, seeds 5-7",
+      "why": "human: everything in one model incl. coarse-to-fine (v0.5.12)",
+      "depends_on": [
+        "A3"
+      ],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 150
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "fleet (C2F jobs, train_c2f.py)",
+      "status": "running",
+      "source": "experiments/checks/PREDICTIONS.md 'A4 full stack'",
+      "added": "2026-11-23T13:40:48-05:00"
+    },
+    {
+      "id": "SQ373",
+      "kind": "side-quest",
+      "title": "SQ373: reward-forgery fix in post_training/rewards.py",
+      "why": "probe showed exec/compile no-op forgery (C83)",
+      "depends_on": [],
+      "resources": {
+        "type": "cpu",
+        "est_minutes": 60
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": null,
+      "status": "done",
+      "source": "experiments/side-quests.md SQ373; v0.5.11",
+      "added": "2026-11-23T13:40:48-05:00"
     }
   ]
 }

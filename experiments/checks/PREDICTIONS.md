@@ -831,3 +831,13 @@ Prompted by outside review 2026-11-23 12:10 (`notes/reviews/2026-11-23-1210-revi
   - The full stack is **viable** if A4a lies within 3% of A3mx (paired 95% CI upper bound <= +3%).
   - The byte refinement loop **earns its place** if R2's CI lies below 0. If A4a ties A4c, it is unique parameters, not sharing.
   - Throughput and memory are reported next to the results. Speculative-decoding acceptance on A4a is a secondary readout.
+
+### A4 amendment 1 (2026-11-23 ~13:50 EST, before any A4 run; outside review 13:40)
+- **Confound found:** A4a (shared r_b = 2) trains with the per-pass auxiliary loss at weight 0.5, and A4b (r_b = 1) cannot use one, so R2 (A4a vs A4b) mixes "second pass" with "deep supervision". A4c matches A4a's aux loss but uses about 4% fewer computed FLOPs (0.963x vs 1.003x A3mx), so R3 is reported with that difference.
+- **Added arm:** **A4d** [142c51551569b410], which is A4a with `refine_aux_weight = 0`, seeds 5-7.
+- **Re-specified tests:**
+  - **R2'** (second shared pass): A4d vs A4b, prediction -1% (range -3% to +0.5%).
+  - **R2''** (deep supervision): A4a vs A4d, prediction -0.5% (range -2% to +1%).
+  - R1 and the viability rule (A4a within 3% of A3mx) are unchanged.
+  - R2 (A4a vs A4b) is still reported, labelled as the combined effect.
+- **Multiplicity:** R2', R2'' and R3 form one Holm family.

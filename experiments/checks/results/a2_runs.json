@@ -131,6 +131,38 @@
    "dataset": "code-py-v2"
   },
   {
+   "run": "A2a-20261123-172502-s2",
+   "arm": "A2a",
+   "seed": 2,
+   "lr": 0.006,
+   "tokens": 200015872.0,
+   "clean80": 0.27263956727236044,
+   "tokens_per_s": 87195.37848685279,
+   "wall_min": 38.23135955731074,
+   "flops": 3.820776792784896e+16,
+   "params_non_embedding": 15380656,
+   "params_total": 18526384,
+   "git": "f85ada5614fc3c5d44eca77f00183817fb7ef9e4",
+   "git_describe": "v0.5.4",
+   "dataset": "code-py-v2"
+  },
+  {
+   "run": "E24-20261123-180403-s3",
+   "arm": "E24",
+   "seed": 3,
+   "lr": 0.003,
+   "tokens": 200015872.0,
+   "clean80": 0.24109955450929155,
+   "tokens_per_s": 96927.42176761104,
+   "wall_min": 34.39272195498149,
+   "flops": 3.714600047267021e+16,
+   "params_non_embedding": 26037728,
+   "params_total": 29183456,
+   "git": "f85ada5614fc3c5d44eca77f00183817fb7ef9e4",
+   "git_describe": "v0.5.4",
+   "dataset": "code-py-v2"
+  },
+  {
    "run": "A1e-20261123-173213-s4",
    "arm": "A1e",
    "seed": 4,

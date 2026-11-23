@@ -21,16 +21,17 @@
    "params_non_embedding": 9460760
   },
   "A1b": {
-   "n_seeds": 1,
+   "n_seeds": 2,
    "per_seed": {
-    "1": 0.0023191899579164676
+    "1": 0.0023191899579164676,
+    "0": -0.004820679270645445
    },
-   "effect": 0.0023191899579164676,
+   "effect": -0.001257124873315451,
    "winner": false,
    "prediction": -0.005,
    "in_predicted_range": true,
-   "mean_clean80": 0.3275926737327689,
-   "tokens_per_s": 377418.31549645856,
+   "mean_clean80": 0.3281511627842378,
+   "tokens_per_s": 377036.7191404562,
    "params_non_embedding": 9463448
   },
   "A1c": {
@@ -76,16 +77,17 @@
    "params_non_embedding": 9460760
   },
   "A1f": {
-   "n_seeds": 1,
+   "n_seeds": 2,
    "per_seed": {
-    "1": 0.00023422126490846293
+    "1": 0.00023422126490846293,
+    "0": 0.0010304242244072448
    },
-   "effect": 0.00023422126490846293,
+   "effect": 0.0006322435523357352,
    "winner": false,
    "prediction": -0.03,
    "in_predicted_range": false,
-   "mean_clean80": 0.32691123365296726,
-   "tokens_per_s": 275155.6781337256,
+   "mean_clean80": 0.32877675813727736,
+   "tokens_per_s": 323270.68515414547,
    "params_non_embedding": 9460760
   },
   "A1g": {
@@ -115,6 +117,48 @@
    "mean_clean80": 0.3098302182138021,
    "tokens_per_s": 327260.381383313,
    "params_non_embedding": 11387748
+  },
+  "A1i": {
+   "n_seeds": 2,
+   "per_seed": {
+    "1": -0.019046834598520745,
+    "0": -0.0233051508321539
+   },
+   "effect": -0.02117830841234471,
+   "winner": true,
+   "prediction": -0.005,
+   "in_predicted_range": false,
+   "mean_clean80": 0.32160685553341306,
+   "tokens_per_s": 340663.9213345193,
+   "params_non_embedding": 9460760
+  },
+  "A1k": {
+   "n_seeds": 2,
+   "per_seed": {
+    "1": 0.012977051080891755,
+    "0": 0.014212593471722546
+   },
+   "effect": 0.013594634015042914,
+   "winner": false,
+   "prediction": 0.0,
+   "in_predicted_range": false,
+   "mean_clean80": 0.3330362054846903,
+   "tokens_per_s": 391155.16873557935,
+   "params_non_embedding": 9460760
+  },
+  "A1z": {
+   "n_seeds": 2,
+   "per_seed": {
+    "1": -0.00040511067968829195,
+    "0": -0.0023623436830204625
+   },
+   "effect": -0.001384206690107303,
+   "winner": false,
+   "prediction": 0.0,
+   "in_predicted_range": true,
+   "mean_clean80": 0.32811196131437426,
+   "tokens_per_s": 384167.4283805088,
+   "params_non_embedding": 9460760
   }
  },
  "winners": [
@@ -122,7 +166,8 @@
   "A1c",
   "A1e",
   "A1g",
-  "A1h"
+  "A1h",
+  "A1i"
  ],
  "any_arm_improves_2pct": true
 }

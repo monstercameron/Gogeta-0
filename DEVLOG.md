@@ -18,6 +18,34 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.13: A1 amendment: placebo stable, fixed depth beats random depth ~3% at equal compute, E27 LR bracketed; outside review 13:10 (full-stack risks)
+*2026-11-23*
+
+**A1 amendment arms read out (placebo, truncation control, LR edge), and the outside review at 13:10 on full-stack integration risks.**
+
+A1 amendment 1 (registered before any A1 result; seeds 0-1, paired with E27; per seed: s0, s1):
+
+| Arm | Effect vs E27 | Reading |
+|---|---|---|
+| **A1z** placebo (E27 re-run on the new fleet) | -0.14% (-0.04, -0.24) | the reference is stable; screen noise is small (prediction \|effect\| < 0.5%: met) |
+| **A1i** full backprop, random r | -2.1% (-1.9, -2.3) | same training compute as A1a (both +17% vs E27) |
+| A1a fixed r = 4 | -5.2% | at equal compute, **fixed depth beats random depth by about 3%**; removing the truncation is worth about 2% |
+| **A1k** E27 at lr 1.2e-2 | +1.4% (+1.3, +1.4) | worse, as 2e-3 was (+0.6%): E27's 6e-3 is bracketed, not at an edge |
+| A1b, A1f (now 2 seeds) | -0.1%, +0.1% | null confirmed |
+
+- **Consequence:** the assembled model's fixed passes with full backprop is the right loop-training recipe.
+- **Outside review 13:10** (the full-stack integration risks):
+  - Draft acceptance at the untrained r = 1 operating point and the numerics margin for "lossless" go to the decode builder's bench. SQ381 (draft-aware training with an auxiliary first-pass loss) is the fallback; random-r training stays rejected per A1a vs A1i.
+  - SQ382: a per-pass MoE routing audit.
+  - SQ383: does the coda attention carry copy-at-distance? Agreed: the GDN copy-deficit fix goes OUTSIDE the loop (more full attention in the prelude or coda), not inside the shared core, where it would be quadratic and paid r times.
+  - The byte-decoder init depth and precision go to the coarse-to-fine builder as a required test.
+  - A3 reports its ternary parameter share; A3mx's ternary sits in the core MoE experts.
+- **Quick review 13:07:** the N1X kernel check is rejected, since no current result depends on the N1X; the decode-timing gate belongs to the 3090/4090 check (SQ285).
+- **Fleet:** the A2 wave is down to its slow last box. A3 trains on 4 boxes, with 2 more loading.
+- **Claim audit 13:07:** skipped; no claim was due (all 131 in cool-down).
+
+---
+
 ## v0.5.12: Full stack (everything): FusionDance hooks for coarse-to-fine; builders start c2f + self-speculative decoding
 *2026-11-23*
 

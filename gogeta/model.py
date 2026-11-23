@@ -9,6 +9,7 @@ Block kinds
     O(n^2) at our 1k context. Swap for a block-sparse kernel before long-context tests.
 
 Every block is pre-norm:  x += mixer(norm(x));  x += SwiGLU(norm(x)).
+With moe_experts > 0 the SwiGLU is a dropless top-k MoE of SwiGLU experts (gogeta/moe.py; off by default).
 
 Looping (when `core` is non-empty):
   e = prelude(embed(tokens))
@@ -32,6 +33,8 @@ from dataclasses import asdict, dataclass, field
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+from gogeta.moe import MoEFFN, combine_aux
 
 
 # ----------------------------------------------------------------------------- config
@@ -59,13 +62,26 @@ class ModelConfig:
     # 1/sqrt(2 * effective_depth). "flat": std 0.02 everywhere, no residual scaling (HF Llama's
     # initializer_range). Default "gogeta" is the pre-existing behaviour, bit-identical.
     init: str = "gogeta"
+    # Code-MoE FFN (E60, gogeta/moe.py): moe_experts > 0 replaces every block's SwiGLU with a dropless top-k MoE of
+    # SwiGLU experts of width moe_hidden. 0 = dense (default): bit-identical to the pre-MoE code, and to_dict()
+    # omits every moe_* key so existing run configs and their hashes are unchanged (tests/test_moe.py).
+    moe_experts: int = 0
+    moe_top_k: int = 2
+    moe_hidden: int = 512
+    moe_balance_coef: float = 0.01   # Switch load-balance loss weight (per MoE layer)
+    moe_zloss_coef: float = 1e-3     # router z-loss weight (per MoE layer)
+    moe_router_frozen: bool = False  # router weights requires_grad=False (frozen random router)
+    moe_impl: str = "gather"         # "gather" (active compute only) | "dense" (all experts, static shapes)
 
     @property
     def head_dim(self) -> int:
         return self.d_model // self.n_heads
 
     def to_dict(self) -> dict:
-        return asdict(self)
+        d = asdict(self)
+        if not self.moe_experts:
+            d = {k: v for k, v in d.items() if not k.startswith("moe_")}
+        return d
 
 
 # ----------------------------------------------------------------------------- BitLinear
@@ -216,10 +232,13 @@ class Block(nn.Module):
             self.mixer = GatedDeltaNet(cfg)
         else:
             raise ValueError(f"unknown block kind {kind!r}")
-        self.mlp = SwiGLU(cfg)
+        self.moe = bool(cfg.moe_experts)
+        self.mlp = MoEFFN(cfg) if self.moe else SwiGLU(cfg)
 
-    def forward(self, x):
+    def forward(self, x, aux: list | None = None):
         x = x + self.mixer(self.norm1(x))
+        if self.moe:
+            return x + self.mlp(self.norm2(x), aux)
         return x + self.mlp(self.norm2(x))
 
 
@@ -227,11 +246,16 @@ class Block(nn.Module):
 class FusionDance(nn.Module):
     def __init__(self, cfg: ModelConfig):
         super().__init__()
+        if cfg.moe_experts and cfg.ternary:
+            raise ValueError("moe_experts > 0 with ternary=True is not supported (no BitLinear for batched experts)")
         self.cfg = cfg
         self.rope = Rotary(cfg.head_dim, cfg.max_seq_len, cfg.rope_base)
         self.embed = nn.Embedding(cfg.vocab_size, cfg.d_model)
         mk = lambda kinds: nn.ModuleList(Block(k, cfg, self.rope) for k in kinds)
         self.prelude, self.core, self.coda = mk(cfg.prelude), mk(cfg.core), mk(cfg.coda)
+        for i, b in enumerate([*self.prelude, *self.core, *self.coda]):
+            if b.moe:
+                b.mlp.layer_idx = i
         if self.core:
             self.inj_norm_h, self.inj_norm_e = nn.RMSNorm(cfg.d_model), nn.RMSNorm(cfg.d_model)
             self.inject = make_linear(cfg, 2 * cfg.d_model, cfg.d_model)
@@ -256,12 +280,19 @@ class FusionDance(nn.Module):
                 nn.init.normal_(m.weight, std=std_res if getattr(m, "is_residual_out", False) else 0.02)
             elif isinstance(m, nn.Embedding):
                 nn.init.normal_(m.weight, std=0.02)
+            elif isinstance(m, MoEFFN):  # batched experts are not nn.Linear: up std 0.02, down std_res (as SwiGLU)
+                m.reset_parameters(0.02, std_res)
 
     # ------------------------------------------------------------------ forward
-    def forward(self, idx: torch.Tensor, targets: torch.Tensor | None = None, loops: int | None = None):
+    def forward(self, idx: torch.Tensor, targets: torch.Tensor | None = None, loops: int | None = None,
+                return_aux: bool = False):
+        """(logits, loss) with loss = LM cross-entropy only. With MoE on and return_aux=True, returns
+        (logits, loss, aux) where aux["loss"] is the weighted MoE auxiliary loss that the trainer adds to the LM
+        loss (gogeta.train.forward_backward), plus detached routing diagnostics (gogeta.moe.combine_aux)."""
+        aux = [] if self.cfg.moe_experts else None
         x = self.embed(idx)
         for b in self.prelude:
-            x = b(x)
+            x = b(x, aux)
         if self.core:
             r = loops if loops is not None else self.cfg.loops
             n_nograd = max(0, r - self.cfg.bptt_loops) if self.training else 0
@@ -270,15 +301,20 @@ class FusionDance(nn.Module):
                 with torch.no_grad() if i < n_nograd else nullcontext():
                     h = h + self.inject(torch.cat([self.inj_norm_h(h), self.inj_norm_e(e)], dim=-1))
                     for b in self.core:
-                        h = b(h)
+                        h = b(h, aux)
             x = h
         for b in self.coda:
-            x = b(x)
+            x = b(x, aux)
         logits = self.head(self.norm_out(x))
-        if targets is None:
-            return logits, None
-        loss = F.cross_entropy(logits.float().reshape(-1, logits.size(-1)), targets.reshape(-1))
+        loss = None
+        if targets is not None:
+            loss = F.cross_entropy(logits.float().reshape(-1, logits.size(-1)), targets.reshape(-1))
+        if return_aux:
+            return logits, loss, (self.moe_aux(aux) if aux else None)
         return logits, loss
+
+    def moe_aux(self, calls: list) -> dict:
+        return combine_aux(calls, self.cfg.moe_balance_coef, self.cfg.moe_zloss_coef)
 
     # ------------------------------------------------------------------ accounting
     def param_counts(self) -> dict:
@@ -288,9 +324,16 @@ class FusionDance(nn.Module):
         emb = self.embed.weight.numel()
         pre, core, coda = n(self.prelude), n(self.core), n(self.coda)
         other = sum(p.numel() for p in self.parameters()) - emb - pre - core - coda
-        return {"total": sum(p.numel() for p in self.parameters()), "embedding": emb,
-                "prelude": pre, "core": core, "coda": coda, "other": other,
-                "non_embedding": pre + core + coda + other}
+        d = {"total": sum(p.numel() for p in self.parameters()), "embedding": emb,
+             "prelude": pre, "core": core, "coda": coda, "other": other,
+             "non_embedding": pre + core + coda + other}
+        if self.cfg.moe_experts:  # MoE: total counts every expert; active counts top_k experts (+ router) per token
+            inact = {s: sum(b.mlp.inactive_params() for b in getattr(self, s) if b.moe) for s in ("prelude", "core", "coda")}
+            n_in = sum(inact.values())
+            d.update({"moe_inactive": n_in, "active_total": d["total"] - n_in,
+                      "active_non_embedding": d["non_embedding"] - n_in,
+                      **{f"active_{s}": d[s] - v for s, v in inact.items()}})
+        return d
 
     def flops_per_token(self, seq_len: int, loops: int | None = None, training: bool = True) -> float:
         """Approximate FLOPs per token (6N rule for matmuls + attention/GDN terms).
@@ -298,12 +341,14 @@ class FusionDance(nn.Module):
         Matmul params counted once per *application* (core counted r times). Attention adds
         4*d*ctx per layer per token forward (QK^T and AV), ctx = mean attended length.
         GDN adds ~4*H*hd^2 per layer per token forward for state read/write. Training = 3x forward.
+        MoE: only *active* params count (top_k experts + router per token), whatever moe_impl computes.
         """
         cfg = self.cfg
         r = (loops or cfg.loops) if self.core else 0
         pc = self.param_counts()
         inj = 2 * cfg.d_model * cfg.d_model if self.core else 0
-        matmul_params = pc["prelude"] + pc["coda"] + r * (pc["core"] + inj) + cfg.d_model * cfg.vocab_size
+        pre, core, coda = (pc.get(f"active_{s}", pc[s]) for s in ("prelude", "core", "coda"))
+        matmul_params = pre + coda + r * (core + inj) + cfg.d_model * cfg.vocab_size
         fwd = 2 * matmul_params
         kinds = list(cfg.prelude) + list(cfg.coda) + r * list(cfg.core)
         for k in kinds:

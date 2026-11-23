@@ -433,7 +433,7 @@
     "arc": "Code-MoE",
     "title": "Code-MoE stage 1-2: MoE FFN as capacity (E1) and as a loop rescue (E2 vs E9)",
     "question": "At matched active FLOPs, does a dropless top-2 MoE FFN (4 experts x 512) lower clean80 bpc vs E1, how much of a dense total-param-matched control's gain does it capture, does learned routing beat a frozen random router, and does MoE help the looped E2 more than its unlooped twin E9 (interaction I)?",
-    "prediction": "TO REGISTER: experiments/checks/PREDICTIONS.md section 'Registered Code-MoE predictions E60' (draft in experiments/design/code-moe-draft.md §5), before any run.",
+    "prediction": "Registered: experiments/checks/PREDICTIONS.md, section 'E60 stage 1' (M1-M3, M5, M8; D1-D3), v0.4.96, before any run.",
     "ingredients": [
       "MoE FFN 4x512 top-2 (dropless)",
       "Switch balance loss 0.01 + z-loss 1e-3",
@@ -451,9 +451,9 @@
     ],
     "status": "planned",
     "version": null,
-    "config": "experiments/staged-configs/code-moe/ (to be staged; needs the code-moe patch)",
+    "config": "experiments/staged-configs/e60/ (e60a_moe, e60b_frozen_router, e60c_dense2048); code gogeta/moe.py (v0.4.96)",
     "results": {},
-    "notes": "Human proposal 2026-11-22 (programming-specialised MoE in the recurrent loop). Semantic supervision (stage 3) and the Byte Quest combo (stage 4) are conditional on stage 1 (SQ255/SQ258/SQ260). Primary metric clean80 bpc; RTX 5090 only, never pooled with N1X runs."
+    "notes": "Human proposal 2026-11-22 (programming-specialised MoE in the recurrent loop). Semantic supervision (stage 3) and the Byte Quest combo (stage 4) are conditional on stage 1 (SQ255/SQ258/SQ260). Primary metric clean80 bpc; RTX 5090 only, never pooled with N1X runs. Ungated v0.4.94 (SQ282: lever = unique params; SQ238 done)."
   },
   {
     "id": "E61",

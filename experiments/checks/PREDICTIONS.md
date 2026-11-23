@@ -682,3 +682,24 @@ Source: outside review 2026-11-23 00:10. C197's limitation (event 4): E34, which
   - **H3'** (descriptive): the 200M interaction contrast, computed at each cell's better LR, is reported with its CI. At n = 3 it is underpowered and is not a confirmatory test.
 - **Decision rule:** if H2' holds, F2's 20M interaction is conditional on 20M-selected LRs, and any 200M statement must use the per-cell best LR. F2's registered 20M analysis is unchanged either way.
 - **Blinding:** SQ263 results are not analysed or looked at until F2's registered analysis has been run and recorded. The monitor redacts these runs too, because they carry E2x names.
+
+## E60 stage 1 (2026-11-23 ~02:30 EST, before dispatch): Code-MoE core (E60a/E60b/E60c)
+- **Design:** `experiments/design/code-moe-draft.md` §3–§5. The code lands in v0.4.96 (`gogeta/moe.py`): off by default, and bit-identical for dense models, pinned by `tests/test_moe.py`.
+- **Arms** (code-py-v1, 200M tokens, RTX 5090, clean80 bpc; sha256-16 in brackets):
+  - **E60a** `staged-configs/e60/e60a_moe.json` [b06cbada9d0604ac]: E1 with a dropless 4 × 512 top-2 MoE FFN, balance 0.01, z-loss 1e-3. 18.2M total non-embedding params, 11.1M active.
+  - **E60b** `e60b_frozen_router.json` [6d3c11ecb472bc18]: E60a with a frozen random router, balance and z-loss off.
+  - **E60c** `e60c_dense2048.json` [2bce1f8d7ff0eb42]: dense SwiGLU 2048, total-param matched (1.47× E1 FLOPs).
+  - **Reference:** E1, the 7 Phase 2b-5090 seeds.
+- **LR (G3 rule):** each arm at lr ∈ {3e-3, 6e-3, 1.2e-2}, seed 0, 20M tokens (9 runs). The 200M runs use each arm's argmin. If the argmin is at a grid edge by more than 2%, one extension point is run.
+- **200M:** E60a, E60b and E60c × seeds 0–5 (18 runs). E60d (8 experts) is deferred.
+- **Predictions** (log clean80, relative):
+  - **M1:** E60a − E1 = −1.8% (−0.8% to −3.5%).
+  - **M2:** E60c − E1 = −3.0% (−1.5% to −4.5%). E60a is worse than E60c by 0.3–2.0%.
+  - **M3:** |E60a − E60b| ≤ 0.8%.
+  - **M5** (descriptive): max per-expert share ≤ 0.35 in every layer at the end of training, and no expert below 2%.
+  - **M8** (descriptive): measured tok/s of E60a vs E1 is 0.55–0.80, and of E60c vs E1 is 0.70–0.85.
+- **Decisions:**
+  - **D1:** the Welch 95% CI of E60a − E1 lies below 0 and the effect exceeds the MDE (about 0.8%) → a new claim; otherwise record "MoE buys nothing measurable at 14M / 200M".
+  - **D2:** the CI of E60a − E60b lies below 0 → learned routing matters; otherwise "the gain is capacity, not routing".
+  - **D3:** compare E60a and E60c per measured GPU-minute.
+- **Context:** SQ282 (v0.4.94) found the C197 lever is unique params, not depth, so E60 is ungated. The stage-1 "max expert load > 0.6 or NaN" instability check gates stage 2.

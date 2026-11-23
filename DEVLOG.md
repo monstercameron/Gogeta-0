@@ -18,6 +18,58 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.96: Code-MoE layer for E60 (off by default, bit-identical); E60 stage 1 registered; outside review 02:09 (SQ320-SQ324)
+*2026-11-23*
+
+**Code-MoE FFN for E60** (subagent, Opus; the main agent re-ran every suite):
+- **`gogeta/moe.py`:** a dropless top-k MoE FFN with SwiGLU experts.
+  - Routing is softmax top-k with renormalised gates, depends only on the current token, and has no capacity dropping and no expert-choice routing.
+  - It adds a Switch balance loss and a router z-loss, with an optional frozen router.
+  - The `gather` dispatch computes only the active experts; the `dense` dispatch is an option.
+- **Off by default:** new `ModelConfig` fields `moe_*` (and mirrored in `gogeta/hf.py`), with `moe_experts = 0` meaning dense. With them off, models are **bit-identical**, pinned in `tests/test_moe.py` against values captured on the unmodified code. For E0/E1/E2/E3/E9/E11 it pins:
+  - the initial state_dict sha256;
+  - the RNG state after construction;
+  - `to_dict` and `param_counts`;
+  - FLOPs as float hex;
+  - the first 3 AdamW losses for E0/E1/E2.
+- **`train.py`:** the aux loss is added to the backward pass only for MoE models. Reported and val losses stay LM-only, and `moe/*` stats are logged.
+- **Tests, re-run by the main agent** (`experiments/checks/results/test-runs/2026-11-23-C100-C80.txt`):
+  - `tests.test_options` + `tests.test_moe`: 28 OK, 1 skipped (needs a GPU);
+  - `post_training.test_hf`: 10/10;
+  - `evals.test_wiring`: 6/6.
+  - Causality holds (perturbing future tokens leaves past logits within 1e-6).
+  - Gather equals dense dispatch to 1e-5.
+- **E60 configs** (`experiments/staged-configs/e60/`):
+
+  | Arm | What it is | Non-embedding params | FLOPs vs E1 |
+  |---|---|---|---|
+  | E60a | 4 × 512 top-2 MoE | 18.2M total, 11.1M active | 1.00× |
+  | E60b | E60a with a frozen router, balance/z-loss off | as E60a | 1.00× |
+  | E60c | dense SwiGLU 2048, total-param matched | 18.2M | 1.47× |
+
+- **Not yet measured:** GPU throughput, and inductor compile of the gather path (it graph-breaks; the dense dispatch is the fallback).
+
+**E60 stage 1 registered** (`experiments/checks/PREDICTIONS.md`):
+- **LR:** a G3 grid at 20M (9 runs), then 3 arms × 6 seeds at 200M.
+- **Predictions:**
+  - **M1:** E60a − E1 = −1.8%;
+  - **M2:** E60c − E1 = −3.0%;
+  - **M3:** |E60a − E60b| ≤ 0.8%.
+- **Decisions:** D1–D3 as in the design.
+- **Cost:** about 2.5 GPU-h, about $1.5, which fits the remaining budget.
+- E60 is ungated by SQ282 and SQ238.
+
+**Outside review 02:09 (Haiku), triaged:**
+- **Accepted:**
+  - SQ320: position-in-window loss split;
+  - SQ321: a long causal conv mixer vs GDN;
+  - SQ322: a one-rule TOST symmetry pass, a fair hit, because C197's "unique params" lever rests on SQ282's registered tie rule, not an equivalence test;
+  - SQ323: clean-threshold sensitivity;
+  - SQ324: a horizon replot.
+- **Rejected:** a ternary width sweep, already covered by the F2 ternary factor, E3 and SQ290.
+
+---
+
 ## v0.4.95: Claim audit 2026-11-23-0209: 48 claims, 17 non-SOLID; C200, C1, C131 downgraded to PARTIAL; C5 qualifier
 *2026-11-23*
 

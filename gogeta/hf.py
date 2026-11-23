@@ -78,6 +78,15 @@ class GogetaConfig(PreTrainedConfig):
     ternary: bool = False
     gdn_neg_eigval: bool = False  # v0.4.7 (E11): beta in (0, 2) via the kernel's 2*sigmoid
     init: str = "gogeta"          # ModelConfig.init: "gogeta" (scaled residual-output init) | "flat"
+    # ModelConfig.moe_* (E60 Code-MoE FFN, gogeta/moe.py); defaults = dense. Not inherited from to_dict() of a
+    # dense ModelConfig (it omits moe_* keys), so these defaults must equal ModelConfig's.
+    moe_experts: int = 0
+    moe_top_k: int = 2
+    moe_hidden: int = 512
+    moe_balance_coef: float = 0.01
+    moe_zloss_coef: float = 0.001
+    moe_router_frozen: bool = False
+    moe_impl: str = "gather"
     tie_word_embeddings: bool = True
     # HF / generation fields (ids match gogeta/assets/tokenizer-code-py-v1.json)
     eos_token_id: int | None = 0

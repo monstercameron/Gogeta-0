@@ -1,0 +1,46 @@
+{
+  "experiment": "E60a",
+  "description": "Code-MoE stage 1: E1 (configs/e1_hybrid.json) with every SwiGLU replaced by a dropless top-2 MoE of 4 SwiGLU experts x 512 (Switch balance 0.01, router z-loss 1e-3, learned router); matched active FLOPs to E1, 1.64x non-embedding params.",
+  "model": {
+    "vocab_size": 8192,
+    "d_model": 384,
+    "n_heads": 6,
+    "mlp_hidden": 1024,
+    "prelude": [
+      "swa",
+      "gdn",
+      "gdn",
+      "swa",
+      "gdn",
+      "attn"
+    ],
+    "core": [],
+    "coda": [],
+    "window": 256,
+    "max_seq_len": 1024,
+    "ternary": false,
+    "moe_experts": 4,
+    "moe_top_k": 2,
+    "moe_hidden": 512,
+    "moe_balance_coef": 0.01,
+    "moe_zloss_coef": 0.001,
+    "moe_router_frozen": false,
+    "moe_impl": "gather"
+  },
+  "train": {
+    "dataset": "code-py-v1",
+    "seq_len": 1024,
+    "batch_size": 32,
+    "max_tokens": 200000000,
+    "lr": 0.006,
+    "min_lr_frac": 0.1,
+    "warmup_steps": 300,
+    "weight_decay": 0.1,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "grad_clip": 1.0,
+    "eval_every": 250,
+    "eval_seqs": 128,
+    "seed": 0
+  }
+}

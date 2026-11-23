@@ -20,6 +20,9 @@ Opt-in options (all OFF by default; defaults are bit-identical to the pre-option
                         init) | "gogeta" (std 0.02, residual outputs o_proj/down_proj scaled by 1/sqrt(2*layers))
   train.schedule        "cosine" (default) | "wsd" (warmup, constant, linear decay over the last train.decay_frac)
   train.micro_batch     default = batch_size (no accumulation); else gradient accumulation, --micro-batch overrides
+  model.moe_experts     0 (default, dense SwiGLU) | E > 0: Code-MoE FFN (gogeta/moe.py). The MoE auxiliary loss
+                        (balance + z-loss) is added to the LM loss for backprop; train/loss and val/loss stay LM-only,
+                        moe/* and train/loss_total are logged separately.
 """
 from __future__ import annotations
 
@@ -177,11 +180,19 @@ def micro_batches(tc: dict) -> tuple[int, int]:
     return mb, B // mb
 
 
-def forward_backward(fwd_model, x, y, r, n_micro: int = 1):
+def is_moe(model) -> bool:
+    return bool(getattr(getattr(model, "cfg", None), "moe_experts", 0))
+
+
+def forward_backward(fwd_model, x, y, r, n_micro: int = 1, stats: dict | None = None):
     """Forward + backward on one optimizer step's batch; returns the (mean) loss.
     n_micro == 1 is the plain full-batch step. Otherwise the same batch is split into n_micro equal row
     chunks, each backpropagated with loss/n_micro, so the summed gradient equals the full-batch mean-loss
-    gradient (equal token counts per chunk) up to float associativity; same data order, same effective batch."""
+    gradient (equal token counts per chunk) up to float associativity; same data order, same effective batch.
+    MoE models (model.moe_experts > 0) backprop LM loss + the MoE auxiliary loss; the returned loss is still
+    the LM loss only, and `stats` (if given) receives the detached aux diagnostics (see _forward_backward_moe)."""
+    if is_moe(fwd_model):
+        return _forward_backward_moe(fwd_model, x, y, r, n_micro, stats)
     if n_micro == 1:
         with torch.autocast("cuda", dtype=torch.bfloat16):
             _, loss = fwd_model(x, y, loops=r)
@@ -193,6 +204,25 @@ def forward_backward(fwd_model, x, y, r, n_micro: int = 1):
             _, loss = fwd_model(xs, ys, loops=r)
         (loss / n_micro).backward()
         total = total + loss.detach() / n_micro
+    return total
+
+
+MOE_STATS = ("aux", "balance", "z", "max_load", "min_load", "entropy")
+
+
+def _forward_backward_moe(fwd_model, x, y, r, n_micro, stats):
+    """As forward_backward, but backprops (lm + aux["loss"]) / n_micro per chunk. stats gets the micro-batch
+    means of the detached tensors moe/{aux,balance,z,max_load,min_load,entropy} (no host sync here)."""
+    total, acc = 0.0, {k: 0.0 for k in MOE_STATS}
+    for xs, ys in (zip(x.chunk(n_micro), y.chunk(n_micro)) if n_micro > 1 else [(x, y)]):
+        with torch.autocast("cuda", dtype=torch.bfloat16):
+            _, loss, aux = fwd_model(xs, ys, loops=r, return_aux=True)
+        ((loss + aux["loss"]) / n_micro).backward()
+        total = total + loss.detach() / n_micro
+        for k in MOE_STATS:
+            acc[k] = acc[k] + (aux["loss"] if k == "aux" else aux[k]).detach().float() / n_micro
+    if stats is not None:
+        stats.update(acc)
     return total
 
 
@@ -300,7 +330,8 @@ def main():
                 gp["lr"] = lr
             r = loop_rng.randint(mc.loops_min, mc.loops_max) if looped else None
             x, y = data.batch(tc["batch_size"], device)
-            loss = forward_backward(fwd_model, x, y, r, micro_batches(tc)[1])
+            moe_stats = {} if is_moe(model) else None
+            loss = forward_backward(fwd_model, x, y, r, micro_batches(tc)[1], moe_stats)
             gnorm = torch.nn.utils.clip_grad_norm_(model.parameters(), tc["grad_clip"])
             opt.step()
             opt.zero_grad(set_to_none=True)
@@ -317,11 +348,16 @@ def main():
                      "tokens": tokens, "flops": flops, "perf/tokens_per_s": tps}
                 if looped:
                     m["train/loops"] = r
+                if moe_stats:   # train/loss stays the LM loss; the optimised total is LM + moe/aux
+                    m.update({f"moe/{k}": v.item() for k, v in moe_stats.items()})
+                    m["train/loss_total"] = loss.item() + m["moe/aux"]
                 if run:
                     run.log(m, step=step)
                 if step % 100 == 0:
                     print(f"step {step:6d}/{total_steps} loss {loss.item():.4f} lr {lr:.2e} "
-                          f"gn {gnorm.item():.2f} {tps/1e3:.0f}k tok/s r={r}", flush=True)
+                          f"gn {gnorm.item():.2f} {tps/1e3:.0f}k tok/s r={r}"
+                          + (f" moe_aux {m['moe/aux']:.4f} max_load {m['moe/max_load']:.3f}" if moe_stats else ""),
+                          flush=True)
             if run and (step % tc["eval_every"] == 0 or step == total_steps - 1) and step > 0:
                 vl = evaluate(model, data, tc["eval_seqs"], tc["batch_size"], device)
                 run.log({"val/loss": vl, "tokens": tokens, "flops": flops}, step=step)

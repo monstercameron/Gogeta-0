@@ -841,3 +841,9 @@ Prompted by outside review 2026-11-23 12:10 (`notes/reviews/2026-11-23-1210-revi
   - R1 and the viability rule (A4a within 3% of A3mx) are unchanged.
   - R2 (A4a vs A4b) is still reported, labelled as the combined effect.
 - **Multiplicity:** R2', R2'' and R3 form one Holm family.
+
+### A3 amendment 1 (2026-11-23 ~14:10 EST, before these runs; claim audit 2026-11-23-1404): learning-rate bracket for the A arms
+- **Why:** statistics policy section 2.3 requires both arms of a VERIFIED training comparison to be tuned or LR-robust. Every A2/A3 arm ran at 6e-3, inherited from E27's bracket (v0.5.13), and A2s/A3mx were never bracketed. C206-C208 are PARTIAL until this is settled.
+- **Runs:** A2s and A3mx at lr 3e-3 and 1.2e-2, seed 5, 200M tokens of code-py-v2 (4 runs; configs `a2/a2s.json`, `a3/a3mx.json`), on the A3/A4 fleet.
+- **Rule:** an arm is **LR-robust at 6e-3** if its seed-5 clean80 at 6e-3 is within 1% of the best of {3e-3, 6e-3, 1.2e-2}. If both A2s and A3mx pass, C206-C208 return to VERIFIED on their registered results. If either fails, the affected A3 comparisons are re-run at the better LR (seeds 5-7) before any upgrade.
+- **Prediction:** both pass (6e-3 within 1% of the best), because E27's family optimum sits at 6e-3 and the A arms share its recipe.

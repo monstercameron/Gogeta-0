@@ -105,7 +105,7 @@ def main():
     print("provenance:", "OK" if not bad else f"MISMATCH {bad}")
     y = {}
     for r in runs:
-        if r["arm"] in LR and abs(r["lr"] - LR[r["arm"]]) > 1e-12:
+        if abs(r["lr"] - LR.get(r["arm"], 0.006)) > 1e-12:   # A arms at 6e-3; LR-bracket runs (A3 amendment 1) go to `lr_bracket`
             continue
         y.setdefault(r["arm"], {})[r["seed"]] = r["clean80"]
     g = lambda a: y.get(a, {})  # noqa: E731
@@ -154,16 +154,23 @@ def main():
         am2["confirmed (3-seed CI below 0 and <= -1%)"] = (am2["n"] >= 3 and am2["rel"] <= -0.01 and am2.get("ci95", [0, 0])[1] < 0)
     sec = {}
     for arm in ARMS:
-        rr = [r for r in runs if r["arm"] == arm and (arm not in LR or abs(r["lr"] - LR[arm]) < 1e-12) and r.get("tokens_per_s")]
+        rr = [r for r in runs if r["arm"] == arm and abs(r["lr"] - LR.get(arm, 0.006)) < 1e-12 and r.get("tokens_per_s")]
         if rr:
             sec[arm] = {"tokens_per_s": st.mean(r["tokens_per_s"] for r in rr), "wall_min": st.mean(r["wall_min"] for r in rr),
                         "flops": rr[0]["flops"], "params_total": rr[0]["params_total"],
                         "params_non_embedding": rr[0]["params_non_embedding"], "n": len(rr)}
+    lrb = {}
+    for r in runs:
+        if r["arm"] in ("A2s", "A3mx") and r["seed"] == 5:
+            lrb.setdefault(r["arm"], {})[str(r["lr"])] = r["clean80"]
+    for arm, d in lrb.items():
+        best = min(d.values())
+        d["robust_at_6e-3 (within 1% of best)"] = (d["0.006"] / best - 1 <= 0.01) if "0.006" in d and len(d) >= 3 else None
     mem = os.path.join(RES, "a3_memory.json")
     for c in list(res.values()) + [am2]:
         c.pop("_mlog", None)
     out = {"clean80": {a: dict(sorted(d.items())) for a, d in y.items()}, "predictions": res, "decisions": dec,
-           "A1_amendment2_A1a_vs_A1i": am2, "secondary_throughput_params": sec,
+           "A1_amendment2_A1a_vs_A1i": am2, "A3_amendment1_lr_bracket": lrb, "secondary_throughput_params": sec,
            "weight_memory": json.load(open(mem))["arms"] if os.path.exists(mem) else None,
            "provenance": {"commits": COMMITS, "note": "training-equivalent (see COMMITS comment)", "mismatch": bad}}
     json.dump(out, open(os.path.join(RES, "a3_assembled.json"), "w", newline="\n"), indent=1, default=str)

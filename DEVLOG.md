@@ -18,6 +18,23 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.18: Claim audit 2026-11-23-1404: C206-C208 to PARTIAL pending an LR bracket (registered, running); C204 superseded by C209 (compute difference stated); C205 reporting fixed
+*2026-11-23*
+
+**Claim audit 2026-11-23-1404: five auditors on the five newest claims, all WEAK and all confirmed after checking. Three downgrades to PARTIAL, one supersession, one reporting fix, and an LR bracket registered to settle the downgrades.**
+
+- **Scope:** only five claims were due (C204-C208); every other claim is in its 6-hour cool-down. One Codex GPT-6 Luna auditor per claim (`notes/reviews/claims/2026-11-23-1404-b1..b5.md`), all ok.
+- **Downgrades (VERIFIED -> PARTIAL):**
+  - **C206** (ternary MoE core -3.3%) and **C207** (ternary cost splits evenly): statistics policy 2.3 requires both arms tuned or LR-robust. A2s and the A3 arms all ran at 6e-3, inherited from E27's bracket, and were never bracketed themselves.
+  - **C208** (all-parts model's standing): the same gap, and here it matters for direction, since A3mx (untuned) trails E24 and E20 at their tuned 3e-3. Limitations added: E20 used 6% more training FLOPs than A3mx (4.01e16 vs 3.79e16), and "+1.1% vs E20" is an inconclusive point estimate, not equivalence.
+  - C207 also gains an attribution fix: the +9.5% full-precision gap is A2's P3, not C204.
+- **Superseded:** **C204 -> C209** (VERIFIED). C204 said "matched training FLOPs", but E27 trains on about 10% less compute (truncated BPTT; 3.41-3.43e16 vs 3.79e16). C209 states the compute difference. The effect (-16.67% [-17.74, -15.58], dz -31) is far larger than the A1 screen's compute-matched lever (about 3%).
+- **Reporting fix, status kept:** **C205** gains dz -30.1, identical FLOPs and params for A1e and E27, and the LR note. E27's 6e-3 is bracketed, and A1e is the untuned winner, so a better LR could only enlarge the effect.
+- **A3 amendment 1 (registered before running):** A2s and A3mx at lr 3e-3 and 1.2e-2, seed 5, on the A3/A4 fleet (the low-LR pair started on box 4 at 14:07). Rule: 6e-3 within 1% of the best restores C206-C208 to VERIFIED; otherwise the affected comparisons re-run at the better LR. `a3_assembled.py` now keeps the bracket runs out of the paired comparisons.
+- **Quick review 14:04 (competitor lab):** repo-held-out ranking merged into SQ379, packed-ternary batch-1 latency merged into SQ378; its deployment-metric question is answered in the triage footer.
+
+---
+
 ## v0.5.17: A3 final: all four fixes count (MoE core -3.3%, FP mixers -5.0%, FP FFN -5.2%, all parts -7.7%); the all-parts model ties full precision but trails unshared GDN by 4.4% (C206-C208)
 *2026-11-23*
 

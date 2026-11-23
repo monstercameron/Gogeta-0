@@ -18,6 +18,21 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.105: Docs refresh (hourly)
+*2026-11-23*
+
+**Docs refresh (hourly, Haiku; checked by the main agent).** The shared documents now match v0.4.103–v0.4.104:
+- **README:**
+  - status paragraph: the 200M F2 reversal as log-points, the SQ337 trajectory, SQ338's 1.62x wall time and the torn-down fleet;
+  - a new "The fusion does not stack at 200M" result bullet;
+  - the "Start reading here" C201 line is corrected (overlap at 20M, compound at 200M);
+  - a stale "stage 2 is dispatching, cells blinded" sentence now says F2 is analysed.
+- **notes/sketch.md:** decisions-log lines for v0.4.98 to v0.4.104; status at v0.4.104 (claims 18/27/9/2/1/71/2 = 130; fleet 0 instances; queue).
+- **experiments/launch/campaigns/README.md:** queue timestamp updated.
+- **post_training/SETUP.md:** status date updated; the sandbox list now includes /var/tmp, self-test 12/12.
+
+---
+
 ## v0.4.104: Outside review 08:37: the 200M anti-synergy grows through training (SQ337); GDN loses at equal wall-clock (SQ338); LR-artifact claim corrected
 *2026-11-23*
 

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-23T15:16:21-05:00",
+  "updated": "2026-11-23T16:05:51-05:00",
   "policy": "Order = priority, highest first; `next` walks the list top to bottom and returns the first item that is queued, ready, has all dependencies done and needs no human. Ordering rule: scientific value per GPU-minute, with validity first. (1) Controls, tuning and seeds that make existing claims trustworthy: K8 leakage/arithmetic check, K7 LR sweep, tuned 3-seed E10 and E1, E9, conditional E0/E2 re-runs, replication verdicts. Every later comparison is only as good as these. (2) Cheap inference-only diagnostics on existing checkpoints (SQ50, SQ14, SQ21, SQ37, eval suite) and the K3 redesign. They cost 4-20 GPU-minutes and decide what to build next; because the campaign runner is sequential, use `next --gpu --max-minutes 10` to slot them between campaign items or while a run is cooling. (3) Thesis-critical experiments: E11 (then 3 seeds), looped neg-eig parity, E3 at the tuned LR, the loop fixes (SQ15, SQ16, loop norm) gated on SQ14, neg-eig in the looped core, SQ32. (4) Side quests (gates, KDA, NoPE, decode path, ternary x loop, computed tables, research searches). (5) Long-term: E4 full fusion, E8, Mamba-3. Compute budget (AGENTS 5): one GPU item running at a time; up to 8 CPU items alongside, thread-capped by the launcher. CPU items that can run in parallel with any GPU job: Q3, Q5 (K7 analysis), Q6, Q13, Q15, Q18, Q20 (authoring: write scripts and register predictions), Q12 (verdict writing), SQ1, SQ41. Authoring items edit experiments/checks/PREDICTIONS.md and should be done one at a time by the main agent (or by subagents given disjoint files). Items needing a registered prediction wait for Q1 (the tagged 'registered' version). New items enter via `queue.py add` and are appended at the end; reordering needs an explicit `move --reason`. Estimates come from compiled throughputs (E0 210k tok/s, E1 100k, E2 44k) plus ~2 min launch/compile overhead; they are planning numbers, not measurements. needs_human items are never picked by `next`.",
   "order_log": [
     {
@@ -1308,7 +1308,7 @@
       ],
       "needs_human": false,
       "launch": "bash experiments/launch/E8.sh",
-      "status": "running",
+      "status": "queued",
       "source": "registry E8; claims C19",
       "history": [
         {
@@ -1328,11 +1328,17 @@
           "from": "running",
           "to": "running",
           "note": "decode path built in v0.5.20 (gogeta/decode.py); CPU bench: lossless FAIL at near-ties under int8 activations. Next: GPU wall-clock bench of greedy vs self-speculative decode at batch 1 on a rented 24 GB card (RTX 3090 or 4090, the goal-6 deployment target; SQ220 showed 3090s rent on Vast), after the fla decode path is validated on CUDA (quick review 2026-11-23 15:14)."
+        },
+        {
+          "t": "2026-11-23T16:05:50-05:00",
+          "from": "running",
+          "to": "queued",
+          "note": "no GPU job running for E8: decode path built (v0.5.20), CPU bench done; the batch-1 GPU bench waits for a rented 24 GB card (RTX 3090/4090) after the fla decode path is validated on CUDA"
         }
       ],
-      "updated": "2026-11-23T15:16:21-05:00",
+      "updated": "2026-11-23T16:05:50-05:00",
       "started": "2026-11-23T15:16:21-05:00",
-      "last_note": "decode path built in v0.5.20 (gogeta/decode.py); CPU bench: lossless FAIL at near-ties under int8 activations. Next: GPU wall-clock bench of greedy vs self-speculative decode at batch 1 on a rented 24 GB card (RTX 3090 or 4090, the goal-6 deployment target; SQ220 showed 3090s rent on Vast), after the fla decode path is validated on CUDA (quick review 2026-11-23 15:14)."
+      "last_note": "no GPU job running for E8: decode path built (v0.5.20), CPU bench done; the batch-1 GPU bench waits for a rented 24 GB card (RTX 3090/4090) after the fla decode path is validated on CUDA"
     },
     {
       "id": "SQ7",
@@ -1869,6 +1875,35 @@
       "status": "done",
       "source": "experiments/side-quests.md SQ373; v0.5.11",
       "added": "2026-11-23T13:40:48-05:00"
+    },
+    {
+      "id": "B1",
+      "kind": "train",
+      "title": "GPU batch B1 (20M screens): SQ401 MoE core vs dense-2048 capacity, SQ402 fixed GDN beta, SQ404 core LR multiplier vs E24; 23 runs on one rented RTX 5090",
+      "why": "outside reviews 15:07 and 15:37: capacity, delta-rule and sharing-step-size confounds behind C206, the GDN mixer and the loop cost (C197/D3); human: 'Yes, rent one'",
+      "depends_on": [],
+      "resources": {
+        "type": "gpu",
+        "est_minutes": 80
+      },
+      "ready": true,
+      "missing": [],
+      "needs_human": false,
+      "launch": "fleet (scratchpad b1/, one box)",
+      "status": "running",
+      "source": "experiments/checks/PREDICTIONS.md 'GPU batch B1'",
+      "added": "2026-11-23T16:05:43-05:00",
+      "history": [
+        {
+          "t": "2026-11-23T16:05:51-05:00",
+          "from": "queued",
+          "to": "running",
+          "note": "box gogeta-cockpit-b1-1 rented ~15:57, bootstrapped at v0.5.31"
+        }
+      ],
+      "updated": "2026-11-23T16:05:51-05:00",
+      "started": "2026-11-23T16:05:51-05:00",
+      "last_note": "box gogeta-cockpit-b1-1 rented ~15:57, bootstrapped at v0.5.31"
     }
   ]
 }

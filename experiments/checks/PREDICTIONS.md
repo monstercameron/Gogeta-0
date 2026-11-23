@@ -915,3 +915,14 @@ All runs use code-py-v2, 20M tokens and one rented RTX 5090. They are explorator
 - **Rule:**
   - If the best multiplier closes more than half of the 20M gap, the A2f vs E24 comparison (C209 limitation, D3) is re-run at 200M at that multiplier before any loop-cost conclusion.
   - If the best multiplier is 1, or it closes less than half the gap, the loop cost is not a step-size artifact at 20M.
+
+### B1 amendment 1 (2026-11-23 ~16:15 EST, before these runs; outside review 16:07, 2.2): SQ350, parameter-matched loop control
+- **Why:** the D3 loop cost (A2f vs E24 +3.2%) mixes looping with the unique-parameter deficit, because A2f's 6-block core run twice has half the unique core parameters of E24's 12 unshared blocks (C197's lever).
+- **Added arm:** **A2f at one pass** (`b1/sq350_a2f_r1.json`: 6 core blocks x 1, same unique params as A2f, half its core FLOPs), seeds 0-1, lr 6e-3, 20M tokens. It is paired with B1's SQ404 arms A2f (6 x 2, mult 1) and E24 (12 x 1, lr 3e-3) at the same seeds.
+- **Decomposition:**
+  - A2f(6x2) - A2f(6x1) is the loop effect at equal unique params;
+  - E24(12x1) - A2f(6x2) is the unique-param effect at equal FLOPs.
+- **Prediction:** A2f(6x2) vs A2f(6x1) = -4% (range -8% to -1%): the second pass helps at equal params, but less than the doubling of unique params that E24 gets.
+- **Rule** (exploratory, 2 seeds):
+  - If the loop effect at equal params is at least 3x the size of A2f's remaining gap to E24, loops are a real compute lever and the D3 cost is mainly a unique-parameter cost (C197). C197's wording then gains "at matched FLOPs, not matched params".
+  - If the loop effect is under 1%, the second pass does little even at equal params.

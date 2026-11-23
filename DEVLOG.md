@@ -18,6 +18,25 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.33: Outside review 16:07: SQ350 parameter-matched loop control added to the running B1 batch (amendment 1); SQ408, SQ409; C212 selection-seed limitation; B1 box training
+*2026-11-23*
+
+**Outside review 16:07: SQ350 (parameter-matched loop control) promoted into the running B1 batch as amendment 1. Two new side quests. C212 gains a selection-seed limitation. The B1 box is up and training.**
+
+- **B1 status:** the box (RTX 5090) passed its GPU tests at v0.5.31: `test_model` 12/12 and `test_assembly` 16/16, including the new switches on CUDA. v1/v2 data are rebuilt and verified. The worker launched at 16:11 with the 23 registered jobs.
+- **Outside review** (`notes/reviews/2026-11-23-1607-review.md`, Haiku), triaged in its footer:
+  - **B1 amendment 1 (registered before these runs): SQ350.** A2f at one pass (6 x 1, same unique params as A2f, half the core FLOPs), seeds 0-1, queued on the B1 box (config `b1/sq350_a2f_r1.json` [603ff93bdcc9d59e]). With B1's A2f (6 x 2) and E24 (12 x 1), it splits the D3 loop cost into a loop effect at equal params and a unique-param effect at equal FLOPs. Prediction: A2f(6x2) vs A2f(6x1) = -4% (-8% to -1%).
+  - **C212 limitation:** seeds 0-1 both chose and tested A1a, so the CI is not a fresh-seed interval. The fresh seed alone gives -3.11%.
+  - **New:** SQ408 (zero-parameter conjugated passes, pass identity) and SQ409 (line-permutation re-score: does the assembly gain need document structure?).
+  - **Merged:** an SWA-only arm into SQ392 (window vs RoPE at 2,048), and a shared-vs-unshared ternary threshold sweep into SQ365.
+  - **Partly rejected:** "E27 is untuned". Its LR is bracketed (v0.5.13); it is the naive fusion with default choices, as C209 states.
+- **Queue:** B1 added and running. E8 is corrected from "running" to "queued", since no GPU job ran for it; its batch-1 bench waits for a 24 GB card.
+- **Quick reviews:**
+  - 16:04 (competitor lab): renaming is already in SQ194; a large renaming gap would narrow C209's scope, not refute it.
+  - 16:09 (systems): throughput is a secondary readout; per-run tokens/s are logged, but GPU clocks and temperature are not.
+
+---
+
 ## v0.5.32: Claim audit 2026-11-23-1602: C213 gains a scale-compression confound (stays UNVERIFIED); B1 decode tests pass
 *2026-11-23*
 

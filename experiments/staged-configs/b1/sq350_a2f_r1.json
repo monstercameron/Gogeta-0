@@ -1,0 +1,49 @@
+{
+ "experiment": "SQ350r1",
+ "description": "SQ350 (B1 amendment 1): A2f run at one pass (6 unique core blocks x 1): same unique parameters as A2f (6x2), half its core FLOPs. Parameter-matched loop control. 20M tokens.",
+ "model": {
+  "vocab_size": 8192,
+  "d_model": 384,
+  "n_heads": 6,
+  "mlp_hidden": 1024,
+  "window": 256,
+  "max_seq_len": 1024,
+  "ternary": false,
+  "prelude": [
+   "swa"
+  ],
+  "core": [
+   "gdn",
+   "gdn",
+   "swa",
+   "gdn",
+   "gdn",
+   "swa"
+  ],
+  "coda": [
+   "attn"
+  ],
+  "loops": 1,
+  "loops_min": 1,
+  "loops_max": 1,
+  "bptt_loops": 1,
+  "ternary_fp_ends": true,
+  "inject_contractive": true
+ },
+ "train": {
+  "dataset": "code-py-v2",
+  "seq_len": 1024,
+  "batch_size": 32,
+  "max_tokens": 20000000,
+  "lr": 0.006,
+  "min_lr_frac": 0.1,
+  "warmup_steps": 300,
+  "weight_decay": 0.1,
+  "beta1": 0.9,
+  "beta2": 0.95,
+  "grad_clip": 1.0,
+  "eval_every": 250,
+  "eval_seqs": 128,
+  "seed": 0
+ }
+}

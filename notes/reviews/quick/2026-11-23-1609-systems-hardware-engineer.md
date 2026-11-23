@@ -1,0 +1,11 @@
+# Quick review 2026-11-23-1609 - systems/hardware engineer (Codex GPT-6 Luna high)
+
+- **Observation:** The queue’s E0/E1/E2 throughput and two-minute launch overhead are planning estimates. B1 is a 23-run batch, so actual per-run timing will show how much those estimates affect the campaign. (experiments/QUEUE.md; DEVLOG.md, v0.5.31)
+- **Observation:** C190 reports activation memory scaling nearly linearly with sequence length (exponent 0.976); its evidence is one K1 run, and the claim explicitly limits the streaming check to a chunk boundary. Treat memory and streaming conclusions as narrow until checked at more lengths and split points. (C190)
+- **Observation:** B1’s 20M-token screens run on one RTX 5090. Keeping all comparison arms on the same GPU helps control hardware variation, but the latest devlog does not report sustained clocks or per-run throughput. (DEVLOG.md, v0.5.31; experiments/QUEUE.md)
+
+- **Idea — sustained throughput stability [speculation]:** Hypothesis: GPU boost or thermal behavior changes tokens/s between the initial and steady-state portions of a run. **Cheapest test:** run one fixed-shape, 13M-parameter training config for 8–10 GPU minutes; record temperature, clocks, and tokens/s in short intervals. **Change the plan if:** median steady-state throughput differs by more than 5% from the initial interval; use steady-state timings for estimates and comparisons.
+- **Question for the main agent:** Are B1’s per-run logs capturing temperature, clocks, and steady-state tokens/s, or only aggregate run time?
+## Triage
+- Sustained throughput stability: rejected as a separate experiment. Throughput is a reported secondary readout, never a claim metric, and every B1 arm runs on the same box in sequence. The training log already prints tokens/s every 100 steps, so a warm-up versus steady-state gap can be read from the B1 logs after the fact.
+- Question (do B1's logs capture temperature, clocks and steady-state tokens/s?): partly. Each run logs tokens/s every 100 steps and an aggregate `tokens_per_s` and `wall_min` in `summary.json`. GPU temperature and clocks are not recorded. If a throughput claim is ever made, the worker should log `nvidia-smi --query-gpu=temperature.gpu,clocks.sm` alongside it. For B1's quality comparisons, clocks do not affect the result.

@@ -18,6 +18,21 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.46: Docs refresh (hourly)
+*2026-11-23*
+
+**Docs refresh (hourly): the README status and the sketch status now reflect v0.5.45. No results changed.**
+
+- **README:** the C209 sentence now says SQ419 is queued at 200M tokens on seeds 2-4 and waits for the human's go-ahead (QUEUE.md, DEVLOG v0.5.45).
+- **notes/sketch.md status:**
+  - The heading, and the version the claim counts are quoted from, move from v0.5.40 to v0.5.45. The counts themselves are unchanged and match claims-status.md.
+  - The queue line is updated to 18:17 and names SQ419 as waiting for the human.
+  - SQ419 is added to the open list.
+- **No change needed:** experiments/launch/campaigns/README.md and post_training/SETUP.md were checked and are current.
+- Written by a Haiku docs subagent; the main agent checked every changed fact against QUEUE.md, DEVLOG and claims-status.
+
+---
+
 ## v0.5.45: Outside review 18:08 + CI erratum: Cornish-Fisher t quantile replaced by exact t in six scripts; C209 CI [-17.86, -15.46], no decision changes; SQ419 moves to 200M
 *2026-11-23*
 

@@ -427,5 +427,32 @@
     "config": "experiments/staged-configs/byte/ (staged; E16)",
     "results": {},
     "notes": "Main quest added 2026-11-22 on the human's request ('add byte level tokens as a main quest, lets experiment with its granularity and loops'). Design: notes/analysis-coarse-to-fine.md; plan: notes/byte-quest.md (in progress). Prerequisites: SQ206 causality test, SQ189 throughput probe, flex-attention SWA patch (C12), SQ207 speller on frozen E1. Configs staged in experiments/staged-configs/byte/ until moved into configs/ between campaigns. Primary metric: doc-level bits/char on val_clean80 (K9/A1); exact-span accuracy (SQ209)."
+  },
+  {
+    "id": "E60",
+    "arc": "Code-MoE",
+    "title": "Code-MoE stage 1-2: MoE FFN as capacity (E1) and as a loop rescue (E2 vs E9)",
+    "question": "At matched active FLOPs, does a dropless top-2 MoE FFN (4 experts x 512) lower clean80 bpc vs E1, how much of a dense total-param-matched control's gain does it capture, does learned routing beat a frozen random router, and does MoE help the looped E2 more than its unlooped twin E9 (interaction I)?",
+    "prediction": "TO REGISTER: experiments/checks/PREDICTIONS.md section 'Registered Code-MoE predictions E60' (draft in experiments/design/code-moe-draft.md §5), before any run.",
+    "ingredients": [
+      "MoE FFN 4x512 top-2 (dropless)",
+      "Switch balance loss 0.01 + z-loss 1e-3",
+      "frozen-router control",
+      "dense total-param control",
+      "loop-index router bias (stage 2)"
+    ],
+    "metrics": [
+      "clean80 doc-level bpc (primary)",
+      "memorisation gap g",
+      "per-category bpc (tokenize classes)",
+      "expert load / router entropy",
+      "loop-to-loop routing divergence",
+      "measured tok/s"
+    ],
+    "status": "planned",
+    "version": null,
+    "config": "experiments/staged-configs/code-moe/ (to be staged; needs the code-moe patch)",
+    "results": {},
+    "notes": "Human proposal 2026-11-22 (programming-specialised MoE in the recurrent loop). Semantic supervision (stage 3) and the Byte Quest combo (stage 4) are conditional on stage 1 (SQ255/SQ258/SQ260). Primary metric clean80 bpc; RTX 5090 only, never pooled with N1X runs."
   }
 ]

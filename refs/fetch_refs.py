@@ -188,6 +188,43 @@ PAPERS = {
         ("2611.04215", "Tokenizer Myths", "2026-11: BPB is NOT tokenizer-agnostic for untrained/real models; caution for our byte-vs-BPE bits/char comparisons"),
         ("2611.13607", "One Byte, One Token (27B byteified)", "2026-11: Qwen3.8-27B (GDN + full attn hybrid) to vocab-384 pure byte model, no patching; 3-5x less output per step"),
     ]),
+    "15-moe": ("Mixture-of-Experts: code MoE, looped MoE, specialisation, routing (notes: notes/research-code-moe.md)", [
+        # --- code models built on MoE ---
+        ("2406.11931", "DeepSeek-Coder-V2", "MoE code LM (16B/2.4B-active, 236B/21B-active); generic DeepSeekMoE experts, not code-dimension experts"),
+        ("2401.06066", "DeepSeekMoE", "Fine-grained + shared experts; the framework under DeepSeek-Coder-V2"),
+        ("2407.10671", "Qwen2 Technical Report", "Includes Qwen2-57B-A14B MoE; generic experts"),
+        ("2508.19268", "MultiPL-MoE", "Token-level + segment-level (expert-choice) experts for programming-language syntax; segment EC is non-causal for pretraining"),
+        # --- MoE x recurrent / universal / looped depth ---
+        ("2310.07096", "Sparse Universal Transformer (SUT)", "UT + MoE FFN/attention + stick-breaking halting"),
+        ("2405.16039", "MoEUT", "Shared-layer MoE UT; beats param-matched dense from 44M (C4 18.30 vs 18.97 ppl); experts reused across layers; also on The Stack"),
+        ("2605.09165", "Sparse Layers for Looped LMs (Looped-MoE)", "MoE fixes looped-model scaling; 25-53% of tokens get disjoint experts on loop 2; E=8 k=2; 5e16-1e18 FLOPs"),
+        ("2404.02258", "Mixture-of-Depths", "Per-token layer skipping (routing depth, not experts)"),
+        # --- routing, balancing, collapse ---
+        ("2101.03961", "Switch Transformer", "Top-1 routing + load-balance loss (alpha 0.01); capacity factor"),
+        ("2202.08906", "ST-MoE", "Router z-loss and stability recipe"),
+        ("2408.15664", "Auxiliary-Loss-Free Load Balancing", "DeepSeek bias-based balancing without an aux loss"),
+        ("2202.09368", "Expert Choice Routing", "Experts pick tokens: balanced by construction, non-causal at token level"),
+        ("2106.04426", "Hash Layers", "Fixed token-id hash routing competitive with learned routing: the 'is routing doing anything' control"),
+        ("2204.09179", "X-MoE (representation collapse)", "Routing representation collapse and a fix"),
+        ("2402.13089", "Empirical MoE Design Choices (Fan et al.)", "GPT-2 small: token vs sequence routing; frozen random router ~ learned; only token-level top-2 beats dense at equal total params"),
+        ("2202.01169", "Unified Scaling Laws for Routed LMs", "Routed-model scaling with active vs total params across 5 orders of magnitude"),
+        ("2402.07871", "Scaling Laws for Fine-Grained MoE", "Expert granularity as a scaling axis; FFN-sized experts are rarely optimal"),
+        ("2310.10837", "sigma-MoE (Approximating 2-layer FFNs)", "Parameter-equal MoE vs dense Transformer-XL at small scale (WikiText-103, enwik8)"),
+        # --- is specialisation semantic? ---
+        ("2401.04088", "Mixtral of Experts", "Routing analysis: no domain specialisation; routing follows syntax"),
+        ("2402.01739", "OpenMoE", "Context-independent (token-ID) specialisation, early routing saturation, drop-towards-the-end"),
+        ("2409.02060", "OLMoE", "From-scratch MoE: domain + vocabulary specialisation, rare co-activation, early router saturation"),
+        ("2604.02178", "The Expert Strikes Back", "Experts as fine-grained task experts; code concepts probed; attribution, no knockout"),
+        ("2601.03425", "Standing Committee (Illusion of Specialization)", "Domain-invariant coalition of experts takes most routing mass"),
+        # --- supervised / domain-routed / modular experts ---
+        ("2108.05036", "DEMix Layers", "Domain-label-routed FFN experts; modular add/remove of domains"),
+        ("2208.03306", "Branch-Train-Merge", "Separately trained domain expert LMs"),
+        ("2303.14177", "c-BTM", "Unsupervised domain clusters -> expert LMs, sparse ensemble"),
+        ("2403.07816", "Branch-Train-MiX", "Domain experts merged into an MoE with a learned router"),
+        ("2110.03742", "Task-level MoE (Beyond Distillation)", "Token vs sentence vs task-level routing granularity"),
+        # --- region / segment-level routing ---
+        ("2405.03133", "Lory", "Fully differentiable MoE; causal segment routing (previous segment decides); domain specialisation without labels"),
+    ]),
 }
 # Note (2026-11-22): no Qwen4 paper exists on arXiv (title search "Qwen4" returned nothing); Qwen3.8-Flash-Next is
 # Alibaba's announced Qwen4 architecture preview. Re-check and add Qwen4 here when an official report appears.

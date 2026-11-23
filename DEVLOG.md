@@ -17,6 +17,42 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.83: Claim audit 2302; Code-MoE researched and registered as E60 (planned); SQ238/SQ200 wave-6 registrations
+*2026-11-22*
+
+**Claim audit 23:02** (1 claim due; the rest are in their 6-hour cool-down from 22:03):
+- C197: the auditor's verdict was WEAK, citing an LR mismatch with E2.
+- **Rejected after checking the run:** E2's Phase 2b-5090 run trained at lr 0.006 by CLI override (`meta.json` cli_overrides), the same LR as E32/E33. The 0.003 the auditor saw is the config file's default.
+- No ledger change; C197 stays PARTIAL [exploratory n=1].
+
+**Code-MoE (the human's proposal) researched and registered as E60, status planned** (research agent, Opus: `notes/research-code-moe.md`, `experiments/design/code-moe-draft.md`).
+- **Literature:** no MoE result exists at our scale; MoEUT's smallest model is 44M, at about +0.5–1.2% vs dense at matched total params.
+- **An MoE FFN adds unique params at about zero FLOPs.** That is C197's lever, so the decisive controls are a dense total-param-matched arm and a frozen random router.
+- **Semantic expert specialisation is weak in published analyses and largely unmeasurable on code-py-v1:**
+  - async, subprocess, hashlib and pickle appear in 0% of val docs;
+  - `ast.parse` fails on all algorithmic docs;
+  - only about 4 label classes are computable.
+- **Stage 1 (about 2.5 GPU-h):**
+  - E60a: E1 + a dropless 4×512 top-2 MoE (18.2M non-embedding, 1.0× E1 FLOPs);
+  - E60b: a frozen router;
+  - E60c: dense SwiGLU 2048, total-param matched;
+  - 6 seeds each.
+- **Stage 2:** the {E9, E2} × {dense, MoE} 2×2 plus a loop-index router bias. Does MoE rescue the loop?
+- **Stage 3:** supervised semantic routing, only if learned routing beats the frozen router.
+- **Causality rules:** no capacity dropping or expert-choice routing; region routing uses the previous segment or a prefix summary.
+- **Corrected:** 8 experts × 512 is 4× the dense MLP, not 2×.
+- **Before any E60 run:** its predictions get registered and `gogeta/moe.py` is written (off by default, bit-identical).
+- **Queue:** SQ254–SQ261 added (label tooling, knockout specialisation, router collapse, token/segment/prefix routing, aux objectives, loop routing divergence, Byte Quest × MoE, CPU causality check).
+- **References:** 29 papers added to `refs/fetch_refs.py` (section 15-moe). They are **not downloaded**: downloads are a human-only action (AGENTS §0a).
+
+**Wave-6 registrations** (WIP commits before dispatch):
+- **SQ238** dedup-only control: the v1-subset builder, config, and predictions D1–D3.
+- **SQ200 init 2×2 + SQ234:** E0-gogeta, E0-flat, E10-gogeta and E1-flat at 200M, 4 seeds each. Predictions I1–I4.
+
+**Quick review 23:02 (reproducibility auditor):** SQ274, evidence-value matching in the release lint.
+
+---
+
 ## v0.4.82: Opt-in training options (init, LR schedule, gradient accumulation), defaults bit-identical; SQ238 dedup control registered
 *2026-11-22*
 

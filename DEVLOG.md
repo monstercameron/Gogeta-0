@@ -18,6 +18,17 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.14: A1 amendment 2: third seed for fixed vs random loop depth (registered before running)
+*2026-11-23*
+
+**A1 amendment 2 registered: a third seed for "fixed depth beats random depth"** (quick review 13:14, statistician).
+- **What runs:** A1a (fixed r = 4) and A1i (random r, full backprop), which use equal training compute, at seed 2, paired with E27 seed 2. They run at the tail of the A3 wave.
+- **Prediction:** A1a - A1i = -3% (range -5% to -1%). The comparison is confirmed only if the 3-seed paired CI lies below 0.
+- **Status until then:** exploratory. The assembled recipe's fixed r is a design choice made on that basis.
+- **Status:** the A3 all-parts arms are at 55-70% of training; first results are due in about 10 minutes.
+
+---
+
 ## v0.5.13: A1 amendment: placebo stable, fixed depth beats random depth ~3% at equal compute, E27 LR bracketed; outside review 13:10 (full-stack risks)
 *2026-11-23*
 

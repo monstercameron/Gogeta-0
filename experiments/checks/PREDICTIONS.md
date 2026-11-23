@@ -805,3 +805,8 @@ Prompted by outside review 2026-11-23 12:10 (`notes/reviews/2026-11-23-1210-revi
   - The four fixes form one family, Holm-adjusted.
   - The all-parts model is **competitive** if A3mx lies within 2% of E24 and at or below E20.
   - Throughput and weight memory are reported next to it.
+
+### A1 amendment 2 (2026-11-23 ~13:20 EST, before these runs; quick review 13:14): third seed for fixed vs random depth
+- **Added runs:** A1a (fixed r = 4) and A1i (random r, full backprop) at seed 2, 200M tokens, lr 6e-3, paired with E27 seed 2 (SQ263). Both arms use the same training compute (+17% vs E27).
+- **Estimand:** A1a - A1i (log clean80, paired by seed, seeds 0-2, df 2).
+- **Prediction:** -3% (range -5% to -1%). **Rule:** "fixed depth beats random depth at equal compute" counts as confirmed if the 3-seed paired 95% CI lies below 0 and the effect is <= -1%. Until then it stays exploratory, as the A1 screen is (the assembled recipe already uses fixed r on that exploratory basis).

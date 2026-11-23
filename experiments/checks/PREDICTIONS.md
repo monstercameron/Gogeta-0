@@ -612,3 +612,15 @@ Source: `notes/research-inkling2-mini.md`, from the research agent's cited prima
 - **SQ271 (thick outer layers):** both variants have E2's unique-parameter count (12,606,488), with 13 block visits at fixed r = 5.
   - **K4:** thick_pre and thick_coda are each within ±1% of e2_fixed_r4 (14 visits), with thick_pre the better of the two (Inkling and 2610.40325 favour looping the middle).
 - **Seeds and MDE:** 3 seeds per arm, so the MDE is about 1–1.5% at the 20M seed sd (0.4–1.2%). Smaller differences are ties.
+
+## Fleet wave 6, part 4 (2026-11-23 ~00:30, before dispatch): SQ282 depth vs width (LR-fair), SQ283 C197 seed replication
+Source: outside review 2026-11-23 00:10. C197's limitation (event 4): E34, which is E9 widened with about the same unique params and FLOPs as E32, is 14% worse than E32 at untuned LRs.
+- **SQ282:**
+  - **Runs:** E32 (14 unshared blocks, `staged-configs/e32_unshared14_e2flops.json`), E34 (5 wide blocks, `e34_e9_wide_e2flops.json`) and E2 (`configs/e2_looped.json`), each at lr ∈ {3e-3, 6e-3, 1.2e-2}, seeds 0–1, **20M tokens** (`--max-tokens 20000000`). 18 runs, RTX 5090, clean80.
+  - **W1:** at each arm's best LR (G3, the min of the 2-seed mean), E32 beats E34 by ≥ 5%. Depth beats width at matched params and FLOPs, even LR-fair.
+  - **W2:** E34 at its best LR beats E2 at its best LR.
+  - **Decision:** if E32 and E34 tie within 2× the seed sd at their best LRs, C197's lever is "unique params" (as first read). If E32 wins, the lever is "distinct depth", and E60/MoE (which adds width-like capacity) loses its prior.
+- **SQ283:** E32 and E2 at 200M, their file LR (6e-3), seeds 1–3, joining the existing seed 0. 6 runs.
+  - **R1:** E32 beats E2 by ≥ 10% on the 4-seed means, so the C197 gap replicates.
+  - **R2:** E32 beats the E1 7-seed mean by ≥ 5%.
+- **Queue order (changed, not a registration change):** wave 6 (SQ200/SQ234 init, Inkling SQ266/SQ271, SQ238), then SQ282/SQ283, then SQ263 (the 200M factorial gate), then F2. **E60 is gated** on SQ282 and SQ238 (the review argues E60's prior rests on width).

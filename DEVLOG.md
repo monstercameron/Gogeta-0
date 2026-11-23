@@ -18,6 +18,21 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.39: Outside review 17:10: A2 headline holds against fixed-depth E27 (-12.6%); C214 style-shift limitation; decode frontier is E8's next step; readouts frozen before dispatch; erratum on 'vanishes'
+*2026-11-23*
+
+**Outside review 17:10: the A2 headline holds against a fixed-depth E27 (-12.6%); C214 gains a style-shift limitation; a batch-1 decode frontier becomes E8's next step; readout scripts are now frozen before dispatch. Erratum: the ternary cost did not "vanish".**
+
+- **Comparator check (review item D, no GPU):** against the fixed-r E27 family A1a (seeds 0-2, 200M, 1.9% more FLOPs), A2s is **-12.56% [-12.98, -12.15]** (Welch, unpaired), and -12.4% on the shared seed 2. About 12.5 of the 16.7 points survive a fixed-depth comparator (fixed r alone is about 3.2%, C212), so the headline is mostly the assembly. Recorded as C209 evidence.
+- **C214 limitation:** the SQ99 out-of-corpus files are both unseen and library-style, so C214 cannot separate generalisation from a style shift. New SQ415 (training filtered against the SQ99 set) and SQ416 (a prose slice) address it.
+- **E8's next GPU step (queue):** a registered batch-1 decode frontier on a rented 24 GB card. Per-token latency for A2s, A2f, E27, E24 and E20, fp16 plus packed ternary, greedy vs self-speculative. It measures whether loops (r reads of the shared core per token) and ternary cost anything on goal 6's metric.
+- **Process rule** (PREDICTIONS.md): every batch registration names its readout script's sha256-16 before dispatch, and in-flight amendments state what had been seen.
+- **SQ417:** WSD vs cosine schedule robustness of the assembly gain.
+- **Erratum (v0.5.38):** "the ternary cost vanishes" overstates +0.42% [-0.92, +1.77] (n 6, no TOST). The correct wording is "not distinguishable from 0 out of corpus". The README is corrected, and its stale "C213 UNVERIFIED" now reads PARTIAL.
+- **Quick review 17:10 (skeptical peer reviewer):** length dependence of C214 and of the ternary result merged into SQ385; C214 stays scoped to the one out-of-corpus set.
+
+---
+
 ## v0.5.38: Out of corpus, looped models beat unshared GDN (loop cost reverses: A2f vs E24 -1.91%, C214 VERIFIED); ternary cost vanishes; C213 PARTIAL and its design rule fires; SQ403 fixed-r tuned to its pass count
 *2026-11-23*
 

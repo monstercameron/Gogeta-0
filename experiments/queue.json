@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-23T17:51:04-05:00",
+  "updated": "2026-11-23T18:00:37-05:00",
   "policy": "Order = priority, highest first; `next` walks the list top to bottom and returns the first item that is queued, ready, has all dependencies done and needs no human. Ordering rule: scientific value per GPU-minute, with validity first. (1) Controls, tuning and seeds that make existing claims trustworthy: K8 leakage/arithmetic check, K7 LR sweep, tuned 3-seed E10 and E1, E9, conditional E0/E2 re-runs, replication verdicts. Every later comparison is only as good as these. (2) Cheap inference-only diagnostics on existing checkpoints (SQ50, SQ14, SQ21, SQ37, eval suite) and the K3 redesign. They cost 4-20 GPU-minutes and decide what to build next; because the campaign runner is sequential, use `next --gpu --max-minutes 10` to slot them between campaign items or while a run is cooling. (3) Thesis-critical experiments: E11 (then 3 seeds), looped neg-eig parity, E3 at the tuned LR, the loop fixes (SQ15, SQ16, loop norm) gated on SQ14, neg-eig in the looped core, SQ32. (4) Side quests (gates, KDA, NoPE, decode path, ternary x loop, computed tables, research searches). (5) Long-term: E4 full fusion, E8, Mamba-3. Compute budget (AGENTS 5): one GPU item running at a time; up to 8 CPU items alongside, thread-capped by the launcher. CPU items that can run in parallel with any GPU job: Q3, Q5 (K7 analysis), Q6, Q13, Q15, Q18, Q20 (authoring: write scripts and register predictions), Q12 (verdict writing), SQ1, SQ41. Authoring items edit experiments/checks/PREDICTIONS.md and should be done one at a time by the main agent (or by subagents given disjoint files). Items needing a registered prediction wait for Q1 (the tagged 'registered' version). New items enter via `queue.py add` and are appended at the end; reordering needs an explicit `move --reason`. Estimates come from compiled throughputs (E0 210k tok/s, E1 100k, E2 44k) plus ~2 min launch/compile overhead; they are planning numbers, not measurements. needs_human items are never picked by `next`.",
   "order_log": [
     {
@@ -1552,10 +1552,16 @@
           "from": "queued",
           "to": "queued",
           "note": "Record warmed unprofiled median step time next to the profiled breakdown and report the profiler overhead (quick review 17:04). Also profile the same config at seq_len 256, 512 and 1024: with SWA run as a dense T x T mask (C12), attention/mask work may become the top bucket at longer contexts, which would rank a windowed SWA kernel ahead of other kernel work (quick review 2026-11-23 17:24)."
+        },
+        {
+          "t": "2026-11-23T18:00:37-05:00",
+          "from": "queued",
+          "to": "queued",
+          "note": "Record the warmed unprofiled median step time next to the profiled breakdown and report the profiler overhead (quick review 17:04). Also sweep seq_len 256/512/1024 (quick review 17:24). Profile the arms in both orders, E0->E2 then E2->E0, and flag any arm whose wall or busy time shifts by more than 10%. Save the top-30 kernel names with their bucket labels and cross-check the bucket totals against an independent timeline capture (nsys or torch.cuda events) on one arm; report whether any reclassification would cross C119's pass/refute criteria (quick review 2026-11-23 17:59)."
         }
       ],
-      "updated": "2026-11-23T17:25:48-05:00",
-      "last_note": "Record warmed unprofiled median step time next to the profiled breakdown and report the profiler overhead (quick review 17:04). Also profile the same config at seq_len 256, 512 and 1024: with SWA run as a dense T x T mask (C12), attention/mask work may become the top bucket at longer contexts, which would rank a windowed SWA kernel ahead of other kernel work (quick review 2026-11-23 17:24)."
+      "updated": "2026-11-23T18:00:37-05:00",
+      "last_note": "Record the warmed unprofiled median step time next to the profiled breakdown and report the profiler overhead (quick review 17:04). Also sweep seq_len 256/512/1024 (quick review 17:24). Profile the arms in both orders, E0->E2 then E2->E0, and flag any arm whose wall or busy time shifts by more than 10%. Save the top-30 kernel names with their bucket labels and cross-check the bucket totals against an independent timeline capture (nsys or torch.cuda events) on one arm; report whether any reclassification would cross C119's pass/refute criteria (quick review 2026-11-23 17:59)."
     },
     {
       "id": "SQ71",

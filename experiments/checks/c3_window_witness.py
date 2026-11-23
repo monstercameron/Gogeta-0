@@ -7,7 +7,8 @@ Checks, seeded, fp32, CPU, small model (d 64, window 8, T 32):
   (1) causality per block type: perturbing token t changes no logit at positions < t (max |diff| must be exactly 0);
   (2) SWA cutoff: in a single-SWA-layer model, perturbing token 0 changes logits at positions < window and leaves
       positions >= window exactly unchanged (max |diff| == 0).
-    python3 experiments/checks/c3_window_witness.py   # -> results/c3_window_witness.json
+    python3 experiments/checks/c3_window_witness.py         # CPU, torch reference recurrence -> results/c3_window_witness.json
+    python3 experiments/checks/c3_window_witness.py --gpu   # CUDA production kernels (fla), no patch -> results/c3_window_witness_gpu.json
 """
 import json
 import os
@@ -32,12 +33,17 @@ def ref_kernel(q, k, v, g, beta, scale=None, **_):
     return o.to(q.dtype), None
 
 
+GPU = "--gpu" in sys.argv
+DEV = "cuda" if GPU else "cpu"
+
+
 def build(**kw):
     torch.manual_seed(0)
-    m = FusionDance(ModelConfig(**{**BASE, **kw})).eval()
-    for b in [*m.prelude, *m.core, *m.coda]:
-        if b.kind == "gdn":
-            b.mixer._kernel = ref_kernel
+    m = FusionDance(ModelConfig(**{**BASE, **kw})).eval().to(DEV)
+    if not GPU:  # the production fla kernel needs CUDA; on CPU use the torch reference recurrence
+        for b in [*m.prelude, *m.core, *m.coda]:
+            if b.kind == "gdn":
+                b.mixer._kernel = ref_kernel
     return m
 
 
@@ -48,7 +54,7 @@ def logits(m, x):
 
 def causality(m, t):
     torch.manual_seed(1)
-    x = torch.randint(0, 97, (1, T))
+    x = torch.randint(0, 97, (1, T)).to(DEV)
     y = x.clone(); y[0, t] = (y[0, t] + 1) % 97
     a, b = logits(m, x), logits(m, y)
     return {"t": t, "max_diff_before_t": float((a[:, :t] - b[:, :t]).abs().max()) if t else 0.0,
@@ -56,7 +62,7 @@ def causality(m, t):
 
 
 def main():
-    out = {"config": BASE, "T": T, "dtype": "float32 model, float64 diffs", "device": "cpu", "causality": {}}
+    out = {"config": BASE, "T": T, "dtype": "float32 model, float64 diffs", "device": DEV, "kernels": "production (fla on CUDA, bf16 autocast inside GDN)" if GPU else "torch reference recurrence", "causality": {}}
     kinds = {"attn": dict(prelude=["attn"], core=[], coda=[]), "swa": dict(prelude=["swa"], core=[], coda=[]),
              "gdn": dict(prelude=["gdn"], core=[], coda=[]),
              "looped_hybrid": dict(prelude=["swa"], core=["gdn", "swa"], coda=["attn"])}
@@ -71,7 +77,7 @@ def main():
               "  ".join(f"t={r['t']}: before {r['max_diff_before_t']:.1e} after {r['max_diff_at_or_after_t']:.1e}" for r in rows))
     m = build(prelude=["swa"], core=[], coda=[])
     torch.manual_seed(1)
-    x = torch.randint(0, 97, (1, T)); y = x.clone(); y[0, 0] = (y[0, 0] + 1) % 97
+    x = torch.randint(0, 97, (1, T)).to(DEV); y = x.clone(); y[0, 0] = (y[0, 0] + 1) % 97
     a, b = logits(m, x), logits(m, y)
     w = BASE["window"]
     inside = float((a[:, :w] - b[:, :w]).abs().max()); outside = float((a[:, w:] - b[:, w:]).abs().max())
@@ -81,7 +87,7 @@ def main():
                          "max_diff_positions_ge_window": outside, "pass": swa_ok}
     print(f"swa cutoff (window {w}): inside max {inside:.2e}, outside max {outside:.2e} -> {'PASS' if swa_ok else 'FAIL'}")
     out["all_pass"] = ok
-    json.dump(out, open(os.path.join(ROOT, "experiments", "checks", "results", "c3_window_witness.json"), "w",
+    json.dump(out, open(os.path.join(ROOT, "experiments", "checks", "results", "c3_window_witness_gpu.json" if GPU else "c3_window_witness.json"), "w",
                         newline="\n"), indent=1)
     print("ALL PASS" if ok else "SOME FAILED")
     return 0 if ok else 1

@@ -18,6 +18,26 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.44: Claim audit 2026-11-23-1802: 48 claims, 17 SOLID (incl. C214), 21 NEEDS-EVIDENCE (all already UNVERIFIED), 9 WEAK as limitations, C36 WRONG rejected against the primary PDF; C3 witness scoped to the reference path
+*2026-11-23*
+
+**Claim audit 2026-11-23-1802: 48 claims, 8 auditors. 17 SOLID (including the new C214), 21 NEEDS-EVIDENCE (all already UNVERIFIED), 9 WEAK (confirmed as wording or scope limitations), 1 WRONG (C36, rejected against the primary PDF). No status changes. C3's exact-zero witness is scoped to the reference path.**
+
+- **Scope:** 48 claims out of cool-down, 8 Codex GPT-6 Luna auditors (`notes/reviews/claims/2026-11-23-1802-b1..b8.md`), all ok.
+- **C214** (out of corpus, the loop cost reverses): **SOLID**. The auditor matched -1.90% [-3.40, -0.40] (n 6) to `sq400.json` and the registered P7.
+- **C36 WRONG: rejected.** `pdftotext` of the archived Hyperloop paper's Table 1 shows "Transformer 238.0 M 14.65 14.85" and a separate "mHC 241.0 M 14.55 14.73" row, so C36's attribution to the depth-matched Transformer is right. The auditor misread the table.
+- **WEAK, confirmed as limitations (no status change):**
+  - C190: exact streaming is shown at a chunk-boundary split only.
+  - C84: "341x" counts forward token positions, not measured work.
+  - C193: an exploratory post hoc association.
+  - C73, C29, C61, C52, C31: paper-reported attribution.
+  - C125: "power-limited" is not supported by the telemetry.
+- **NEEDS-EVIDENCE (21), all on UNVERIFIED claims:** they stay UNVERIFIED. C113 and C114 (GB10 figures are not N1X measurements) and C129 (SQ71 is not an NPU probe) gain explicit limitations.
+- **C3 scope** (quick review 18:04): the exact-zero witness covers the torch reference path. `c3_window_witness.py --gpu` runs the production fla kernels at the next GPU batch; the CUDA path's last check was tests/test_model.py 12/12 at a 1e-4 tolerance, with no saved output.
+- **Quick review 17:59 (systems):** SQ75 gains a run-order check and a cross-check of its regex buckets against an independent timeline.
+
+---
+
 ## v0.5.43: Evidence refreshed: C106 sandbox 16/16 checks + 6/6 gate tests; C3 causality and SWA cutoff exact-zero witness; SQ419 queued ahead of SQ75
 *2026-11-23*
 

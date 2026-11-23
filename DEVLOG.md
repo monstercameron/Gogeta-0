@@ -17,6 +17,41 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.84: Outside review 00:10: C197 confounded by depth (E34 14% worse at matched params); Inkling 2 Mini loop research; queue reordered
+*2026-11-22*
+
+**Outside review 00:10 (Haiku), triaged:**
+- **C197 is confounded.** E34 (E9's 5-block layout widened to d=576) has about the same unique params and FLOPs as E32, yet scores **0.2834 vs 0.2486, 14% worse**. So "unique params at matched FLOPs" is not sufficient: at matched params and FLOPs, *distinct depth* beat width here. Both ran at untuned LRs, n=1.
+- **Ledger:** C197 gets a limitation (event 4); it stays PARTIAL [exploratory n=1].
+- **New items, registered and queued:**
+  - **SQ282:** LR-fair depth vs width. E32, E34 and E2 × 3 LRs × 2 seeds at 20M.
+  - **SQ283:** C197 seed replication. E32 and E2 at 200M, seeds 1–3.
+  - **SQ284:** per-pass unique low-rank adapters in the shared loop. Accepted, needs a model option.
+- **Queue reordered:** wave 6, then SQ282/SQ283, then SQ263 (the 200M factorial gate), then F2.
+- **E60 (Code-MoE) is gated on SQ282 and SQ238,** because its prior assumes width-like capacity helps.
+
+**Inkling 2 Mini research (the human's request):** research agent, `notes/research-inkling2-mini.md`, cited sources; not every fact re-verified by the main agent.
+- **Model:** Thinking Machines Lab, released 2026-11-20. A 26.4B/3.4B-active MoE whose layers 6–17 run 3× with shared weights (layers 0–5 and 18–23 run once).
+- **The loop slightly loses on training compute** (7.5%) but wins on parameters and inference.
+- **Ingredients we lack:**
+  - a closed-gate restart, so the looped net starts out *exactly* its unlooped twin;
+  - no residual carry between passes;
+  - a fixed r = 3 (we sample U{1..7});
+  - thick outer layers (a quarter of the layers on each side; ours is 1/3/1);
+  - gated messages plus attention residuals.
+- **SQ266–SQ273 added.** The config-only SQ266 (fixed-r sweep) and SQ271 (thick outer layers) are registered as wave 6 part 3: 21 runs, predictions K1–K4.
+- **Correction:** `notes/research-looped.md`'s "Inkling 2 is not looped" is true only for Inkling 2 *Small*.
+- 3 papers were listed in `refs/fetch_refs.py` and **not downloaded** (human-only).
+
+**Wave 4 so far:**
+- SQ243 at d = 512: E1 0.5262–0.5295 vs E10 0.5265–0.5268 in-training val.
+- SQ241 param-matched E1: 0.5875–0.5881. Clean80 scoring is pending.
+- Inference (SQ248 knockouts) is running.
+
+**Quick reviews:** 23:05 (SQ275, bound the SWA mask cache) and 23:09 (rejected as covered by C190/K1/SQ244). A research agent is searching for a better code corpus (the human's request).
+
+---
+
 ## v0.4.83: Claim audit 2302; Code-MoE researched and registered as E60 (planned); SQ238/SQ200 wave-6 registrations
 *2026-11-22*
 

@@ -215,7 +215,7 @@ SPLIT_ID = {"train": 0, "id": 1, "len2x": 2, "len4x": 3, "gen": 4}
 EVAL_N = 2048          # items per (task, split): worst-case 95% half-width 1.96*0.5/sqrt(2048) = 2.17 points
 
 
-def make_batch(task: str, B: int, seed: int, split: str = "train", stream: int = 0):
+def make_batch(task: str, B: int, seed: int, split: str = "train", stream: int = 0, train_range=None):
     """Unified API. Returns torch-ready (x, y) int64 numpy arrays. stream distinguishes successive training batches."""
     s = SPLITS[task]
     if task in ("parity", "modadd5", "modadd7"):
@@ -229,10 +229,10 @@ def make_batch(task: str, B: int, seed: int, split: str = "train", stream: int =
         return x, y
     if task.startswith("graph"):
         kind = task.split("_")[1]
-        ks = s["train_k"] if split == "train" else s["id" if split == "id" else "gen"]
+        ks = (train_range or s["train_k"]) if split == "train" else s["id" if split == "id" else "gen"]
         x, y, *_ = graph_batch(B, kind, ks, seed * 100003 + stream, split=SPLIT_ID[split])
         return x, y
-    ks = s["train_L"] if split == "train" else s["id" if split == "id" else "gen"]
+    ks = (train_range or s["train_L"]) if split == "train" else s["id" if split == "id" else "gen"]
     x, y, *_ = program_batch(B, ks, seed * 100003 + stream, split=SPLIT_ID[split])
     return x, y
 
@@ -345,7 +345,7 @@ def baselines(n=4000, seed=0):
 
 # ----------------------------------------------------------------------------- tiny-model sanity (CPU)
 def run_sanity(task, kind, steps, seed, d=64, layers=2, loops=None, lr=2e-3, batch=64, shuffle_labels=False,
-               threads=2, log_every=500, eval_n=EVAL_N, block="attn", device="cpu", neg_eig=False):
+               threads=2, log_every=500, eval_n=EVAL_N, block="attn", device="cpu", neg_eig=False, curriculum=False):
     """Train a tiny model from scratch on `task` and evaluate every split. block: attn|gdn|swa (gdn: cuda + fla,
     run it in ~/.venvs/gogeta). kind: stack (layers x block, one pass) | loop (core = layers x block, `loops` passes)."""
     import torch
@@ -365,7 +365,11 @@ def run_sanity(task, kind, steps, seed, d=64, layers=2, loops=None, lr=2e-3, bat
     t0 = time.time(); m.train(); rr = np.random.default_rng(seed)
     for s in range(steps):
         for g in opt.param_groups: g["lr"] = lr_at(s, steps, lr, 100)
-        x, y = make_batch(task, batch, seed, "train", stream=s)
+        tr = None
+        if curriculum and task in ("graph_hops", "graph_reach", "program"):   # ramp max depth 1 -> train max over 50% of steps
+            lo, hi = SPLITS[task]["train_k" if task.startswith("graph") else "train_L"]
+            tr = (lo, max(lo, 1 + int((hi - 1) * min(1.0, s / (0.5 * steps)))))
+        x, y = make_batch(task, batch, seed, "train", stream=s, train_range=tr)
         if shuffle_labels:                                  # negative control: labels permuted across items
             ym = y != -100
             yy = y.copy(); vals = y[ym]; rr.shuffle(vals); yy[ym] = vals; y = yy
@@ -402,6 +406,7 @@ if __name__ == "__main__":
     ap.add_argument("--shuffle", action="store_true")
     ap.add_argument("--block", default="attn", choices=["attn", "gdn", "swa"])
     ap.add_argument("--neg-eig", action="store_true")
+    ap.add_argument("--curriculum", action="store_true", help="ramp hop count / statements 1 -> train max over the first half")
     ap.add_argument("--device", default="cpu")
     ap.add_argument("--out", default="")
     a = ap.parse_args()
@@ -411,7 +416,7 @@ if __name__ == "__main__":
         for k, v in baselines().items(): print(f"  {k:45s} {v:.3f}")
     if a.sanity:
         r = run_sanity(a.sanity, a.kind, a.steps, a.seed, layers=a.layers, loops=a.loops, shuffle_labels=a.shuffle,
-                       block=a.block, device=a.device, neg_eig=a.neg_eig)
+                       block=a.block, device=a.device, neg_eig=a.neg_eig, curriculum=a.curriculum)
         print("RESULT", json.dumps(r))
         if a.out:
             p = pathlib.Path(a.out); p.parent.mkdir(parents=True, exist_ok=True); p.write_text(json.dumps(r, indent=1))

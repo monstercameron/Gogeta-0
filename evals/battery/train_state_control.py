@@ -36,7 +36,7 @@ def main(argv=None):
     ap.add_argument("--train-k", default="1,2,4"); ap.add_argument("--train-d", default="0,8,16")
     ap.add_argument("--eval-cells", default="assign:1:0,assign:4:16,assign:8:64,incr:2:0,incr:4:16")
     ap.add_argument("--n-eval", type=int, default=300); ap.add_argument("--seed", type=int, default=0)
-    ap.add_argument("--out", default="")
+    ap.add_argument("--modes", default="assign,incr"); ap.add_argument("--out", default="")
     a = ap.parse_args(argv)
     torch.set_num_threads(a.threads); torch.manual_seed(a.seed)
     from gogeta.hf import load_tokenizer
@@ -53,7 +53,7 @@ def main(argv=None):
         for g in opt.param_groups: g["lr"] = lr
         seqs, tgts = [], []
         for _ in range(a.batch):
-            mode = rng.choice(["assign", "incr"]); k = rng.choice(ks if mode == "assign" else [max(2, v) for v in ks])
+            mode = rng.choice(a.modes.split(",")); k = rng.choice(ks if mode == "assign" else [max(2, v) for v in ks])
             it = make_item(mode, k, rng.choice(ds), 1000 + a.seed, idx); idx += 1
             p = [eos] + tok.encode(it["prompt"], add_special_tokens=False)
             c = tok.encode(it["choices"][it["gold"]], add_special_tokens=False)

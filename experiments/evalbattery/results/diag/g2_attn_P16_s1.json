@@ -1,0 +1,76 @@
+{
+ "args": {
+  "kind": "attn",
+  "pairs": 16,
+  "seq": 64,
+  "key_vocab": 64,
+  "val_vocab": 64,
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "window": 4,
+  "steps": 6000,
+  "batch": 64,
+  "lr": 0.001,
+  "wd": 0.1,
+  "warmup": 200,
+  "curriculum": false,
+  "curriculum_start": 2,
+  "neg_eig": false,
+  "mastery": true,
+  "mastery_acc": 0.9,
+  "seed": 1,
+  "eval_seq": 2048,
+  "device": "cpu",
+  "threads": 2,
+  "log_every": 1000,
+  "out": "experiments/evalbattery/results/diag/g2_attn_P16_s1.json"
+ },
+ "acc": 1.0,
+ "ci95": [
+  1.0,
+  1.0
+ ],
+ "eval_loss": 2.7088388421248055e-08,
+ "chance_uniform_values": 0.015625,
+ "chance_context_values": 0.0625,
+ "loss_hist": [
+  [
+   0,
+   2,
+   4.9144
+  ],
+  [
+   1000,
+   16,
+   0.0008
+  ],
+  [
+   2000,
+   16,
+   0.0006
+  ],
+  [
+   3000,
+   16,
+   0.0
+  ],
+  [
+   4000,
+   16,
+   0.0
+  ],
+  [
+   5000,
+   16,
+   0.0
+  ],
+  [
+   5999,
+   16,
+   0.0
+  ]
+ ],
+ "train_s": 939.6,
+ "params": 90496
+}

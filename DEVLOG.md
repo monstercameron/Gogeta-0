@@ -17,6 +17,26 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.62: A4 eval battery (final): MQAR fixed by a mastery curriculum; state-tracking probe; iterative suite
+*2026-11-22*
+
+### A4 evaluation battery (rigor workstream, final hand-back; snapshot was v0.4.47)
+**What**: battery v1 spec (`notes/eval-battery.md`): 37 cells in 4 families (LM, functional coding, memory/retrieval, iterative computation), each with a statistic, chance level, **a required positive control with a pass gate**, CI arithmetic and a CPU/GPU split. Code in `experiments/evalbattery/` (`mqar.py`, `itercomp.py`) and `evals/battery/` (a code state-tracking probe, scorers, 23 lm-eval task YAMLs). **Tests: 10/10 OK (re-run by the main agent).**
+**Findings** (reported by the subagent, CPU, tiny models; single-seed diagnostics):
+- **K3's MQAR failure diagnosed and fixed.** The task was fine; training sat on the induction plateau. P=16 pairs reached only 14–24% with any lr, width or fixed curriculum, but a **mastery curriculum** (double the pairs whenever train accuracy reaches 90%) reaches **100% at P=16 on seeds 0 and 1**, with the no-memory control at 2.5% (gate 11.3%). The K3 geometry (P=32/64) is a GPU item (QB1).
+- **Iterative suite:** modadd5 and parity pass their validity gates. graph_hops/graph_reach and program are not yet validated (shortcuts or at chance), so they're excluded until the GPU gate passes. A hint: looped beats a 4-layer stack at 2× length on modadd5 (37.0% vs 28.2%, one seed).
+- **Code state-tracking probe** (the outside review's idea, SQ90): E0 is at floor (31% vs 25% chance, flat in k and distance), while the **positive control solves it** (a tiny LM trained on probe snippets: 100% / 96.3%), so the probe is valid and E0 just can't do it. Proposed rule: a cell counts only if its CI lower bound is ≥ 35%.
+- **Line-shuffle control:** bpb 0.240 → 0.787 (gap 0.547 against a 0.15 gate).
+- **CI arithmetic:** 1,068 items → ±3 points. HumanEval+ (164) can't resolve below 3 points, so it's a sanity check only.
+
+**GPU plan:** 10 queue proposals (QB1–QB10, about 375 GPU-min; the minimum informative set is about 175 min), all `ready: false` until their predictions are registered.
+**Blocker for the human (parked):** `flash-linear-attention==0.6.0` in `~/.venvs/gogeta-eval`, so lm-eval can score GDN checkpoints (QB10).
+**Caveat:** `proposed-predictions.md` was written after the CPU diagnostics; those numbers are labelled diagnostics, not predictions.
+### Quick review 19:21 (safety/sandbox reviewer, Codex)
+**SQ211** (sandbox escape probes: fd inheritance, /proc, symlinks) and **SQ212** (secret canaries through results, logs, the cockpit DB and run forms) accepted. No RL runs on untrusted completions exist; SQ61 gates any real GRPO.
+
+---
+
 ## v0.4.61: Claim audit 2026-11-22-1902: 23 findings verified, 5 VERIFIED claims downgraded
 *2026-11-22*
 

@@ -1,0 +1,61 @@
+{
+ "args": {
+  "kind": "swa",
+  "pairs": 16,
+  "seq": 64,
+  "key_vocab": 64,
+  "val_vocab": 64,
+  "d": 64,
+  "layers": 2,
+  "heads": 2,
+  "window": 4,
+  "steps": 3000,
+  "batch": 64,
+  "lr": 0.001,
+  "wd": 0.1,
+  "warmup": 200,
+  "curriculum": false,
+  "curriculum_start": 2,
+  "neg_eig": false,
+  "mastery": true,
+  "mastery_acc": 0.9,
+  "seed": 0,
+  "eval_seq": 2048,
+  "device": "cpu",
+  "threads": 2,
+  "log_every": 1000,
+  "out": "experiments/evalbattery/results/diag/g1_swa4_P16.json"
+ },
+ "acc": 0.024658203125,
+ "ci95": [
+  0.022979736328125,
+  0.026336669921875
+ ],
+ "eval_loss": 10.075865864753723,
+ "chance_uniform_values": 0.015625,
+ "chance_context_values": 0.0625,
+ "loss_hist": [
+  [
+   0,
+   2,
+   4.882
+  ],
+  [
+   1000,
+   2,
+   0.6547
+  ],
+  [
+   2000,
+   2,
+   0.5019
+  ],
+  [
+   2999,
+   2,
+   0.4128
+  ]
+ ],
+ "train_s": 83.6,
+ "params": 90496
+}

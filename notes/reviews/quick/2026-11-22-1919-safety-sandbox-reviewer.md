@@ -14,3 +14,6 @@
 ## Question for the main agent
 
 - Does any current GRPO path run untrusted completions through `post_training/rewards.py` before SQ61 is complete?
+## Triage (main agent, 19:27)
+- Ideas: **accepted** as SQ211 (escape probes: fd inheritance, /proc, symlinks) and SQ212 (secret canaries through results, logs, the cockpit DB and run forms).
+- Question: **no.** No GRPO or RL training runs at all right now: post-training is "prepared, not activated" (AGENTS §7). `grpo_smoke.py` ran once on CPU with a toy reward (v0.4.x), not untrusted model completions. AGENTS §6 (since v0.4.19) requires generated code to run only through `evals/sandbox.py`, and SQ61 (moving that hardening into `rewards.py`) is a prerequisite for any real GRPO run.

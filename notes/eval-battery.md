@@ -15,12 +15,15 @@ Related: `notes/benchmark-suite.md` (survey, tier 1-3 tasks), `evals/README.md`,
 
 ## 0. TL;DR
 
-1. **Battery v1 = 4 families, 30 task cells**, all seeded and deterministic; item counts are chosen so the 95% CI
+1. **Battery v1 = 4 families, 37 task cells** (3 L, 5 F, 1 MQAR + 18 probe + 4 recall = 23 M, 6 I), all seeded and deterministic; item counts are chosen so the 95% CI
    half-width is <= 3 points wherever the task is not floored (arithmetic in section 6).
-2. **K3 diagnosed (section 3.2).** The MQAR *task* was fine; the *training recipe* was the problem. Tiny attention
-   models solve P=4 pairs to 100% in 3,000 steps at any sane lr, but at P=8 reach 38% and at P=16 only 15-24% in
-   3,000 steps, for every lr/curriculum variant tried. This is the induction-circuit plateau: the steps needed grow
-   steeply with the number of pairs, and K3 asked for P=64 in 4,000 steps. Fix: [MQAR-FIX].
+2. **K3 diagnosed and fixed on CPU (section 3.2).** The MQAR *task* was fine; the *training recipe* was the
+   problem. A 2-layer attention model solves P=4 pairs to 100% in 3,000 steps, but only 38% at P=8 and 16-24% at
+   P=16, **and 10,000 plain steps at P=16 still give 24.2%**: more steps do not help, lr 1e-3/3e-3, d=128/4 heads and a
+   fixed-schedule curriculum do not help. What does: a **mastery curriculum** (start at 2 pairs, double the number of
+   pairs whenever the running training accuracy reaches 90%). It takes the same model from 24% to **100.0%** at P=16
+   in 6,000 steps (no-memory swa(4): 2.5%). The gate is therefore passable on CPU at P=16; the K3 geometry (P=64)
+   is a GPU job (QB1).
 3. **Floors are the main finding for LM-level probes.** The 13.8M attention-only E0 sits at chance on every
    code-native probe: state tracking 31% vs 25% chance (and *below* chance, 15-17%, on increments), `gogeta_recall_d64`
    0.5-0.7%. These families therefore **cannot discriminate our current checkpoints**; they are kept in the battery
@@ -98,15 +101,28 @@ section 1). "Controlled key-value recall" = MQAR v2 (synthetic) + code recall (c
 | P=16, lr 3e-3 | 3,000 | 20.9% | [20.4, 21.3] | 6.3% |
 | P=16, lr 1e-3 + doubling-P curriculum (4->16) | 3,000 | 23.7% | [23.1, 24.2] | 6.3% |
 | P=16, lr 3e-3 + curriculum | 3,000 | 14.6% | [14.2, 15.0] | 6.3% |
-| [MQAR-ROWS] | | | | |
+| P=16, lr 1e-3, **plain, 10,000 steps** | 10,000 | 24.2% | [23.7, 24.7] | 6.3% |
+| P=16, d=128, 4 heads, lr 1e-3 | 3,000 | 16.0% | [15.7, 16.4] | 6.3% |
+| **P=16, mastery curriculum (start 2 pairs, x2 at running acc >= 90%), lr 1e-3** | 6,000 | **100.0%** | [100.0, 100.0] | 6.3% |
+| no-memory baseline swa(w=4), P=16, mastery, lr 1e-3 (seed 0) | 3,000 | 2.5% | [2.3, 2.6] | 6.3% (1/V = 1.6%) |
+| **same, seed 1** | 6,000 | **100.0%** | [100.0, 100.0] | 6.3% |
+
+Gate check on CPU at P=16 (d=64): attention mean over 2 seeds **100.0% >= 90%** and swa(4) **2.5% <= 1/16 + 5 = 11.3%**:
+**both gates pass**. A P=32/T=128 CPU run (8,000 steps) was started and stopped unfinished (CPU contention); the P=32
+and P=64 behaviour is QB1's job.
 
 Reading: (i) the task and generator are fine (P=4 is solved exactly, and `evals/battery/test_battery.py` checks
 every query's target equals its context binding); (ii) accuracy at fixed steps falls steeply with P and is
-insensitive to lr (1e-3 to 3e-3) and to a fixed-ramp curriculum: this is the **induction-circuit plateau** (the loss
-sits near ln P, "I know which values are in context", until a previous-token head + lookup head form), and its
-length grows with P. K3 (P=64, 4,000 steps) was stopped on the plateau: its eval loss 4.23 ~ ln 64 = 4.16.
-(iii) it is **not** too-few-heads/too-small-d, vocabulary size, or sequence length per se; it is steps-at-P.
-[MQAR-FIX]
+insensitive to lr (1e-3 to 3e-3), width (d=64 vs 128), a fixed-ramp curriculum, and **even to 3.3x more steps**
+(24.1% at 3,000 vs 24.2% at 10,000): the model is stuck on the **induction-circuit plateau** (loss near ln P, i.e.
+"I know which values are in context" but no binding) and does not leave it by waiting. K3 (P=64, 4,000 steps) sat on it:
+its eval loss 4.23 is ~ ln 64 = 4.16. (iii) What gets it off the plateau is learning the circuit at small P first and
+keeping it: the **mastery curriculum** (advance when running train accuracy >= 90%, min 100 steps per stage, training
+sequences of length 4P until the final stage) reaches 100.0% at P=16 in 6,000 steps, from the same init and lr that give
+24% without it. The fixed-schedule curriculum (4 -> 8 -> 16 at fixed step counts) did not work because it advanced
+before the small-P circuit was learned. **Recipe v2 (frozen with the battery): d=128, 2 layers, 2 heads, lr 1e-3, batch 64,
+warm-up 200, cosine to 0.1x, wd 0.1, mastery curriculum from P=2, 2,048 eval sequences.**
+Caveat: single seed and tiny models on CPU; P=64 / GPU behaviour is the QB1 prediction (60% confidence), not a result.
 
 **Generator** (`mqar.py`): Zoology-style. Tokens: 0 = filler, keys 1..K, values K+1..K+V (disjoint). Context
 `k1 v1 ... kP vP`, then each key queried once in random order followed by its value, filler in unused slots when
@@ -142,7 +158,14 @@ the variable with the gold choice (`test_battery.py`, 10/10 [verified here]).
 - **Required positive control**: (1) *scorer oracle/pipeline control*: a tiny attention LM trained **on probe-style
   snippets only** (train seeds 1000+, eval seed 0) must reach >= 90% on assign k=1; this proves the probe is solvable
   and the scoring path (eos prefix, tokenisation boundary, choice log-likelihood) works end to end:
-  `evals/battery/train_state_control.py` [CONTROL-RESULT]. (2) *Checkpoint validity gate*: a pretrained checkpoint
+  `evals/battery/train_state_control.py` 
+  **[verified here, CPU, 2,500 steps, 2 layers d=128, trained on assign k in {1,2,4} x distance in {0,8,16} and incr k in {2,3,4}; n=300 per cell, scored by the same scorer, `results/state_track_control_cpu.json`]**:
+  assign k=1 d=0 **100.0%** [100.0, 100.0]; assign k=4 d=16 **96.3%** [94.0, 98.3] (inside the training range);
+  incr k=2 d=0 66.3% [61.0, 71.7]; incr k=4 d=16 38.0% [32.7, 43.3] (hard cells, still above the 25% chance);
+  assign k=8 d=64 21.7% [17.0, 26.3] (outside the training range: distance 64 never seen, chance level). **Gate passed
+  (>= 90% on assign k=1): the probe is solvable, and tokenisation boundary, eos prefix and choice scoring work end to
+  end.** It also shows what a floor at the checkpoint level means: E0 is at 31% on the same cells where a model that has
+  seen the format gets 96-100%.. (2) *Checkpoint validity gate*: a pretrained checkpoint
   is interpretable on a cell only if its lower CI bound is >= 35% (chance + 10); otherwise the cell is `floor`
   for that checkpoint and **excluded from the claim tables** (not counted as "no difference").
 
@@ -184,7 +207,29 @@ stream) only.
   SQ6; graph/program: a reference with enough sequential depth, to be established on GPU, SQ131-SQ133); (iii) a
   **label-shuffled control** is within chance +- 3 points; (iv) the best trivial heuristic on the generalisation split is
   <= chance + 10 (graph) / + 20 (program).
-- **CPU tiny-model sanity [verified here, d=64, 3,000 steps, seed 0]**: [ITER-ROWS]
+- **CPU tiny-model sanity [verified here, d=64, 3,000 steps (shuffled controls 1,500), seed 0, eval 2,048 items per split]**
+  (`results/itercomp/*.json`; accuracy %, chance in brackets; id / length-or-depth generalisation):
+
+  | Task | 1 layer | 4 layers | 1 layer looped x4 | label-shuffled control (4 layers) |
+  |---|---|---|---|---|
+  | `modadd5` [20] | 21.2 / 20.0 / 20.1 | **98.1** / 28.2 / 20.2 | **96.9** / **37.0** / 20.0 | 20.1 / 20.1 / 20.1 |
+  | `program` [10] | 39.9 / 13.8 | 38.5 / 13.8 | **50.2** / 12.7 | 11.1 / 11.1 |
+  | `graph_hops` [10] | 10.6 / 11.9 | 11.6 / 12.5 | 12.0 / 11.1 | 10.0 / 9.4 |
+  | `graph_reach` [50] | 49.8 / 50.4 | 49.8 / 50.4 | 49.8 / 50.4 | 49.8 / 50.4 |
+  | `parity` [50] (id / len2x / len4x) | 57.3 / 50.2 / 49.9 | **94.1** / 51.3 / 50.0 | 50.2 / 50.2 / 50.1 | 50.3 / 50.0 / 50.0 |
+
+  Reading: (a) the **shuffled controls sit at chance** on every task (gate iii passes). (b) `modadd5` has a passing
+  reference (attention 98.1%, looped 96.9% in-distribution, both >= 90%), so the task is **valid for the loops claim
+  on CPU already**. At 2x length the looped single layer (37.0%) beats the 4-layer stack (28.2%) at roughly equal compute
+  (1 layer x 4 vs 4 layers), one seed, CI half-width about 2 points: suggestive for P2, not a result.
+  (c) `parity` also has a passing reference (4-layer attention 94.1% in-distribution at T=32, shuffled 50.3%) and fails
+  to generalise to 2x/4x length (51.3% / 50.0%) for every arm: the intended failure mode. The looped single layer
+  (50.2%) did **not** match the 4-layer stack (94.1%) at equal compute here: loops did not help parity in 3,000 steps
+  (cf. K5/SQ6 for GDN, where they did). (d) `program` is learnable above chance (up to 50.2% looped) but below the "last
+  SET" shortcut at id (54.9%) and at the shortcut floor at gen: **unvalidated**. (e) `graph_hops` / `graph_reach`: every
+  arm is at chance in 3,000 CPU steps (the lookup plateau again): **unvalidated**; QB3 stage A (GPU, 20k steps,
+  k-curriculum) validates or drops them. **CPU-valid today: `modadd5` and `parity` (gate ii and iii cleared); not yet:
+  `modadd7` (not run), `program`, `graph_*`.** Nothing is claimed from the unvalidated tasks.
 
 ### 3.4 F: functional coding
 
@@ -261,10 +306,34 @@ three runs, C44).
 | Iterative self-test + baselines | PASS; shortcut table in section 3.3 | `experiments/evalbattery/itercomp.py` |
 | lm-eval route on E0 CPU, `--limit 150`: val bpb 0.2398, **lineshuf 0.7867**, recall_d64 0.7%, state_assign_k1_d0 32.7% | all 4 battery tasks run end to end | `evals/results/battery-smoke-E0-limit150-tier1-20261122-183529.json` |
 | State probe on E0 (n=300 x 5 cells) | floor, section 3.2 | `experiments/evalbattery/results/state_track_E0_cpu_n300.json` |
+| State probe positive control (tiny LM trained on probe snippets) | assign k=1 100%, k=4 d=16 96.3%: gate passed | `experiments/evalbattery/results/state_track_control_cpu.json` |
 | MQAR K3 diagnosis grid | section 3.2 | `experiments/evalbattery/results/diag/*.json` |
 | Iterative tiny-model sanity | section 3.3 | `experiments/evalbattery/results/itercomp/*.json` |
 
-## 9. Next steps
+## 9. GPU eval campaign plan (after Phase 2b) [proposed]
+
+Full items in `experiments/evalbattery/proposed-queue.json` (10 items, validated against `tools/queue.py`'s schema,
+none added to the live queue). Order and cost (planning numbers, not measurements):
+
+| Item | What | Checkpoints / models | GPU min | Blocker |
+|---|---|---|---|---|
+| QB1 | MQAR v2 gate: attn + swa(4), 2 seeds, P=16 and P=64 (K3 geometry), mastery curriculum | tiny from scratch | 20 | registered prediction B1 |
+| QB2 | K3 v2 (replaces Q16): attn, swa, linattn, GDN, GDN neg-eig x 3 seeds | tiny from scratch | 40 (P=16) | QB1 passes |
+| QB3 | iterative suite stage A: validity gate (attn4, GDN neg-eig, shuffled) on parity/modadd5/graph_hops/program | tiny from scratch | 25 | B5 |
+| QB3b | iterative suite stage B: looped vs unlooped at matched compute, 5 tasks x 6 arms x 2 seeds | tiny from scratch | 90 | QB3 gate, Q19 |
+| QB4 | battery on E0, E1, E2: LM (+ line-shuffle control) + probe (18 cells) + recall | existing seed-0 checkpoints | 30 | fla in eval venv for the lm-eval half (QB10); probe scorer works now |
+| QB5 | functional family: HE+, MBPP+ greedy, CRUX-O, harness gate | E0 (then E1/E2) | 45 | B4, SQ138 harness gate, no KV cache |
+| QB6 | post-Phase-2b battery (LM + probe + recall) on all 3-seed runs (E10 x3, E1 x3, E11 x3, E9, E2, E0) | 12 checkpoints | 100 | Phase 2b done; QB10 |
+| QB7 | loop-count sweep r = 1..8 of the probe on E2 (E9 control) | E2, E9 | 25 | QB4 shows an interpretable cell |
+| QB9 | analysis: paired item bootstraps, interaction contrasts, gate table | CPU | 45 CPU | QB2, QB3b, QB6 |
+| QB10 | **human**: install fla into `gogeta-eval` | | 5 | needs human |
+
+Sum of GPU time: about 375 min if every item runs; the *minimum* informative set after Phase 2b is QB1 + QB3 + QB4 + QB6
+(about 175 min). Because the campaign runner is sequential, QB1/QB3/QB4 (<= 30 min each) fit the `next --gpu --max-minutes`
+slots while a long run cools. Scripts: `run_mqar_gate.sh`, `run_mqar_k3v2.sh`, `run_iter_gpu.sh` in
+`experiments/evalbattery/` (run in `~/.venvs/gogeta`; bf16 autocast on CUDA is built in).
+
+## 10. Next steps
 
 See `experiments/evalbattery/proposed-queue.json` (GPU campaign after Phase 2b), `proposed-claims.md` (C170-C179),
 `proposed-side-quests.md` (SQ130-SQ139), `proposed-predictions.md`.

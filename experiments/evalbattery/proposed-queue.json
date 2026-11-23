@@ -1,0 +1,237 @@
+[
+  {
+    "id": "QB1",
+    "kind": "check",
+    "title": "MQAR v2 validity gate: attention (positive control) and swa(w=4) (no-memory baseline), 2 seeds, mastery curriculum, at P=16/T=64 and the K3 geometry P=64/T=256",
+    "why": "C16/SQ59 are blocked because K3's attention control reached 8.6%. The CPU diagnostics (C170) show the recipe, not the task, was the problem. Gate: attn >= 90% and swa(4) <= 1/P + 5 points; otherwise the memory family stays unvalidated.",
+    "depends_on": [
+      "Q1"
+    ],
+    "resources": {
+      "type": "gpu",
+      "est_minutes": 20
+    },
+    "ready": false,
+    "missing": [
+      "prediction B1 (experiments/evalbattery/proposed-predictions.md) registered in experiments/checks/PREDICTIONS.md",
+      "recipe finalised from the CPU diagnostics (mastery curriculum steps for P=64 are extrapolated)"
+    ],
+    "needs_human": false,
+    "launch": "bash experiments/launch/status.sh && bash experiments/evalbattery/run_mqar_gate.sh",
+    "status": "queued",
+    "source": "experiments/evalbattery/mqar.py; notes/eval-battery.md 3.2; experiments/cards/K3.md",
+    "note": "GPU use: tiny models (d=128, 2 layers). Results land in experiments/evalbattery/results/gate/*.json (per-arm accuracy + sequence-cluster bootstrap CI). Replaces Q15's design work (done on CPU)."
+  },
+  {
+    "id": "QB2",
+    "kind": "check",
+    "title": "K3 v2 (replaces Q16): MQAR recall with attn, swa(4), plain linear attention, GDN and GDN neg-eig, 3 seeds, at the geometry that cleared QB1",
+    "why": "Settles C16 (vs plain linear attention only) and unblocks SQ59 (KDA vs GDN recall). Interpretable only if QB1 passed.",
+    "depends_on": [
+      "QB1"
+    ],
+    "resources": {
+      "type": "gpu",
+      "est_minutes": 40
+    },
+    "ready": false,
+    "missing": [
+      "QB1 gate result",
+      "prediction B1 arm predictions registered"
+    ],
+    "needs_human": false,
+    "launch": "bash experiments/launch/status.sh && GEOM=P16 STEPS=8000 bash experiments/evalbattery/run_mqar_k3v2.sh",
+    "status": "queued",
+    "source": "experiments/evalbattery/run_mqar_k3v2.sh; experiments/cards/K3.md; claims C16",
+    "note": "15 runs (5 arms x 3 seeds), about 2.5 min each at P=16/T=64/8k steps (GDN is slower than attention). Use GEOM=P64 STEPS=30000 only if QB1 showed attention clears the K3 geometry (then est 150 min: split per arm)."
+  },
+  {
+    "id": "QB3",
+    "kind": "check",
+    "title": "Iterative-computation suite, stage A (validity gate): attn4, GDN neg-eig 1-pass and label-shuffled controls on parity, modadd5, graph_hops, program (id + length/depth-generalisation splits), 20k steps, 1 seed",
+    "why": "The 'do extra loops do useful work' testbed needs a reference model >= 90% in-distribution and shuffled controls at chance before any looped-vs-unlooped contrast is read. CPU tiny models (3k steps) are at chance on the graph tasks (C176).",
+    "depends_on": [
+      "Q1"
+    ],
+    "resources": {
+      "type": "gpu",
+      "est_minutes": 25
+    },
+    "ready": false,
+    "missing": [
+      "prediction B5 registered in PREDICTIONS.md"
+    ],
+    "needs_human": false,
+    "launch": "bash experiments/launch/status.sh && STAGE=A bash experiments/evalbattery/run_iter_gpu.sh",
+    "status": "queued",
+    "source": "experiments/evalbattery/itercomp.py; notes/eval-battery.md 3.3; K5/SQ6 cards",
+    "note": "12 runs of 20k steps at ~5 ms/step (T <= 128) plus 4 shuffled controls of 5k steps. Output experiments/evalbattery/results/itercomp_gpu/*.json."
+  },
+  {
+    "id": "QB3b",
+    "kind": "check",
+    "title": "Iterative-computation suite, stage B: looped vs unlooped at matched compute (attn4 vs attn1x4, gdn4/gdn1x4, neg-eig variants) on 5 tasks, 2 seeds, depth-generalisation drop as the headline",
+    "why": "C18/C22/C179: the direct loops test with the validity gate in place; reports id and gen accuracy with paired item bootstrap CIs.",
+    "depends_on": [
+      "QB3",
+      "Q19"
+    ],
+    "resources": {
+      "type": "gpu",
+      "est_minutes": 90
+    },
+    "ready": false,
+    "missing": [
+      "QB3 gate passed (reference >= 90% id for each task; tasks that fail are dropped, not interpreted)"
+    ],
+    "needs_human": false,
+    "launch": "bash experiments/launch/status.sh && STAGE=B bash experiments/evalbattery/run_iter_gpu.sh",
+    "status": "queued",
+    "source": "experiments/evalbattery/run_iter_gpu.sh; notes/eval-battery.md 3.3",
+    "note": "60 runs (5 tasks x 6 arms x 2 seeds), ~1.5 min each at 20k steps. Split by task if a slot is short."
+  },
+  {
+    "id": "QB4",
+    "kind": "eval",
+    "title": "Battery on the existing seed-0 checkpoints (E0, E1, E2): language modelling (val + fresh + line-shuffle control), code-native state-tracking probe (18 cells x 1,100), battery recall (n=1,100)",
+    "why": "First four-family numbers and the floor check (C172): which cells are interpretable (lower CI >= 35%) on real checkpoints. Extends Q14 (tier 1) with the battery tasks.",
+    "depends_on": [
+      "Q14"
+    ],
+    "resources": {
+      "type": "gpu",
+      "est_minutes": 30
+    },
+    "ready": false,
+    "missing": [
+      "predictions B2, B3 registered",
+      "E1/E2 via lm-eval need flash-linear-attention in ~/.venvs/gogeta-eval (QB10, human); the standalone probe scorer works now in ~/.venvs/gogeta"
+    ],
+    "needs_human": false,
+    "launch": "for c in E0-20261122-122059-s0 E1-20261122-124440-s0 E2-20261122-132340-s0; do ~/.venvs/gogeta/bin/python -m evals.battery.score_state_track --checkpoint ~/fusiondance-data/checkpoints/$c/model.pt --device cuda --bs 32 --out experiments/evalbattery/results/state_track_${c%%-*}_gpu.json; done",
+    "status": "queued",
+    "source": "evals/battery/score_state_track.py; evals/tasks/battery/*.yaml; notes/eval-battery.md 3.1-3.2",
+    "note": "Probe: 18 cells x 1,100 items x 4 choices = 79k sequences of 70-600 tokens, about 4 GPU-min per checkpoint (CPU: ~46 s for 48 items at k=8 d=64). The lm-eval half (tier 1 + gogeta_battery_val_lineshuf_bpb + gogeta_battery_recall_d*, ~8 min each) runs after QB10: `~/.venvs/gogeta-eval/bin/python -m evals.run_suite --checkpoint <model.pt> --tasks gogeta_val_bpb,gogeta_uncheatable_py_bpb,gogeta_battery_val_lineshuf_bpb,gogeta_battery_recall_d64,gogeta_battery_recall_d256,gogeta_battery_recall_d512,gogeta_battery_recall_d960 --device cuda --log-samples`."
+  },
+  {
+    "id": "QB5",
+    "kind": "eval",
+    "title": "Functional family on E0/E1/E2: HumanEval+ and MBPP+ greedy pass@1 (+ clean twins), CRUXEval-O, and the canonical-solution / stub harness gate",
+    "why": "C177: is F above the 5% floor at all? The harness gate (canonical = 100%, stub = 0%) validates plumbing without a strong model.",
+    "depends_on": [
+      "Q14"
+    ],
+    "resources": {
+      "type": "gpu",
+      "est_minutes": 45
+    },
+    "ready": false,
+    "missing": [
+      "prediction B4 registered",
+      "harness-gate script (SQ138) not written",
+      "no KV cache in gogeta/hf.py: generation recomputes the prefix every token (CPU: 46 generations took 223 s)"
+    ],
+    "needs_human": false,
+    "launch": "~/.venvs/gogeta-eval/bin/python -m evals.run_suite --checkpoint ~/fusiondance-data/checkpoints/E0-20261122-122059-s0/model.pt --tier 2 --device cuda",
+    "status": "queued",
+    "source": "evals/run_suite.py tier 2; notes/benchmark-suite.md",
+    "note": "E0 only until fla is installed in the eval venv; then repeat for E1/E2 (est 15 min each). Greedy tier 2 only; the n=20 sampled tier (2s) is about 20x and belongs in a separate item if pass@1 clears 5%."
+  },
+  {
+    "id": "QB6",
+    "kind": "eval",
+    "title": "Post-Phase-2b battery on all 3-seed checkpoints (E10 x3, E1 x3, E11 x3, plus E9, E2 and E0 at the tuned LR): language modelling + probe + recall",
+    "why": "The paired-document bootstrap for hybrid vs attention (P1) and the 2x2 interaction contrast inputs (P4) need per-doc scores for every seed; also the loops-vs-control comparison E2 vs E9 (P2).",
+    "depends_on": [
+      "Q7",
+      "Q8",
+      "E9",
+      "Q10",
+      "Q17",
+      "QB4"
+    ],
+    "resources": {
+      "type": "gpu",
+      "est_minutes": 100
+    },
+    "ready": false,
+    "missing": [
+      "Phase 2b checkpoints (Q7, Q8, E9, Q10, Q17 not done)",
+      "fla in the eval venv (QB10) for the GDN checkpoints",
+      "E10 loads through the HF-dir path (not tested here)"
+    ],
+    "needs_human": false,
+    "launch": "for run in $(ls ~/fusiondance-data/checkpoints | grep -E '^(E10|E1|E11|E9|E2|E0)-'); do ~/.venvs/gogeta-eval/bin/python -m evals.run_suite --checkpoint ~/fusiondance-data/checkpoints/$run/model.pt --tasks gogeta_val_bpb,gogeta_uncheatable_py_bpb,gogeta_battery_val_lineshuf_bpb,gogeta_battery_recall_d64,gogeta_battery_recall_d960 --device cuda --log-samples; done",
+    "status": "queued",
+    "source": "notes/eval-battery.md sections 3.1, 4; evals/run_suite.py",
+    "note": "12 checkpoints x ~8 min. Select the Phase 2b runs by name (the glob also matches K7 sweep runs; filter to the 200M-token runs listed in the Phase 2b campaign file) before launching. --log-samples keeps per-doc (ll, bytes) pairs for the paired bootstrap."
+  },
+  {
+    "id": "QB7",
+    "kind": "eval",
+    "title": "Loop-count sweep of the state-tracking probe on E2 (and its unlooped control E9): r = 1, 2, 3, 4, 6, 8 on the incr and assign k in {2,4} d in {0,16} cells",
+    "why": "P2 at checkpoint level: does an extra loop change the probe score? Interpretable only if some cell clears the floor gate (QB4); otherwise reports a null on a floored task.",
+    "depends_on": [
+      "QB4",
+      "Q10",
+      "E9"
+    ],
+    "resources": {
+      "type": "gpu",
+      "est_minutes": 25
+    },
+    "ready": false,
+    "missing": [
+      "QB4 shows at least one interpretable cell"
+    ],
+    "needs_human": false,
+    "launch": "for r in 1 2 3 4 6 8; do ~/.venvs/gogeta/bin/python -m evals.battery.score_state_track --checkpoint ~/fusiondance-data/checkpoints/<E2 run>/model.pt --loops $r --cells assign:2:0,assign:4:16,incr:2:0,incr:4:16 --device cuda --bs 32 --out experiments/evalbattery/results/state_track_E2_r$r.json; done",
+    "status": "queued",
+    "source": "evals/battery/score_state_track.py (--loops)",
+    "note": "Replace <E2 run> with the E2 checkpoint name; E9 has no loops (single run)."
+  },
+  {
+    "id": "QB9",
+    "kind": "analysis",
+    "title": "Battery analysis: per-family paired item bootstraps (A2 stats core), interaction contrasts, validity-gate table, write results/battery-v1.json and the evidence tables",
+    "why": "Turns QB1-QB7 into verdicts per family with the gates applied; cells below the floor gate are excluded, not counted as null.",
+    "depends_on": [
+      "QB2",
+      "QB3b",
+      "QB6"
+    ],
+    "resources": {
+      "type": "cpu",
+      "est_minutes": 45
+    },
+    "ready": false,
+    "missing": [
+      "QB2, QB3b, QB6 results",
+      "analysis script (to be written: reads results/*.json, calls experiments/stats/core.py bootstrap/paired_bootstrap)"
+    ],
+    "needs_human": false,
+    "launch": "agent task, no launcher command",
+    "status": "queued",
+    "source": "notes/eval-battery.md sections 1, 4, 6; experiments/stats/core.py"
+  },
+  {
+    "id": "QB10",
+    "kind": "analysis",
+    "title": "Human: install flash-linear-attention into ~/.venvs/gogeta-eval so lm-eval can load GDN checkpoints (E1, E2, E9, E11)",
+    "why": "Blocks the lm-eval half of QB4/QB5/QB6 for every GDN checkpoint. The standalone probe scorer and all tiny-model scripts run in ~/.venvs/gogeta, which already has fla 0.6.0 (checked), so only lm-eval tasks wait.",
+    "depends_on": [],
+    "resources": {
+      "type": "cpu",
+      "est_minutes": 5
+    },
+    "ready": false,
+    "missing": [
+      "human approval of a network install"
+    ],
+    "needs_human": true,
+    "reason": "pip install downloads packages into a venv; AGENTS rules park installs for the human. Command: ~/.venvs/gogeta-eval/bin/pip install flash-linear-attention==0.6.0 ; then check: ~/.venvs/gogeta-eval/bin/python -c \"import torch, lm_eval, fla; print(torch.__version__, lm_eval.__version__, fla.__version__)\" must print 2.14.1+cu130 0.4.13 0.6.0 (torch must not change).",
+    "launch": "~/.venvs/gogeta-eval/bin/pip install flash-linear-attention==0.6.0",
+    "status": "queued",
+    "source": "evals/README.md Environment; notes/eval-battery.md section 7"
+  }
+]

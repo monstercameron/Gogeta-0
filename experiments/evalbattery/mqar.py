@@ -66,10 +66,10 @@ def mqar_batch(B: int, gen: torch.Generator, pairs: int, seq_len: int, key_v: in
     return x, y
 
 
-def build(kind: str, d: int, layers: int, heads: int, vocab: int, T: int, window: int = 4):
+def build(kind: str, d: int, layers: int, heads: int, vocab: int, T: int, window: int = 4, neg_eig: bool = False):
     base = {"attn": "attn", "swa": "swa", "gdn": "gdn", "linattn": "attn"}[kind]
     cfg = ModelConfig(vocab_size=vocab, d_model=d, n_heads=heads, mlp_hidden=2 * d, prelude=[base] * layers,
-                      core=[], coda=[], window=window, max_seq_len=T)
+                      core=[], coda=[], window=window, max_seq_len=T, gdn_neg_eigval=neg_eig)
     m = FusionDance(cfg)
     if kind == "linattn":
         import torch.nn as nn
@@ -81,6 +81,11 @@ def build(kind: str, d: int, layers: int, heads: int, vocab: int, T: int, window
             nn.init.normal_(b.mixer.qkv.weight, std=0.02)
             nn.init.normal_(b.mixer.o.weight, std=std_res)
     return m
+
+
+def autocast_ctx(device):
+    """bf16 autocast on CUDA (needed by the fla GDN kernels), plain fp32 on CPU."""
+    return torch.autocast("cuda", dtype=torch.bfloat16) if str(device).startswith("cuda") else torch.autocast("cpu", enabled=False)
 
 
 def lr_at(step, total, peak, warmup):
@@ -111,7 +116,8 @@ def evaluate(m, pairs, seq_len, key_v, val_v, seed, n_seq=2048, bs=256, device="
     for _ in range(n_seq // bs):
         x, y = mqar_batch(bs, gen, pairs, seq_len, key_v, val_v)
         x, y = x.to(device), y.to(device)
-        logits, loss = m(x, y)
+        with autocast_ctx(device):
+            logits, loss = m(x, y)
         mask = y != -100
         hit = (logits.argmax(-1) == y) & mask
         corr.append(hit.sum(1).cpu()); tot.append(mask.sum(1).cpu()); losses.append(loss.item())
@@ -132,7 +138,7 @@ def run(a):
     vocab = make_vocab(a.key_vocab, a.val_vocab)
     T = a.seq
     torch.manual_seed(a.seed)
-    m = build(a.kind, a.d, a.layers, a.heads, vocab, T, a.window).to(a.device)
+    m = build(a.kind, a.d, a.layers, a.heads, vocab, T, a.window, a.neg_eig).to(a.device)
     opt = torch.optim.AdamW(m.parameters(), lr=a.lr, betas=(0.9, 0.95), weight_decay=a.wd)
     gen = torch.Generator().manual_seed(a.seed)
     t0 = time.time(); hist = []
@@ -148,7 +154,8 @@ def run(a):
             Tc = T
         x, y = mqar_batch(a.batch, gen, P, Tc, a.key_vocab, a.val_vocab)
         x, y = x.to(a.device), y.to(a.device)
-        logits, loss = m(x, y)
+        with autocast_ctx(a.device):
+            logits, loss = m(x, y)
         if a.mastery:
             mk = y != -100
             tacc = ((logits.argmax(-1) == y) & mk).sum().item() / mk.sum().item()
@@ -195,6 +202,7 @@ def parser():
     p.add_argument("--warmup", type=int, default=200)
     p.add_argument("--curriculum", action="store_true")
     p.add_argument("--curriculum-start", type=int, default=4)
+    p.add_argument("--neg-eig", action="store_true", help="GDN with negative eigenvalues (beta in (0,2))")
     p.add_argument("--mastery", action="store_true", help="advance P (x2) when the running train accuracy >= --mastery-acc")
     p.add_argument("--mastery-acc", type=float, default=0.9)
     p.add_argument("--seed", type=int, default=0)

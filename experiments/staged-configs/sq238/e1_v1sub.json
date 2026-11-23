@@ -1,0 +1,39 @@
+{
+  "experiment": "SQ238v1sub",
+  "description": "SQ238 dedup-only control: E1 (same as E53) trained on code-py-v1sub, a seeded uniform random v1 subset with v2's doc count (698,714) and v1-val families excluded, NOT deduplicated. 200M tokens, lr 6e-3.",
+  "model": {
+    "vocab_size": 8192,
+    "d_model": 384,
+    "n_heads": 6,
+    "mlp_hidden": 1024,
+    "window": 256,
+    "max_seq_len": 1024,
+    "ternary": false,
+    "prelude": [
+      "swa",
+      "gdn",
+      "gdn",
+      "swa",
+      "gdn",
+      "attn"
+    ],
+    "core": [],
+    "coda": []
+  },
+  "train": {
+    "dataset": "code-py-v1sub",
+    "seq_len": 1024,
+    "batch_size": 32,
+    "max_tokens": 200000000,
+    "lr": 0.006,
+    "min_lr_frac": 0.1,
+    "warmup_steps": 300,
+    "weight_decay": 0.1,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "grad_clip": 1.0,
+    "eval_every": 250,
+    "eval_seqs": 128,
+    "seed": 0
+  }
+}

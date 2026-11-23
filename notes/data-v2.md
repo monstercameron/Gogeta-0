@@ -58,3 +58,30 @@ copy-on-write). Output about 0.4 GB. The synthetic test (3,200 docs) takes ~3 s 
 - Test split (`code-py-v1-test*`) is untouched; `-indist` docs are not excluded here (apply `train_exclude_doc_ids` separately).
 - Signatures keep the low 32 bits of each MinHash value (half the RAM; collision odds 2^-32 per perm), so families can
   differ at the margin from the 64-bit `corpus_families.py` labels.
+
+## code-py-v1sub: the dedup-only control (SQ238)
+
+Builder: `experiments/data_integrity/build_v1_subset.py`; test: `test_build_v1_subset.py`.
+
+**Why.** v2 changes two things relative to v1: it removes near-duplicates, and it shrinks train (698,714 docs / 202.5M tokens vs
+987,154 / 262.4M), so a 200M-token run covers ~99% of v2 but ~76% of v1. A v1-vs-v2 gap cannot be attributed to dedup alone.
+v1sub is **a uniform random subset of v1 train with v2's doc count and no dedup**; v1sub-vs-v2 isolates dedup at matched
+doc count, v1-vs-v1sub isolates coverage/size.
+
+**Definition.** (1) Recompute build_v2's families (same functions and params, train + val together). (2) Exclude every v1 train
+doc whose family contains a v1 val doc, and every train doc sharing a rare first def/class name (<= 50 docs, non-generic) with a
+v1 val doc, so v1sub is not more contaminated against v1 val than v2 is. (3) Draw exactly 698,714 (read from
+`dataset-v2.manifest.json`) of the remaining docs with `numpy.default_rng(1234).choice(replace=False)`, keep v1 file order.
+Output `datasets/code-py-v1sub/`: `train.bin`, `val.bin` (v1's, byte-identical), `docs_val.jsonl` (v1's), `meta.json`
+(with a `v1sub` block: exclusion counts), `tokenizer.json`, `train_keep_ids.npy`; `--manifest` uses the v2 manifest schema.
+The build asserts that its token stream matches v1 `train.bin`/`val.bin` when those exist (same tokenisation path as
+`tools/prepare_data.py`).
+
+**Exclusion is a recomputation, not read from v2's outputs.** `train_keep_ids.npy` only lists kept docs, so "removed because of
+v1 val" cannot be separated from "removed as a duplicate". The builder therefore re-runs the family computation (deterministic,
+identical to v2's). Choice: use all 4,000 v1 val docs (v2 applied the name link only to the 614 accepted ones, and also dropped
+families of 20k extra train-drawn candidates, which are not v1-val related and are NOT excluded here). This is a slight superset
+of v2's v1-val-driven exclusions: v1sub is at least as clean against v1 val as v2. Counts are in `meta.json` `v1sub`.
+
+**Run** (box with v1 `docs_train.jsonl`, KEEP=1): `python experiments/data_integrity/build_v1_subset.py --manifest v1sub.manifest.json`.
+Expected cost: same pipeline as build_v2 minus the two 13-gram scans, about 3-5 min on 24 cores, peak RAM ~6-9 GB, output ~0.4 GB.

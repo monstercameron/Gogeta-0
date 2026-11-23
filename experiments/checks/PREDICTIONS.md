@@ -554,3 +554,22 @@ This executes only stages registered in v0.4.40 (`experiments/design/power-cost.
   - Stage 2's size is set so the final N gives 80% power for |I| = 1%, capped at the registered N = 246.
   - If stage 1 already reaches that N, F2 stops.
   - Because the re-estimation is blinded, the alpha of the final test is unchanged (Kieser & Friede 2003). The stage-1 sigma and the stage-2 size are recorded in the devlog before stage 2 dispatches.
+
+## Fleet wave 6, part 1 (2026-11-22 ~23:40, before dispatch): SQ238 dedup-only control
+- **Question:** the H5 bridge showed E1 on code-py-v2 at 0.2599 clean80 bpc, against 0.2679 on v1 (−3.0%). v2 changes both duplication and coverage: 200M tokens is about 99% of v2's train but about 76% of v1's. How much of the gap is **dedup**?
+- **Data:** `code-py-v1sub` (`experiments/data_integrity/build_v1_subset.py`, tests 7/7) is a seeded uniform random v1 subset with **v2's doc count (698,714)**, the v1-val families excluded, and **no dedup**. It is built on the box, and its manifest is committed after a 2-box determinism check (as for v2).
+- **Arms** (200M tokens, lr 6e-3, RTX 5090, clean80 primary):
+  - **A:** E1 on v1sub (`experiments/staged-configs/sq238/e1_v1sub.json` [85c36365c0f4f55a]), seeds 0–3;
+  - **B:** E1 on v2 (E53), seeds 1–3, plus the existing seed 0;
+  - **C:** E1 on v1, the existing Phase 2b-5090 7 seeds (0.26795).
+- **Contrasts:**
+  - **dedup effect** D = log bpc(A) − log bpc(B), paired by seed;
+  - **coverage/size effect** S = log bpc(C) − log bpc(A), Welch.
+- **Predictions:**
+  - **D1:** D > 0 (dedup helps), with D between 1.0% and 3.0%.
+  - **D2:** |S| ≤ 1.0% (a smaller but undeduplicated set is about as good as v1 at 200M).
+  - **D3:** D + S ≈ the H5 gap (3.0%), within the CIs.
+- **Decision rule:**
+  - If D's 95% CI excludes 0 and is positive, the A3 v2 results stand as "with dedup".
+  - If D's CI includes 0 and S explains the gap, v2's apparent gain is a coverage artefact, and A3 conclusions must not cite dedup.
+- **Seeds:** 4 per arm. The MDE is about 0.9% (the SQ253 sd), so a D below about 1% would read as inconclusive.

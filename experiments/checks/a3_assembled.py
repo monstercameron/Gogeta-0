@@ -89,6 +89,7 @@ def paired(a, b):
         return out
     m = st.mean(d)
     out["rel"] = math.expm1(m)
+    out["loso"] = [math.expm1(st.mean(d[:i] + d[i + 1:])) for i in range(len(d))] if len(d) >= 3 else None  # leave-one-seed-out (policy)
     if len(d) >= 2:
         se = st.stdev(d) / math.sqrt(len(d))
         out.update({"df": len(d) - 1, "se_log": se, "t": m / se if se else float("inf"),
@@ -161,7 +162,7 @@ def main():
                         "params_non_embedding": rr[0]["params_non_embedding"], "n": len(rr)}
     lrb = {}
     for r in runs:
-        if r["arm"] in ("A2s", "A3mx") and r["seed"] == 5:
+        if r["arm"] in ("A2s", "A3mx", "A2f") and r["seed"] == 5:   # A3 amendments 1-2
             lrb.setdefault(r["arm"], {})[str(r["lr"])] = r["clean80"]
     for arm, d in lrb.items():
         best = min(d.values())

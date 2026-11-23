@@ -48,6 +48,7 @@ def paired(a, b):
     o = {"n": len(x), "seeds": seeds, "per_seed": {s: math.expm1(v) for s, v in zip(seeds, x)}}
     if len(x) >= 2:
         m = st.mean(x); se = st.stdev(x) / math.sqrt(len(x)); df = len(x) - 1
+        o["loso"] = [math.expm1(st.mean(x[:i] + x[i + 1:])) for i in range(len(x))] if len(x) >= 3 else None  # leave-one-seed-out (policy)
         o.update({"rel": math.expm1(m), "df": df, "dz": m / st.stdev(x), "p": t_two_sided_p(m / se, df),
                   "ci95": [math.expm1(m - t_quantile(0.05, df) * se), math.expm1(m + t_quantile(0.05, df) * se)],
                   "_m": m, "_se": se})

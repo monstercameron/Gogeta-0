@@ -18,6 +18,28 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.22: Outside review 14:41: compute-matched E27 for the A2 headline and an A2f LR bracket registered and queued; expenses reconciled ($42.75 total); erratum: A2 headline not at matched FLOPs
+*2026-11-23*
+
+**Outside review 14:41: the A2 headline gets a compute-matched control and A2f an LR bracket (both registered and queued); expenses reconciled ($42.75 total, $12.57 for assembly); four new side quests. Erratum: the A2 headline was never "at matched FLOPs".**
+
+- **Outside review** (`notes/reviews/2026-11-23-1441-review.md`, Haiku), triaged in its footer:
+  - **A2 amendment 3** (registered before running): E27 at 221.6M tokens (FLOP-matched to A2s), seeds 2-4. Prediction: A2s - E27 = -15.5% (-17% to -13%). C209 is REFUTED by its own criterion if the CI reaches -5%.
+  - **A3 amendment 2** (registered): A2f at 3e-3 and 1.2e-2, seed 5, so the ternary cost (A2s vs A2f) is fair on LR too.
+  - Both run on the A3 fleet's last box after the A3 amendment 1 pair.
+  - **SQ392 protocol clarification** before it runs: max_seq_len 2048 in both dense arms.
+  - **New side quests:** SQ395 (compute-to-target from existing curves), SQ396 (minimal-pair likelihood), SQ397 (learned global tokens for SWA), SQ398 (A2s vs E27 at 20M). The token-class reweighting idea is merged into SQ318.
+- **Erratum (v0.5.10):** "the A1 winners add up to -16.7% at matched FLOPs" is wrong. A2s uses about 10% more training compute than E27 (3.79e16 vs 3.41-3.43e16; C209). A2 amendment 3 measures the compute-matched gap.
+- **Expenses reconciled** (`experiments/expenses.json`): there were no entries after 2026-11-22 22:35. Added from provider credit:
+  - X5: fleet wave 4, $23.22, including the ~$8.5 idle time disclosed in v0.4.103;
+  - X6: the assembly waves A1-A4, $12.57 to 14:45;
+  - a reconciliation at 14:45: total spend $42.75, credit $57.25.
+  The assembly phase is under the agent's self-imposed $25 cap, within the human's 5090-or-better grant (v0.5.0).
+- **Queue:** A3 and A4 are marked done, and E8 stays running (decode built, GPU speedup not measured). QUEUE.md is re-rendered.
+- **Quick review 14:41 (statistician):** leave-one-seed-out on every A3/A4 contrast. No sign flips and no decision changes. `a3_assembled.py` and `a4_fullstack.py` now write `loso` to their result JSON. The LR bracket is paired on data order, because the batch sampler has its own seeded generator (`gogeta/train.py:61-65`).
+
+---
+
 ## v0.5.21: Docs refresh (hourly)
 *2026-11-23*
 

@@ -853,3 +853,17 @@ Prompted by outside review 2026-11-23 12:10 (`notes/reviews/2026-11-23-1210-revi
 - **Estimand:** the hybrid's advantage over dense past 1,024 tokens (log NLL ratio, paired by seed), without vs with interpolation on the dense arm.
 - **Prediction:** interpolation removes about half of the dense arm's post-1,024 degradation, so the advantage shrinks from -60.7% to about -30% (range -45% to -10%).
 - **Rule:** if the advantage with interpolation is still beyond -50%, the long-context result stands as stated. If it falls inside -30%, it is restated as "vs unscaled RoPE", and the README's long-context bullet is rewritten before it is cited again.
+
+### A2 amendment 3 (2026-11-23 ~14:50 EST, before running; outside review 14:41, critique 2.1): compute-matched E27 for the A2 headline (C209)
+- **Why:** C209's A2s-vs-E27 gap (-16.67%) compares A2s at 3.79e16 training FLOPs with E27 at 3.41-3.43e16 (truncated BPTT). DEVLOG v0.5.10 called it "matched FLOPs", which was wrong (erratum in v0.5.22).
+- **Runs:** E27 (`experiments/staged-configs/e27_fact111.json`, lr 6e-3) at **221.6M tokens** (200M x 3.79/3.42, so its training FLOPs match A2s's), seeds 2, 3, 4, paired with A2s at the same seeds (shared data order).
+- **Estimand:** A2s - E27(221.6M), log clean80, paired by seed, df 2.
+- **Prediction:** -15.5% (range -17% to -13%). The extra 10.8% of tokens is worth about 1-2% to E27 at this horizon.
+- **Rule:** C209 gains a compute-matched evidence event if the paired 95% CI lies below -5% (its refutation bound). If the CI reaches -5% or above, C209 is REFUTED by its own criterion and is restated.
+
+### A3 amendment 2 (2026-11-23 ~14:50 EST, before running; outside review 14:41, critique 2.2 / I-6): bracket the full-precision reference A2f
+- **Why:** A3 amendment 1 brackets A2s and A3mx only. The ternary cost (A2s vs A2f, A2 P3 +9.5%, used in C207's wording) is fair only if A2f's 6e-3 is also near its optimum.
+- **Runs:** A2f (`a2/a2f.json`) at lr 3e-3 and 1.2e-2, seed 5, 200M tokens.
+- **Rule:** A2f is LR-robust at 6e-3 if its seed-5 clean80 at 6e-3 is within 1% of the best of {3e-3, 6e-3, 1.2e-2}. If not, the ternary cost is restated at A2f's best LR, and C207 gains an LR limitation.
+- **Prediction:** robust (within 1%), as A2s was at 3e-3 (+0.6%).
+- **SQ392 protocol clarification (2026-11-23 ~14:50, before running; outside review 14:41, critique 2.4):** both dense arms are built with `max_seq_len = 2048`, so the RoPE cos/sin table covers every scored position. The baseline uses raw positions 0-2047, and the interpolated arm divides positions by 2 before the table lookup. Nothing else differs between the two arms.

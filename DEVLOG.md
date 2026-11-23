@@ -18,6 +18,31 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.104: Outside review 08:37: the 200M anti-synergy grows through training (SQ337); GDN loses at equal wall-clock (SQ338); LR-artifact claim corrected
+*2026-11-23*
+
+**Outside review 08:37 (Haiku) and quick reviews 08:34 (statistician) and 08:39 (ML theorist), triaged.** Three of their ideas could be answered from runs already on disk, so they were run at once (descriptive, not registered):
+
+| Check | Result |
+|---|---|
+| SQ336, leave-one-seed-out on the 200M I | no sign flip; per-seed I = +8.83%, +3.94%, +5.86% |
+| SQ337, I along training (in-training eval loss, not clean80) | **-4.0% at step 250, 0 near ~107M tokens, +4.5% at the last eval**: one rising trajectory, not a transient |
+| SQ338, equal wall-clock | the GDN cell takes 1.62x the dense time; its -3.4% per FLOP becomes **+8.2% worse** at equal wall-clock |
+
+- **Corrections:**
+  - The F2 devlog's "the reversal is not an LR artifact" overstated H2'. Cells 000 and 100 ran only at 3e-3 at 200M, so an LR confound remains open (SQ342; C202 limitation added).
+  - The I figures are log-points (+6.21 log-points = +6.4% as a ratio).
+  - The README now says C202 is PARTIAL, and that GDN's lead holds per FLOP only.
+- **Noted:** looping halves the unique parameters at matched block applications (12.3M vs 27.9M), so the loops factor is also a unique-params factor (consistent with C197).
+- **New side quests:**
+  - CPU: SQ339 (split the ternary cost into weights vs int8 activations, post hoc), SQ340 (fp32 reference scoring of cells 000, 100 and 111), SQ341 (loop-count curve on the loop cells). The 200M checkpoints are local.
+  - GPU, needing a budget approval: SQ342 (200M LR completion), SQ343 (loop placement by block kind).
+  - Merged: decay-only cell 111 into SQ235; per-name init generators into SQ332.
+  - Rejected: A5 (per-cell LR at 20M), superseded by SQ342 at 200M; A8 (identifier renaming), covered by SQ194.
+- **Fleet:** 0 instances; GPU budget spent.
+
+---
+
 ## v0.4.103: SQ263: at 200M the fusion ingredients compound (I = +6.2%, anti-synergy); C201 REFUTED, C202; K9 reproduced exactly; fleet killed
 *2026-11-23*
 

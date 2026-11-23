@@ -17,6 +17,30 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.70: Outside review 20:37: E1's headline lead over E0 may be a baseline artifact
+*2026-11-22*
+
+### Outside review 2026-11-22 20:37 (Haiku)
+`notes/reviews/2026-11-22-2037-review.md`, with the main agent's triage.
+**Key finding (computed; contaminated val; provisional):**
+- E10 (HF Llama at E0's exact shapes) averages 0.5845 over 3 seeds, **~3.7% below our E0 (0.6063)**, about the size of the C5 headline (3.6%).
+- **E1 seed 0 at its tuned LR (0.5835) is only ~0.2% below E10's mean.**
+- So E1's headline lead over E0 may be largely an E0 baseline artifact (init; SQ200).
+- The registered Phase 2b verdict already compares E1 with **E10** on clean-val doc-level bits/char over 3 seeds.
+- Recorded as a **C5 limitation event** and in the README status paragraph (with C193).
+
+**Ideas:**
+- I1 (packed vs doc-level protocol re-score, with length strata): merged into A2's post-campaign doc-level re-score plus SQ214;
+- **I2 → SQ222** (dtype parity E1 vs E10);
+- I3 (LR horizon check): already in A3's design and queued for the cloud fleet.
+
+### README version badge fixed
+The badge was stuck at v0.4.65. v0.4.66 skipped the README bump (another agent was editing it), and later bumps searched for the exact previous version. The release helper now replaces any version string.
+### Cloud monitoring
+The cockpit TUI is running in the human's terminal. The Vast.ai fleet integration (SSH monitoring, just-in-time rentals, 5-minute idle teardown) is being built; the SSH key is set up; no instance is rented yet.
+
+---
+
 ## v0.4.69: Byte predictions bound to config hashes; Vast.ai CLI installed (no rentals)
 *2026-11-22*
 

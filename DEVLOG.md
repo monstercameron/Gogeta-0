@@ -18,6 +18,20 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.42: Outside review 17:37: A2 headline not parameter-matched (15.1M vs 9.5M unique params); C209 caveat; 'mostly the assembly' withdrawn; SQ419 F-6 control is the next GPU pick
+*2026-11-23*
+
+**Outside review 17:37: the A2 headline is not parameter-matched (A2s about 15.1M vs E27 about 9.5M unique params). C209 gains that caveat, and v0.5.39's "mostly the assembly" is withdrawn. SQ419 (F-6 control) is the next GPU pick.**
+
+- **Outside review** (`notes/reviews/2026-11-23-1737-review.md`, Haiku), triaged in its footer:
+  - **C209 limitation:** the -16.7% (and the -12.6% vs fixed-depth A1a) includes a unique-parameter increase from the A1g 6x2 shape, which C197 shows is a large lever at matched FLOPs. v0.5.39's "the headline is mostly the assembly" is therefore not shown and is withdrawn.
+  - **SQ419 (top GPU pick):** F-6, E27's recipe on A2s's 6-block core, at 20M with 3 seeds. It splits the headline into shape and params vs the compensations.
+  - **New:** SQ420 (freeze mixers vs MLPs: which unique parameters carry the lever), SQ421 (token-weighted vs per-doc aggregation, zero GPU), SQ422 (init on the assembled shape).
+  - **Not added:** bits-matched ternary duplicates SQ393. The loop-cost param confound is already measured by B1's SQ350.
+- **Quick review 17:34 (ML theorist):** reversing the core's block order is rejected, because a fixed-r model is off-distribution for any change. Loop theory targets parameter sharing at fixed compute, while refinement is goal 2 (SQ399, SQ381).
+
+---
+
 ## v0.5.41: Docs refresh (hourly)
 *2026-11-23*
 

@@ -18,6 +18,47 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.92: SQ308: C197's depth edge needs the depth-scaled init; SQ307 inconclusive; docs refresh (hourly); F2 stage 2 dispatched
+*2026-11-23*
+
+**SQ308, the init-controlled depth test of C197** (registered v0.4.90; 20M tokens, lr 6e-3, 3 seeds; `experiments/checks/results/sq308.json`):
+
+| Comparison | Effect | 95% CI (df 2) | Prediction |
+|---|---|---|---|
+| E32 flat vs E32 gogeta | **+7.02%** | [+0.86%, +13.55%] | G1 FAIL |
+| E1 flat vs E1 gogeta | +1.74% | [−0.34%, +3.86%] | |
+| E32 vs E1, gogeta init | **−2.64%** | [−2.97%, −2.31%] | G2 FAIL (needs ≤ −3%) |
+| E32 vs E1, flat init | **+2.42%** | [−1.78%, +6.79%] | G2 FAIL |
+
+- **By the registered rule:** inconclusive.
+- **Read:** the 14-block stack depends on the depth-scaled init. Under flat init it trains 7% worse and does not beat E1. C197's lever is therefore "distinct depth *with* a depth-appropriate init", the standard deep-net recipe, not depth alone.
+- **The gap depends on horizon:** about 2.6% at 20M against about 7% at 200M.
+- **Ledger:**
+  - C197 gets a limitation (event 5);
+  - C199 gets evidence that init effects depend on depth and horizon (E1 is +1.7% at 20M, +0.04% at 200M).
+- **Micro devlog:** `experiments/devlogs/SQ308.md`.
+
+**SQ307, the fresh-seed check of SQ301** (registered; seeds 2–5): E1 at 1.2e-2 vs E10 at 3e-3 at d = 256 is **−1.64%**, CI [−3.66%, +0.43%].
+- All four seeds favour E1, but the CI includes 0, so **W3 FAILS: inconclusive**.
+- E10's seed noise at this width is the limit.
+- E1 at 1.8e-2 is worse than at 1.2e-2 on every seed.
+- C198 gets this as evidence (event 6).
+
+**Docs refresh (hourly, Haiku; diff checked by the main agent):**
+- README:
+  - "tie" wording replaced by "no difference detected";
+  - an F2 stage-1/stage-2 sentence added (cell results stay blinded);
+  - the fleet is down to five boxes;
+  - the SQ307 and SQ308 outcomes added by the main agent.
+- `notes/sketch.md`: status refreshed and decision lines for v0.4.89–v0.4.91 added. The main agent corrected two stale points: SQ200's init finding, and the Byte Quest status.
+- The campaigns README's queue date is updated.
+
+**F2 stage 2 is dispatched:** 87 runs on four boxes, at commit `5d86866` (after the sigma record).
+
+**Quick review 01:33 (competitor lab):** SQ314, a source-disjoint re-check of the tuned 7+7 headline checkpoints on the SQ99 out-of-corpus set.
+
+---
+
 ## v0.4.91: F2 stage 1 done: blinded sigma 0.0087, N_final 221 (stage 2 = 87 runs); code-py-v1sub verified on two boxes; fleet down to 5
 *2026-11-23*
 

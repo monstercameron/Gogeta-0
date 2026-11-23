@@ -1,0 +1,173 @@
+{
+ "runs": {
+  "E1-20261123-061833-s0": {
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "n_prelude": 6,
+   "seed": 0
+  },
+  "E1-20261123-062143-s1": {
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "n_prelude": 6,
+   "seed": 1
+  },
+  "E1-20261123-062454-s2": {
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "n_prelude": 6,
+   "seed": 2
+  },
+  "E32-20261123-061938-s0": {
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "n_prelude": 14,
+   "seed": 0
+  },
+  "E32-20261123-062249-s1": {
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "n_prelude": 14,
+   "seed": 1
+  },
+  "E32-20261123-062559-s2": {
+   "init": "gogeta",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "n_prelude": 14,
+   "seed": 2
+  },
+  "SQ200_e1_flat-20261123-061905-s0": {
+   "init": "flat",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "n_prelude": 6,
+   "seed": 0
+  },
+  "SQ200_e1_flat-20261123-062216-s1": {
+   "init": "flat",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "n_prelude": 6,
+   "seed": 1
+  },
+  "SQ200_e1_flat-20261123-062527-s2": {
+   "init": "flat",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "n_prelude": 6,
+   "seed": 2
+  },
+  "SQ243E10d256-20261123-060932-s2": {
+   "init": "gogeta",
+   "lr": 0.003,
+   "max_tokens": 96000000,
+   "n_prelude": 0,
+   "seed": 2
+  },
+  "SQ243E10d256-20261123-061419-s3": {
+   "init": "gogeta",
+   "lr": 0.003,
+   "max_tokens": 96000000,
+   "n_prelude": 0,
+   "seed": 3
+  },
+  "SQ243E10d256-20261123-061840-s4": {
+   "init": "gogeta",
+   "lr": 0.003,
+   "max_tokens": 96000000,
+   "n_prelude": 0,
+   "seed": 4
+  },
+  "SQ243E10d256-20261123-062302-s5": {
+   "init": "gogeta",
+   "lr": 0.003,
+   "max_tokens": 96000000,
+   "n_prelude": 0,
+   "seed": 5
+  },
+  "SQ243E1d256-20261123-060724-s2": {
+   "init": "gogeta",
+   "lr": 0.012,
+   "max_tokens": 99000000,
+   "n_prelude": 6,
+   "seed": 2
+  },
+  "SQ243E1d256-20261123-061047-s2": {
+   "init": "gogeta",
+   "lr": 0.018,
+   "max_tokens": 99000000,
+   "n_prelude": 6,
+   "seed": 2
+  },
+  "SQ243E1d256-20261123-061246-s3": {
+   "init": "gogeta",
+   "lr": 0.012,
+   "max_tokens": 99000000,
+   "n_prelude": 6,
+   "seed": 3
+  },
+  "SQ243E1d256-20261123-061534-s3": {
+   "init": "gogeta",
+   "lr": 0.018,
+   "max_tokens": 99000000,
+   "n_prelude": 6,
+   "seed": 3
+  },
+  "SQ243E1d256-20261123-061708-s4": {
+   "init": "gogeta",
+   "lr": 0.012,
+   "max_tokens": 99000000,
+   "n_prelude": 6,
+   "seed": 4
+  },
+  "SQ243E1d256-20261123-061956-s4": {
+   "init": "gogeta",
+   "lr": 0.018,
+   "max_tokens": 99000000,
+   "n_prelude": 6,
+   "seed": 4
+  },
+  "SQ243E1d256-20261123-062129-s5": {
+   "init": "gogeta",
+   "lr": 0.012,
+   "max_tokens": 99000000,
+   "n_prelude": 6,
+   "seed": 5
+  },
+  "SQ243E1d256-20261123-062417-s5": {
+   "init": "gogeta",
+   "lr": 0.018,
+   "max_tokens": 99000000,
+   "n_prelude": 6,
+   "seed": 5
+  },
+  "SQ308-20261123-062041-s0": {
+   "init": "flat",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "n_prelude": 14,
+   "seed": 0
+  },
+  "SQ308-20261123-062352-s1": {
+   "init": "flat",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "n_prelude": 14,
+   "seed": 1
+  },
+  "SQ308-20261123-062703-s2": {
+   "init": "flat",
+   "lr": 0.006,
+   "max_tokens": 20000000,
+   "n_prelude": 14,
+   "seed": 2
+  }
+ },
+ "source": "run meta.json, pulled from the fleet"
+}

@@ -40,3 +40,20 @@ Prediction NOT met at gaps 256/512: I_copy +3.51 [-2.99,+10.01] and +3.27 [-3.20
 
 ## SQ365 (done): ternary threshold sensitivity
 Gaussian jitter of 5% of absmean scale, 3 draws, 300 clean80 docs, seeds 0-2: penalty 001 +1.39% (sd 0.38), 111 +2.63% (sd 0.74) vs 000 +0.23%, 100 +0.21%. Near-threshold share (|abs(w)/s-0.5|<0.05) 10.5% (001), 14.1% (111) vs 6.0% (fp cells); code flips per draw 4.1% / 5.5% vs 2.4%. Files: `experiments/checks/sq365_ternary_jitter.py`, `results/sq365.json`, `experiments/devlogs/SQ365.md`.
+
+## SQ374 (done): byte models E13 scored on clean80 (CPU)
+9 byte runs scored (K8 protocol in bytes, clean80 = 2,333 docs). 200M bytes seed 0: E13a (P=2) 0.4622 bpc, E13b (P=4) 0.5533 vs E1 (53.5M tokens, same text, 4.87e15 FLOPs) 0.3388: byte/token 1.36 (E13a at 1.9x FLOPs) and 1.63 (E13b at 1.04x FLOPs). 20M-byte sweep 3.29 (P=2) / 3.93 (P=4) / 4.23 (P=8) / 4.37 (P=16); E13b LR grid 3.98/3.93/4.26/4.13 at 1.5e-3/3e-3/6e-3/1.2e-2. Patch lag: last slot 7-9% worse than first at 200M (12-15% at 20M for P=2-4). Files: `experiments/checks/sq374_byte_scoring.py`, `results/sq374.json`, `experiments/devlogs/SQ374.md`.
+
+## SQ349 (done, low power): syntax-validity proxy
+60 greedy 64-token continuations per cell: bracket_ok 100% in 000/100/111; indent_ok 96.7% / 93.3% / 96.7%. Null, weak (2 generations). Files: `experiments/checks/sq349_syntax_proxy.py`, `results/sq349.json`, `experiments/devlogs/SQ349.md`.
+
+## Housekeeping
+Scratch `.log` files in `experiments/checks/results/` were deleted; `__pycache__` dirs may remain under experiments/checks and tests. pytest is not installed in any venv; all tests are unittest (`python -m unittest ...`, venv gogeta; `tests.test_sandbox_gate` in gogeta-eval for lm-eval).
+
+## Next list (from coordinator, 13:2x): started
+- Deleted `chainB.sh` at the repo root (mine). The original scratch chain scripts were in the session scratchpad.
+- SQ379 running (2 parts, `experiments/checks/sq379_a2_out_of_corpus.py --part 0/1`, then `--analyze`).
+## SQ376 (done): data gate from Phase 2b logs
+E1 (n=3, lr 6e-3) val loss falls 22.0% from 100M to 197M tokens, E10 (n=3, lr 3e-3) 19.9%; all runs >> 1%. Cosine-schedule confound (100M point mid-schedule), 128-seq v1 val, only seeds 0-2 logs found locally. Files: `experiments/checks/sq376_data_gate.py`, `results/sq376.json`, `experiments/devlogs/SQ376.md`.
+## SQ368 (proposal only; test_moe.py NOT edited)
+tests/test_moe.py pins (PINNED[*]["state"], ["rng_after"], PINNED_LOSSES) are CPU RNG / reduction dependent; to_dict, param_counts, flops_1024 are not. Proposal: (1) assert the platform-independent fields (to_dict hash, param_counts, flops_1024) on every platform; (2) move state/rng_after/losses into `PINNED_BY_PLATFORM = {("aarch64", "2.14.1+cu130"): {...}, ("x86_64", "<ver>"): {...}}` keyed by (platform.machine(), torch.__version__); (3) `setUp` skips with "no pins for <machine>/<torch>: run `python tests/test_moe.py --capture --platform-tag` on this box and add them" when the key is missing, instead of failing; (4) `--capture` prints the dict entry for the current key so a rented x86-64 box can produce the values (capture must be run on the pre-MoE commit 5e72d80 or via the dense-default path, since the pins assert dense-default bit-identity); (5) keep the exact-equality assertion for known keys. Note the capture on x86-64 must use the same code revision as the ARM pins, otherwise the pin means "unchanged since this box's capture" only.

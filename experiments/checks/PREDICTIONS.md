@@ -810,3 +810,24 @@ Prompted by outside review 2026-11-23 12:10 (`notes/reviews/2026-11-23-1210-revi
 - **Added runs:** A1a (fixed r = 4) and A1i (random r, full backprop) at seed 2, 200M tokens, lr 6e-3, paired with E27 seed 2 (SQ263). Both arms use the same training compute (+17% vs E27).
 - **Estimand:** A1a - A1i (log clean80, paired by seed, seeds 0-2, df 2).
 - **Prediction:** -3% (range -5% to -1%). **Rule:** "fixed depth beats random depth at equal compute" counts as confirmed if the 3-seed paired 95% CI lies below 0 and the effect is <= -1%. Until then it stays exploratory, as the A1 screen is (the assembled recipe already uses fixed r on that exploratory basis).
+
+## A4 full stack (2026-11-23 ~13:40 EST, before dispatch): every component in one model
+- **Human instruction (v0.5.12):** "everything: ssm + sliding windows + loops + coarse to fine + bitnet + MoE + speculative decode".
+- **Model** (`gogeta/c2f.py`, tokens-as-patches; `experiments/devlogs/C2F.md`):
+  - The global trunk is the A3 all-parts backbone (A3mx: GDN + SWA + attention mixers, shared 6x2 loop with contractive injection, ternary MoE core, full-precision mixers and ends) on BPE tokens.
+  - A byte decoder (d_local 128) spells token i+1 from the trunk state at token i. It is causal: only completed tokens are visible, which the bitwise perturbation tests check.
+  - Self-speculative decoding is built separately (`gogeta/decode.py`) and measured on the trained checkpoints.
+- **Arms** (`experiments/staged-configs/a4/`, sha256-16), 200M tokens of code-py-v2, lr 6e-3, seeds 5, 6, 7 (paired with A3mx at the same seeds):
+  - **A4a** [92651a7ca10e9dc2]: shared byte refinement loop, r_b = 2 (H-C2F);
+  - **A4b** [2477497ecfc336df]: single-pass byte decoder, r_b = 1;
+  - **A4c** [f5d8f46678fc399b]: unshared 2-block decoder, parameter-matched to A4a (the A'' control).
+  - Computed training FLOPs per token: 1.003x / 0.949x / 0.963x A3mx's (the decoder replaces the 8k-way head).
+- **Metric:** in-training val loss in nats per target token on the v2 val split. The byte decoder's loss counts all bytes plus EOT of the target token, so it is directly comparable with the BPE head's val_loss on the same tokens. Paired by seed vs A3mx. Clean80 doc-level scoring is not wired for the byte decoder yet, which is a stated limitation.
+- **Predictions:**
+  - **R1:** A4a vs A3mx +2% (range -2% to +6%). Spelling a token byte by byte costs a little against a direct 8k-way head at this scale.
+  - **R2 (H-C2F, sharing helps):** A4a vs A4b -1.5% (range -4% to 0%).
+  - **R3 (sharing vs unique params):** A4a vs A4c 0% (range -1.5% to +1.5%).
+- **Decision rules:**
+  - The full stack is **viable** if A4a lies within 3% of A3mx (paired 95% CI upper bound <= +3%).
+  - The byte refinement loop **earns its place** if R2's CI lies below 0. If A4a ties A4c, it is unique parameters, not sharing.
+  - Throughput and memory are reported next to the results. Speculative-decoding acceptance on A4a is a secondary readout.

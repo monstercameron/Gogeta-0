@@ -181,16 +181,13 @@ stdlib only, no venv packages), fresh temp cwd, env reduced to PATH/LANG; networ
 `unshare -rn` (new user + net namespace) when available, else it runs with network and says so
 (`network="require_off"` makes that an error).
 
-NOT isolated: the filesystem. The child can read world-readable files and write to /tmp and
-/dev/shm. **Under WSL it can also write to `/mnt/c`, i.e. this repo and all of C:, even as
-`nobody`**, because drvfs shows Windows files as mode 777. A control write through `run_tests`
-succeeded (ledger C105, verified 2026-11-22). As a normal user it can touch all your files. Until
-SQ61 moves the hardening in, use `evals/sandbox.py` for anything untrusted: user/net/mount
-namespaces, private tmpfs over /mnt, /tmp, /dev/shm, /run and /var/tmp (added in v0.4.100), nested uid 65534; self-test 12/12.
-Also NOT isolated: same-uid signalling, and reward
-hacking inside the harness process (monkeypatching builtins, digging the nonce out of the
-harness). For real RL, wrap the same harness in a container or bubblewrap/nsjail with a
-read-only root and a tmpfs work dir, and log/inspect high-reward completions. Throughput
+**Status at v0.5.11 (SQ373 and SQ61; committed devlogs `experiments/devlogs/SQ373.md`, `SQ61.md`).**
+
+- **Reward forgery: fixed for the probe's cases (SQ373, C83).** The child is now a grader process that forks a worker. The worker runs the solution and the tests inside the same namespaced sandbox and rlimits. The grader binds every function it uses before the solution runs, each test runs in a fresh shallow copy of the solution's namespace with pristine builtins, the stdin nonce is dropped in the worker, and the result comes back over a pipe that only the grader turns into the final line. Every forgery probe (exec/compile no-op, AssertionError swallowing, `__main__` and `sys.modules` tampering, `os._exit`/`sys.exit`, printed forged result lines, trace hooks, background threads) now scores 0 on a failing test. Honest pass, honest fail and partial credit are unchanged. `python -m unittest post_training.test_rewards`: 30 tests OK, 11 of them forgery cases.
+- **Residual forgery routes (not closed).** Solution code can still imitate the worker's side of the pipe (find the fds via `/proc/self/fd` and write a forged result), or defeat a test from inside the objects it checks (an `__eq__` that is always true, mutated shared objects). Closing these needs a process the solution cannot touch. Not attempted.
+- **Filesystem and network (SQ61, C105/C106).** `run_tests(..., fs_isolation="auto"|"require"|"off")` builds a private mount namespace (tmpfs over /mnt, /tmp, /dev/shm, /run, /var/tmp; nested uid 65534) with no network. `code_exec_reward`, the GRPO path, defaults to `"require"` and fails closed: it refuses to score rather than run unisolated. The repo-write control and the fail-closed tests are in `post_training/test_rewards.py`. `evals/sandbox.py` delegates to the same harness and keeps its self-test.
+- **Still open (SQ61 row):** the resource-budget test, the world-writable-path sweep, and descendant cleanup (a `setsid` grandchild; PID namespace or cgroup kill).
+- **Not a security boundary.** Inside the namespace the rest of the root filesystem stays world-readable. With `fs_isolation="off"`, or "auto" on a host without a working namespace, the child can still write to /tmp, /dev/shm and, under WSL, `/mnt/c` (C105, verified 2026-11-22 on the old path). For real RL, wrap the same harness in a container or bubblewrap/nsjail with a read-only root and a tmpfs work dir, and log/inspect high-reward completions. Throughput
 [verified here, trivial solution, CPU shared with another job]: 29.5 ms per completion serially,
 64 completions in 0.47 s with the default 8 threads.
 

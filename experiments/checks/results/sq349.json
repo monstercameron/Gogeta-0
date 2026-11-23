@@ -1,0 +1,1196 @@
+{
+ "check": "SQ349",
+ "git": "fb169bf",
+ "status": "descriptive, not registered; low power (n=20 prompts x 3 seeds)",
+ "n_prompts": 20,
+ "gen_tokens": 64,
+ "cells": {
+  "000": {
+   "per_seed": {
+    "0": {
+     "run": "E20-20261123-065619-s0",
+     "bracket_ok": 1.0,
+     "indent_ok": 1.0,
+     "both_ok": 1.0,
+     "rows": [
+      {
+       "doc": 2925,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef union(x, y, parent):\n    \"\"\"\n    Merge two elements x and y into a single component.\n    \"\"\"\n    # Find the parent of x and y\n    par_x = find(x, parent)\n    par_y = find(y, parent)\n    # If the roots are the"
+      },
+      {
+       "doc": 3270,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef max_line_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_crossing_"
+      },
+      {
+       "doc": 303,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# The function uses the 'count' method of the Counter object to count the frequency of each character in the string 's'.\n# It then iterates over the characters and their counts, updating the frequency of each character in the Counter object.\n# The 'count' method returns the total count of characters in '"
+      },
+      {
+       "doc": 1941,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": " # If the first character of the string matches the first character of the pattern, then the pattern matches the first character of the string\n    # or if the pattern character is '.*'\n    for i in range(1, len(s) + 1):\n        if pattern[i - 1] == '*':\n            dp"
+      },
+      {
+       "doc": 3986,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n\n    # Populate the graph with the given paths\n    for i, j in paths:\n        graph[i].append(j)\n\n    # Define a helper function to perform DFS\n    def dfs(i: int, visited: List[bool], paths: List[List[bool]]) -> None:\n        \"\"\"\n        Depth"
+      },
+      {
+       "doc": 3757,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef valid_unit(unit):\n    \"\"\"\n    This function checks if a given 3x3 sub-box is valid.\n    A sub-box is valid if it contains the digits 1-9 without repetition.\n    \"\"\"\n    # Check each 3x3 sub-box\n    for i in range(0,"
+      },
+      {
+       "doc": 3122,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": " if not path or nums[i] >= path[-1]:\n        # Add the current element to the path\n        path.append(nums[i])\n        \n        # Recursively call the DFS function with the next index\n        dfs(path, i + 1)\n        # Remove the last element from the path to backtrack\n        path"
+      },
+      {
+       "doc": 2263,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "def merge_sort(left_half):\n        # Initialize an empty list to store the merged result\n        result = []\n        \n        # Merge the two halves\n        while i < len(left_half) and j < len(right_half):\n            # Compare the elements at the current indices of the two halves\n            #"
+      },
+      {
+       "doc": 3696,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n        i -= 1\n    \n    # If we have reached the end of the list, it means there is no greater number with the same digits\n    if i == -1:\n        return -1\n    \n    # Find the smallest digit to the right of the found digit that is larger than it\n    j = len(N) -"
+      },
+      {
+       "doc": 2716,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "def square_array(arr: List[int]) -> List[int]:\n    \"\"\"\n    This function takes an array of integers and returns a new array where each element is the square of the corresponding element in the input array.\n    \n    Parameters:\n    arr (List[int]): The input array of integers.\n    \n    Returns"
+      },
+      {
+       "doc": 1635,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n\n    # If the first character of s is an empty string, there is only one way to match it\n    if s[0] == '':\n        dp[0][0] = 1\n\n    # Iterate through the strings s and t\n    for i in range(1, len(s) + 1):\n       "
+      },
+      {
+       "doc": 3937,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": " # If the middle element is equal to k, increment the left pointer to search the left half of the list\n        if arr[mid] == k:\n            left = mid + 1\n        # If the middle element is less than k, move the left pointer to search the right half of the list\n        else:\n           "
+      },
+      {
+       "doc": 1040,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": " 3. While `h` is not empty, pop the enemy's strength from the heap `h`.\n    4. Calculate the number of enemies that can be enemies by using the current enemy's strength and the enemy's strength.\n    5. Return the total number of"
+      },
+      {
+       "doc": 2114,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Function to check if a queen can be placed at the given position\ndef is_safe(board, row, col, n):\n    \"\"\"\n    Checks if a queen can be placed at the given position (row, col) on the board.\n    \"\"\"\n    # Check the column\n    for i in range"
+      },
+      {
+       "doc": 1042,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n\n    # Iterate through each house\n    for house in houses:\n        # If the current house is greater than the radius of the heaters, increment the radius\n        if house > radius:\n            radius = house\n\n    # Return the radius + 1, as this represents the minimum radius needed to cover all houses\n    return radius + 1"
+      },
+      {
+       "doc": 675,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef has_valid_path(grid):\n    for i in range(n):\n        for j in range(m):\n            if grid[i][j] == 1:\n                if i > 0 and grid[i - 1][j] == 1:\n                    return True\n                elif j > 0 and grid"
+      },
+      {
+       "doc": 1864,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n            # If the current line is at the end of the word, add it to the current line\n            cur_line += words[len(words[wi])]]\n\n        # If there are no more words left, add the current line to the result\n        if not cur_line:\n            op.append(words"
+      },
+      {
+       "doc": 1088,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": " dp = [[0] * cols for _ in range(rows)]\n    \n    # Initialize a variable to store the maximum side length of the square\n    max_side = 0\n\n    # Iterate through the matrix\n    for i in range(rows):\n        for j in range(cols):\n            # If the current cell contains '"
+      },
+      {
+       "doc": 2319,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "target = sum(stones) - 2 * stones\n\n    # Initialize a list to store the minimum weight of the last stone for each subset\n    dp = [0] * (target + 1)\n\n    # Iterate through each stone weight\n    for i in stones:\n        # Iterate through the dp list in reverse to find the"
+      },
+      {
+       "doc": 704,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef find(x):\n    \"\"\"\n    Find the root of a set.\n    \"\"\"\n    # If the two nodes are already in the same set, return the root.\n    if x == y:\n        return x\n    # Otherwise, recursively find the root of the set.\n    return find(x)Write"
+      }
+     ]
+    },
+    "1": {
+     "run": "E20-20261123-071921-s1",
+     "bracket_ok": 1.0,
+     "indent_ok": 0.95,
+     "both_ok": 0.95,
+     "rows": [
+      {
+       "doc": 2925,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef union(x, y, parent):\n    \"\"\"\n    Merge two sets x and y into a single set.\n    \"\"\"\n    # Find the roots of x and y\n    root_x = find(x, parent)\n    root_y = find(y, parent)\n\n    # If the roots are the"
+      },
+      {
+       "doc": 3270,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": " # Helper function to calculate the maximum number of uncrossed lines at a given index\n    def max_uncrossed_lines(index, current_line):\n        \"\"\"\n        Helper function to calculate the maximum number of uncrossed lines at a given index.\n\n        Parameters:\n        index (int):"
+      },
+      {
+       "doc": 303,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# The function uses a Counter to count the frequency of each character in 'words' and returns the result.\n# The result is a list of integers, where each integer represents the number of strings in 'words' that have a higher frequency of their smallest character.\n# The function iterates over each word in '"
+      },
+      {
+       "doc": 1941,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "if __name__ == \"__main__\":\n    # Test cases\n    assert is_match(\"aa\", \"a*\") == True\n    assert is_match(\"ab\", \".*\") == True\n    assert is_match(\"aab\", \"c*a*b\") == True\n    assert is_match(\"mississippi\", \"mis"
+      },
+      {
+       "doc": 3986,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Function to perform Depth-First Search (DFS) on the graph\ndef dfs(node, paths, res):\n    \"\"\"\n    Depth-First Search function to traverse the graph and mark all the flowers in the same garden as visited.\n\n    :param node: Current node being visited\n    :param paths: List"
+      },
+      {
+       "doc": 3757,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef valid_unit(row):\n    \"\"\"\n    Check if the given row is valid. A valid unit of the Sudoku board is valid if:\n    1. Each row contains the digits 1-9 without repetition.\n    2. Each column contains the digits 1-9 without repetition.\n    3. Each of the"
+      },
+      {
+       "doc": 3122,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# and the function has not returned yet, it means we have found a valid subsequence\ndef check_non_decreasing(nums):\n    \"\"\"\n    This function checks if the given list of integers can be sorted by modifying at most one element.\n    It uses a modified version of the function to check if the list is"
+      },
+      {
+       "doc": 2263,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "def merge_sort(arr):\n        \n        # Base case: if the list has one or no elements, it's already sorted\n        if len(arr) <= 1:\n            return arr\n        \n        # Divide the list into two halves\n        mid = len(arr) // 2\n        left_half = arr[:mid]\n       "
+      },
+      {
+       "doc": 3696,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef next_greater_digit(n: int) -> int:\n    \"\"\"\n    Given a positive integer n, find the smallest integer greater than n that has the same digits as n.\n    If no such digit exists, return -1.\n    \n    Example:\n    next_greater_digit(12) == 21"
+      },
+      {
+       "doc": 2716,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# Calculate the square of each element in the input array\n# This is done by iterating over the array and calculating the square of each element\n    for i in range(length):\n        squares[i] = arr[i] ** 2\n    \n    # Create a new array of the same length as the input array, filled"
+      },
+      {
+       "doc": 1635,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef count_subsequences(s: str, t: str) -> int:\n    \"\"\"\n    Calculate the number of subsequences of s that match t.\n    \n    Args:\n    s (str): The source string.\n    t (str): The target string.\n    \n    Returns:\n    int: The number of subsequences of s"
+      },
+      {
+       "doc": 3937,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef count_occurrences(arr, k):\n    \"\"\"\n    Given an array of integers arr and an integer k, return the number of times k appears in arr.\n    \n    Example:\n    count_occurrences([1, 2, 3, 4, 5], 6) == 0\n    count_occurrences([1, 2"
+      },
+      {
+       "doc": 1040,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "3. While the heap is not empty, pop the smallest element from the heap and add it to the total strength.\n    4. Return the total number of enemies that can be defeated.\n    \"\"\"\n    # Initialize a variable `answer` to keep track of the total strength of enemies\n   "
+      },
+      {
+       "doc": 2114,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Function to solve the n-queens problem\ndef n_queens(n):\n    \"\"\"\n    Solve the n-queens problem and return all possible solutions.\n    \"\"\"\n    # Initialize the result list to store all solutions\n    result = []\n    \n    # Initialize the chessboard with all empty spaces\n    board = [["
+      },
+      {
+       "doc": 1042,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef findRadius(houses, heaters):\n    \"\"\"\n    Helper function to find the closest heater for each house.\n    :param houses: List[int] - the locations of houses.\n    :param heaters: List[int] - the locations of heaters.\n    :return: int - the closest heater"
+      },
+      {
+       "doc": 675,
+       "bracket_ok": true,
+       "indent_ok": false,
+       "gen": "\tif ds[x][y] == 0:\n\t\treturn True\n\tif ds[x][y] == 0:\n\t\treturn False\n\tif ds[x][y] == 1:\n\t\treturn True\n\tif ds[x][y] == 1:\n\t"
+      },
+      {
+       "doc": 1864,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n                    # Add the current line to the list of justified lines\n                    op.append(cur_line)\n                    # Reset the current line and length for the next iteration\n                    cur_line, wi = [], 0\n                wi += 1\n\n        # Add the current line to the list of justified lines\n        op.append"
+      },
+      {
+       "doc": 1088,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# dp[i][j] represents the size of the largest square ending at matrix[i][j]\n# starting at matrix[i][j]\n\ndef largest_square_in_matrix(matrix):\n    \"\"\"\n    Given a 2D binary matrix filled with '0's and '1's,"
+      },
+      {
+       "doc": 2319,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Function to find the minimum weight of the last stone\ndef find_min_weight(stones: List[int]) -> int:\n    \"\"\"\n    This function takes a list of stone weights and returns the minimum weight of the last stone.\n    If the list is empty, it returns 0.\n\n    :param"
+      },
+      {
+       "doc": 704,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Define a function to find the root of a node.\n# The root of a node is the node that is the root of the other node.\n# This function uses the union by ranking to merge the sets of nodes into one.\ndef find(x):\n    # If the node is not"
+      }
+     ]
+    },
+    "2": {
+     "run": "E20-20261123-073423-s2",
+     "bracket_ok": 1.0,
+     "indent_ok": 0.95,
+     "both_ok": 0.95,
+     "rows": [
+      {
+       "doc": 2925,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef find_parent(x, parent):\n    \"\"\"\n    Finds the parent of x in the parent dictionary.\n    If x is not the root, it recursively finds the parent of the parent of x.\n    \"\"\"\n    # If x is not the root, recursively find the parent of the parent of x.\n   "
+      },
+      {
+       "doc": 3270,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef max_line_crossing_ trucks(A: List[int], B: List[int]) -> int:\n    \"\"\"\n    This function calculates the maximum number of uncrossed lines that can be formed\n    by two players. It uses a two-pointer approach to efficiently find the\n    maximum number of"
+      },
+      {
+       "doc": 303,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# If the string is empty, return an empty list.\n        \"\"\"\n        if not s:\n            return []\n        # Count the frequency of each character in the string\n        freq = [0] * 26\n        for c in s:\n            freq[ord(c) - ord('a')] += 1\n        # Count"
+      },
+      {
+       "doc": 1941,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef is_match(s: str, p: str) -> bool:\n    \"\"\"\n    Helper function to check if the string `s` matches the pattern `p`.\n    \n    Parameters:\n    s (str): The input string to match.\n    p (str): The pattern string.\n    \n    Returns:\n    bool"
+      },
+      {
+       "doc": 3986,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef garden_no_adj(N: int, paths: List[List[int]]) -> List[int]:\n    \"\"\"\n    Detailed explanation of the function:\n    - The function takes two parameters:\n    - N: Number of gardens.\n    - paths: List of paths between gardens"
+      },
+      {
+       "doc": 3757,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef valid_unit(unit):\n    \"\"\"\n    This function checks if the given unit (row, column) is valid according to the Sudoku rules.\n    It returns True if the unit is valid, and False otherwise.\n    \n    :param unit: List[str] - a list of strings representing the unit.\n   "
+      },
+      {
+       "doc": 3122,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# This means we have found a valid subsequence with at least two elements and can be formed by removing the last element from the path\n# The function returns a list of all non-decreasing subsequences found by removing at least two elements from the path\n\n# The function uses a depth-first search (DFS) approach"
+      },
+      {
+       "doc": 2263,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "def merge_sort(arr):\n        \n        # While there are elements left in both halves and there are elements left in both halves\n        while i < len(arr) and j < len(arr):\n            # Compare elements from both halves and append the smaller one to the result list\n            if arr[i] < arr"
+      },
+      {
+       "doc": 3696,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n        i -= 1\n    \n    # If no such digit is found, return -1\n    if i == -1:\n        return -1\n    \n    # Find the smallest digit to the right of the found digit that is larger than it\n    j = len(N) - 1\n    while(j >= 0 and N[j"
+      },
+      {
+       "doc": 2716,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# Define a function to check if a given integer is a perfect square\ndef is_perfect_square(n: int) -> bool:\n    \"\"\"\n    This function checks if a given integer is a perfect square.\n    \n    Parameters:\n    n (int): The integer to check.\n    \n    Returns:\n    bool: True"
+      },
+      {
+       "doc": 1635,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n    for j in range(len(t) + 1):\n        dp[0][j] = 1\n    \n    # Iterate through the strings\n    for i in range(1, len(s) + 1):\n        for j in range(1, len(t) + 1):\n            # If the current characters"
+      },
+      {
+       "doc": 3937,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n            right = mid - 1\n        # If the middle element is equal to k, we've found our first occurrence\n        else:\n            # Return the count of occurrences\n            return left\n    \n    # If we've gone through the entire list and haven't found k occurrences, return 0\n    return 0Write a function to find"
+      },
+      {
+       "doc": 1040,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\nfrom typing import List\nimport heapq\n\ndef max_enemies(n: int, k: int) -> int:\n    \"\"\"\n    Calculate the maximum number of enemies that can be fully dued with a given number of soldiers.\n    \n    :param n: Number of soldiers.\n    :"
+      },
+      {
+       "doc": 2114,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# Example usage:\n# print(n_queens(4))  # Output: [['.', 'Q', 'Q', 'R', 'Q'], ['..', 'Q', 'Q', 'R', 'Q']]\n# print(n_queens(1))  # Output: [['Q"
+      },
+      {
+       "doc": 1042,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef findRadius(houses, heaters):\n    \"\"\"\n    Given a list of houses and a list of heaters, find the minimum radius of the heaters\n    such that all houses are covered by at least one heater.\n    \n    :param houses: List[int] - the locations of houses.\n    :param heaters"
+      },
+      {
+       "doc": 675,
+       "bracket_ok": true,
+       "indent_ok": false,
+       "gen": "\tself.f[x] = y\n\tself.f[y] = 0\n\tfor i in range(n):\n\t\tif grid[i][x] == 1:\n\t\t\tself.f[x] = self.find(self.f[x])\n\treturn self."
+      },
+      {
+       "doc": 1864,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef justify_text(words, maxWidth):\n    # Initialize an empty list to store the current line of words and the current line of text\n    cur_line = []\n    cur_line = []\n\n    # Loop through each word in the input list\n    for word in words:\n        # If adding the current word"
+      },
+      {
+       "doc": 1088,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef largest_square_in_grid(grid):\n    \"\"\"\n    Given a 2D binary matrix filled with '0's and '1's, find the largest square containing only '1's and return its area.\n    \n    Example:\n        Input: \n            grid = [\n                [\"1\",\"0\",\"1\",\"0"
+      },
+      {
+       "doc": 2319,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "def stone_weight_II(stones: List[int]) -> int:\n    \"\"\"\n    This function calculates the maximum weight that can be achieved by the subset sum problem.\n    The subset sum problem is a classic example of the problem, and the subset sum problem is a list of positive integers.\n    The subset"
+      },
+      {
+       "doc": 704,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Define a function to find the root of a node in the union of two nodes.\ndef find(x):\n    # If the node is not its own root, recursively find the root of its parent.\n    if x != root[x]:\n        root[x] = find(root[x])"
+      }
+     ]
+    }
+   },
+   "pooled": {
+    "bracket_ok": 1.0,
+    "indent_ok": 0.9666666666666667,
+    "both_ok": 0.9666666666666667,
+    "n_generations": 60
+   }
+  },
+  "100": {
+   "per_seed": {
+    "0": {
+     "run": "E24-20261123-070152-s0",
+     "bracket_ok": 1.0,
+     "indent_ok": 0.95,
+     "both_ok": 0.95,
+     "rows": [
+      {
+       "doc": 2925,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef dsu_union(x, y, parent):\n    \"\"\"\n    Find the parent of two elements x and y.\n    \"\"\"\n    # Find the parent of both x and y.\n    x_root = find(x, parent)\n    y_root = find(y, parent)\n\n    # If"
+      },
+      {
+       "doc": 3270,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": " # Get the lengths of the two input lists\n    m, n = len(A), len(B)\n\n    # Initialize a 2D list (dp) to store the maximum number of uncrossed lines at each step\n    dp = [[0] * (n + 1) for _ in range(m"
+      },
+      {
+       "doc": 303,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# The frequency is calculated by subtracting the frequency of the smallest character in the string from the frequency of the smallest character in the string.\n        \"\"\"\n        return s.count(min(s))\n    \n    # Calculate the frequency of the smallest character in 'queries'\n    freq = calc_count(queries)\n    \n    # Initialize"
+      },
+      {
+       "doc": 1941,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef check_match(s: str, p: str) -> bool:\n    \"\"\"\n    This function checks if the string s matches the pattern p.\n    \n    Args:\n    s (str): The string to be checked against the pattern p.\n    p (str): The pattern string to match against the string p"
+      },
+      {
+       "doc": 3986,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n\n    # Populate the adjacency list with the paths from the paths\n    for i in range(N):\n        graph[i].append(i)\n\n    # Define a helper function to perform DFS\n    def dfs(i):\n        \"\"\"\n        Perform DFS to check if the garden can be planted in the graph.\n\n        :param"
+      },
+      {
+       "doc": 3757,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef valid_unit(unit):\n    \"\"\"\n    Check if the given unit (row, column, or 3x3 sub-box) is valid.\n    A valid unit is one that contains digits 1-9 without repetition.\n    \"\"\"\n    # Check rows\n    for row in board:\n        if not valid_"
+      },
+      {
+       "doc": 3122,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Define a helper function to perform DFS\ndef dfs(path, start):\n    \"\"\"\n    This helper function performs a depth-first search to find all non-decreasing subsequences.\n    \n    Parameters:\n    path (list): The current subsequence being built.\n    start (int): The starting index for the current recursive call"
+      },
+      {
+       "doc": 2263,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "def merge_sort(arr):\n    \"\"\"\n    Merges two sorted lists into one sorted list.\n    \n    :param arr: List of integers to be sorted\n    :return: Sorted list of integers\n    \"\"\"\n    # Base case: if the list has one or no elements, it's already sorted\n    if len("
+      },
+      {
+       "doc": 3696,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n        i -= 1\n    \n    # If no such digit is found, return -1\n    if(i == 0):\n        return -1\n    \n    # Find the smallest digit to the right of the found digit that is larger than it\n    j = len(N) - 1\n    while(N[j] <= N["
+      },
+      {
+       "doc": 2716,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# Define a helper function to calculate the square of a number\ndef square_of_numbers(n):\n    \"\"\"\n    This function calculates the square of a number using the square of a given number.\n    \n    Parameters:\n    n (int): The number to calculate the square of.\n    \n    Returns:\n    int: The"
+      },
+      {
+       "doc": 1635,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\tdp[i][0] = 1\n    \n    # Iterate through each character in s\n    for i in range(1, len(s) + 1):\n        # Iterate through each character in t in reverse order\n        for j in range(1, len(t) + 1):\n            # If the current characters"
+      },
+      {
+       "doc": 3937,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": " right = mid - 1\n        # If the middle element is equal to k, we've found the first occurrence of k\n        else:\n            break\n    \n    # Return the final position of the left pointer, which represents the number of occurrences of k in the list\n    return leftWrite a python function to find the number of"
+      },
+      {
+       "doc": 1040,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": " 5. While there are still enemies in the heap:\n        a. Pop the enemy's strength from the heap.\n        b. If the current enemy's strength is greater than or equal to the enemy's strength, pop the enemy's strength from the heap.\n        c"
+      },
+      {
+       "doc": 2114,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Example usage:\n# This is a solution to the n-queens problem.\n# This is a solution to the n-queens problem.\n# The function uses backtracking to try placing queens in each column of the current row.\n# It checks if the current position is safe to place a queen at"
+      },
+      {
+       "doc": 1042,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef findRadius(houses, heaters):\n    \"\"\"\n    Finds the minimum radius of the heaters so that all houses are covered by the heaters.\n    \n    :param houses: List[int] - the locations of houses.\n    :param heaters: List[int] - the locations of heaters.\n    :return"
+      },
+      {
+       "doc": 675,
+       "bracket_ok": true,
+       "indent_ok": false,
+       "gen": "\tif ds.getId(x, y):\n\t\treturn True\n\tif ds.getId(x, y):\n\t\treturn False\n\treturn True\n```Write a python function to find the number of ways to reach the last cell of a grid from the first cell using only"
+      },
+      {
+       "doc": 1864,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n                    # Add the current line to the list of words\n                    op.append(cur_line)\n                    # Reset the current line and the index of the next word\n                    wi = 0\n                    wi = wi + 1\n\n        # Add the current line to the list of words\n        op.append(cur_"
+      },
+      {
+       "doc": 1088,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": " dp = [[0] * cols for _ in range(rows)]\n    \n    # Initialize a variable to store the maximum side length of the square found\n    max_side = 0\n\n    # Iterate through the matrix\n    for i in range(rows):\n        for j in range(cols):\n            # If the current cell contains"
+      },
+      {
+       "doc": 2319,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef min_stone_weight_II(stones: List[int]) -> int:\n    \"\"\"\n    This function calculates the minimum possible weight of the last remaining stone after performing the operations.\n    The operations involve selecting two stones and smashing them together.\n\n    :param stones: List[int] representing"
+      },
+      {
+       "doc": 704,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Define a helper function to perform union operation on two nodes.\ndef union(x, y):\n    # Find the roots of the two nodes.\n    a, b = find(x), find(y)\n    \n    # If the roots are the same, it means there is a cycle, so return False"
+      }
+     ]
+    },
+    "1": {
+     "run": "E24-20261123-072506-s1",
+     "bracket_ok": 1.0,
+     "indent_ok": 0.9,
+     "both_ok": 0.9,
+     "rows": [
+      {
+       "doc": 2925,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef union(x, y, parent):\n    \"\"\"\n    This function merges two sets containing elements x and y.\n    It returns True if the union was successful (i.e., the union was successful),\n    False otherwise.\n\n    Parameters:\n    x (int): The first element.\n    y (int):"
+      },
+      {
+       "doc": 3270,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef max_line_crossing_way(A: List[int], B: List[int]) -> int:\n    \"\"\"\n    This function takes two lists of integers, A and B, as input.\n    It returns the maximum number of uncrossed lines that can be formed from the given lists A"
+      },
+      {
+       "doc": 303,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef calc_count(s):\n    \"\"\"\n    Helper function to calculate the frequency of the smallest character in a string.\n    \n    :param s: A string to calculate the frequency of.\n    :return: The frequency of the smallest character in the string.\n    \"\"\"\n    # Initialize a list to store the frequency of"
+      },
+      {
+       "doc": 1941,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": " matches = [[False] * (len(pattern) + 1) for _ in range(len(s) + 1)]\n    \n    # Set the first cell of the first column to True if the pattern starts with '*'\n    for j in range(1, len(pattern) + 1):\n        matches[0]["
+      },
+      {
+       "doc": 3986,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n\n    # Populate the graph with connections between flowers\n    for i, j in paths:\n        graph[i].append(j)\n        graph[j].append(i)\n\n    # Initialize a list to store the result, with all elements set to 0\n    res = [0] * N\n\n    # Define a helper"
+      },
+      {
+       "doc": 3757,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef valid_unit(row: List[str], col: List[str], board: List[str]) -> bool:\n    \"\"\"\n    Check if the given Sudoku board is valid. A valid Sudoku board is one where no two rows, columns, and 3x3 subgrids are valid.\n\n    :param"
+      },
+      {
+       "doc": 3122,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# and the current element is greater than the last element in the path, break the loop\n            if len(path) == 0 or path[-1] < path[-1]:\n                dfs(path + [nums[i]], i + 1)\n\n    # Start the DFS from the first element in the list\n    dfs"
+      },
+      {
+       "doc": 2263,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# Helper function to merge two sorted halves and merge them back into a single sorted list\ndef merge_sort(left, right):\n    \"\"\"\n    Merge two sorted lists into a single sorted list.\n    \n    Parameters:\n    left (list): The first sorted list.\n    right (list): The second sorted list.\n    \n   "
+      },
+      {
+       "doc": 3696,
+       "bracket_ok": true,
+       "indent_ok": false,
+       "gen": "\ti -= 1  # Move to the next digit in the list\n\ti -= 1  # Move to the next digit in the list\n\treturn int(''.join(map(str, N)))  # Convert the list of digits back to a number and return itWrite a function to find the number"
+      },
+      {
+       "doc": 2716,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# Helper function to calculate square of a number\ndef square_array(n: int) -> List[int]:\n    \"\"\"\n    Calculate square of a number using the square of a number.\n    \n    Parameters:\n    n (int): The number to calculate square of.\n    \n    Returns:\n    List[int]: A list"
+      },
+      {
+       "doc": 1635,
+       "bracket_ok": true,
+       "indent_ok": false,
+       "gen": "\n      # If the current character in s matches the current character in t,\n      # we can either include it in the subsequence or not\n                    if s[i - 1] == t[i - 1]:\n                        dp[i][0] = dp[i - 1][0] + 1\n      else:\n       "
+      },
+      {
+       "doc": 3937,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef find_occurrences(arr, k):\n    \"\"\"\n    Given a sorted array arr and a target value k, return the number of times k occurs in arr.\n    \n    Example:\n    >>> find_occurrences([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 5"
+      },
+      {
+       "doc": 1040,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef max_enemies_defeated(n: int, k: int, enemy: list) -> int:\n    \"\"\"\n    Given n rooms, each room is represented by a list of [enemy, strength]\n    indicating the strength of an enemy. The function returns"
+      },
+      {
+       "doc": 2114,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# without being attacking any other queen in the same column\n            if col not in col and row - col not in row and row + col not in row and row + col not in row and row - col not in row and row - col not in row and row - col not in row and row + col"
+      },
+      {
+       "doc": 1042,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n\n    # Iterate through each house and its corresponding position\n    for house, pos in houses:\n        # Find the index of the closest heater to the current house\n        pos = bisect_left(heaters, pos)\n\n        # If the current heater is the same as the closest heater, increment the radius\n        if pos =="
+      },
+      {
+       "doc": 675,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef has_valid_path(n, m):\n    return all(d == 0 for d in range(n) for d in range(m))\n```Write a function to find the maximum number of non-overlapping subarrays with sum equals to target.\n\n```python\ndef max_subarrays"
+      },
+      {
+       "doc": 1864,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n                # Add the current line to the list of words\n                cur_line.append(words[wi])\n                wi += 1\n                break\n            else:\n                # If the current line is not fully justified, add the current line to the list of words\n                cur_line.append(words[wi])\n               "
+      },
+      {
+       "doc": 1088,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": " dp = [[0] * cols for _ in range(rows)]\n    \n    # Initialize a variable to store the maximum side length of the square found\n    max_side = 0\n\n    # Iterate through the matrix\n    for i in range(rows):\n        for j in range(cols):\n            # If the current cell contains"
+      },
+      {
+       "doc": 2319,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# This is the total weight of the stones list divided by 2, as each pair represents a stone that is not yet to be removed\n    target = sum(stones) // 2\n\n    # Initialize a dynamic programming array to store the maximum weight that can be achieved with a subset of stones\n    dp = [0] *"
+      },
+      {
+       "doc": 704,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Define a class for the nodes of the graph.\nclass Node:\n    \"\"\"\n    A class to represent a node in the graph.\n    Each node has a value, and pointers to its left and right children.\n    \"\"\"\n    def __init__(self, val=0, left=None, right="
+      }
+     ]
+    },
+    "2": {
+     "run": "E24-20261123-074008-s2",
+     "bracket_ok": 1.0,
+     "indent_ok": 0.95,
+     "both_ok": 0.95,
+     "rows": [
+      {
+       "doc": 2925,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Define a function to find the root of a node in a Disjoint Set Union (DSU) data structure.\ndef find_root(x, parent):\n    \"\"\"\n    This function finds the root of a node in a Disjoint Set Union (DSU).\n    It uses the"
+      },
+      {
+       "doc": 3270,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef max_line_crossing_cuts(A: List[int], B: List[int]) -> int:\n    \"\"\"\n    This function calculates the maximum number of non-crossed lines that can be formed\n    by choosing elements from two lists A and B. The lines are represented as a list of"
+      },
+      {
+       "doc": 303,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# The frequency of a character is calculated as the number of times it appears in the string.\n        \"\"\"\n        freq = {}  # Dictionary to store the frequency of each character\n        for c in s:\n            freq[c] = freq.get(c, 0) + 1  # Increment the frequency of the"
+      },
+      {
+       "doc": 1941,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": " for i in range(1, len(s) + 1):\n        dp[i][0] = dp[i - 1][0] and pattern[i - 1] == '*'\n    \n    # Iterate through the pattern and string\n    for i in range(1, len(p) + 1):\n        for"
+      },
+      {
+       "doc": 3986,
+       "bracket_ok": true,
+       "indent_ok": false,
+       "gen": "\n# Populate the graph with the given paths\ngraph = [set() for _ in range(N)]\n for i, j in paths:\n        graph[i].add(j)\n        graph[j].add(i)\n\n    # Iterate through each garden\n    for i in range(N):\n        #"
+      },
+      {
+       "doc": 3757,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef valid_unit(row):\n    \"\"\"\n    This function checks if a given Sudoku board is valid.\n    A Sudoku board is valid if:\n    1. Each row contains the digits 1-9 without repetition.\n    2. Each column contains the digits 1-9 without repetition.\n    3. Each of the"
+      },
+      {
+       "doc": 3122,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef find_subsets(nums):\n    \"\"\"\n    Given a set of distinct integers, nums, return all possible subsets (the power set).\n    Note: The solution set must not contain duplicate subsets.\n    \"\"\"\n    # Initialize an empty list to store the final result\n    res = []\n    \n    # Define a helper function"
+      },
+      {
+       "doc": 2263,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "def merge_sort(arr):\n    \"\"\"\n    Sorts a list of integers using the merge sort algorithm.\n    \n    :param arr: List of integers to be sorted\n    :return: Sorted list of integers\n    \"\"\"\n    # Base case: if the list has one or zero elements, it's already sorted\n    if len"
+      },
+      {
+       "doc": 3696,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# i == len(N) - 1:\n        break\n    \n    # If no such digit is found, return -1\n    if i == -1:\n        return -1\n    \n    # Find the smallest digit to the right of the found digit that is larger than it\n    j = len(N) - 1\n    while"
+      },
+      {
+       "doc": 2716,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# Initialize the left and right pointers for the left and right pointers\n    left, right = 0, length - 1\n    \n    # Iterate from the right pointer to the left pointer\n    while left <= right:\n        # If the absolute value of the number at the left pointer is greater than the number at the right pointer\n        if"
+      },
+      {
+       "doc": 1635,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef count_subsequences(s: str, t: str) -> int:\n    \"\"\"\n    Calculate the number of subsequences of s that are equal to t.\n    \n    Args:\n    s (str): The source string.\n    t (str): The target string.\n    \n    Returns:\n    int: The number of subsequences"
+      },
+      {
+       "doc": 3937,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef count_occurrences(arr, k):\n    \"\"\"\n    This function counts the occurrences of the target value in the list arr.\n    \n    Parameters:\n    arr (list): A list of integers sorted in ascending order.\n    k (int): The target value to count in the list.\n    \n    Returns:\n    int:"
+      },
+      {
+       "doc": 1040,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "5. While the heap is not empty, pop the smallest element from the heap and add it back to the heap.\n    6. If the total strength of the enemy is less than or equal to the number of enemies, return the total number of enemies. Otherwise, return 0.\n   "
+      },
+      {
+       "doc": 2114,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Helper function to check if it's safe to place a queen at board[row][col]\ndef is_safe(board, row, col, n):\n    # Check if the current position is safe (no other queens in the same row, column, or diagonal)\n    if row < n or"
+      },
+      {
+       "doc": 1042,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n\n    # Iterate through each house\n    for house in houses:\n        # Initialize the minimum radius to the maximum of the current radius and the current heater index\n        radius = min(radius, house)\n\n        # Iterate through each heater\n        for heater in heaters:\n            # Calculate the distance between the current house and the heater\n           "
+      },
+      {
+       "doc": 675,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n\n        if x == 0 and y == 0:\n            return True\n\n        if x < 0 or y < 0 or x >= n or y >= m:\n            return False\n\n        if x == 0 or y == 0:\n            return False\n\n        if x == 0 or y == 0:\n            return False\n\n        if x =="
+      },
+      {
+       "doc": 1864,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n                # If the current line is exactly maxWidth characters long, add the word to the current line and update the maximum length\n                if wi == len(words) or wi == len(words[wi]):\n                    cur_line += words[sr][0]\n                    wi += 1\n                # If the current"
+      },
+      {
+       "doc": 1088,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": " # The DP array will store the size of the largest square ending at each cell\n    dp = [[0] * cols for _ in range(rows)]\n    \n    # Initialize a variable to store the maximum side length of the square found\n    max_side = 0\n\n    # Iterate through the matrix\n    for i in range("
+      },
+      {
+       "doc": 2319,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef find_target_weight_II(stones: List[int], target: int) -> int:\n    \"\"\"\n    This function aims to find the minimum possible weight of the last remaining stone after performing the operations.\n    The operations are:\n    1. Take the first stone and add it to the list."
+      },
+      {
+       "doc": 704,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Define a function to find the root of a node.\ndef find(x):\n    # If the node is not its own root, recursively find the root of its parent.\n    # This function is used to find the representative of the path to the root.\n    def find(x):\n        #"
+      }
+     ]
+    }
+   },
+   "pooled": {
+    "bracket_ok": 1.0,
+    "indent_ok": 0.9333333333333332,
+    "both_ok": 0.9333333333333332,
+    "n_generations": 60
+   }
+  },
+  "111": {
+   "per_seed": {
+    "0": {
+     "run": "E27-20261123-070116-s0",
+     "bracket_ok": 1.0,
+     "indent_ok": 0.95,
+     "both_ok": 0.95,
+     "rows": [
+      {
+       "doc": 2925,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef find_parent(x, y):\n    \"\"\"\n    Finds the root of a given node in the disjoint set.\n    \"\"\"\n    # If the node is not in the parent dictionary, it is the root.\n    if parent[x] != x:\n        parent[x] = find(parent[x"
+      },
+      {
+       "doc": 3270,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\tdef max_line_similarity(A: List[int], B: List[int]) -> int:\n    \"\"\"\n    Calculate the maximum number of uncrossed lines that can be formed by the two lists A and B.\n    \"\"\"\n    if len(A) != len(B):\n        return 0"
+      },
+      {
+       "doc": 303,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef calc_count(s: str) -> int:\n    \"\"\"\n    This function calculates the frequency of each character in 's' in 's'.\n    The frequency of a character is defined as the maximum frequency of any character in 's'.\n    If there are multiple characters with the same frequency, the lexicographically"
+      },
+      {
+       "doc": 1941,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef is_match(s, pattern):\n    # If the pattern is empty, it means the pattern has been fully matched\n    if not pattern:\n        return True\n    \n    # Initialize a 2D list `dp` to store whether the pattern matches the first character of the pattern\n    dp = [[False] * ("
+      },
+      {
+       "doc": 3986,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": " # Initialize a list to store the count of flowers for each garden\n    count = [0] * N\n\n    # Iterate through each garden\n    for i in range(N):\n        # Iterate through each garden\n        for j in range(N):\n            # If the garden is empty, increment the count for that garden\n           "
+      },
+      {
+       "doc": 3757,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef valid_sudoku(board):\n    \"\"\"\n    Check if a given 9x9 Sudoku board is valid.\n\n    :param board: List[List[str]] - a 9x9 Sudoku board\n    :return: bool - True if the Sudoku board is valid, False otherwise\n    \"\"\"\n    # Check each 3"
+      },
+      {
+       "doc": 3122,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "from typing import List\n            # If the current path has only one element, add it to the result\n            if len(path) == 1:\n                res.append(path.copy())\n            # If the current path has more elements, add it to the result\n            elif len(path) > len(path):"
+      },
+      {
+       "doc": 2263,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "def merge_sort(arr):\n    \"\"\"\n    Merges two sorted lists into a single sorted list.\n    \n    Args:\n    arr (List[int]): The first sorted list.\n    \n    Returns:\n    List[int]: The merged sorted list.\n    \"\"\"\n    # Initialize an empty list to store the merged result\n    merged"
+      },
+      {
+       "doc": 3696,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef find_next_greater_element(n: int) -> int:\n    \"\"\"\n    Find the smallest integer greater than n such that the sum of its digits is equal to n.\n    If no such integer exists, return -1.\n    \n    :param n: A positive integer\n    :return: The smallest"
+      },
+      {
+       "doc": 2716,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# Iterate through the input array\nfrom typing import List\n\n# Define a helper function to check if a number is square\ndef is_square_square(n: int) -> bool:\n    \"\"\"\n    Check if a number is square.\n    \n    Args:\n    n (int): The number to check.\n    \n   "
+      },
+      {
+       "doc": 1635,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef count_subsequences(s: str, t: str) -> int:\n    \"\"\"\n    Counts the number of subsequences in 's' that are equal to 't'.\n    \n    Parameters:\n    s (str): The input string.\n    t (str): The string to check against.\n    \n    Returns:\n    int"
+      },
+      {
+       "doc": 3937,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef count_occurrences(arr, k):\n    \"\"\"\n    Counts the number of occurrences of a specific element in the given list.\n    \n    Parameters:\n    arr (list): The list to search for.\n    k (int): The element to count in the list.\n    \n    Returns:\n    int: The number of occurrences"
+      },
+      {
+       "doc": 1040,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\nassert max_enemies([1, 1, 1, 1], [1, 1, 1, 1]) == 1\n\n```python\ndef max_enemies(enemies, enemies):\n    # Calculate the strengths of the enemies\n    strengths = sum("
+      },
+      {
+       "doc": 2114,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef n_queens(n):\n    \"\"\"\n    The n-queens puzzle is the problem of placing n queens on an n x n chessboard so that no two queens threaten each other.\n    Thus, a solution requires that no two queens share the same row, column, or diagonal.\n    \n    Args"
+      },
+      {
+       "doc": 1042,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n\n    # Iterate through the sorted heaters list\n    for i in range(len(houses)):\n        # If the current heater is greater than the last heater, the radius is the radius\n        if heaters[i] > heaters[i]:\n            radius += 1\n        # If the current heater is less than the last heater,"
+      },
+      {
+       "doc": 675,
+       "bracket_ok": true,
+       "indent_ok": false,
+       "gen": "\tif x != y:\n\t\treturn False\n\tif x != y:\n\t\treturn False\n\tif x != y:\n\t\treturn False\n\tif x != y:\n\t\treturn False\n\tif x != y:\n\t\treturn False\n\tif x != y:\n\t\treturn"
+      },
+      {
+       "doc": 1864,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef justify_line(words, maxWidth):\n    \"\"\"\n    Given a list of words and a maxWidth, format the text such that each line is exactly maxWidth characters long.\n    Each line is exactly maxWidth characters long.\n    Each line is exactly maxWidth characters long.\n    Each line is exactly maxWidth characters long.\n    Each"
+      },
+      {
+       "doc": 1088,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef largest_square(matrix):\n    \"\"\"\n    This function takes a 2D binary matrix as input and returns the area of the largest square containing only '1's.\n    It uses dynamic programming to efficiently solve the problem.\n\n    :param matrix: List[List[int]] - a 2D binary matrix\n   "
+      },
+      {
+       "doc": 2319,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# This is the maximum possible weight of the last stone.\n    target = len(stones)\n\n    # Initialize a list to store the maximum weight of the last stone.\n    max_weight = [0] * len(stones)\n\n    # Iterate through the stones list starting from the second stone.\n    for i in"
+      },
+      {
+       "doc": 704,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Define a function to find the root of a node in the disjoint set.\ndef find(x):\n    \"\"\"\n    This function takes a node and returns the root of its parent.\n    If the node is not in the same set, it returns None.\n    \"\"\"\n    # If the node is not its"
+      }
+     ]
+    },
+    "1": {
+     "run": "E27-20261123-071613-s1",
+     "bracket_ok": 1.0,
+     "indent_ok": 1.0,
+     "both_ok": 1.0,
+     "rows": [
+      {
+       "doc": 2925,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef find_parent(parent, x):\n    \"\"\"\n    Find the parent of a given node x.\n    If x is not the root, recursively find the parent of x.\n    \"\"\"\n    # If x is not the root of x, recursively find the parent of x.\n    if parent[x] !="
+      },
+      {
+       "doc": 3270,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef max_line_crossing_object(A, B):\n    \"\"\"\n    Helper function to find the maximum number of uncrossed lines that can be formed\n    from a list of non-negative integers.\n\n    Parameters:\n    A (List[int]): The first list of non-negative integers.\n   "
+      },
+      {
+       "doc": 303,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# Returns a list of integers representing the number of strings with the smallest character frequency.\n        \"\"\"\n        return [c * 2 for c, c in zip(s, words[1])]\n    \n    # Initialize an empty list to store the result\n    result = []\n    \n    # Iterate over each query in the list of queries\n   "
+      },
+      {
+       "doc": 1941,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# '*' matches any character in the pattern\n    for i in range(1, len(pattern) + 1):\n        dp[i][0] = dp[i - 1][0] and s[i - 1] == pattern[i - 1]\n    \n    # Iterate through the pattern and pattern\n    for i"
+      },
+      {
+       "doc": 3986,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n\n    # Populate the adjacency list with the given connections\n    for i in range(N):\n        graph[i].append(i)\n\n    # Initialize a list to store the result\n    res = []\n\n    # Iterate through the adjacency list of the tree\n    for i in range(N):\n        # If the node has"
+      },
+      {
+       "doc": 3757,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef valid_sudoku(board):\n    \"\"\"\n    Determine if a given 9x9 Sudoku board is valid. Only the filled cells need to be validated according to the following rules:\n    1. Each row must contain the digits 1-9 without repetition.\n    2. Each column must contain the digits 1-"
+      },
+      {
+       "doc": 3122,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "def dfs(path, start):\n    \"\"\"\n    This function performs a depth-first search to find all non-decreasing subsequences of the given list.\n    \n    Parameters:\n    path (list): The current subsequence being built.\n    start (int): The starting index for the search.\n    \n    Returns:\n    list: A list"
+      },
+      {
+       "doc": 2263,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Call the merge_sort function to sort the list\ndef merge_sort(arr):\n    \"\"\"\n    Sorts an list using the merge sort algorithm.\n    \n    Parameters:\n    arr (list): The list to be sorted.\n    \n    Returns:\n    list: The sorted list.\n    \"\"\"\n    # Base case: if"
+      },
+      {
+       "doc": 3696,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef next_greater_element(n: int) -> int:\n    \"\"\"\n    Find the next greater element for each element in the given array.\n    \n    Args:\n        n: An integer representing the position of the next greater element for the next greater element.\n    \n    Returns:\n        An integer representing the next greater element"
+      },
+      {
+       "doc": 2716,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# Create a new array of the same length as the input array, filled with zeros\n    squares[0] = arr[0]  # Get the last element of the input array\n    \n    # Iterate through the input array starting from the second element\n    for i in range(1, length):\n        # Append the current"
+      },
+      {
+       "doc": 1635,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef main():\n    # Base case: if t is empty, return 0 as there is no way to match an empty string\n    if t == \"\":\n        return 0\n    \n    # Base case: If t is empty, return 0 as there is no way to match an empty string\n    if t == \"\":\n        return 0"
+      },
+      {
+       "doc": 3937,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Example usage:\n# print(count_occurrences([1, 2, 3, 4, 5], 2))  # Output: 3\n# print(count_occurrences([1, 1, 1, 1, 1, 1, 1, 1], 1))  # Output: 1\n# print"
+      },
+      {
+       "doc": 1040,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Define a function `solve_prove` that takes a list of enemies as input and returns the total strength of the enemies.\ndefsolve_prove(enemies):\n    \"\"\"\n    This function calculates the total strength of a enemy.\n    It returns the"
+      },
+      {
+       "doc": 2114,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "def solve_n_queens(board, row, n, result):\n    # Base case: if all queens are placed successfully\n    if row == n:\n        return result\n    \n    # Recursive function to solve the n-queens problem\n    def solve_n_queens(board, row, n, result):\n        #"
+      },
+      {
+       "doc": 1042,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n\n    # Iterate through the sorted houses\n    for i in range(len(houses)):\n        # Check if the current house is closer to the last heater\n        if abs(heaters[i] - heaters[i]) < radius:\n            # If the current house is closer to the last heater, return the radius\n           "
+      },
+      {
+       "doc": 675,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\tx = x * m + y * m + y * m + x * m + y * m + x * m + y * m + y * m + x * m + y * m + x * m + y * m + y * m + x * m + y * m + x"
+      },
+      {
+       "doc": 1864,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Define the function to justify the words line by line\ndef justify_text(words, maxWidth):\n    \"\"\"\n    This function takes a list of words and a maxWidth as input and returns a list of justified text lines.\n    Each line is justified such that the number of words in the current line is exactly maxWidth"
+      },
+      {
+       "doc": 1088,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "def largest_square(matrix):\n    \"\"\"\n    This function finds the largest square containing only '1's in a given matrix.\n    \n    Parameters:\n    matrix (list of list of int): The input matrix to find the largest square containing only '1's.\n    \n    Returns:\n    int: The area of the largest square"
+      },
+      {
+       "doc": 2319,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "from typing import List\n\ndef min_stone_weight_II(stones: List[int]) -> int:\n    \"\"\"\n    This function calculates the minimum possible weight of the last remaining stone after all stones.\n    The stones are numbered from 1 to the number of stones.\n    The function returns the minimum possible weight"
+      },
+      {
+       "doc": 704,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef find_cycle_in_directed_graph(edges):\n    \"\"\"\n    Given a directed graph represented as a list of edges, where each edge is represented as a list of two integers [u, v],\n    where u and v are nodes and the weight of the edge is the weight of the edge from"
+      }
+     ]
+    },
+    "2": {
+     "run": "E27-20261123-072845-s2",
+     "bracket_ok": 1.0,
+     "indent_ok": 0.95,
+     "both_ok": 0.95,
+     "rows": [
+      {
+       "doc": 2925,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Function to find the root of a node in a disjoint set.\ndef find_root(root):\n    \"\"\"\n    This function finds the root of a node in a disjoint set.\n    It uses the Union-Find algorithm to find the root of a node.\n    \"\"\"\n    # If the node is not"
+      },
+      {
+       "doc": 3270,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Function to check if a list of integers is a subsequence of a given list of integers\ndef check_subsequence_of_A_subsequence(nums: List[int]) -> bool:\n    \"\"\"\n    This function checks if the given list of integers is a subsequence of a given list of integers.\n    A"
+      },
+      {
+       "doc": 303,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n        If the string is empty, return an empty list.\n        \"\"\"\n        return len(s)\n    \n    # Initialize an empty list to store the result\n    result = []\n    \n    # Initialize a variable to keep track of the current frequency of the smallest character\n    current_freq = 0\n    \n    # Iterate over each character in the"
+      },
+      {
+       "doc": 1941,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Define a helper function `is_match` that takes two parameters: `s` and `pattern`\ndef is_match(s: str, pattern: str) -> bool:\n    \"\"\"\n    This helper function checks if the given string `s` matches the pattern `pattern`.\n    \n    Parameters:\n   "
+      },
+      {
+       "doc": 3986,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Define a function to perform a depth-first search (DFS) to find the maximum number of flowers that can be planted in a garden\ndef dfs(n, paths, paths):\n    \"\"\"\n    This function performs a depth-first search to find the maximum number of flowers that can be planted in a garden"
+      },
+      {
+       "doc": 3757,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef valid_sudoku(board):\n    \"\"\"\n    Check if a given 9x9 Sudoku board is valid.\n    A Sudoku board is valid if:\n    1. Each row contains the digits 1-9 without repetition.\n    2. Each column contains the digits 1-9 without repetition.\n    3. Each of"
+      },
+      {
+       "doc": 3122,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# and the current path is not empty, add it to the path and continue\n            if not path or path.pop() != nums[i]:\n                dfs(path + [nums[i]], i)\n    \n    # Start the DFS from the first element\n    dfs(nums, 0)\n    \n    # Return the final result"
+      },
+      {
+       "doc": 2263,
+       "bracket_ok": true,
+       "indent_ok": false,
+       "gen": "# Merge the two sorted halves and count the occurrences of each element in the two halves\ndef merge_sort(left, right):\n        \"\"\"\n        Merges two sorted halves and counts the occurrences of each element in the two sorted halves.\n        \n        Parameters:\n        left (int): The left sorted half of the list."
+      },
+      {
+       "doc": 3696,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Test the function with provided data points\nprint(next_greater_element(12))  # Expected output: -1\nprint(next_greater_element(5))  # Expected output: -1Write a function to find the maximum number of non-overlapping subarrays with sum zero in a"
+      },
+      {
+       "doc": 2716,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# Define a function to calculate the square root of a number using the formula for the square root of a number\n    def calculate(x):\n        \"\"\"\n        Calculate the square root of a number using the formula for the square root of a number.\n        \"\"\"\n        # Calculate the square root of the number\n        root = x"
+      },
+      {
+       "doc": 1635,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Define a helper function `dfs` that takes two parameters: `s` and `t`\ndef dfs(s, t):\n    \"\"\"\n    This helper function performs a depth-first search to find the number of subsequences of `s` in `s`.\n    It uses a depth-first search ("
+      },
+      {
+       "doc": 3937,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "# The middle element is less than k, so we move the right pointer to the left\n            right = mid - 1\n        # If the middle element is equal to k, we have found the last occurrence of k\n        else:\n            # Return the left pointer as the index of the first occurrence of k\n            return left"
+      },
+      {
+       "doc": 1040,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef max_enemies(k: int, enemy: int, k: int) -> int:\n    \"\"\"\n    Given a positive integer k and an integer k, return the maximum number of enemies that can be k enemies.\n    \n    :param k: int, the number of"
+      },
+      {
+       "doc": 2114,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n            if col in col_set:\n                # Place the queen in the current position\n                board[row][col] = 'Q'\n                # Recursively try to place the next queen\n                solve_n_queens(board + [row], col + 1, result)\n                # Backtrack: remove the queen from the"
+      },
+      {
+       "doc": 1042,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Define the function to find the closest heater for a given location\ndef find_closest_radius(houses, heaters):\n    \"\"\"\n    This function takes a list of houses and a list of heaters. It returns the radius of the closest heater.\n    \"\"\"\n    # Initialize the radius to 0\n    radius = 0"
+      },
+      {
+       "doc": 675,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef find_path(grid):\n    if grid[x][y] == 0:\n        return 0\n\n    def dfs(x, y):\n        if x < 0 or x >= n or y < 0 or y >= m or grid[x][y] == 0:\n            return\n        grid[x]["
+      },
+      {
+       "doc": 1864,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\ndef check(cur_line):\n    # Initialize the current line and the current line\n    cur_line = []\n    cur_line = []\n\n    # Iterate through the words\n    for i in range(len(words)):\n        # If the current line is not empty and the current line is shorter than the current"
+      },
+      {
+       "doc": 1088,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Define a helper function to check if a given cell is a '1' in the matrix\ndef is_one_in_matrix(matrix):\n    \"\"\"\n    This function checks if a given cell is a '1' in the matrix.\n    It returns True if the cell is a '1' in"
+      },
+      {
+       "doc": 2319,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "target = sum(stones) // 2\n\n    # Initialize a dynamic programming array dp where dp[i] represents the minimum weight of the subset ending with stones[i]\n    dp = [0] * (target + 1)\n    dp[0] = 0  # Base case: 0 can always be achieved\n\n   "
+      },
+      {
+       "doc": 704,
+       "bracket_ok": true,
+       "indent_ok": true,
+       "gen": "\n# Define a function to find the root of a set.\ndef find(x):\n    \"\"\"\n    This function takes a set of unique roots and returns the root of the set.\n    It uses the union operation to find the root of the set.\n    \"\"\"\n    # Define a function to perform union operation on"
+      }
+     ]
+    }
+   },
+   "pooled": {
+    "bracket_ok": 1.0,
+    "indent_ok": 0.9666666666666667,
+    "both_ok": 0.9666666666666667,
+    "n_generations": 60
+   }
+  }
+ },
+ "control_real_continuation_pass_rate": {
+  "bracket_ok": 1.0,
+  "indent_ok": 1.0,
+  "n": 14
+ }
+}

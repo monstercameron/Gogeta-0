@@ -1,0 +1,106 @@
+{
+  "experiment": "A4FPc",
+  "arch": "c2f",
+  "description": "DRAFT (not registered). ALTERNATIVE (fixed 4-byte patches; SQ374 found fixed patches far too costly at this scale): Control A'': unshared 2-layer decoder with the r2_shared arm's unique decoder params (two different lswa+SwiGLU blocks, SwiGLU hidden 74 instead of 320); same passes, depth and init scale, fewer decoder FLOPs.",
+  "computed": {
+    "note": "computed by gogeta.c2f (FusionDance's counting rule: 2 x params per application + attention/GDN terms, training = 3 x forward); per byte; NOT measured",
+    "train_flops_per_byte": 23505960,
+    "inference_flops_per_byte": 7769784,
+    "train_breakdown_per_byte": {
+      "encoder": 1345176,
+      "patch_in": 196608,
+      "global": 19899744,
+      "up": 49200,
+      "decoder": 1622016,
+      "head": 393216
+    },
+    "reference": "E1/3.735 per byte",
+    "reference_train_flops": 24371566,
+    "x_reference": 0.9645,
+    "params": {
+      "total": 10735460,
+      "embedding": 32768,
+      "encoder": 207812,
+      "global": 10091808,
+      "decoder": 238080,
+      "decoder_blocks": 188416,
+      "local": 643396,
+      "global_active": 6847776,
+      "active_total": 7491428
+    },
+    "train_flops_per_token_equiv": 87794761,
+    "x_E1_per_token_equiv": 0.9645
+  },
+  "notes": "Global = a3mx.json's structure with the width scaled to d_model 256 (head_dim 64, mlp_hidden 704, moe_hidden 352) so train FLOPs/byte ~ E1/3.735 (a3mx's own d_model 384 costs 42.62M/byte in the global model alone at P = 4, 1.75 x that target). window = 256 PATCHES. code-py-v1-bytes (no v2 byte dataset). 74.7M bytes = 20M token-equivalents; warmup 280 steps = a3mx's warmup in token-equivalents; --max-tokens counts BYTES here. Param-matched control: SwiGLU hidden 74 (vs 320).",
+  "model": {
+    "patching": "fixed",
+    "patch_size": 4,
+    "d_local": 128,
+    "local_heads": 2,
+    "local_mlp_hidden": 320,
+    "local_window": 64,
+    "local_encoder": [
+      "conv",
+      "gdn"
+    ],
+    "refine_blocks": [
+      "lswa"
+    ],
+    "refine_contractive": true,
+    "refine_passes": 2,
+    "refine_shared": false,
+    "refine_mlp_hidden": 74,
+    "refine_aux_weight": 0.5,
+    "global_model": {
+      "d_model": 256,
+      "n_heads": 4,
+      "mlp_hidden": 704,
+      "window": 256,
+      "ternary": true,
+      "prelude": [
+        "swa"
+      ],
+      "core": [
+        "gdn",
+        "gdn",
+        "swa",
+        "gdn",
+        "gdn",
+        "swa"
+      ],
+      "coda": [
+        "attn"
+      ],
+      "loops": 2,
+      "loops_min": 2,
+      "loops_max": 2,
+      "bptt_loops": 2,
+      "ternary_fp_ends": true,
+      "inject_contractive": true,
+      "moe_experts": 4,
+      "moe_top_k": 2,
+      "moe_hidden": 352,
+      "moe_core_only": true,
+      "ternary_mixer": false
+    }
+  },
+  "train": {
+    "dataset": "code-py-v1-bytes",
+    "seq_len": 4096,
+    "batch_size": 32,
+    "max_bytes": 74700000,
+    "lr": 0.006,
+    "min_lr_frac": 0.1,
+    "warmup_steps": 280,
+    "weight_decay": 0.1,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "grad_clip": 1.0,
+    "eval_every": 250,
+    "eval_seqs": 128,
+    "seed": 0,
+    "eval_loops": [
+      2
+    ]
+  }
+}

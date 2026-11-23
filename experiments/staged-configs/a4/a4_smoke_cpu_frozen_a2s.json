@@ -1,0 +1,39 @@
+{
+  "experiment": "A4-smoke-frozen",
+  "arch": "c2f",
+  "description": "CPU smoke test of the frozen-trunk mode (SQ207/X1 plumbing): the A2s seed-2 checkpoint as the frozen global model on BPE tokens, only a tiny r_b = 2 shared byte decoder trains. code-py-v1 here because code-py-v2 (A2s's dataset, same tokenizer) is not on this machine. Not an experiment; never registered.",
+  "model": {
+    "patching": "tokens",
+    "freeze_global": true,
+    "global_init": "~/fusiondance-data/cloud/fleet/gogeta-cockpit-a2-1/fusiondance-data/checkpoints/A2s-20261123-170724-s2/model.pt",
+    "d_local": 32,
+    "local_heads": 2,
+    "local_mlp_hidden": 64,
+    "local_window": 16,
+    "local_encoder": [],
+    "refine_blocks": ["lswa"],
+    "refine_passes": 2,
+    "refine_shared": true,
+    "refine_contractive": true,
+    "refine_aux_weight": 0.5
+  },
+  "train": {
+    "dataset": "code-py-v1",
+    "seq_len": 64,
+    "batch_size": 4,
+    "max_tokens": 5120,
+    "lr": 0.003,
+    "min_lr_frac": 0.1,
+    "warmup_steps": 5,
+    "weight_decay": 0.1,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "grad_clip": 1.0,
+    "eval_every": 10,
+    "eval_seqs": 4,
+    "final_eval_seqs": 8,
+    "sample_bytes": 24,
+    "print_every": 1,
+    "seed": 0
+  }
+}

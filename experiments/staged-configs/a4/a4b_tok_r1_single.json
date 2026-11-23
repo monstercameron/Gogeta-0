@@ -1,0 +1,97 @@
+{
+  "experiment": "A4b",
+  "arch": "c2f",
+  "description": "DRAFT (not registered). A4 default: tokens as patches on the A3 all-parts backbone (a3mx.json model block unchanged, d_model 384), trained jointly from scratch. Control A: single-pass byte decoder, r_b = 1 (same block, no refinement; fewer FLOPs).",
+  "computed": {
+    "note": "computed by gogeta.c2f (FusionDance's counting rule: 2 x params per application + attention/GDN terms, training = 3 x forward); per token; NOT measured",
+    "train_flops_per_token": 179640173,
+    "inference_flops_per_token": 59880058,
+    "train_breakdown_per_token": {
+      "global": 170490432,
+      "up": 294912,
+      "decoder": 7920253,
+      "head": 934575
+    },
+    "reference": "A3mx BPE (same trunk + 8k head)",
+    "reference_train_flops": 189364800,
+    "x_reference": 0.9486,
+    "params": {
+      "total": 25668144,
+      "embedding": 32896,
+      "global": 25318192,
+      "decoder": 262400,
+      "decoder_blocks": 262400,
+      "local": 349952,
+      "trainable": 25668144,
+      "global_active": 18240304,
+      "active_total": 18590256
+    }
+  },
+  "notes": "Global = a3mx.json's model block verbatim (prelude swa; core gdn,gdn,swa,gdn,gdn,swa x 2 loops, contractive inject; coda attn; ternary core with fp mixers and fp ends; MoE 4 experts top-2 core-only); its 8k BPE head is replaced by the byte decoder. Sizing: the r2_shared decoder (d_local 128, SwiGLU 512) costs about what the head it replaces costs, so arm a is ~1.00 x A3mx's own train FLOPs/token. Train block = a3mx's (code-py-v2, 1024 tokens, batch 32, 20M tokens, lr 0.006, warmup 300); --max-tokens counts TOKENS. val_loss is nats per token on code-py-v2 val, directly comparable with A3mx's val_loss. lr not tuned for the decoder.",
+  "model": {
+    "patching": "tokens",
+    "d_local": 128,
+    "local_heads": 2,
+    "local_mlp_hidden": 512,
+    "local_window": 64,
+    "local_encoder": [],
+    "refine_blocks": [
+      "lswa"
+    ],
+    "refine_contractive": true,
+    "refine_passes": 1,
+    "refine_shared": true,
+    "refine_aux_weight": 0.0,
+    "global_model": {
+      "d_model": 384,
+      "n_heads": 6,
+      "mlp_hidden": 1024,
+      "window": 256,
+      "ternary": true,
+      "prelude": [
+        "swa"
+      ],
+      "core": [
+        "gdn",
+        "gdn",
+        "swa",
+        "gdn",
+        "gdn",
+        "swa"
+      ],
+      "coda": [
+        "attn"
+      ],
+      "loops": 2,
+      "loops_min": 2,
+      "loops_max": 2,
+      "bptt_loops": 2,
+      "ternary_fp_ends": true,
+      "inject_contractive": true,
+      "moe_experts": 4,
+      "moe_top_k": 2,
+      "moe_hidden": 512,
+      "moe_core_only": true,
+      "ternary_mixer": false
+    }
+  },
+  "train": {
+    "dataset": "code-py-v2",
+    "seq_len": 1024,
+    "batch_size": 32,
+    "max_tokens": 20000000,
+    "lr": 0.006,
+    "min_lr_frac": 0.1,
+    "warmup_steps": 300,
+    "weight_decay": 0.1,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "grad_clip": 1.0,
+    "eval_every": 250,
+    "eval_seqs": 128,
+    "seed": 0,
+    "eval_loops": [
+      2
+    ]
+  }
+}

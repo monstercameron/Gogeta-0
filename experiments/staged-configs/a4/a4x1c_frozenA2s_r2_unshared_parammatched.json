@@ -1,0 +1,64 @@
+{
+  "experiment": "A4X1c",
+  "arch": "c2f",
+  "description": "DRAFT (not registered). SQ207/X1 speller on a FROZEN A2s trunk (seed-2 checkpoint): only the byte decoder trains. Control A'': unshared 2-layer decoder with the r2_shared arm's unique decoder params (two different lswa+SwiGLU blocks, SwiGLU hidden 170 instead of 512); same passes, depth and init scale, fewer decoder FLOPs.",
+  "computed": {
+    "note": "computed by gogeta.c2f (FusionDance's counting rule: 2 x params per application + attention/GDN terms, training = 3 x forward); per token; NOT measured",
+    "train_flops_per_token": 68732201,
+    "inference_flops_per_token": 60461395,
+    "train_breakdown_per_token": {
+      "global": 56793280,
+      "up": 294912,
+      "decoder": 9774858,
+      "head": 1869151
+    },
+    "reference": "A2s BPE train FLOPs/token (same trunk + head)",
+    "reference_train_flops": 189254208,
+    "x_reference": 0.3632,
+    "params": {
+      "total": 18630448,
+      "embedding": 32896,
+      "global": 18231088,
+      "decoder": 311808,
+      "decoder_blocks": 262144,
+      "local": 399360,
+      "trainable": 399360
+    },
+    "global_init_sha256": "a0c15385176536b2e9ce622b723e5f0b00932707023423da28af21a5d1ac3dfe"
+  },
+  "notes": "The global model's config and weights come from global_init (A2s = a3mx without MoE, 200M tokens on code-py-v2; its summary.json: val_loss 1.0910 nats/token, val_bits_per_char 0.4156). That val_loss is the bar: the decoder's val_loss on the same val = the trunk's own next-token information plus the spelling cost. The trunk runs forward-only (eval mode, its default 2 loops), so FLOPs/token = A2s forward without its head + 3 x decoder. global_init is this machine's path: a fleet box needs the same checkpoint (sha256 recorded in the run config). 20M tokens, lr 0.006 and warmup 100 are untuned guesses.",
+  "model": {
+    "patching": "tokens",
+    "d_local": 128,
+    "local_heads": 2,
+    "local_mlp_hidden": 512,
+    "local_window": 64,
+    "local_encoder": [],
+    "refine_blocks": [
+      "lswa"
+    ],
+    "refine_contractive": true,
+    "refine_passes": 2,
+    "refine_shared": false,
+    "refine_mlp_hidden": 170,
+    "refine_aux_weight": 0.5,
+    "freeze_global": true,
+    "global_init": "~/fusiondance-data/cloud/fleet/gogeta-cockpit-a2-1/fusiondance-data/checkpoints/A2s-20261123-170724-s2/model.pt"
+  },
+  "train": {
+    "dataset": "code-py-v2",
+    "seq_len": 1024,
+    "batch_size": 32,
+    "max_tokens": 20000000,
+    "lr": 0.006,
+    "min_lr_frac": 0.1,
+    "warmup_steps": 100,
+    "weight_decay": 0.1,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "grad_clip": 1.0,
+    "eval_every": 250,
+    "eval_seqs": 128,
+    "seed": 0
+  }
+}

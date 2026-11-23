@@ -18,6 +18,34 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.15: Full stack: coarse-to-fine byte decoder around the all-parts backbone (tokens as patches); A4 registered; fixed byte patches +63% worse (SQ374)
+*2026-11-23*
+
+**The full stack exists: coarse-to-fine byte decoding around the all-parts backbone (`gogeta/c2f.py`). A4 is registered. Docs refreshed.**
+
+- **SQ374, existing byte runs on clean80** (worker, one seed each): fixed byte patches are far too costly at this scale. E13b (P = 4, about the token model's FLOPs) scores 0.553 bpc vs E1's 0.339 (+63%); E13a (P = 2, 1.9x FLOPs) scores 0.462 (+36%). Loss rises 7-9% across the slots of a patch.
+  - **Design-around:** tokens as patches. The global model stays on BPE tokens, and a byte decoder spells each next token.
+- **Coarse-to-fine module** (C2F builder subagent; tests re-run by the main agent: `tests/test_c2f.py` 17/17, `tests/test_assembly.py` 13/13):
+  - **Default `tokens` mode:** the real `FusionDance` runs on BPE tokens. From the trunk state at token i, a byte decoder spells token i+1 as [BOT, b1..bL] -> [b1..bL, EOT] with a 257-way head. Loss is in nats per target token, so it compares directly with a BPE head.
+  - **Byte refinement loop:** shared-weight (r_b), with a single-pass and a parameter-matched unshared (A'') control, optional contractive updates and a per-pass loss. Its residual init uses its own depth.
+  - **Frozen-trunk mode:** for the cheap X1 test.
+  - **`fixed` P-byte mode:** an alternative through the `inputs_embeds` / `return_hidden` hooks.
+  - **Causality:** bitwise perturbation tests pass for 26 configs (including MoE and the GDN reference), and deliberately broken controls do leak.
+  - **Trainer:** `experiments/byte_model/train_c2f.py`, with the same CLI and run layout as `gogeta.train`; CPU smoke runs completed.
+- **A4, registered before dispatch** (fresh seeds 5-7, paired with A3mx): the A3mx trunk with a byte decoder.
+  - **Arms:** A4a (shared refinement, r_b = 2), A4b (single pass), A4c (unshared, parameter-matched). Computed FLOPs are 1.003x / 0.949x / 0.963x A3mx's.
+  - **Predictions:** A4a +2% vs A3mx; sharing -1.5% vs single pass; 0% vs the parameter-matched unshared decoder.
+  - **Viability rule:** A4a within 3% of A3mx.
+- **Fleet:** the worker script now launches `C2F ...` jobs through `train_c2f.py`. A4 jobs join the A3 wave at this commit.
+- **SQ349, syntax proxy (low power):** bracket validity is 100% in every cell and indent consistency 93-97%. No difference.
+- **Docs (hourly refresh, checked):**
+  - README results gain A2, SQ351 (GDN extrapolation) and SQ347 (copy deficit); "Where we are" describes the full-stack phase; the glossary gets corrected A3 and new A4 entries.
+  - `post_training/SETUP.md` section 7 now describes the fixed harness (SQ373) and SQ61.
+  - The stale A2 line in the README status block is fixed.
+- **Still building:** `gogeta/decode.py` (self-speculative decoding), not in this commit.
+
+---
+
 ## v0.5.14: A1 amendment 2: third seed for fixed vs random loop depth (registered before running)
 *2026-11-23*
 

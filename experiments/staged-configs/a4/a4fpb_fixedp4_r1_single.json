@@ -1,0 +1,105 @@
+{
+  "experiment": "A4FPb",
+  "arch": "c2f",
+  "description": "DRAFT (not registered). ALTERNATIVE (fixed 4-byte patches; SQ374 found fixed patches far too costly at this scale): Control A: single-pass byte decoder, r_b = 1 (same block, no refinement; fewer FLOPs).",
+  "computed": {
+    "note": "computed by gogeta.c2f (FusionDance's counting rule: 2 x params per application + attention/GDN terms, training = 3 x forward); per byte; NOT measured",
+    "train_flops_per_byte": 22917672,
+    "inference_flops_per_byte": 7639224,
+    "train_breakdown_per_byte": {
+      "encoder": 1345176,
+      "patch_in": 196608,
+      "global": 19899744,
+      "up": 49200,
+      "decoder": 1230336,
+      "head": 196608
+    },
+    "reference": "E1/3.735 per byte",
+    "reference_train_flops": 24371566,
+    "x_reference": 0.9403,
+    "params": {
+      "total": 10686052,
+      "embedding": 32768,
+      "encoder": 207812,
+      "global": 10091808,
+      "decoder": 188672,
+      "decoder_blocks": 188672,
+      "local": 593988,
+      "global_active": 6847776,
+      "active_total": 7442020
+    },
+    "train_flops_per_token_equiv": 85597505,
+    "x_E1_per_token_equiv": 0.9403
+  },
+  "notes": "Global = a3mx.json's structure with the width scaled to d_model 256 (head_dim 64, mlp_hidden 704, moe_hidden 352) so train FLOPs/byte ~ E1/3.735 (a3mx's own d_model 384 costs 42.62M/byte in the global model alone at P = 4, 1.75 x that target). window = 256 PATCHES. code-py-v1-bytes (no v2 byte dataset). 74.7M bytes = 20M token-equivalents; warmup 280 steps = a3mx's warmup in token-equivalents; --max-tokens counts BYTES here. Param-matched control: SwiGLU hidden 74 (vs 320).",
+  "model": {
+    "patching": "fixed",
+    "patch_size": 4,
+    "d_local": 128,
+    "local_heads": 2,
+    "local_mlp_hidden": 320,
+    "local_window": 64,
+    "local_encoder": [
+      "conv",
+      "gdn"
+    ],
+    "refine_blocks": [
+      "lswa"
+    ],
+    "refine_contractive": true,
+    "refine_passes": 1,
+    "refine_shared": true,
+    "refine_aux_weight": 0.0,
+    "global_model": {
+      "d_model": 256,
+      "n_heads": 4,
+      "mlp_hidden": 704,
+      "window": 256,
+      "ternary": true,
+      "prelude": [
+        "swa"
+      ],
+      "core": [
+        "gdn",
+        "gdn",
+        "swa",
+        "gdn",
+        "gdn",
+        "swa"
+      ],
+      "coda": [
+        "attn"
+      ],
+      "loops": 2,
+      "loops_min": 2,
+      "loops_max": 2,
+      "bptt_loops": 2,
+      "ternary_fp_ends": true,
+      "inject_contractive": true,
+      "moe_experts": 4,
+      "moe_top_k": 2,
+      "moe_hidden": 352,
+      "moe_core_only": true,
+      "ternary_mixer": false
+    }
+  },
+  "train": {
+    "dataset": "code-py-v1-bytes",
+    "seq_len": 4096,
+    "batch_size": 32,
+    "max_bytes": 74700000,
+    "lr": 0.006,
+    "min_lr_frac": 0.1,
+    "warmup_steps": 280,
+    "weight_decay": 0.1,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "grad_clip": 1.0,
+    "eval_every": 250,
+    "eval_seqs": 128,
+    "seed": 0,
+    "eval_loops": [
+      2
+    ]
+  }
+}

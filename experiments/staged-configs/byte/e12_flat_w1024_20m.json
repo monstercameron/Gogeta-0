@@ -1,0 +1,48 @@
+{
+  "experiment": "E12",
+  "description": "Flat byte-level E1: E1's six mixers at d=384 on raw bytes, vocab 256, T=4,096 bytes, SWA window 1,024 bytes (about E1's 256-token span). Needs the flex-attention SWA patch (swa_impl flex): the dense-mask SWA at T=4,096 is O(T^2) (C12), about 6 GB of scores per layer. [20M-byte sweep variant]",
+  "budget": {
+    "bytes": 20000000,
+    "token_equivalents": 5354752,
+    "steps": 153,
+    "note": "max_bytes counts training byte positions (B x T per step); token_equivalents = bytes / 3.735 (measured val bytes per BPE token)"
+  },
+  "notes": "lr 0.006 = K7's tuned E1 value, NOT tuned for bytes: run the SQ188 LR check (20M-byte variants) first.",
+  "model": {
+    "vocab_size": 256,
+    "max_seq_len": 4096,
+    "d_model": 384,
+    "n_heads": 6,
+    "mlp_hidden": 1024,
+    "prelude": [
+      "swa",
+      "gdn",
+      "gdn",
+      "swa",
+      "gdn",
+      "attn"
+    ],
+    "core": [],
+    "coda": [],
+    "window": 1024,
+    "ternary": false,
+    "swa_impl": "flex"
+  },
+  "train": {
+    "dataset": "code-py-v1-bytes",
+    "seq_len": 4096,
+    "seq_len_unit": "bytes",
+    "batch_size": 32,
+    "max_bytes": 20000000,
+    "lr": 0.006,
+    "min_lr_frac": 0.1,
+    "warmup_steps": 8,
+    "weight_decay": 0.1,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "grad_clip": 1.0,
+    "eval_every": 250,
+    "eval_seqs": 128,
+    "seed": 0
+  }
+}

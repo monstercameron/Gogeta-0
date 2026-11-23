@@ -295,7 +295,7 @@
   "arc": "Byte Quest (granularity x loops)",
   "title": "Flat byte-level E1",
   "question": "Is a flat byte-level model (vocab 256, T=4,096 bytes, E1's mixers) competitive with BPE-E1 at our scale, at matched FLOPs and at matched bytes?",
-  "prediction": "Not yet registered: draft predictions are being written in notes/byte-quest.md and will be registered (committed to experiments/checks/PREDICTIONS.md) before any run.",
+  "prediction": "Registered 2026-11-22 in experiments/checks/PREDICTIONS.md ('Registered Byte Quest predictions E12-E16', v0.4.68), before any run; source notes/byte-quest.md §6.",
   "ingredients": [
    "vocab 256",
    "T=4096 bytes",
@@ -317,7 +317,7 @@
   "arc": "Byte Quest (granularity x loops)",
   "title": "Patch granularity sweep (BLT-lite, P = 2/4/8)",
   "question": "How does fixed patch size trade quality against cost in a patch-global/byte-local model with a single-pass AR byte decoder?",
-  "prediction": "Not yet registered: draft predictions are being written in notes/byte-quest.md and will be registered (committed to experiments/checks/PREDICTIONS.md) before any run.",
+  "prediction": "Registered 2026-11-22 in experiments/checks/PREDICTIONS.md ('Registered Byte Quest predictions E12-E16', v0.4.68), before any run; source notes/byte-quest.md §6.",
   "ingredients": [
    "byte encoder",
    "fixed patches P in {2,4,8}",
@@ -340,7 +340,7 @@
   "arc": "Byte Quest (granularity x loops)",
   "title": "Byte refinement loop sweep (H-C2F)",
   "question": "At matched FLOPs, does a shared-weight byte refinement loop (r = 1/2/4, gated, per-pass loss) beat a single-pass decoder and an equal-FLOP unshared decoder?",
-  "prediction": "Not yet registered: draft predictions are being written in notes/byte-quest.md and will be registered (committed to experiments/checks/PREDICTIONS.md) before any run.",
+  "prediction": "Registered 2026-11-22 in experiments/checks/PREDICTIONS.md ('Registered Byte Quest predictions E12-E16', v0.4.68), before any run; source notes/byte-quest.md §6.",
   "ingredients": [
    "E13 best P",
    "shared refinement x r",
@@ -365,7 +365,7 @@
   "arc": "Byte Quest (granularity x loops)",
   "title": "Parallel-then-refine byte decoding",
   "question": "Can predicting all P bytes of the next patch at once and refining them over r < P passes match byte-autoregressive quality (and so decode faster)?",
-  "prediction": "Not yet registered: draft predictions are being written in notes/byte-quest.md and will be registered (committed to experiments/checks/PREDICTIONS.md) before any run.",
+  "prediction": "Registered 2026-11-22 in experiments/checks/PREDICTIONS.md ('Registered Byte Quest predictions E12-E16', v0.4.68), before any run; source notes/byte-quest.md §6.",
   "ingredients": [
    "parallel patch prediction",
    "r-pass refinement within patch"
@@ -386,7 +386,7 @@
   "arc": "Byte Quest (granularity x loops)",
   "title": "Byte quest x FusionDance ingredients",
   "question": "Does the best byte decoder combine with a looped global core (E2-style) and a ternary global core?",
-  "prediction": "Not yet registered: draft predictions are being written in notes/byte-quest.md and will be registered (committed to experiments/checks/PREDICTIONS.md) before any run.",
+  "prediction": "Registered 2026-11-22 in experiments/checks/PREDICTIONS.md ('Registered Byte Quest predictions E12-E16', v0.4.68), before any run; source notes/byte-quest.md §6.",
   "ingredients": [
    "E14 winner",
    "looped global core",

@@ -1,0 +1,3833 @@
+{
+ "id": "SQ206",
+ "criterion": "(written before running, notes/analysis-coarse-to-fine.md section 2): row j of the logits predicts byte j+1.\nPerturb input byte s (patch starts, middles and ends). Then\n  * ar / flat models: every row j < s (all predictions of bytes <= s) must be BITWISE unchanged, in every pass;\n  * parallel_refine: every row j whose target patch (j+1)//P is <= s//P must be bitwise unchanged (the whole target\n    patch is predicted without its own bytes), in every pass;\n  * non-vacuous: at least one row that is allowed to see byte s does change (ar: row s; parallel: the first row of\n    the next target patch);\n  * control: the deliberately broken variant (patch_shift=False) must FAIL (some protected row changes).",
+ "torch": "2.14.1+cu130",
+ "dtype": "float32",
+ "gdn": "cpu_ref.gated_delta_rule_ref (recurrent)",
+ "n_variants": 42,
+ "n_perturbations": 412,
+ "all_correct_variants_pass": true,
+ "broken_controls_all_fail": true,
+ "verdict": "PASS",
+ "wall_s": 15.8,
+ "results": [
+  {
+   "variant": "flat",
+   "P": 1,
+   "T": 64,
+   "passes": 1,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 1,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_r1",
+   "P": 2,
+   "T": 64,
+   "passes": 1,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 1,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_r2_shared_gated",
+   "P": 2,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 1,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_r4_shared_contractive",
+   "P": 2,
+   "T": 64,
+   "passes": 4,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 1,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_r2_unshared",
+   "P": 2,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 1,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_r2_residual",
+   "P": 2,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 1,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_lswa_local",
+   "P": 2,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 1,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_looped_global",
+   "P": 2,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 1,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_ternary_global",
+   "P": 2,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 1,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "par_r1",
+   "P": 2,
+   "T": 64,
+   "passes": 1,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 1,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "par_r2_soft",
+   "P": 2,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 1,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "par_r3_soft",
+   "P": 2,
+   "T": 64,
+   "passes": 3,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 1,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "par_r2_argmax",
+   "P": 2,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 1,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "par_r2_lswa",
+   "P": 2,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 1,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_r1",
+   "P": 4,
+   "T": 64,
+   "passes": 1,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 14,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_r2_shared_gated",
+   "P": 4,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 14,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_r4_shared_contractive",
+   "P": 4,
+   "T": 64,
+   "passes": 4,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 14,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_r2_unshared",
+   "P": 4,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 14,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_r2_residual",
+   "P": 4,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 14,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_lswa_local",
+   "P": 4,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 14,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_looped_global",
+   "P": 4,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 14,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_ternary_global",
+   "P": 4,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 14,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "par_r1",
+   "P": 4,
+   "T": 64,
+   "passes": 1,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 14,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "par_r2_soft",
+   "P": 4,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 14,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "par_r3_soft",
+   "P": 4,
+   "T": 64,
+   "passes": 3,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 14,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "par_r2_argmax",
+   "P": 4,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 14,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "par_r2_lswa",
+   "P": 4,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 14,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_r1",
+   "P": 8,
+   "T": 64,
+   "passes": 1,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 28,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_r2_shared_gated",
+   "P": 8,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 28,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_r4_shared_contractive",
+   "P": 8,
+   "T": 64,
+   "passes": 4,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 28,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_r2_unshared",
+   "P": 8,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 28,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_r2_residual",
+   "P": 8,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 28,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_lswa_local",
+   "P": 8,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 28,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_looped_global",
+   "P": 8,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 28,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_ternary_global",
+   "P": 8,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 28,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "par_r1",
+   "P": 8,
+   "T": 64,
+   "passes": 1,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 28,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "par_r2_soft",
+   "P": 8,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 28,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "par_r3_soft",
+   "P": 8,
+   "T": 64,
+   "passes": 3,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 28,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "par_r2_argmax",
+   "P": 8,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 28,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "par_r2_lswa",
+   "P": 8,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 28,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "ar_r2_shared_gated",
+   "P": 16,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 16,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 31,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 48,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  },
+  {
+   "variant": "par_r2_soft",
+   "P": 16,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 16,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 31,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 48,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": true,
+   "non_vacuous": true
+  }
+ ],
+ "broken_controls": [
+  {
+   "variant": "BROKEN_ar_noshift",
+   "P": 2,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 1,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        0
+       ],
+       "n": 1
+      },
+      {
+       "pass": 1,
+       "rows": [
+        0
+       ],
+       "n": 1
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        2
+       ],
+       "n": 1
+      },
+      {
+       "pass": 1,
+       "rows": [
+        2
+       ],
+       "n": 1
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        6
+       ],
+       "n": 1
+      },
+      {
+       "pass": 1,
+       "rows": [
+        6
+       ],
+       "n": 1
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        62
+       ],
+       "n": 1
+      },
+      {
+       "pass": 1,
+       "rows": [
+        62
+       ],
+       "n": 1
+      }
+     ],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": false,
+   "non_vacuous": true
+  },
+  {
+   "variant": "BROKEN_par_noshift",
+   "P": 2,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        0
+       ],
+       "n": 1
+      },
+      {
+       "pass": 1,
+       "rows": [
+        0
+       ],
+       "n": 1
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 1,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        0
+       ],
+       "n": 1
+      },
+      {
+       "pass": 1,
+       "rows": [
+        0
+       ],
+       "n": 1
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        2
+       ],
+       "n": 1
+      },
+      {
+       "pass": 1,
+       "rows": [
+        2
+       ],
+       "n": 1
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        2
+       ],
+       "n": 1
+      },
+      {
+       "pass": 1,
+       "rows": [
+        2
+       ],
+       "n": 1
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        6
+       ],
+       "n": 1
+      },
+      {
+       "pass": 1,
+       "rows": [
+        6
+       ],
+       "n": 1
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        6
+       ],
+       "n": 1
+      },
+      {
+       "pass": 1,
+       "rows": [
+        6
+       ],
+       "n": 1
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        62
+       ],
+       "n": 1
+      },
+      {
+       "pass": 1,
+       "rows": [
+        62
+       ],
+       "n": 1
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        62
+       ],
+       "n": 1
+      },
+      {
+       "pass": 1,
+       "rows": [
+        62
+       ],
+       "n": 1
+      }
+     ],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": false,
+   "non_vacuous": true
+  },
+  {
+   "variant": "BROKEN_ar_noshift",
+   "P": 4,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        0,
+        1
+       ],
+       "n": 2
+      },
+      {
+       "pass": 1,
+       "rows": [
+        0,
+        1
+       ],
+       "n": 2
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        0,
+        1,
+        2
+       ],
+       "n": 3
+      },
+      {
+       "pass": 1,
+       "rows": [
+        0,
+        1,
+        2
+       ],
+       "n": 3
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        4,
+        5
+       ],
+       "n": 2
+      },
+      {
+       "pass": 1,
+       "rows": [
+        4,
+        5
+       ],
+       "n": 2
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        4,
+        5,
+        6
+       ],
+       "n": 3
+      },
+      {
+       "pass": 1,
+       "rows": [
+        4,
+        5,
+        6
+       ],
+       "n": 3
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 14,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        12,
+        13
+       ],
+       "n": 2
+      },
+      {
+       "pass": 1,
+       "rows": [
+        12,
+        13
+       ],
+       "n": 2
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        60,
+        61
+       ],
+       "n": 2
+      },
+      {
+       "pass": 1,
+       "rows": [
+        60,
+        61
+       ],
+       "n": 2
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        60,
+        61,
+        62
+       ],
+       "n": 3
+      },
+      {
+       "pass": 1,
+       "rows": [
+        60,
+        61,
+        62
+       ],
+       "n": 3
+      }
+     ],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": false,
+   "non_vacuous": true
+  },
+  {
+   "variant": "BROKEN_par_noshift",
+   "P": 4,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        0,
+        1,
+        2
+       ],
+       "n": 3
+      },
+      {
+       "pass": 1,
+       "rows": [
+        0,
+        1,
+        2
+       ],
+       "n": 3
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 2,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        0,
+        1,
+        2
+       ],
+       "n": 3
+      },
+      {
+       "pass": 1,
+       "rows": [
+        0,
+        1,
+        2
+       ],
+       "n": 3
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 3,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        0,
+        1,
+        2
+       ],
+       "n": 3
+      },
+      {
+       "pass": 1,
+       "rows": [
+        0,
+        1,
+        2
+       ],
+       "n": 3
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        4,
+        5,
+        6
+       ],
+       "n": 3
+      },
+      {
+       "pass": 1,
+       "rows": [
+        4,
+        5,
+        6
+       ],
+       "n": 3
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 6,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        4,
+        5,
+        6
+       ],
+       "n": 3
+      },
+      {
+       "pass": 1,
+       "rows": [
+        4,
+        5,
+        6
+       ],
+       "n": 3
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        4,
+        5,
+        6
+       ],
+       "n": 3
+      },
+      {
+       "pass": 1,
+       "rows": [
+        4,
+        5,
+        6
+       ],
+       "n": 3
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        12,
+        13,
+        14
+       ],
+       "n": 3
+      },
+      {
+       "pass": 1,
+       "rows": [
+        12,
+        13,
+        14
+       ],
+       "n": 3
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 14,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        12,
+        13,
+        14
+       ],
+       "n": 3
+      },
+      {
+       "pass": 1,
+       "rows": [
+        12,
+        13,
+        14
+       ],
+       "n": 3
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        60,
+        61,
+        62
+       ],
+       "n": 3
+      },
+      {
+       "pass": 1,
+       "rows": [
+        60,
+        61,
+        62
+       ],
+       "n": 3
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 62,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        60,
+        61,
+        62
+       ],
+       "n": 3
+      },
+      {
+       "pass": 1,
+       "rows": [
+        60,
+        61,
+        62
+       ],
+       "n": 3
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        60,
+        61,
+        62
+       ],
+       "n": 3
+      },
+      {
+       "pass": 1,
+       "rows": [
+        60,
+        61,
+        62
+       ],
+       "n": 3
+      }
+     ],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": false,
+   "non_vacuous": true
+  },
+  {
+   "variant": "BROKEN_ar_noshift",
+   "P": 8,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        0,
+        1,
+        2,
+        3
+       ],
+       "n": 4
+      },
+      {
+       "pass": 1,
+       "rows": [
+        0,
+        1,
+        2,
+        3
+       ],
+       "n": 4
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+       ],
+       "n": 7
+      },
+      {
+       "pass": 1,
+       "rows": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+       ],
+       "n": 7
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        8,
+        9,
+        10,
+        11
+       ],
+       "n": 4
+      },
+      {
+       "pass": 1,
+       "rows": [
+        8,
+        9,
+        10,
+        11
+       ],
+       "n": 4
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+       ],
+       "n": 7
+      },
+      {
+       "pass": 1,
+       "rows": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+       ],
+       "n": 7
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 28,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        24,
+        25,
+        26,
+        27
+       ],
+       "n": 4
+      },
+      {
+       "pass": 1,
+       "rows": [
+        24,
+        25,
+        26,
+        27
+       ],
+       "n": 4
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        56,
+        57,
+        58,
+        59
+       ],
+       "n": 4
+      },
+      {
+       "pass": 1,
+       "rows": [
+        56,
+        57,
+        58,
+        59
+       ],
+       "n": 4
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62
+       ],
+       "n": 7
+      },
+      {
+       "pass": 1,
+       "rows": [
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62
+       ],
+       "n": 7
+      }
+     ],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": false,
+   "non_vacuous": true
+  },
+  {
+   "variant": "BROKEN_par_noshift",
+   "P": 8,
+   "T": 64,
+   "passes": 2,
+   "positions": [
+    {
+     "s": 0,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+       ],
+       "n": 7
+      },
+      {
+       "pass": 1,
+       "rows": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+       ],
+       "n": 7
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 4,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+       ],
+       "n": 7
+      },
+      {
+       "pass": 1,
+       "rows": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+       ],
+       "n": 7
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 7,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+       ],
+       "n": 7
+      },
+      {
+       "pass": 1,
+       "rows": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+       ],
+       "n": 7
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 8,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+       ],
+       "n": 7
+      },
+      {
+       "pass": 1,
+       "rows": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+       ],
+       "n": 7
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 12,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+       ],
+       "n": 7
+      },
+      {
+       "pass": 1,
+       "rows": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+       ],
+       "n": 7
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 15,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+       ],
+       "n": 7
+      },
+      {
+       "pass": 1,
+       "rows": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+       ],
+       "n": 7
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 24,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+       ],
+       "n": 7
+      },
+      {
+       "pass": 1,
+       "rows": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+       ],
+       "n": 7
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 28,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+       ],
+       "n": 7
+      },
+      {
+       "pass": 1,
+       "rows": [
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+       ],
+       "n": 7
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 56,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62
+       ],
+       "n": 7
+      },
+      {
+       "pass": 1,
+       "rows": [
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62
+       ],
+       "n": 7
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 60,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62
+       ],
+       "n": 7
+      },
+      {
+       "pass": 1,
+       "rows": [
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62
+       ],
+       "n": 7
+      }
+     ],
+     "allowed_row_changed": true
+    },
+    {
+     "s": 63,
+     "leaks": [
+      {
+       "pass": 0,
+       "rows": [
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62
+       ],
+       "n": 7
+      },
+      {
+       "pass": 1,
+       "rows": [
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62
+       ],
+       "n": 7
+      }
+     ],
+     "allowed_row_changed": true
+    }
+   ],
+   "ok": false,
+   "non_vacuous": true
+  }
+ ]
+}

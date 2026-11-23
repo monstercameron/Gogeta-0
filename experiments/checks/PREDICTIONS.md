@@ -340,3 +340,43 @@ All outcomes are relative differences in the **primary metric: doc-level bits/ch
 - **E51** (e51_e1_warm30.json): E1 with warmup 30 at 20M: winner stays 6e-3 or moves to 1.2e-2 (P 75% that it does not move down); loss lower than K7's 0.9925 by 1% to 5%.
 - **E52** (e52_e10_v2.json): E10 on dedup v2, 200M: clean-val bpc higher than the v1-trained E10's clean-val bpc by 0% to 6% (less duplicated data to memorise); the memorisation gap shrinks by >= 30%.
 - **E53** (e53_e1_v2.json): E1 on dedup v2, 200M: E1 vs E52 gap on clean val within 2 points of the v1 gap (P 60%); smaller than the v1 gap (P 60%).
+
+---
+
+## Registered Byte Quest predictions E12-E16 (2026-11-22 ~19:55, committed in v0.4.68 before any byte run exists)
+*Source: `notes/byte-quest.md` §6 (byte-model subagent), registered by the main agent. Primary metric: doc-level bits/char on val_clean80 (K9/A1), reported per doc-length bucket (C193). Ledger status rule of the 18:42 clarification applies. Configs staged in `experiments/staged-configs/byte/`.*
+
+Priors: byte models trail BPE below about 4B params on code (reported by 2602.04289); an AR byte model needs 7.9x the
+compute at 1.0 bpb (reported by 2605.12928); fixed patches suffer patch lag and P = 16 collapses on code (reported by
+2605.09630); H-C2F priors from analysis section 7 (sharing within +-0.5% of equal-FLOP unshared, from C6). Our scale
+(13M params, ~2e16 FLOPs) is below every regime those papers tested, so the priors are directional only.
+
+**E12 (flat byte-E1).** Predicted: clean-val bits/char ratio E12 / E1@53.5M-tok (matched text, E12 at 3.6x FLOPs)
+1.00-1.12; E12 / E1@200M-tok (matched FLOPs, 0.96x) 1.15-1.40. E12 is worse than E13b (same text, 0.29x the FLOPs)
+or within 2% of it. Criteria: "flat bytes viable at matched FLOPs" := ratio vs E1@200M <= 1.05; refute := > 1.15
+(then flat bytes are dead at our scale and only the patched arms matter). Long docs: E12's gap is larger on docs over
+1,200 token-equivalents than on short docs (from C193).
+
+**E13 (granularity).** Predicted at 200M bytes: P = 4 is best or tied with P = 2 (|diff| <= 1%); P = 8 is 1-4% worse
+than P = 4; P = 16 is >= 5% worse than P = 4 (patch lag); E13b / E1@53.5M-tok (matched text, 1.04x FLOPs) 1.02-1.12
+(central 1.06). Per-slot loss rises with staleness (slot P-1 vs slot 0 at fixed P), by <= 3% at P = 4 and more at
+P = 8/16 (weak, direction only). Criteria: the chosen P = argmin clean-val bits/char at 200M bytes, ties (<= 1%) broken
+toward the cheaper (larger) P; "patching pays" := best E13 arm <= E12 + 1% at <= 0.5x E12's FLOPs.
+
+**E14 (loops, H-C2F).** Predicted: (1) E14d (2 unshared) beats E14a (r = 1) by >= 0.5% (more decoder compute helps);
+(2) **E14b (shared r = 2) is within +-0.5% of E14d** (sharing neither helps nor hurts at matched FLOPs); (3) E14c
+(r = 4) beats E14b by <= 0.5% (diminishing); (4) with gated updates the pass-to-pass hidden-norm ratio stays below 1.5
+(K6 counterpoint: E2's grew 7.4 -> 58.9x); (5) per-pass val loss decreases monotonically with pass index for every
+shared arm. Criteria: H-C2F supported := E14b <= E14d - 0.5% and E14b <= E14a - 0.5% (3 seeds); sharing refuted :=
+E14b > E14d + 0.5%; "loops buy nothing" := E14b within +-0.5% of E14a. Optional E14e: L(r) is flat within 0.5% for
+r >= 2 and degrades by < 2% at r = 6-8 (no E2-style blow-up past trained r, because of gating and per-pass loss).
+
+**E15 (parallel_refine).** Predicted: E15a (r = 1, no within-patch bytes) is 3-10% worse than ar E13b; **E15b
+(r = 2) within 1% of ar E13b**; E15c (r = 3) within 0.5% of E15b. Slot 0 matches ar (same information); the gap
+grows with slot index. Criteria: "parallel decoding viable" := E15b <= E13b + 1%; refute := E15b > E13b + 3%.
+Decode-speed benefit (P bytes per r decoder passes) is not measured by E15 and must not be claimed from it.
+
+**E16 (fusion).** Predicted: (a) the looped global core (2.24x E1 FLOPs per text) is within +-1% of the unlooped E14
+winner (loops in the global body don't pay, as C6 found for E2); refute of that prior := E16a <= winner - 1.5%.
+(b) Ternary global body: +3-9% clean-val bits/char vs the bf16 winner (K4 width trend, partly offset by keeping
+all byte layers in bf16); "ternary viable" := gap <= 5%.

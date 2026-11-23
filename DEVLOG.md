@@ -17,6 +17,43 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.68: Byte Quest: model family built (staged), byte dataset, causality test passes; predictions registered
+*2026-11-22*
+
+### Byte Quest build (E12–E16; subagent, verified by the main agent)
+**What**:
+- The byte-level FusionDance family, as **staged patches** (`notes/patches/byte-model.patch`, `byte-train.patch`; `git apply --check` OK; applied between campaigns) plus a CPU-testable working copy in `experiments/byte_model/`.
+- Variants: flat byte-E1; patched coarse-to-fine with P = 2/4/8/16, the one-patch causal shift, a byte encoder, an E1-style global body on patches, expansion, and a shared byte refinement loop × r (gated or contractive updates, re-injection, pass embedding, per-pass loss); an AR or **parallel_refine** decoder; optionally a looped or ternary global core.
+- 30 staged configs in `experiments/staged-configs/byte/` (200M-byte and 20M-byte variants). Every config sets `max_seq_len` to its byte context (the RoPE cap from the 20:07 review). The windows match across the granularity sweep (1,024 bytes); byte layers are GDN + conv.
+
+**Dataset `code-py-v1-bytes`**: the same docs and split as code-py-v1 (val 4,000 docs / 3.94M bytes; train 987,154 docs / 976.9M bytes; uint8; EOS = 0x00, never inside a doc). **Every doc round-trips byte for byte**, and the clean-val ids map one-to-one (the manifest sha256 matches). The locked test splits weren't read.
+**SQ206 causality: PASS.** 42 variant × P combinations and 412 perturbations at patch starts, middles and ends are all bitwise-unchanged. The **broken no-shift control leaks in every case** (4–11 of 8–11 perturbations).
+**Tests**: `test_byte_model.py` **24/24 OK** (re-run by the main agent, 44 s). Defaults are bit-identical to `gogeta.model` for E1/E2/E3/E11-style configs. The trainer smoke test passes on CPU.
+**Costs** (estimates, training FLOPs per BPE-token-equivalent):
+- E12 flat 325M (3.57× E1);
+- E13 P = 2/4/8/16: 172/95/60/43M;
+- E14 r = 2 shared = 2-pass unshared 109M, r = 4 138M;
+- E15 parallel r = 1/2/3: 95/112/129M;
+- E16 looped 204M, ternary 109M.
+
+They match `notes/analysis-coarse-to-fine.md`. About 7 GPU-h per seed overall (to be replaced by SQ189's measurements).
+**Predictions REGISTERED** (`experiments/checks/PREDICTIONS.md`, "Registered Byte Quest predictions E12–E16"; plan `notes/byte-quest.md`), e.g.:
+- E12 1.15–1.40× BPE-E1 bits/char at matched FLOPs;
+- E13: P = 4 best or tied with P = 2, P = 16 ≥ 5% worse;
+- **E14: shared r = 2 within ±0.5% of equal-FLOP unshared;**
+- E15: parallel r = 2 within 1% of AR;
+- E16: ternary global core +3–9%.
+
+Every byte result is reported per doc-length bucket (C193).
+**Not verified**: anything on GPU (fla, bf16, compile, throughput, memory); byte LRs (SQ188 runs first); E12 needs the flex-attention patch.
+
+### Also
+- `notes/compute-rental.md`: a Vast.ai price snapshot (19:50). The RTX 3090 (~$0.20/hr median) is the cheapest card that runs everything; 8× is recommended; renting is the human's call.
+- **SQ220** cloud pilot (parked for the human).
+- **SQ219** context-removal intervention (from the 19:44 ML-theorist review).
+
+---
+
 ## v0.4.67: Byte Quest on the site and README: diagram, 3D concept model, Start-here path
 *2026-11-22*
 

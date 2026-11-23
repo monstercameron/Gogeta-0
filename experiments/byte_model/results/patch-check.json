@@ -1,0 +1,48 @@
+{
+ "byte-model": {
+  "apply_check_vs_HEAD": true,
+  "msg": ""
+ },
+ "byte-train": {
+  "apply_check_vs_HEAD": true,
+  "msg": ""
+ },
+ "both": {
+  "apply_check_vs_HEAD": true,
+  "msg": ""
+ },
+ "stacked_on_other_patches": {
+  "activation-mlp-act.patch": {
+   "ok": true,
+   "msg": ""
+  },
+  "cockpit-logging-train.patch": {
+   "ok": true,
+   "msg": ""
+  },
+  "cockpit-resilience-train.patch": {
+   "ok": false,
+   "msg": "error: patch failed: gogeta/train.py:187\nerror: gogeta/train.py: patch does not apply | train_edits.py on top: rebuilds the trainer (all anchors found)"
+  },
+  "fused-linear-ce.patch": {
+   "ok": true,
+   "msg": ""
+  },
+  "gdn-fused-conv-l2norm.patch": {
+   "ok": true,
+   "msg": ""
+  },
+  "repro-manifest-at-run-end.patch": {
+   "ok": false,
+   "msg": "error: patch failed: gogeta/train.py:187\nerror: gogeta/train.py: patch does not apply | train_edits.py on top: 2 anchors moved: anchor found 0x: overrides = {k: v for k, v in ((\"max_tokens\", args.max_tokens or None), (\"seed\", args.seed; anchor found 0x: \"compile\": args.compile, \"dataset_meta\": {k: data.meta[k] for k in (\"name\", \"source\", \"voc"
+  },
+  "swa-flex-attention.patch": {
+   "ok": true,
+   "msg": ""
+  },
+  "train-perf-flags.patch": {
+   "ok": false,
+   "msg": "error: patch failed: gogeta/train.py:46\nerror: gogeta/train.py: patch does not apply | train_edits.py on top: 3 anchors moved: anchor found 0x: self.train = np.memmap(d / \"train.bin\", dtype=np.uint16, mode=\"r\"); anchor found 0x: overrides = {k: v for k, v in ((\"max_tokens\", args.max_tokens or None), (\"seed\", args.seed; anchor found 0x: \"compile\": args.compile, \"dataset_meta\": {k: data.meta[k] for k in (\"name\", \"source\", \"voc"
+  }
+ }
+}

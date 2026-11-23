@@ -1,0 +1,319 @@
+byte-train.patch  (needs byte-model.patch; working copy experiments/byte_model/train_bytes.py)
+
+Byte datasets in gogeta/train.py: dtype/unit from meta.json (code-py-v1-bytes: uint8, unit bytes), budget key train.max_bytes
+(--max-bytes; max_tokens refused for byte data and vice versa), make_model() for patched configs, sampled refinement
+passes, per-pass / per-slot train and val losses, eval_passes, bytes/token_equiv logging, a byte tokenizer for samples,
+and --device cpu for smoke tests (no autocast / fused AdamW / CUDA calls). Token configs behave as before.
+Smoke-tested on CPU by experiments/byte_model/smoke_train.py.
+
+--- a/gogeta/train.py
++++ b/gogeta/train.py
+@@ -14,6 +14,13 @@
+ 
+ --lr overrides train.lr (used by the K7 LR sweep); the effective value is what the run config
+ records under "train", and every CLI override is listed under "cli_overrides".
++
++Byte datasets (meta.json "unit": "bytes", e.g. code-py-v1-bytes, uint8, EOS = 0x00): the budget is train.max_bytes
++(--max-bytes), and max_tokens is refused, so a byte budget is never read as tokens (or vice versa). A "token" in the
++loop is then one byte position; runs also log bytes and token_equiv (bytes / 3.735). Configs with
++model.patch_size > 0 build gogeta.model.PatchedByteLM (coarse-to-fine); refinement passes are sampled per step when
++refine_max > refine_min, and per-pass / per-slot losses are logged. --device cpu runs a CPU smoke test (no autocast,
++no fused AdamW, no CUDA calls).
+ """
+ from __future__ import annotations
+ 
+@@ -29,7 +36,7 @@
+ import numpy as np
+ import torch
+ 
+-from gogeta.model import FusionDance, ModelConfig
++from gogeta.model import BYTES_PER_TOKEN, FusionDance, ModelConfig, make_model
+ from gogeta.tracking import DATA, Run
+ 
+ ROOT = pathlib.Path(__file__).resolve().parent.parent
+@@ -46,16 +53,19 @@
+     def __init__(self, name: str, seq_len: int, seed: int):
+         d = DATA / "datasets" / name
+         self.meta = json.loads((d / "meta.json").read_text())
+-        self.train = np.memmap(d / "train.bin", dtype=np.uint16, mode="r")
+-        self.val = np.memmap(d / "val.bin", dtype=np.uint16, mode="r")
++        dtype = np.dtype(self.meta.get("dtype", "uint16"))
++        self.train = np.memmap(d / "train.bin", dtype=dtype, mode="r")
++        self.val = np.memmap(d / "val.bin", dtype=dtype, mode="r")
++        self.unit = self.meta.get("unit", "tokens")   # "bytes" for code-py-v1-bytes
+         self.T = seq_len
+         self.g = torch.Generator().manual_seed(seed)
+-        self.chars_per_token = self.meta["splits"]["train"]["chars_per_token"]
++        self.chars_per_token = self.meta["splits"]["train"]["chars_per_token"]   # chars per position (incl. EOS)
+ 
+     def batch(self, B: int, device: str):
+         ix = torch.randint(len(self.train) - self.T - 1, (B,), generator=self.g).tolist()
+         buf = np.stack([self.train[i:i + self.T + 1] for i in ix]).astype(np.int64)
+-        t = torch.from_numpy(buf).pin_memory().to(device, non_blocking=True)
++        t = torch.from_numpy(buf)
++        t = t.pin_memory().to(device, non_blocking=True) if device == "cuda" else t.to(device)
+         return t[:, :-1].contiguous(), t[:, 1:].contiguous()
+ 
+     def val_batches(self, n_seqs: int | None, B: int, device: str):
+@@ -69,6 +79,22 @@
+ 
+ 
+ # ----------------------------------------------------------------------------- reference model
++class ByteTokenizer:
++    """The tokenizer interface sample() uses, for byte datasets: ids are byte values, EOS = meta eos_id (0x00)."""
++
++    def __init__(self, eos_id: int = 0):
++        self.eos_id = eos_id
++
++    def encode(self, text: str):
++        return SimpleNamespace(ids=list(text.encode("utf-8")))
++
++    def decode(self, ids) -> str:
++        return bytes(i for i in ids if i != self.eos_id and 0 <= i < 256).decode("utf-8", errors="replace")
++
++    def token_to_id(self, name: str):
++        return self.eos_id if name == "<|eos|>" else None
++
++
+ class HFLlama(torch.nn.Module):
+     """HF `LlamaForCausalLM` behind the small interface this loop uses from FusionDance:
+     forward(idx, targets, loops) -> (logits, loss), cfg.max_seq_len, core (empty: not looped),
+@@ -121,7 +147,7 @@
+     arch = cfg.get("arch", "fusiondance")
+     if arch == "fusiondance":
+         mc = ModelConfig(**{**cfg["model"], "vocab_size": vocab_size, "max_seq_len": seq_len})
+-        return FusionDance(mc), mc
++        return make_model(mc), mc   # FusionDance, or PatchedByteLM when model.patch_size > 0
+     if arch == "hf_llama":
+         m = HFLlama(cfg["model"], vocab_size, seq_len)
+         return m, m.cfg
+@@ -136,17 +162,44 @@
+     return tc["lr"] * (tc["min_lr_frac"] + (1 - tc["min_lr_frac"]) * 0.5 * (1 + math.cos(math.pi * min(1.0, p))))
+ 
+ 
++def autocast(device: str):
++    return torch.autocast(device, dtype=torch.bfloat16, enabled=device == "cuda")
++
++
++def is_patched(model) -> bool:
++    return getattr(getattr(model, "cfg", None), "patch_size", 0) > 0
++
++
+ @torch.no_grad()
+-def evaluate(model, data, n_seqs, B, device, loops=None) -> float:
++def evaluate(model, data, n_seqs, B, device, loops=None, passes=None) -> float:
+     model.eval()
++    kw = {"passes": passes} if passes is not None else {}
+     tot, cnt = 0.0, 0
+     for x, y in data.val_batches(n_seqs, B, device):
+-        with torch.autocast("cuda", dtype=torch.bfloat16):
+-            _, loss = model(x, y, loops=loops)
++        with autocast(device):
++            _, loss = model(x, y, loops=loops, **kw)
+         tot += loss.item() * x.numel()
+         cnt += x.numel()
+     model.train()
+     return tot / cnt
++
++
++@torch.no_grad()
++def evaluate_detail(model, data, n_seqs, B, device) -> dict:
++    """Patched byte models: val loss of every refinement pass and of every within-patch slot (patch lag)."""
++    model.eval()
++    P, r = model.cfg.patch_size, model.cfg.refine_passes
++    passes, slots, cnt = torch.zeros(r), torch.zeros(P), 0
++    for x, y in data.val_batches(n_seqs, B, device):
++        with autocast(device):
++            model(x, y, return_all=True)
++        passes += torch.stack([v.float().cpu() for v in model.last_aux["pass_loss"]]) * x.numel()
++        slots += model.last_aux["slot_loss"].float().cpu() * x.numel()
++        cnt += x.numel()
++    model.train()
++    out = {f"val_loss_pass{k + 1}": v for k, v in enumerate((passes / cnt).tolist())}
++    out.update({f"val_loss_slot{j}": v for j, v in enumerate((slots / cnt).tolist())})
++    return out
+ 
+ 
+ @torch.no_grad()
+@@ -156,7 +209,7 @@
+     eos = tok.token_to_id("<|eos|>")
+     x = torch.tensor([ids], device=device)
+     for _ in range(n_new):
+-        with torch.autocast("cuda", dtype=torch.bfloat16):
++        with autocast(torch.device(device).type):
+             logits, _ = model(x[:, -model.cfg.max_seq_len:], loops=loops)
+         logits = logits[0, -1].float() / temperature
+         v, _ = torch.topk(logits, top_k)
+@@ -173,7 +226,9 @@
+ def main():
+     ap = argparse.ArgumentParser()
+     ap.add_argument("--config", required=True)
+-    ap.add_argument("--max-tokens", type=int, help="override train.max_tokens")
++    ap.add_argument("--max-tokens", type=int, help="override train.max_tokens (token datasets)")
++    ap.add_argument("--max-bytes", type=int, help="override train.max_bytes (byte datasets)")
++    ap.add_argument("--device", default="cuda", choices=["cuda", "cpu"], help="cpu: smoke tests only")
+     ap.add_argument("--seed", type=int, help="override train.seed")
+     ap.add_argument("--lr", type=float, help="override train.lr (peak LR; recorded in the run config)")
+     ap.add_argument("--require-clean", action="store_true", help="refuse to run with uncommitted changes")
+@@ -187,67 +242,88 @@
+     tc = dict(cfg["train"])
+     if args.max_tokens:
+         tc["max_tokens"] = args.max_tokens
++    if args.max_bytes:
++        tc["max_bytes"] = args.max_bytes
+     if args.seed is not None:
+         tc["seed"] = args.seed
+     if args.lr is not None:
+         tc["lr"] = args.lr
+-    overrides = {k: v for k, v in (("max_tokens", args.max_tokens or None), ("seed", args.seed),
+-                                   ("lr", args.lr)) if v is not None}
+-    device = "cuda"
++    overrides = {k: v for k, v in (("max_tokens", args.max_tokens or None), ("max_bytes", args.max_bytes or None),
++                                   ("seed", args.seed), ("lr", args.lr)) if v is not None}
++    if args.device != "cuda":
++        overrides["device"] = args.device
++    device = args.device
++    cuda = device == "cuda"
+     torch.manual_seed(tc["seed"])
+     torch.backends.cuda.matmul.allow_tf32 = True
+ 
+     data = TokenData(tc["dataset"], tc["seq_len"], tc["seed"])
++    budget_key = "max_bytes" if data.unit == "bytes" else "max_tokens"
++    other_key = "max_tokens" if budget_key == "max_bytes" else "max_bytes"
++    if other_key in tc or budget_key not in tc:
++        raise SystemExit(f"dataset {tc['dataset']} counts {data.unit}: the budget must be train.{budget_key} "
++                         f"(found {sorted(k for k in tc if k.startswith('max_'))})")
+     model, mc = build_model(cfg, data.meta["vocab_size"], tc["seq_len"])
+     model = model.to(device)
+     fwd_model = torch.compile(model) if args.compile else model
+     pc = model.param_counts()
+     looped = len(model.core) > 0
+     loop_rng = random.Random(tc["seed"] + 1)
++    patched = is_patched(model)
++    sample_passes = patched and mc.refine_max > mc.refine_min
++    pass_rng = random.Random(tc["seed"] + 2)
+ 
+     decay = [p for n, p in model.named_parameters() if p.dim() >= 2]
+     no_decay = [p for n, p in model.named_parameters() if p.dim() < 2]
+     opt = torch.optim.AdamW([{"params": decay, "weight_decay": tc["weight_decay"]},
+                              {"params": no_decay, "weight_decay": 0.0}],
+-                            lr=tc["lr"], betas=(tc["beta1"], tc["beta2"]), fused=True)
+-
+-    tokens_per_step = tc["batch_size"] * tc["seq_len"]
+-    total_steps = args.bench or math.ceil(tc["max_tokens"] / tokens_per_step)
++                            lr=tc["lr"], betas=(tc["beta1"], tc["beta2"]), fused=cuda)
++
++    tokens_per_step = tc["batch_size"] * tc["seq_len"]   # positions: tokens, or bytes for byte datasets
++    total_steps = args.bench or math.ceil(tc[budget_key] / tokens_per_step)
++    unit = "bytes" if data.unit == "bytes" else "tok"
++    extra = f" | patched P={mc.patch_size} r={mc.refine_passes} {mc.decoder}" if patched else ""
+     print(f"params: total {pc['total']/1e6:.2f}M non-emb {pc['non_embedding']/1e6:.2f}M | "
+-          f"steps {total_steps} x {tokens_per_step} tok | looped={looped}", flush=True)
++          f"steps {total_steps} x {tokens_per_step} {unit} | looped={looped}{extra}", flush=True)
+ 
+     run = None
+     if not args.bench:
+-        run_cfg = {"config_file": str(cfg_path.relative_to(ROOT)), "arch": arch, "cli_overrides": overrides,
++        cfg_name = str(cfg_path.relative_to(ROOT) if cfg_path.is_relative_to(ROOT) else cfg_path)
++        run_cfg = {"config_file": cfg_name, "arch": arch, "cli_overrides": overrides,
+                    "model": mc.to_dict(), "train": tc,
+                    "params": pc, "flops_per_token_at_default_loops": model.flops_per_token(tc["seq_len"]),
+-                   "compile": args.compile, "dataset_meta": {k: data.meta[k] for k in ("name", "source", "vocab_size")}}
++                   "compile": args.compile, "dataset_meta": {k: data.meta.get(k) for k in ("name", "source", "vocab_size", "unit")},
++                   "position_unit": data.unit}
+         run = Run(cfg["experiment"], config=run_cfg, seed=tc["seed"], require_clean=args.require_clean)
+         print(f"run: {run.name}", flush=True)
+ 
+     t_start = time.time()
+     tokens = flops = 0.0
+     t_log, tok_log = time.time(), 0
+-    torch.cuda.reset_peak_memory_stats()
++    if cuda:
++        torch.cuda.reset_peak_memory_stats()
+     try:
+         for step in range(total_steps):
+             lr = lr_at(step, total_steps, tc)
+             for gp in opt.param_groups:
+                 gp["lr"] = lr
+             r = loop_rng.randint(mc.loops_min, mc.loops_max) if looped else None
++            npass = pass_rng.randint(mc.refine_min, mc.refine_max) if sample_passes else None
++            kw = {"passes": npass} if npass is not None else {}
+             x, y = data.batch(tc["batch_size"], device)
+-            with torch.autocast("cuda", dtype=torch.bfloat16):
+-                _, loss = fwd_model(x, y, loops=r)
++            with autocast(device):
++                _, loss = fwd_model(x, y, loops=r, **kw)
+             loss.backward()
+             gnorm = torch.nn.utils.clip_grad_norm_(model.parameters(), tc["grad_clip"])
+             opt.step()
+             opt.zero_grad(set_to_none=True)
+ 
+             tokens += tokens_per_step
+-            flops += model.flops_per_token(tc["seq_len"], loops=r) * tokens_per_step
++            flops += model.flops_per_token(tc["seq_len"], loops=r, **kw) * tokens_per_step
+             tok_log += tokens_per_step
+             if step % 10 == 0 or step == total_steps - 1:
+-                torch.cuda.synchronize()
++                if cuda:
++                    torch.cuda.synchronize()
+                 dt = time.time() - t_log
+                 tps = tok_log / dt if dt > 0 else 0.0
+                 t_log, tok_log = time.time(), 0
+@@ -255,6 +331,14 @@
+                      "tokens": tokens, "flops": flops, "perf/tokens_per_s": tps}
+                 if looped:
+                     m["train/loops"] = r
++                if data.unit == "bytes":
++                    m["bytes"] = tokens
++                    m["token_equiv"] = tokens / BYTES_PER_TOKEN
++                if patched and model.last_aux:
++                    for k, v in zip(model.last_aux["pass_ids"], model.last_aux["pass_loss"]):
++                        m[f"train/loss_pass{k + 1}"] = v.item()
++                    if npass is not None:
++                        m["train/passes"] = npass
+                 if run:
+                     run.log(m, step=step)
+                 if step % 100 == 0:
+@@ -266,7 +350,7 @@
+                 print(f"  eval step {step}: val/loss {vl:.4f}", flush=True)
+ 
+         wall = time.time() - t_start
+-        peak = torch.cuda.max_memory_allocated() / 2**30
++        peak = torch.cuda.max_memory_allocated() / 2**30 if cuda else 0.0
+         if args.bench:
+             print(f"BENCH {cfg['experiment']}: {total_steps} steps, {tokens/wall/1e3:.1f}k tok/s overall "
+                   f"(incl. warmup), peak mem {peak:.2f} GB", flush=True)
+@@ -278,6 +362,15 @@
+         if looped:
+             for r_eval in tc.get("eval_loops", [mc.loops]):
+                 summary[f"val_loss_r{r_eval}"] = evaluate(model, data, None, tc["batch_size"], device, loops=r_eval)
++        if patched:
++            summary.update(evaluate_detail(model, data, None, tc["batch_size"], device))
++            if mc.refine_shared:
++                for p_eval in tc.get("eval_passes", []):
++                    summary[f"val_loss_passes{p_eval}"] = evaluate(model, data, None, tc["batch_size"], device,
++                                                                   passes=p_eval)
++        if data.unit == "bytes":
++            summary["bytes"] = tokens
++            summary["token_equiv"] = tokens / BYTES_PER_TOKEN
+         summary.update({
+             "tokens": tokens, "flops": flops, "steps": total_steps, "wall_min": wall / 60,
+             "tokens_per_s": tokens / wall, "peak_mem_gb": peak,
+@@ -290,10 +383,14 @@
+               flush=True)
+ 
+         # ---- samples + checkpoint
+-        from tokenizers import Tokenizer
+-        tok = Tokenizer.from_file(str(DATA / "datasets" / tc["dataset"] / "tokenizer.json"))
++        if data.unit == "bytes":
++            tok = ByteTokenizer(data.meta.get("eos_id", 0))
++        else:
++            from tokenizers import Tokenizer
++            tok = Tokenizer.from_file(str(DATA / "datasets" / tc["dataset"] / "tokenizer.json"))
+         torch.manual_seed(0)
+-        texts = [sample(model, tok, p, 160, device) for p in PROMPTS]
++        n_new = 160 * (4 if data.unit == "bytes" else 1)   # about the same text length in bytes
++        texts = [sample(model, tok, p, n_new, device) for p in PROMPTS]
+         (run.dir / "samples.txt").write_text("\n\n" + "\n\n=====\n\n".join(texts) + "\n", encoding="utf-8")
+         ck = DATA / "checkpoints" / run.name
+         ck.mkdir(parents=True, exist_ok=True)

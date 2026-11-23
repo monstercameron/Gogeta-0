@@ -1,0 +1,65 @@
+{
+  "experiment": "E13c",
+  "description": "Patched coarse-to-fine, P=8, r=1, AR byte decoder (granularity sweep). Global body on 512 patches, window 128 patches.",
+  "budget": {
+    "bytes": 200000000,
+    "token_equivalents": 53547523,
+    "steps": 1526,
+    "note": "max_bytes counts training byte positions (B x T per step); token_equivalents = bytes / 3.735 (measured val bytes per BPE token)"
+  },
+  "notes": "lr 0.006 = K7's tuned E1 value, NOT tuned for bytes: run the SQ188 LR check (20M-byte variants) first.",
+  "model": {
+    "vocab_size": 256,
+    "max_seq_len": 4096,
+    "d_model": 384,
+    "n_heads": 6,
+    "mlp_hidden": 1024,
+    "prelude": [
+      "swa",
+      "gdn",
+      "gdn",
+      "swa",
+      "gdn",
+      "attn"
+    ],
+    "core": [],
+    "coda": [],
+    "window": 128,
+    "patch_size": 8,
+    "d_local": 192,
+    "local_heads": 3,
+    "local_mlp_hidden": 512,
+    "local_window": 64,
+    "local_encoder": [
+      "conv",
+      "gdn"
+    ],
+    "refine_blocks": [
+      "conv",
+      "gdn"
+    ],
+    "refine_passes": 1,
+    "refine_shared": true,
+    "refine_update": "gated",
+    "refine_loss": "linear",
+    "decoder": "ar",
+    "ternary": false
+  },
+  "train": {
+    "dataset": "code-py-v1-bytes",
+    "seq_len": 4096,
+    "seq_len_unit": "bytes",
+    "batch_size": 32,
+    "max_bytes": 200000000,
+    "lr": 0.006,
+    "min_lr_frac": 0.1,
+    "warmup_steps": 76,
+    "weight_decay": 0.1,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "grad_clip": 1.0,
+    "eval_every": 250,
+    "eval_seqs": 128,
+    "seed": 0
+  }
+}

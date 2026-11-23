@@ -1,0 +1,110 @@
+{
+ "created": "2026-11-22T19:40:51",
+ "dataset": "code-py-v1-bytes",
+ "builder": "experiments/byte_model/build_bytes.py",
+ "builder_git": {
+  "commit": "1e0e0565b49a09cdf6fae3e953291e335a5773d7",
+  "describe": "v0.4.65"
+ },
+ "location": "$GOGETA_DATA/datasets/code-py-v1-bytes/ (WSL filesystem; data are never committed)",
+ "source": {
+  "dataset": "code-py-v1",
+  "docs_sha256": {
+   "train": "fb2bb23fccfa8cea8abcde98b7649be639b5402e5bff06795d77559147d96917",
+   "val": "f821d119e552fd94e69414f35849f323cd6d3e9744c771b68da7b563e7e377a9"
+  },
+  "pointer": "experiments/data_integrity/dataset.manifest.json"
+ },
+ "encoding": "utf-8 bytes of each doc text, then EOS = 0x00 (never inside a doc); ids = byte values",
+ "vocab_size": 256,
+ "eos_id": 0,
+ "dtype": "uint8",
+ "splits": {
+  "train": {
+   "docs": 987154,
+   "bytes_content": 976921391,
+   "positions": 977908545,
+   "chars": 976520477,
+   "bytes_per_char": 1.000411,
+   "chars_per_token": 0.998581,
+   "nonascii_docs": 18256,
+   "doc_bytes_p50": 758,
+   "doc_bytes_max": 13908,
+   "build_s": 8.9,
+   "sha256": "9978018d30ceac00a8eb250368381fb0b828e646f90af58b69efdbe8a730245d",
+   "offsets_sha256": "0d6161ef3324fb9f97088b14c0dc2b5599ba17830fafed7b1430aaf34baa0297",
+   "files": {
+    "train.bin": {
+     "sha256": "9978018d30ceac00a8eb250368381fb0b828e646f90af58b69efdbe8a730245d",
+     "bytes": 977908545
+    },
+    "train_doc_offsets.npy": {
+     "sha256": "0d6161ef3324fb9f97088b14c0dc2b5599ba17830fafed7b1430aaf34baa0297",
+     "bytes": 7897368
+    }
+   }
+  },
+  "val": {
+   "docs": 4000,
+   "bytes_content": 3940661,
+   "positions": 3944661,
+   "chars": 3938783,
+   "bytes_per_char": 1.000477,
+   "chars_per_token": 0.99851,
+   "nonascii_docs": 69,
+   "doc_bytes_p50": 749,
+   "doc_bytes_max": 5886,
+   "build_s": 0.0,
+   "sha256": "fd869b2c1170ed5dbf8a5a6b54e607aa38ec74cb28472597b861c87a51c11c0f",
+   "offsets_sha256": "fe1295e723477e8ff430e9a36d0cdec1c0d37ccf141a2026416152565480a82c",
+   "files": {
+    "val.bin": {
+     "sha256": "fd869b2c1170ed5dbf8a5a6b54e607aa38ec74cb28472597b861c87a51c11c0f",
+     "bytes": 3944661
+    },
+    "val_doc_offsets.npy": {
+     "sha256": "fe1295e723477e8ff430e9a36d0cdec1c0d37ccf141a2026416152565480a82c",
+     "bytes": 32136
+    }
+   }
+  }
+ },
+ "test_splits": "not built (locked; byte form = utf-8 + EOS of docs_test.jsonl at the guarded read)",
+ "verification": {
+  "val_docs": 4000,
+  "val_roundtrip_exact": true,
+  "val_bytecounts_match": true,
+  "train_docs": 987154,
+  "train_roundtrip_mismatches": 0,
+  "train_eos_count_matches_docs": true,
+  "bpe_val_docs": 4000,
+  "bpe_val_decodes_to_same_docs": true,
+  "bpe_train_docs": 987154,
+  "bpe_train_doc_count_matches": true,
+  "clean_val_manifest_docs_sha_matches": true,
+  "clean_val_n_val_docs_matches": true,
+  "clean_val_lists": {
+   "val_clean80": {
+    "n": 2333,
+    "ids_valid_unique": true,
+    "bytes_content": 2670035,
+    "chars": 2668267
+   },
+   "val_clean50": {
+    "n": 1174,
+    "ids_valid_unique": true,
+    "bytes_content": 1467241,
+    "chars": 1465550
+   },
+   "val_clean50_nofamily": {
+    "n": 1174,
+    "ids_valid_unique": true,
+    "bytes_content": 1467241,
+    "chars": 1465550
+   }
+  },
+  "verify_s": 7.9,
+  "all_pass": true
+ },
+ "wall_s": 27.1
+}

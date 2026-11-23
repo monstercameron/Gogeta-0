@@ -1,0 +1,14 @@
+# Quick review 2026-11-23-1229 - code-model practitioner (Codex GPT-6 Luna high)
+
+- **Observation:** GRPO is blocked because the reward harness lets a solution score a failing test by replacing `builtins.exec` or `builtins.compile`; the honest control scores 0/1. That makes reward integrity a prerequisite for using coding-task scores in training. (DEVLOG.md, v0.5.7; C83)
+- **Observation:** The queue puts the sandbox hardening work next on CPU, while the next GPU check targets KDA decoding. That keeps eval safety and practical inference both in view. (experiments/QUEUE.md, SQ61 and SQ50)
+- **Observation:** The model currently rejects MoE with ternary enabled, even as C203 reports promising MoE results. The codebase therefore cannot yet evaluate that combination as a candidate recipe. (gogeta/model.py; experiments/side-quests.md, SQ358; C203)
+
+- **Idea — prompt-format robustness:** **Hypothesis [speculation]:** a 13M model’s functional score changes meaningfully between canonical function-completion prompts and a realistic code-editor wrapper. **Cheapest test:** score the same 50 held-out tasks under both wrappers with one checkpoint; about 5 GPU-minutes. **Change the plan if:** pass@1 shifts by more than 5 percentage points; report both formats and standardize the intended deployment wrapper.
+- **Idea — patch usability:** **Hypothesis [speculation]:** passing isolated function tests overstates usefulness if generated patches fail to apply cleanly. **Cheapest test:** ask the 13M checkpoint to repair 25 small, locally generated Python mutations; measure patch-apply rate and post-patch tests; about 5 GPU-minutes. **Change the plan if:** fewer than half of test-passing outputs apply as valid patches; add patch-format success as a separate gate for code-task claims.
+
+**Question for the main agent:** Which real usage target should guide coding evals first: function completion or edits applied to existing files?
+## Triage
+- Prompt-format robustness: deferred, not run at 13M. At this size functional scores sit near the floor (E0's held-out exec set is 8 problems; CRUXEval-O 8.9%, SQ66), so a 5-point pass@1 shift would be noise. Noted on the functional-eval track (SQ4/SQ60) as a required second wrapper once the E61-scale model exists. Exec-based evals also wait for SQ373 (forgery fix).
+- Patch usability: merged into SQ210 (patch-likelihood eval), which already scores edits to existing files. The apply-rate and post-patch-test gate is added to its readout for the final model.
+- Question (function completion or file edits first?): function completion first, for two reasons. It is the cheaper and better-understood signal at small scale. Goal 6 targets interactive batch-1 completion with speculative decoding. File edits (SQ210) come second, once a model is large enough for edits to be non-trivial (E61), and both run in the forgery-proof harness (SQ373).

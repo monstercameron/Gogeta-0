@@ -18,6 +18,24 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.8: Docs refresh (hourly)
+*2026-11-23*
+
+**Docs refresh (hourly, Haiku; checked by the main agent), with an erratum and a found-but-unanalysed result.**
+
+- **README:**
+  - The status block now carries the A1 results (exploratory) and says A2 is running and that GRPO is blocked until the reward-forgery fix (SQ373).
+  - "Where we are, in plain words" is brought up to date.
+  - A new **Glossary** covers A1/A2/A3, E-numbers, the F2 cells, clean80/clean50, matched FLOPs, "parameter-changed arm", log-points and what A2 can claim (recipe-level only).
+- **Cold-start check:** the refresh agent followed the README quick start literally, and every referenced file, config, script and flag exists. The test count and skip notes were not re-run.
+- **Byte Quest line, and an erratum to v0.5.6:**
+  - The README said "the E13 patch-size sweep is underway (P = 2 is best so far; the 200M runs are in progress)". The 12:15 outside review flagged it, and the v0.5.6 triage wrongly said the phrase did not exist; the main agent had misread a truncated grep. The erratum is appended to that review's triage.
+  - The runs are real: E13a and E13b at 200M bytes (seed 0, lr 3e-3) finished on the w4 fleet before teardown and were pulled, but never analysed (full-val 0.2774 and 0.3338 nats/byte).
+  - The README now says so, and **SQ374** analyses them: clean80 bits/char, matched-FLOP comparison with the token models, and loss by position in the patch. This is the first step toward the coarse-to-fine byte stage the human asked about.
+- **notes/sketch.md:** status at v0.5.7.
+
+---
+
 ## v0.5.7: Reward forgery confirmed in the test harness (C83, SQ373: GRPO blocked); A2 amendment 1 (A1e on fresh seeds) registered
 *2026-11-23*
 

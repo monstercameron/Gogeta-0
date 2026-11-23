@@ -340,7 +340,12 @@ def main():
             opt.zero_grad(set_to_none=True)
 
             tokens += tokens_per_step
-            flops += model.flops_per_token(tc["seq_len"], loops=r) * tokens_per_step
+            if looped and r > mc.bptt_loops:  # passes before the last bptt_loops run under no_grad: forward only (v0.5.3)
+                g = mc.bptt_loops
+                flops += (model.flops_per_token(tc["seq_len"], loops=r, training=False)
+                          + 2 * model.flops_per_token(tc["seq_len"], loops=g, training=False)) * tokens_per_step
+            else:
+                flops += model.flops_per_token(tc["seq_len"], loops=r) * tokens_per_step
             tok_log += tokens_per_step
             if step % 10 == 0 or step == total_steps - 1:
                 torch.cuda.synchronize()

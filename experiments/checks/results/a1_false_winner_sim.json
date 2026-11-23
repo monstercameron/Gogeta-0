@@ -1,0 +1,15 @@
+{
+ "model": "null effects, per-run log sd 0.0053, shared E27 reference, A1 winner rule",
+ "n_sim": 200000,
+ "k8": {
+  "k_arms": 8,
+  "P_at_least_one_false_winner": 0.13827,
+  "expected_false_winners": 0.2235
+ },
+ "k11_with_A2": {
+  "k_arms": 11,
+  "P_at_least_one_false_winner": 0.167165,
+  "expected_false_winners": 0.30927,
+  "P_false_winner_survives_A2_3_fresh_seeds": 0.00346
+ }
+}

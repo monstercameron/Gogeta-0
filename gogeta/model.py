@@ -78,6 +78,7 @@ class ModelConfig:
     inject_contractive: bool = False  # h = lam * h + inject(...), lam = sigmoid(per-channel param), init 0.9 (Parcae-style)
     ternary_acts: bool = True         # ternary=True: also int8 absmax activations (BitNet b1.58); False = weights only
     ternary_fp_ends: bool = False     # ternary=True: prelude, coda and inject stay full precision (only the core is ternary)
+    loop_adapter_rank: int = 0        # > 0: per-pass low-rank adapter after each core block (SQ357), passes >= loops_max share the last
 
     @property
     def head_dim(self) -> int:
@@ -93,7 +94,8 @@ class ModelConfig:
         return d
 
 
-_ASSEMBLY_DEFAULTS = {"loop_embed": False, "inject_contractive": False, "ternary_acts": True, "ternary_fp_ends": False}
+_ASSEMBLY_DEFAULTS = {"loop_embed": False, "inject_contractive": False, "ternary_acts": True, "ternary_fp_ends": False,
+                      "loop_adapter_rank": 0}
 
 
 # ----------------------------------------------------------------------------- BitLinear
@@ -300,6 +302,11 @@ class FusionDance(nn.Module):
                 self.loop_emb = nn.Parameter(torch.zeros(max(cfg.loops_max, cfg.loops), cfg.d_model))
             if cfg.inject_contractive:  # lam = sigmoid(lam_logit) in (0, 1), init 0.9
                 self.lam_logit = nn.Parameter(torch.full((cfg.d_model,), math.log(0.9 / 0.1)))
+            if cfg.loop_adapter_rank:  # per-pass, per-core-block low-rank adapters (SQ357): down N(0, 0.02), up zero-init
+                P, J, d, rk = cfg.loops_max, len(cfg.core), cfg.d_model, cfg.loop_adapter_rank
+                self.adapt_norm = nn.RMSNorm(d)
+                self.adapt_down = nn.Parameter(torch.zeros(P, J, d, rk))  # N(0, 0.02) drawn LAST in _init_weights
+                self.adapt_up = nn.Parameter(torch.zeros(P, J, rk, d))
         self.norm_out = nn.RMSNorm(cfg.d_model)
         self.head = nn.Linear(cfg.d_model, cfg.vocab_size, bias=False)
         if cfg.tie_embeddings:
@@ -322,6 +329,8 @@ class FusionDance(nn.Module):
                 nn.init.normal_(m.weight, std=0.02)
             elif isinstance(m, MoEFFN):  # batched experts are not nn.Linear: up std 0.02, down std_res (as SwiGLU)
                 m.reset_parameters(0.02, std_res)
+        if getattr(self, "adapt_down", None) is not None:  # drawn after every other init, so they stay bit-identical
+            nn.init.normal_(self.adapt_down, std=0.02)
 
     # ------------------------------------------------------------------ forward
     def forward(self, idx: torch.Tensor, targets: torch.Tensor | None = None, loops: int | None = None,
@@ -346,8 +355,11 @@ class FusionDance(nn.Module):
                         h = h + inj
                     if self.cfg.loop_embed:
                         h = h + self.loop_emb[min(i, self.loop_emb.shape[0] - 1)]
-                    for b in self.core:
+                    p = min(i, self.cfg.loops_max - 1)
+                    for j, b in enumerate(self.core):
                         h = b(h, aux)
+                        if self.cfg.loop_adapter_rank:  # per-pass low-rank residual after each core block (zero-init up)
+                            h = h + (self.adapt_norm(h) @ self.adapt_down[p, j]) @ self.adapt_up[p, j]
             x = h
         for b in self.coda:
             x = b(x, aux)
@@ -394,7 +406,8 @@ class FusionDance(nn.Module):
         pc = self.param_counts()
         inj = 2 * cfg.d_model * cfg.d_model if self.core else 0
         pre, core, coda = (pc.get(f"active_{s}", pc[s]) for s in ("prelude", "core", "coda"))
-        matmul_params = pre + coda + r * (core + inj) + cfg.d_model * cfg.vocab_size
+        adapt = 2 * cfg.d_model * cfg.loop_adapter_rank * len(cfg.core) if (self.core and cfg.loop_adapter_rank) else 0
+        matmul_params = pre + coda + r * (core + inj + adapt) + cfg.d_model * cfg.vocab_size
         fwd = 2 * matmul_params
         kinds = list(cfg.prelude) + list(cfg.coda) + r * list(cfg.core)
         for k in kinds:

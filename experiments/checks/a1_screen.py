@@ -19,7 +19,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 RES = os.path.join(ROOT, "experiments", "checks", "results")
 PRED = {"A1a": (-0.015, -0.04, 0.005), "A1b": (-0.005, -0.02, 0.005), "A1c": (-0.005, -0.025, 0.015),
         "A1d": (-0.02, -0.05, 0.0), "A1e": (-0.03, -0.06, -0.01), "A1f": (-0.03, -0.06, -0.01),
-        "A1g": (-0.02, -0.05, 0.01), "A1h": (-0.01, -0.03, 0.01)}
+        "A1g": (-0.02, -0.05, 0.01), "A1h": (-0.01, -0.03, 0.01),
+        "A1i": (-0.005, -0.02, 0.01), "A1z": (0.0, -0.005, 0.005), "A1k": (0.0, -0.01, 0.01)}
 
 
 def gather():
@@ -30,10 +31,14 @@ def gather():
         name, m = os.path.basename(d), s.get("metrics", {})
         dl = glob.glob(f"{base}/*/Gogeta-0/experiments/stats/doclevel/{name}.json")
         tr = s["config"]["train"]
-        out.append({"run": name, "arm": s["experiment"], "seed": s["seed"], "lr": tr.get("lr"), "tokens": m.get("tokens"),
+        arm = s["experiment"]
+        if arm == "A1z" and abs(tr.get("lr", 0) - 0.006) > 1e-12:  # A1k = the placebo config at lr 1.2e-2 (amendment 1)
+            arm = "A1k"
+        out.append({"run": name, "arm": arm, "seed": s["seed"], "lr": tr.get("lr"), "tokens": m.get("tokens"),
                     "status": s.get("status"), "clean80": json.load(open(dl[0]))["bpc"]["clean80"] if dl else None,
                     "tokens_per_s": m.get("tokens_per_s"), "wall_min": m.get("wall_min"),
-                    "params_non_embedding": m.get("params_non_embedding"), "git": s.get("git", {}).get("commit")})
+                    "params_non_embedding": m.get("params_non_embedding"), "git": s.get("git", {}).get("commit"),
+                    "git_describe": s.get("git", {}).get("describe"), "dataset": tr.get("dataset")})
     json.dump({"check": "A1-runs", "source": "pulled fleet run summary.json + doclevel clean80 (v2 val)", "runs": out},
               open(os.path.join(RES, "a1_runs.json"), "w", newline="\n"), indent=1)
     print(len(out), "runs gathered")
@@ -41,6 +46,11 @@ def gather():
 
 def main():
     runs = [r for r in json.load(open(os.path.join(RES, "a1_runs.json")))["runs"] if r["clean80"] and r["tokens"] and r["tokens"] > 1e8]
+    # provenance (quick review 11:39): registered commits only, clean tree, code-py-v2
+    ok_commits = ("36acccc", "482af19")
+    bad = [r["run"] for r in runs if not str(r.get("git") or "").startswith(ok_commits)
+           or "dirty" in str(r.get("git_describe") or "") or r.get("dataset") != "code-py-v2"]
+    print("provenance:", "OK" if not bad else f"MISMATCH {bad}")
     ref = {r["seed"]: r for r in json.load(open(os.path.join(RES, "sq263_runs.json")))["runs"]
            if r["cell"] == "E27" and abs(r["lr"] - 0.006) < 1e-12}
     e27_tps = None

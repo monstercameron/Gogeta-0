@@ -82,3 +82,24 @@ def test_contractive_loop_embed_train_step_backprops():
     _, loss = m(x, targets=x, loops=3)
     loss.backward()
     assert m.loop_emb.grad is not None and m.lam_logit.grad is not None
+
+
+def test_loop_adapter_zero_init_identity_params_and_flops():
+    a, b = build(), build(loop_adapter_rank=4)
+    assert torch.equal(out(a), out(b))
+    extra = sum(p.numel() for p in b.parameters()) - sum(p.numel() for p in a.parameters())
+    assert extra == 4 * 2 * 2 * 32 * 4 + 32  # loops_max x core blocks x (down + up) x d x rank + adapter norm
+    assert b.flops_per_token(16) > a.flops_per_token(16)
+    with torch.no_grad():
+        b.adapt_up[0, 0].fill_(0.1)
+    assert not torch.equal(out(a), out(b))
+    assert out(b, loops=9).shape == out(a, loops=9).shape  # passes beyond loops_max reuse the last adapter set
+    assert "loop_adapter_rank" not in ModelConfig(**BASE).to_dict()
+
+
+def test_loop_adapter_backprops():
+    m = build(loop_adapter_rank=4).train()
+    x = torch.randint(0, 97, (2, 16))
+    _, loss = m(x, targets=x, loops=3)
+    loss.backward()
+    assert m.adapt_up.grad is not None and m.adapt_up.grad.abs().sum() > 0

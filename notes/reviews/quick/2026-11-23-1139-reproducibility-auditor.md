@@ -1,0 +1,14 @@
+# Quick review 2026-11-23-1139 - reproducibility auditor (Codex GPT-6 Luna high)
+
+- **Observation:** The ledger tracks 131 claims, but 71 remain `UNVERIFIED`; many definitions also have scope or refutation fields marked TBD. That makes it hard to tell what evidence would settle some claims. (`experiments/claims-status.md`)
+- **Observation:** C1 is only `PARTIAL`: the machine-readable rerun used an RTX 5090, while the N1X evidence is a notebook transcription. The evidence does not yet reproduce the claim on its stated hardware. (C1; `experiments/claims-status.md`)
+- **Observation:** The queue names SQ50 as the next GPU item, while the latest devlog describes A1 jobs dispatching across an eight-box fleet. The queue timestamp predates that update, so it may not represent the live run order. (`experiments/QUEUE.md`; v0.5.1, `DEVLOG.md`)
+
+- **Idea:** Audit provenance fields across three recent run summaries. **Hypothesis:** at least one summary may lack a source commit, config, seed, or dataset identifier needed to reproduce its result. **Cheapest test:** 5 CPU-minutes; compare each summary to its run files and registered config. **Change the plan if:** any field is missing or disagrees; require that field before using the run in a comparison. [speculation]
+- **Idea:** Score the same fixed checkpoint and document subset twice in fresh processes. **Hypothesis:** scoring may vary enough across processes to affect small reported differences. **Cheapest test:** 5 CPU-minutes at 13M parameters; compare ordered per-document scores and aggregates. **Change the plan if:** outputs differ beyond a predeclared tolerance; record the cause and control it before comparing arms. [speculation]
+
+- **Question for the main agent:** Are A1 run summaries tied to immutable source, config, and dataset identifiers, including the amended jobs?
+## Triage
+- Provenance audit of run summaries: accepted as a check inside the A1 gather step. Every A1 run summary records the git commit and describe (the worker runs with `--require-clean`), the full config dict, `cli_overrides`, the seed and the dataset meta. The A1 analysis will assert that each run's commit is 36acccc (original jobs) or 482af19 (amendment jobs), that the tree was clean, and that the dataset is code-py-v2, and it will report any mismatch.
+- Scoring twice in fresh processes: accepted as SQ359. The CPU scorer is already known to be deterministic (the K9 re-run reproduced every value), but the GPU scorer has not been tested this way.
+- Question (are A1 summaries tied to immutable source, config and dataset identifiers, including the amended jobs?): yes, for source and config. The amended jobs check out the pushed commit 482af19 before running, and the configs are committed with registered sha256 values. The dataset is pinned by the v2 manifest check every box ran ("V2 OK" against the committed manifest's sha256 values) before training.

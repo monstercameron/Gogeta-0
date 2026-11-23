@@ -18,6 +18,25 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.3: Outside review 12:00: F2's loop cells were ~11% under-computed (truncated BPTT); FLOP accounting fixed; per-pass adapters (A2 candidate)
+*2026-11-23*
+
+**Outside review 12:00 (Haiku) and quick reviews 11:29 (statistician), 11:34 (systems) and 11:39 (reproducibility), triaged. A compute-accounting finding is fixed.**
+
+- **Finding: F2's loop cells were under-computed.**
+  - Loop cells train with r ~ U{1..7} and backprop through only the last 4 passes, so passes 5-7 run forward-only. The trainer counted every pass at full training cost.
+  - Real training compute for E27-style cells is 1.715e8 FLOPs/token, against the recorded 1.928e8 (-11.1%). So F2's "FLOPs-matched" loop cells (010, 111) got about 11% less compute than the dense and GDN cells.
+  - Part of the 200M loop penalty may therefore be a compute deficit. This is now a C202 limitation.
+  - A1a (fixed r = 4) and A1i (full backprop) remove the deficit and use 12.4% more compute than E27; they are read with that caveat.
+  - `gogeta/train.py` now counts no_grad passes as forward only. Training itself is unchanged.
+- **A1 false-winner calibration** (`experiments/checks/a1_false_winner_sim.py`, 200,000 null screens): with 11 arms the screen nominates at least one false winner 16.7% of the time, but only 0.35% would also pass A2's 3-fresh-seed confirmation. The two-stage design holds.
+- **A2 candidate code:** per-pass low-rank adapters (`loop_adapter_rank`, SQ357). There is one rank-r residual adapter per core block and pass, zero-init up, and its down init is drawn last, so every other weight keeps its init. Off by default, `to_dict()` omits it, and its FLOPs are counted. Tests: `tests/test_assembly.py` 9/9, `tests.test_moe` OK.
+- **A1 provenance check:** `experiments/checks/a1_screen.py` asserts the registered commits (36acccc / 482af19), a clean tree and code-py-v2 for every run.
+- **New side quests:** SQ359 (scorer determinism), SQ360 (elastic unshared depth), SQ361 (warm-started tying), SQ362 (decode-time frontier for goal 6), SQ363 (shared MLP with per-pass mixers), SQ364 (GDN state capacity), SQ365 (ternary threshold sensitivity, CPU). SQ342 gains fresh seeds 3-5.
+- **A1 in flight:** the first runs are in (A1e, A1g, A1d, A1f, full-val loss only). Clean80 scoring follows on each box, and the registered analysis runs once all are pulled.
+
+---
+
 ## v0.5.2: Docs refresh (hourly)
 *2026-11-23*
 

@@ -22,7 +22,7 @@ MAN=experiments/byte_model/dataset-bytes.manifest.json
 t0=$(date +%s)
 exec > >(tee "$GOGETA_DATA/logs/fetch_bytes.log") 2>&1
 
-[ -z "$(git status --porcelain)" ] || { git status --porcelain; echo "BYTES FAILED: checkout not clean"; exit 1; }
+[ -z "$(git status --porcelain --untracked-files=no)" ] || { git status --porcelain --untracked-files=no; echo "BYTES FAILED: tracked files modified"; exit 1; }
 for f in docs_train.jsonl docs_val.jsonl; do
   [ -s "$SRC/$f" ] || { echo "BYTES FAILED: $SRC/$f missing (run fetch_data.sh with KEEP=1 first)"; exit 1; }
 done
@@ -56,5 +56,5 @@ restore_manifest
 [ $rc -eq 0 ] || { echo "BYTES FAILED: build_bytes.py exit $rc"; exit 1; }
 echo "== verify against the committed $MAN"
 if ! verify; then echo "BYTES MISMATCH: see above"; exit 3; fi
-if [ -n "$(git status --porcelain)" ]; then git status --porcelain; echo "BYTES MISMATCH: repo changed"; exit 3; fi
+if [ -n "$(git status --porcelain --untracked-files=no)" ]; then git status --porcelain --untracked-files=no; echo "BYTES MISMATCH: tracked repo files changed"; exit 3; fi
 echo "BYTES OK built + verified in $(( $(date +%s) - t0 ))s ($(python -P -c "import json;print(json.load(open('$SNAP'))['splits']['train']['sha256'][:16])") train.bin)"

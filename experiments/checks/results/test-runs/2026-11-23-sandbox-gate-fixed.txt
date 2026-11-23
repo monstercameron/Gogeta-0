@@ -1,0 +1,11 @@
+../mnt/c/Users/mreca/Desktop/Gogeta-0/tests/test_sandbox_gate.py:94: DeprecationWarning: get_task_dict is deprecated. Use TaskManager.load() instead.
+  task = list(lt.get_task_dict(names[:1], manager).values())[0]
+/root/.venvs/gogeta-eval/lib/python3.12/site-packages/lm_eval/tasks/__init__.py:167: DeprecationWarning: Use TaskManager.load(), which returns flat dicts of tasks and groups.
+  result = task_manager.load_task_or_group(specs) if specs else {}
+gogeta_heldout_exec: Custom kwargs can be passed to `--metadata` in console (as json string) or to the TaskManager.
+For example --metadata='{"max_seq_lengths":[4096, 8192]}'. For details see task Readme.
+....
+----------------------------------------------------------------------
+Ran 6 tests in 10.549s
+
+OK

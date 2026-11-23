@@ -39,6 +39,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import time
 from functools import lru_cache
 
 from post_training import rewards
@@ -90,6 +91,44 @@ def _run_tests_unchecked(code: str, tests: list[str], timeout: float = 5.0, mem_
     return res
 
 
+def _procs_with(marker: str) -> list[int]:
+    """Host PIDs whose command line contains `marker` (the self-test's descendant probe)."""
+    out = []
+    for d in os.listdir("/proc"):
+        if d.isdigit():
+            try:
+                with open(f"/proc/{d}/cmdline", "rb") as f:
+                    if marker.encode() in f.read():
+                        out.append(int(d))
+            except OSError:
+                pass
+    return out
+
+
+def _probe_setsid_cleanup(tag: str) -> bool:
+    """SQ61 descendant cleanup: sandboxed code starts a child that calls setsid (leaving the process group) and sleeps.
+    Pass: the timed-out call returns within its bounded cleanup and no process carrying the probe's marker survives.
+    Any survivor is killed here, so a failing probe leaves nothing running."""
+    marker = f"gogeta_setsid_probe_{tag}"
+    code = ("import subprocess, sys\n"
+            "subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)  # %s'], start_new_session=True)\n"
+            "import time\ntime.sleep(30)\n" % marker)
+    t0 = time.monotonic()
+    try:
+        r = _run_tests_unchecked(code, ["assert True"], timeout=1)
+        took = time.monotonic() - t0
+        time.sleep(0.5)
+        return bool(r["timed_out"]) and took < 1 + rewards._CLEANUP_S + 2 and not _procs_with(marker)
+    except RuntimeError:  # _reap's bounded wait expired: a survivor held the pipes
+        return False
+    finally:
+        for pid in _procs_with(marker):
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except (ProcessLookupError, PermissionError):
+                pass
+
+
 def self_test(repo_root: str) -> dict:
     """Probe the sandbox. Every entry must be True before code tasks may run."""
     global _GATE
@@ -135,6 +174,7 @@ def self_test(repo_root: str) -> dict:
         checks["network_blocked"] = not r["ran"]
         r = _run_tests_unchecked("while True:\n    pass\n", ["assert True"], timeout=2)
         checks["timeout_kills"] = r["timed_out"] and not r["ran"]
+        checks["setsid_descendant_killed"] = _probe_setsid_cleanup(tag)
         r = _run_tests_unchecked("x = bytearray(2 * 1024**3)\n", ["assert True"], mem_mb=256)
         checks["memory_capped"] = not r["ran"]
         checks["runs_as_nobody"] = _drop_privileges()

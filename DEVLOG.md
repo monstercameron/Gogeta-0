@@ -18,6 +18,28 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.48: Sandbox setsid escape fixed: PID namespace + bounded wait (SQ61); GRPO gate lifted; SQ428 inconclusive
+*2026-11-23*
+
+**Sandbox descendant escape fixed (SQ61). Every sandbox child is now PID 1 of its own PID namespace, so a timed-out sample cannot leave a process behind or stall the reward harness. The v0.5.47 GRPO gate is lifted. SQ428 (endpoint fit of the C209 gap) is inconclusive: in-run curves cannot identify an asymptote.**
+
+- **The fix** (on the human's go-ahead), in `post_training/rewards.py`:
+  - Both launch paths add `unshare -p -f --kill-child`. The harness is PID 1 of a fresh PID namespace, and the sandboxed code cannot signal the launcher, which sits outside its namespace.
+  - On timeout, `_kill_sandbox` SIGKILLs PID 1 first, which makes the kernel kill every process in the namespace, including setsid descendants. Then it kills the process group.
+  - `_reap` waits at most 5 s for the pipes and raises (fail closed) if anything survived. Before, it was an unbounded `communicate()`.
+- **Checks** (saved under `experiments/checks/results/test-runs/2026-11-23-*-fixed.txt`):
+  - The v0.5.47 probe `sandbox_kill_cleanup.py` passes. The setsid child is killed in 1.0 s, no survivors, and the host mount table is unchanged. It failed before the fix (the v0.5.47 output is kept).
+  - The sandbox self-test gains a fail-closed probe, `setsid_descendant_killed`; 17 of 17 checks are true.
+  - `post_training/test_rewards.py` is 37/37, with 3 new descendant tests: a setsid child on the private-filesystem path and on the network-only path, and a harness that calls setsid itself.
+  - `tests/test_sandbox_gate.py` is 6/6, and `evals/test_wiring.py` is 6/6.
+- **Ledger:** evidence events on C83 and C106 (statuses unchanged). The rest of SQ61 stays open: the resource-budget test, the world-writable sweep and the /proc PID view.
+- **SQ428** (side-quest worker; checked against `results/sq428.json`): A2s and E27 seeds 2-4, power-law fits of the in-training val curves.
+  - In 12 of 12 fits the asymptote falls to its lower bound, because under a cosine schedule the in-run curve behaves as a pure power law. The endpoint is not identified, so the fixed rule gives no verdict.
+  - The fitted gap at 200M is -11.9% and -12.3%, against -12.45% observed on in-training val (not clean80).
+  - In-run curves cannot answer the horizon question; SQ380 (600M) can. No claim change.
+
+---
+
 ## v0.5.47: Outside review 18:42: sandbox setsid escape (GRPO re-gated on SQ61), C209/C205 status rows carry exact-t intervals, SQ428-SQ431
 *2026-11-23*
 

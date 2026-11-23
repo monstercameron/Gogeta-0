@@ -9,7 +9,9 @@ returns one float per completion. TRL passes every dataset column except `prompt
 functions as keyword arguments, so the dataset needs a `tests` column (list of assert strings).
 
 What IS isolated / limited on Linux (each point exercised by post_training/test_rewards.py):
-  * separate process in its own session; the whole process group is SIGKILLed on timeout
+  * separate process in its own session and its own PID namespace (PID 1 of it); on timeout PID 1 and the process
+    group are SIGKILLed, and the kernel then kills every process in the namespace, including setsid descendants
+    (SQ61); the wait for output after the kill is bounded and raises if anything survived
   * wall-clock timeout (`timeout` s) plus a CPU-time limit (RLIMIT_CPU)
   * address-space limit (RLIMIT_AS = `mem_mb`), max written file size (RLIMIT_FSIZE, 16 MB),
     no core dumps, max 64 open files. The harness sets these on itself with soft == hard
@@ -333,6 +335,50 @@ def _child_python() -> str:
     return os.path.realpath(getattr(sys, "_base_executable", None) or sys.executable)
 
 
+# Descendant cleanup (SQ61; escape demonstrated by experiments/checks/sandbox_kill_cleanup.py, v0.5.47): every sandbox
+# child runs as PID 1 of its own PID namespace (`-p -f`). When PID 1 dies the kernel SIGKILLs every process in that
+# namespace, including descendants that called setsid to leave the process group, which a killpg alone misses.
+# --kill-child also kills PID 1 if the unshare launcher itself dies. The child cannot signal the launcher: it sits
+# outside the child's PID namespace.
+_PIDNS = ("-p", "-f", "--kill-child")
+_CLEANUP_S = 5.0  # bounded wait for the pipes after the kill; past it, fail loudly instead of hanging
+
+
+def _kill_sandbox(proc: subprocess.Popen) -> None:
+    """SIGKILL a timed-out sandbox: first PID 1 of its PID namespace (the launcher's children), which takes the whole
+    namespace down even if the harness itself called setsid, then the process group, then the launcher."""
+    kids = []
+    try:
+        with open(f"/proc/{proc.pid}/task/{proc.pid}/children") as f:
+            kids = [int(p) for p in f.read().split()]
+    except (OSError, ValueError):
+        pass
+    for pid in kids:
+        try:
+            os.kill(pid, signal.SIGKILL)
+        except (ProcessLookupError, PermissionError):
+            pass
+    try:
+        os.killpg(proc.pid, signal.SIGKILL)
+    except (ProcessLookupError, PermissionError, AttributeError):
+        proc.kill()
+
+
+def _reap(proc: subprocess.Popen) -> tuple[str, str]:
+    """Collect output after _kill_sandbox, but never wait unbounded: a survivor that still holds the pipes raises."""
+    try:
+        return proc.communicate(timeout=_CLEANUP_S)
+    except subprocess.TimeoutExpired:
+        for s in (proc.stdout, proc.stderr, proc.stdin):
+            try:
+                if s:
+                    s.close()
+            except OSError:
+                pass
+        raise RuntimeError("sandbox cleanup failed: a process survived the timeout kill and still holds the output "
+                           "pipes (fail closed; see experiments/checks/sandbox_kill_cleanup.py)")
+
+
 @lru_cache(maxsize=1)
 def _unshare_works() -> bool:
     exe = shutil.which("unshare")
@@ -340,7 +386,7 @@ def _unshare_works() -> bool:
         return False
     kw = {"user": NOBODY, "group": NOBODY, "extra_groups": []} if _drop_privileges() else {}
     try:
-        r = subprocess.run([exe, "-rn", "true"], capture_output=True, timeout=10, **kw)
+        r = subprocess.run([exe, "-rn", *_PIDNS, "true"], capture_output=True, timeout=10, **kw)
         return r.returncode == 0
     except Exception:
         return False
@@ -383,7 +429,7 @@ FS_MODES = ("auto", "require", "off")
 
 
 def _ns_cmd(python: str, harness_src: str) -> list[str]:
-    return [shutil.which("unshare"), "-rnm", "sh", "-c", _NS_PRELUDE, python, harness_src]
+    return [shutil.which("unshare"), "-rnm", *_PIDNS, "sh", "-c", _NS_PRELUDE, python, harness_src]
 
 
 @lru_cache(maxsize=1)
@@ -439,7 +485,7 @@ def run_tests(code: str, tests: list[str], timeout: float = 5.0, mem_mb: int = 1
             os.chown(work, NOBODY, NOBODY)
         cmd = [_child_python(), "-I", harness]
         if use_ns:
-            cmd = [shutil.which("unshare"), "-rn"] + cmd
+            cmd = [shutil.which("unshare"), "-rn", *_PIDNS] + cmd
         kw = {"user": NOBODY, "group": NOBODY, "extra_groups": []} if drop else {}
         env = {"PATH": "/usr/bin:/bin", "LANG": "C.UTF-8"}
         stdin = nonce + "\n" + json.dumps({"code": code, "tests": list(tests),
@@ -452,11 +498,8 @@ def run_tests(code: str, tests: list[str], timeout: float = 5.0, mem_mb: int = 1
             out, _err = proc.communicate(stdin, timeout=timeout)
         except subprocess.TimeoutExpired:
             timed_out = True
-            try:
-                os.killpg(proc.pid, signal.SIGKILL)
-            except (ProcessLookupError, PermissionError, AttributeError):
-                proc.kill()
-            out, _err = proc.communicate()
+            _kill_sandbox(proc)
+            out, _err = _reap(proc)
         res = None
         for line in reversed(out.splitlines()):
             if line.startswith(nonce):
@@ -488,11 +531,8 @@ def _run_in_fs_ns(code, tests, timeout, mem_mb, nproc, nonce) -> dict:
         out, err = proc.communicate(stdin, timeout=timeout)
     except subprocess.TimeoutExpired:
         timed_out = True
-        try:
-            os.killpg(proc.pid, signal.SIGKILL)
-        except (ProcessLookupError, PermissionError, AttributeError):
-            proc.kill()
-        out, err = proc.communicate()
+        _kill_sandbox(proc)
+        out, err = _reap(proc)
     if proc.returncode == 97:
         raise RuntimeError(f"sandbox mount setup failed (fail closed): {err.strip()[:300]}")
     res = None

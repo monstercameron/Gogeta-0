@@ -1,0 +1,274 @@
+{
+ "check": "SQ428",
+ "git": "217aa94",
+ "status": "diagnostic, not confirmatory",
+ "law": "L(N) = a + b N^-c, N in millions of tokens",
+ "seeds": [
+  2,
+  3,
+  4
+ ],
+ "missing_curves": [],
+ "fits": {
+  "from_step_750": {
+   "per_seed": {
+    "2": {
+     "A2s": {
+      "a": 1.000000000018468e-06,
+      "b": 3.386063007811794,
+      "c": 0.20635776385550997,
+      "rms_nats": 0.01198380692198243,
+      "rms_rel": 0.009301833799908015,
+      "L200": 1.1346648069804521,
+      "n_points": 23,
+      "last_eval_loss": 1.1273
+     },
+     "E27": {
+      "a": 1.0000000008449772e-06,
+      "b": 3.3777704541960216,
+      "c": 0.18103708849666547,
+      "rms_nats": 0.010884181265052018,
+      "rms_rel": 0.007488943180402116,
+      "L200": 1.2943905675326817,
+      "n_points": 23,
+      "last_eval_loss": 1.2899
+     },
+     "gap_asymptote_pct": -8.265104153219465e-08,
+     "gap_at_200M_fitted_pct": -12.339842745972163,
+     "gap_at_200M_observed_pct": -12.60562834328243
+    },
+    "3": {
+     "A2s": {
+      "a": 1.0000000000173328e-06,
+      "b": 3.3462669255918964,
+      "c": 0.20343694434617848,
+      "rms_nats": 0.015436800499132911,
+      "rms_rel": 0.01194202473923426,
+      "L200": 1.1388169311805179,
+      "n_points": 23,
+      "last_eval_loss": 1.1256
+     },
+     "E27": {
+      "a": 1.000000001329477e-06,
+      "b": 3.3333616271541655,
+      "c": 0.17982218057372276,
+      "rms_nats": 0.014179906302943671,
+      "rms_rel": 0.009690886453412059,
+      "L200": 1.285621527069407,
+      "n_points": 23,
+      "last_eval_loss": 1.2804
+     },
+     "gap_asymptote_pct": -1.3121450584125995e-07,
+     "gap_at_200M_fitted_pct": -11.418959063600335,
+     "gap_at_200M_observed_pct": -12.08997188378632
+    },
+    "4": {
+     "A2s": {
+      "a": 1.000000000003118e-06,
+      "b": 3.327096494996426,
+      "c": 0.20299102152693985,
+      "rms_nats": 0.015580103788662193,
+      "rms_rel": 0.012100984049927667,
+      "L200": 1.1349710864301588,
+      "n_points": 23,
+      "last_eval_loss": 1.1224
+     },
+     "E27": {
+      "a": 1.0000000000000046e-06,
+      "b": 3.3590085710227213,
+      "c": 0.18098308739183744,
+      "rms_nats": 0.012064541194150501,
+      "rms_rel": 0.00806644035342791,
+      "L200": 1.2875691927596704,
+      "n_points": 23,
+      "last_eval_loss": 1.2849
+     },
+     "gap_asymptote_pct": 3.1139535394734874e-10,
+     "gap_at_200M_fitted_pct": -11.851643172857012,
+     "gap_at_200M_observed_pct": -12.646898591330057
+    }
+   },
+   "mean_curve_fit": {
+    "A2s": {
+     "a": 1.0000000000063417e-06,
+     "b": 3.3530432065948106,
+     "c": 0.20426091334999671,
+     "rms_nats": 0.014007208583556086,
+     "rms_rel": 0.010910304041392923,
+     "L200": 1.1361522630568055,
+     "n_points": 23
+    },
+    "E27": {
+     "a": 1.0000000000094569e-06,
+     "b": 3.3567045653783083,
+     "c": 0.1806156112385638,
+     "rms_nats": 0.011274927140323528,
+     "rms_rel": 0.007801692503189844,
+     "L200": 1.2891936090057836,
+     "n_points": 23
+    },
+    "gap_asymptote_pct": -3.113953539463791e-10,
+    "gap_at_200M_fitted_pct": -11.871090957936289
+   },
+   "pooled": {
+    "gap_asymptote_pct_mean": -7.118471733983575e-08,
+    "gap_asymptote_pct_sd": 6.650844393132397e-08,
+    "gap_at_200M_fitted_pct_mean": -11.870148327476501,
+    "gap_at_200M_fitted_pct_sd": 0.46072065253827404,
+    "gap_at_200M_observed_pct_mean": -12.447499606132936,
+    "per_seed_asymptote": [
+     -8.265104153219465e-08,
+     -1.3121450584125995e-07,
+     3.1139535394734874e-10
+    ]
+   },
+   "asymptote_identified": false,
+   "n_fits_with_a_at_lower_bound": 6,
+   "decision_rule": {
+    "asymptote_gap_minus_C209_points": 16.69999992881528,
+    "result_mechanical": "C209 needs a horizon qualifier",
+    "result": "INCONCLUSIVE: the asymptote is not identified (a sits at its lower bound in 6 of 6 fits: the curve is fitted by a pure power law, so a -> 0 and the asymptote gap is 0 by construction); the mechanical rule output is therefore not evidence"
+   },
+   "extrapolated_gap_pct_by_Mtokens": {
+    "200": -11.870324373807838,
+    "400": -13.302888756413703,
+    "1000": -15.160845149249361,
+    "10000": -19.65537842873071,
+    "100000": -23.91105579293242
+   },
+   "extra_same_metric": {
+    "asymptote_minus_fitted_200M_points": 11.870148256291785
+   }
+  },
+  "from_step_2000": {
+   "per_seed": {
+    "2": {
+     "A2s": {
+      "a": 1.0000000000262141e-06,
+      "b": 3.7552446040319674,
+      "c": 0.22744249832021346,
+      "rms_nats": 0.007853179096579,
+      "rms_rel": 0.00613792818130652,
+      "L200": 1.1253690080085719,
+      "n_points": 18,
+      "last_eval_loss": 1.1273
+     },
+     "E27": {
+      "a": 1.0000000012130024e-06,
+      "b": 3.6169299210627393,
+      "c": 0.19492439309658952,
+      "rms_nats": 0.008717648921885516,
+      "rms_rel": 0.006042324607507654,
+      "L200": 1.2877178270093372,
+      "n_points": 18,
+      "last_eval_loss": 1.2899
+     },
+     "gap_asymptote_pct": -1.1867875564127537e-07,
+     "gap_at_200M_fitted_pct": -12.607483999643987,
+     "gap_at_200M_observed_pct": -12.60562834328243
+    },
+    "3": {
+     "A2s": {
+      "a": 1.0000000158324287e-06,
+      "b": 3.8719647627296667,
+      "c": 0.23318602220040632,
+      "rms_nats": 0.009205774021485678,
+      "rms_rel": 0.007029163453816901,
+      "L200": 1.1255694739015087,
+      "n_points": 18,
+      "last_eval_loss": 1.1256
+     },
+     "E27": {
+      "a": 1.0000000531758883e-06,
+      "b": 3.6436456621871094,
+      "c": 0.19783122469915493,
+      "rms_nats": 0.010559231507744677,
+      "rms_rel": 0.007241104021382833,
+      "L200": 1.2774036491336063,
+      "n_points": 18,
+      "last_eval_loss": 1.2804
+     },
+     "gap_asymptote_pct": -3.7343457406311165e-06,
+     "gap_at_200M_fitted_pct": -11.88615480588915,
+     "gap_at_200M_observed_pct": -12.08997188378632
+    },
+    "4": {
+     "A2s": {
+      "a": 1.0000000000092216e-06,
+      "b": 3.859192308841999,
+      "c": 0.2333244973730834,
+      "rms_nats": 0.008744722413451301,
+      "rms_rel": 0.006881620449523442,
+      "L200": 1.1210337860199717,
+      "n_points": 18,
+      "last_eval_loss": 1.1224
+     },
+     "E27": {
+      "a": 1.0000000004679658e-06,
+      "b": 3.6094048124380764,
+      "c": 0.19563783072694832,
+      "rms_nats": 0.008443454649790783,
+      "rms_rel": 0.005873597328318176,
+      "L200": 1.2801904809125924,
+      "n_points": 18,
+      "last_eval_loss": 1.2849
+     },
+     "gap_asymptote_pct": -4.5874415366989155e-08,
+     "gap_at_200M_fitted_pct": -12.432266702933513,
+     "gap_at_200M_observed_pct": -12.646898591330057
+    }
+   },
+   "mean_curve_fit": {
+    "A2s": {
+     "a": 1.0000000000112913e-06,
+     "b": 3.8284945274199425,
+     "c": 0.23132016578783937,
+     "rms_nats": 0.008277716415045978,
+     "rms_rel": 0.006437212463781414,
+     "L200": 1.1239895260341612,
+     "n_points": 18
+    },
+    "E27": {
+     "a": 1.0000000171910937e-06,
+     "b": 3.623277264971491,
+     "c": 0.19612912337087016,
+     "rms_nats": 0.008440489580184014,
+     "rms_rel": 0.00584492574797976,
+     "L200": 1.2817700157498688,
+     "n_points": 18
+    },
+    "gap_asymptote_pct": -1.7179802321940753e-06,
+    "gap_at_200M_fitted_pct": -12.309578768185014
+   },
+   "pooled": {
+    "gap_asymptote_pct_mean": -1.29963297054646e-06,
+    "gap_asymptote_pct_sd": 2.108837315347172e-06,
+    "gap_at_200M_fitted_pct_mean": -12.308635169488882,
+    "gap_at_200M_fitted_pct_sd": 0.37622136899324793,
+    "gap_at_200M_observed_pct_mean": -12.447499606132936,
+    "per_seed_asymptote": [
+     -1.1867875564127537e-07,
+     -3.7343457406311165e-06,
+     -4.5874415366989155e-08
+    ]
+   },
+   "asymptote_identified": false,
+   "n_fits_with_a_at_lower_bound": 6,
+   "decision_rule": {
+    "asymptote_gap_minus_C209_points": 16.69999870036703,
+    "result_mechanical": "C209 needs a horizon qualifier",
+    "result": "INCONCLUSIVE: the asymptote is not identified (a sits at its lower bound in 6 of 6 fits: the curve is fitted by a pure power law, so a -> 0 and the asymptote gap is 0 by construction); the mechanical rule output is therefore not evidence"
+   },
+   "extrapolated_gap_pct_by_Mtokens": {
+    "200": -12.308895863096803,
+    "400": -14.421793179735067,
+    "1000": -17.13668891917867,
+    "10000": -23.583689092345963,
+    "100000": -29.527407656963828
+   },
+   "extra_same_metric": {
+    "asymptote_minus_fitted_200M_points": 12.308633869855912
+   }
+  }
+ }
+}

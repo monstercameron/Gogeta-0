@@ -1,0 +1,25 @@
+{
+  "ok": true,
+  "checks": {
+    "linux_and_unshare": true,
+    "pass_and_fail_scored": true,
+    "repo_not_visible": true,
+    "repo_not_writable": true,
+    "windows_drive_hidden": true,
+    "home_not_writable": true,
+    "home_listdir_raises": true,
+    "home_venvs_invisible": true,
+    "negative_control_fails": true,
+    "positive_control_proc_visible": true,
+    "shared_tmp_private": true,
+    "cannot_unmount_private_view": true,
+    "network_blocked": true,
+    "timeout_kills": true,
+    "setsid_descendant_killed": true,
+    "memory_capped": true,
+    "runs_as_nobody": true
+  },
+  "child_python": "/usr/bin/python3.12",
+  "platform": "linux"
+}
+rc=0

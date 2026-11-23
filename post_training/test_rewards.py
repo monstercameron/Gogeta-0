@@ -174,6 +174,61 @@ class TestFsIsolation(unittest.TestCase):
         self.assertEqual((r["ran"], r["passed"], r["total"]), (True, 0, 1), r)
 
 
+@unittest.skipUnless(IS_LINUX, "PID namespaces are Linux-only")
+class TestDescendantCleanup(unittest.TestCase):
+    """SQ61: a timed-out sample must leave no process behind, even one that called setsid to leave the process group,
+    and run_tests must return within its bounded cleanup (v0.5.47 demonstrated the escape and the hang)."""
+
+    @staticmethod
+    def _procs_with(marker):
+        out = []
+        for d in os.listdir("/proc"):
+            if d.isdigit():
+                try:
+                    with open(f"/proc/{d}/cmdline", "rb") as f:
+                        if marker.encode() in f.read():
+                            out.append(int(d))
+                except OSError:
+                    pass
+        return out
+
+    def _check(self, code_fmt, **kw):
+        marker = f"reward_setsid_probe_{os.getpid()}_{time.monotonic_ns()}"
+        t0 = time.monotonic()
+        try:
+            r = run_tests(code_fmt % marker, ["assert True"], timeout=1, **kw)
+            took = time.monotonic() - t0
+            time.sleep(0.5)
+            self.assertTrue(r["timed_out"], r)
+            self.assertLess(took, 1 + rewards._CLEANUP_S + 2, "run_tests waited on a surviving descendant")
+            self.assertEqual(self._procs_with(marker), [], "a sandboxed descendant survived the timeout kill")
+        finally:
+            for pid in self._procs_with(marker):
+                os.kill(pid, 9)
+
+    SETSID_CHILD = ("import subprocess, sys\n"
+                    "subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)  # %s'], start_new_session=True)\n"
+                    "import time\ntime.sleep(30)\n")
+    SETSID_SELF = ("import os, subprocess, sys\nos.setsid()\n"
+                   "subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)  # %s'])\n"
+                   "import time\ntime.sleep(30)\n")
+
+    def test_setsid_child_fs_namespace(self):
+        if not rewards._fs_ns_works():
+            self.skipTest("private mount namespace cannot be built here")
+        self._check(self.SETSID_CHILD, fs_isolation="require", network="require_off")
+
+    def test_harness_calls_setsid_fs_namespace(self):
+        if not rewards._fs_ns_works():
+            self.skipTest("private mount namespace cannot be built here")
+        self._check(self.SETSID_SELF, fs_isolation="require", network="require_off")
+
+    def test_setsid_child_network_only_path(self):
+        if not rewards._unshare_works():
+            self.skipTest("unshare with a PID namespace is not usable here")
+        self._check(self.SETSID_CHILD, fs_isolation="off", network="require_off")
+
+
 class TestFailClosed(unittest.TestCase):
     @staticmethod
     def _tripwire(*a, **k):

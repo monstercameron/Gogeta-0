@@ -21,3 +21,6 @@ The first SQ6 output (all arms about 50%) was invalid and was superseded; the ag
 
 ### 2026-11-22 17:19 · v0.4.6 · Ledger and decisions
 C22 REFUTED at our scale; C43 added VERIFIED (parity, 2 seeds): a one-flag change to GDN does what the loop was supposed to do for state tracking and length-generalises. Decision (proposed): test neg-eig GDN for language modelling (E11) and inside the looped core before more loop work. Commit 17:19:34. (Source: DEVLOG v0.4.6; LABNOTEBOOK; claims.md verdicts)
+
+### 2026-11-22 19:30 · v0.4.59 · Claim audit triage
+C18, C43 (n=2 seeds) and C44 (2 distinct seeds, two protocols) downgraded VERIFIED to PARTIAL under the statistics policy; C22 stays REFUTED, requalified as the local analogue [exploratory n=2]. (Source: notes/reviews/claims/2026-11-22-1902-b1/b5/b6/b7.md Triage)

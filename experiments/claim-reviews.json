@@ -1,0 +1,341 @@
+{
+ "cooldown_hours": 6,
+ "reviews": [
+  {
+   "id": "C106",
+   "ts": "2026-11-22T19:14:42-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b1.md",
+   "verdict": "SOLID",
+   "note": "sandbox probes 11/11; not a security boundary"
+  },
+  {
+   "id": "C95",
+   "ts": "2026-11-22T19:14:42-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b1.md",
+   "verdict": "SOLID",
+   "note": "param/FLOP comparison matches registry"
+  },
+  {
+   "id": "C18",
+   "ts": "2026-11-22T19:14:42-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b1.md",
+   "verdict": "WEAK",
+   "note": "n=2 seeds; looped model fails length generalisation"
+  },
+  {
+   "id": "C8",
+   "ts": "2026-11-22T19:14:42-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b1.md",
+   "verdict": "WEAK",
+   "note": "K9 near-dup val is not clean held-out"
+  },
+  {
+   "id": "C2",
+   "ts": "2026-11-22T19:14:42-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b1.md",
+   "verdict": "SOLID",
+   "note": "SQ70 keyword-call errors within tolerance"
+  },
+  {
+   "id": "C83",
+   "ts": "2026-11-22T19:14:42-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b1.md",
+   "verdict": "WEAK",
+   "note": "network-isolation fallback not in limitations"
+  },
+  {
+   "id": "C130",
+   "ts": "2026-11-22T19:14:42-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b2.md",
+   "verdict": "SOLID",
+   "note": "trace and fp32 caveat recorded"
+  },
+  {
+   "id": "C84",
+   "ts": "2026-11-22T19:14:42-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b2.md",
+   "verdict": "SOLID",
+   "note": "computed-not-measured caveat kept"
+  },
+  {
+   "id": "C17",
+   "ts": "2026-11-22T19:14:42-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b2.md",
+   "verdict": "WEAK",
+   "note": "K4 scored on contaminated val; no K9 limitation"
+  },
+  {
+   "id": "C7",
+   "ts": "2026-11-22T19:14:42-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b2.md",
+   "verdict": "SOLID",
+   "note": "single-seed and K9 caveats recorded"
+  },
+  {
+   "id": "C128",
+   "ts": "2026-11-22T19:14:42-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b2.md",
+   "verdict": "SOLID",
+   "note": "documented-only half separated"
+  },
+  {
+   "id": "C10",
+   "ts": "2026-11-22T19:14:42-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b2.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "9.46M count not in cited model.py"
+  },
+  {
+   "id": "C111",
+   "ts": "2026-11-22T19:14:43-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b3.md",
+   "verdict": "SOLID",
+   "note": "SQ70 tolerances met"
+  },
+  {
+   "id": "C82",
+   "ts": "2026-11-22T19:14:43-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b3.md",
+   "verdict": "SOLID",
+   "note": "CPU plumbing scope kept"
+  },
+  {
+   "id": "C15",
+   "ts": "2026-11-22T19:14:43-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b3.md",
+   "verdict": "WRONG",
+   "note": "K1 SWA mem exponent 1.953 contradicts combined claim"
+  },
+  {
+   "id": "C6",
+   "ts": "2026-11-22T19:14:43-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b3.md",
+   "verdict": "WEAK",
+   "note": "single seed on contaminated val"
+  },
+  {
+   "id": "C80",
+   "ts": "2026-11-22T19:14:43-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b3.md",
+   "verdict": "SOLID",
+   "note": "CPU attn/SWA scope"
+  },
+  {
+   "id": "C4",
+   "ts": "2026-11-22T19:14:43-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b3.md",
+   "verdict": "WEAK",
+   "note": "test does one backward pass, no optimizer updates"
+  },
+  {
+   "id": "C110",
+   "ts": "2026-11-22T19:14:44-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b4.md",
+   "verdict": "SOLID",
+   "note": "positional inf vs keyword errors recorded"
+  },
+  {
+   "id": "C81",
+   "ts": "2026-11-22T19:14:44-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b4.md",
+   "verdict": "SOLID",
+   "note": "CPU scope explicit"
+  },
+  {
+   "id": "C14",
+   "ts": "2026-11-22T19:14:44-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b4.md",
+   "verdict": "SOLID",
+   "note": "K2 slowdowns match"
+  },
+  {
+   "id": "C5",
+   "ts": "2026-11-22T19:14:44-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b4.md",
+   "verdict": "WEAK",
+   "note": "label exploratory single-run contaminated-val lead"
+  },
+  {
+   "id": "C103",
+   "ts": "2026-11-22T19:14:44-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b4.md",
+   "verdict": "SOLID",
+   "note": "counts match contamination JSON"
+  },
+  {
+   "id": "C3",
+   "ts": "2026-11-22T19:14:44-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b4.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "test asserts tolerances, no saved exact-zero output"
+  },
+  {
+   "id": "C109",
+   "ts": "2026-11-22T19:14:45-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b5.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "upstream lm-eval source not in evidence"
+  },
+  {
+   "id": "C44",
+   "ts": "2026-11-22T19:14:45-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b5.md",
+   "verdict": "WEAK",
+   "note": "only two distinct seeds"
+  },
+  {
+   "id": "C13",
+   "ts": "2026-11-22T19:14:45-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b5.md",
+   "verdict": "SOLID",
+   "note": "7.8x body / 3.1x whole contradict 10x"
+  },
+  {
+   "id": "C92",
+   "ts": "2026-11-22T19:14:45-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b5.md",
+   "verdict": "WEAK",
+   "note": "LR selected on contaminated val"
+  },
+  {
+   "id": "C101",
+   "ts": "2026-11-22T19:14:45-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b5.md",
+   "verdict": "SOLID",
+   "note": "E0 protocol gap matches JSON"
+  },
+  {
+   "id": "C1",
+   "ts": "2026-11-22T19:14:45-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b5.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "error values not in a run artifact"
+  },
+  {
+   "id": "C108",
+   "ts": "2026-11-22T19:14:47-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b6.md",
+   "verdict": "WEAK",
+   "note": "one-seed refutation is exploratory"
+  },
+  {
+   "id": "C43",
+   "ts": "2026-11-22T19:14:47-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b6.md",
+   "verdict": "WEAK",
+   "note": "2 seeds, one task, length 128"
+  },
+  {
+   "id": "C131",
+   "ts": "2026-11-22T19:14:47-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b6.md",
+   "verdict": "WEAK",
+   "note": "one split does not establish any random split"
+  },
+  {
+   "id": "C100",
+   "ts": "2026-11-22T19:14:47-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b6.md",
+   "verdict": "WEAK",
+   "note": "GDN untested; tiny attn/SWA only"
+  },
+  {
+   "id": "C28",
+   "ts": "2026-11-22T19:14:47-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b6.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ4 never ran; keep UNVERIFIED"
+  },
+  {
+   "id": "C12",
+   "ts": "2026-11-22T19:14:47-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b6.md",
+   "verdict": "SOLID",
+   "note": "K1 SWA exponents match"
+  },
+  {
+   "id": "C105",
+   "ts": "2026-11-22T19:14:47-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b7.md",
+   "verdict": "SOLID",
+   "note": "sandbox finding recorded"
+  },
+  {
+   "id": "C22",
+   "ts": "2026-11-22T19:14:47-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b7.md",
+   "verdict": "WEAK",
+   "note": "local analogue refuted, external claim untested"
+  },
+  {
+   "id": "C11",
+   "ts": "2026-11-22T19:14:47-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b7.md",
+   "verdict": "SOLID",
+   "note": "machine-specific fix recorded"
+  },
+  {
+   "id": "C107",
+   "ts": "2026-11-22T19:14:47-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b7.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "VERIFIED cites K9 overlap, not exec results"
+  },
+  {
+   "id": "C91",
+   "ts": "2026-11-22T19:14:47-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b7.md",
+   "verdict": "SOLID",
+   "note": "PARTIAL fits; caveat wording stale"
+  },
+  {
+   "id": "C129",
+   "ts": "2026-11-22T19:14:47-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b7.md",
+   "verdict": "SOLID",
+   "note": "SQ71 queued"
+  },
+  {
+   "id": "C104",
+   "ts": "2026-11-22T19:14:48-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b8.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "no primary pointer to the paper's decontamination text"
+  },
+  {
+   "id": "C20",
+   "ts": "2026-11-22T19:14:48-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b8.md",
+   "verdict": "SOLID",
+   "note": "K6 rel change 0.0848 fails <0.05"
+  },
+  {
+   "id": "C9",
+   "ts": "2026-11-22T19:14:48-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b8.md",
+   "verdict": "SOLID",
+   "note": "arithmetic matches; computed caveat kept"
+  },
+  {
+   "id": "C94",
+   "ts": "2026-11-22T19:14:48-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b8.md",
+   "verdict": "SOLID",
+   "note": "K9 supports refutation"
+  },
+  {
+   "id": "C90",
+   "ts": "2026-11-22T19:14:48-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b8.md",
+   "verdict": "SOLID",
+   "note": "K7-parity counts match"
+  },
+  {
+   "id": "C127",
+   "ts": "2026-11-22T19:14:48-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-22-1902-b8.md",
+   "verdict": "WEAK",
+   "note": "ISA facts vs compiler/kernel compatibility not separated"
+  }
+ ]
+}

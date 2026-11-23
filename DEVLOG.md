@@ -17,6 +17,38 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.61: Claim audit 2026-11-22-1902: 23 findings verified, 5 VERIFIED claims downgraded
+*2026-11-22*
+
+### Hourly claim audit 2026-11-22-1902 (AGENTS §0d-ter; first run)
+**What**: 8 read-only Codex GPT-6 Luna auditors ran in parallel over 48 claims (settled first), each in 1.5–3.7 min, with no failures. Verdicts: **25 SOLID, 15 WEAK, 7 NEEDS-EVIDENCE, 1 WRONG.** Every non-SOLID finding was checked against the primary files by a verifier subagent (Opus), then spot-checked by the main agent. All changes went in as ledger events through the API. Audit files with `## Triage` footers are in `notes/reviews/claims/2026-11-22-1902-b1…b8.md`.
+
+**Downgrades:**
+- VERIFIED → PARTIAL:
+  - **C18** (looping solves parity: n=2 seeds, and neg-eig GDN solves it in one pass);
+  - **C8** (compression ratio on contaminated val; exploratory n=1);
+  - **C43** (neg-eig parity: n=2 seeds);
+  - **C44** (2 seeds, 2 protocols);
+  - **C100** (harness wiring, tested on attention/SWA only).
+- **C127** → UNVERIFIED: the PTX doc covers instructions only, and the Triton and FA3/FA4 compatibility parts were inferences.
+- C5, C6 and C92 are re-qualified as PARTIAL [exploratory n=1, K9-contaminated].
+- C108 and C22 stay REFUTED, with an exploratory tag.
+- **C15 → SUPERSEDED** by **C190**. C15 bundled GDN (fixed memory, true) with SWA (K1: memory exponent 1.953, false). C190 states the GDN half alone, VERIFIED from K1.
+- **C107's misfiled K9 row** was split out as **C191** ("the val split is exact-dedup only", VERIFIED from K9.json and `tools/prepare_data.py:9`); C107 reverted to PARTIAL.
+
+**Strengthened with pointers:** C10, C3, C1 and C109 got evidence events and stay VERIFIED. C109 was re-read in the installed lm-eval 0.4.13 YAML.
+**Auditor errors caught:** C107's limit-8 eval JSON isn't empty (pass@1 0.875 on 8 of 2,555 problems). C108 → PARTIAL would contradict the policy, which keeps REFUTED.
+**Result**: claims-status is now **18 VERIFIED (was 23), 20 PARTIAL, 6 REFUTED, 2 WRONG FOR OUR CODE, 72 UNVERIFIED, 1 SUPERSEDED; 119 claims.** All 48 verdicts are recorded as `audit_verdict` events and in `claim-reviews.json`, putting those claims in their 6-hour cool-down (71 due next hour). Lint: 0 fail, 0 warn.
+**Notes**:
+- The events carry version stamp v0.4.59 (the verifier's working version); they're committed here in v0.4.61.
+- The actor is `subagent:main-agent-verifier`, as the lint requires.
+- Unresolved: C104 needs the OpenCoder paper in refs; C127 needs a local probe.
+
+### Quick review 19:16 (code-model practitioner, Codex)
+The repo-edit generate-and-test benchmark was rejected because it floors near 0 at 13M (C102). It's accepted in modified form as **SQ210**, a patch-likelihood probe on SQ99's out-of-corpus pool.
+
+---
+
 ## v0.4.60: Coarse-to-fine architecture analysis; MambaByte speculative decoding research
 *2026-11-22*
 

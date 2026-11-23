@@ -18,6 +18,32 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.9: Outside review 12:40: side quests pruned to decision nodes D1-D6 (34 parked); loop go/no-go rule (disclosed post-hoc); data gate for E61
+*2026-11-23*
+
+**Outside review 12:40 (Haiku) and quick reviews 12:29, 12:34 and 12:39, triaged. The side-quest log is pruned around decision nodes, and a loop go/no-go rule for the final model is written down.**
+
+- **Decision nodes:** D1-D6 now head `experiments/side-quests.md`:
+  - D1: assembled model vs unshared GDN at matched FLOPs;
+  - D2: does ternary buy anything;
+  - D3: is looping worth more than unique params;
+  - D4: batch-1 decode on a 3090/4090;
+  - D5: transfer and the data gate;
+  - D6: safe code execution.
+  The byte / coarse-to-fine track the human asked about stays open.
+- **Pruning:** 34 open rows that move no node are parked with a reason (MoE research, most of the KDA family, SQ7, the E2 looped-core fixes, the hardware micro-benchmarks). They are not deleted, and each can be un-parked with a reason.
+- **Loop go/no-go rule (A2 amendment 2), disclosed as written after A2 seeds 2 and 4 were seen.** Loops stay in the final model's default only if the full-precision assembled model A2f beats the unshared GDN hybrid E24 by >= 1% at matched FLOPs. Otherwise they survive only as a decode-time option (SQ362) or as the byte-refinement loop (E14). The seen seed (A2f -3.7% behind E24) makes "loops leave E61's default" the likely outcome, and that is stated in advance.
+- **Data gate (SQ376):** v2 has about 0.2B tokens, and a 1.2B final model needs about 20B+. Data binds the final run before compute, so code-py-v3 (human download approval) is a prerequisite for E61.
+- **New:** SQ375 (CUDA-graph decode), SQ376 (data gate from existing curves), SQ377 (block duplication at inference on unlooped checkpoints).
+- **Rejected:**
+  - the FLOP audit, done in v0.5.3, and A2's counts are exact;
+  - the matched-applications ladder, merged into A3;
+  - throughput telemetry, covered by SQ79 (now parked);
+  - a v2 val dedup scan, covered by v2's 13-gram build rule and the K9-based clean80 scoring set.
+- **Goal-6 order** (12:34): test the 3090 (sm_86) and 4090 (sm_89) in one rental (SQ285), the 3090 first if only one is possible.
+
+---
+
 ## v0.5.8: Docs refresh (hourly)
 *2026-11-23*
 

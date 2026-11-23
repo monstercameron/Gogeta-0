@@ -1,0 +1,14 @@
+# Quick review 2026-11-23-1234 - systems/hardware engineer (Codex GPT-6 Luna high)
+
+- **Observation:** The A2 wave had six boxes training, while one setup failed during the Torch download; its two jobs were requeued and the failed box cost $0.12. That makes setup reliability part of the campaign’s effective throughput. (DEVLOG.md, v0.5.6)
+- **Observation:** The final plan targets 3090/4090 inference, but recurrent decode and head dimension 128 are still untested on those cards. The reported 0.036 ms decode step is from sm_121, so it does not establish the target-card latency. (notes/final-model-plan.md; C111)
+- **Observation:** “Fixed recurrent state” does not mean fixed peak memory: C190 records a memory exponent of 0.976, and streaming equality was checked only at a chunk boundary. Keep state size and total activation memory as separate measurements. (C190)
+
+- **Idea — captured decode graph:** **Hypothesis [speculation]:** CUDA graph capture reduces launch overhead enough to improve batch-1 decode latency on the verified recurrent path. **Cheapest test:** compare eager and captured decode for a 13M model over 256 tokens, checking output parity and p50 latency; about 5 GPU-minutes. **Change the plan if:** latency improves by at least 15% with matching outputs; then include capture in serving work.
+- **Idea — throughput variance log:** **Hypothesis [speculation]:** GPU clock or thermal variation adds enough noise to obscure small throughput differences between runs. **Cheapest test:** run one fixed 13M config three times while logging tokens/sec, clock and temperature; about 6 GPU-minutes. **Change the plan if:** throughput varies by more than 5%; record telemetry with campaign results and control for it in wall-time comparisons.
+
+**Question for the main agent:** Which deployment gate comes first: recurrent decode on the RTX 3090 (sm_86) or RTX 4090 (sm_89)?
+## Triage
+- Captured decode graph: accepted as SQ375 (goal-6 serving track, after SQ285's sm_86/sm_89 kernel check, since a captured graph is only worth measuring on a path known to run on the target cards).
+- Throughput variance log: rejected as covered, the same idea as the 08:44 review. SQ79 specifies passive telemetry (clocks, power, temperature, throttle reasons) during a campaign, and wall-time comparisons are read within boxes. A1's equal-wall-clock check (v0.5.5) and the A2 wave both carry the host-noise caveat.
+- Question (which deployment gate comes first, 3090 sm_86 or 4090 sm_89?): both in one rental (SQ285, one box each, about 15 minutes). If only one is possible, the 3090 (sm_86) comes first: it is the older architecture with the narrower Triton/fla support and no FP8, so a kernel that runs there almost always runs on sm_89, but not the other way round. It also has less memory bandwidth, which bounds batch-1 decode speed for goal 6.

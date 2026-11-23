@@ -18,8 +18,31 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.86: Docs refresh (hourly); date errata (v0.4.85 and wave-6 headers); SQ299 from quick review
+*2026-11-22*
+
+**Docs refresh (hourly, Haiku subagent; diff checked by the main agent):**
+- **README:**
+  - the status paragraph and the "Scale, so far" bullet now carry the SQ243/SQ241 results (C198 PARTIAL);
+  - quick links gain the final-model plan;
+  - the Byte Quest section no longer says "No byte run has started" (main-agent fix): the SQ188 LR check picked 3e-3 and the E13 sweep is running.
+- **`notes/sketch.md` status:** updated to v0.4.85; the claim counts are now 23 PARTIAL of 126.
+- **`experiments/launch/campaigns/README.md`:**
+  - lists the two watchdog resume campaigns, not run because of the operator hold;
+  - says `--lr` is passed through (Q2 done).
+- **One agent sentence replaced:** "F2 ... not mentioned in v0.4.85" now says F2 is queued after SQ282/SQ283 and the SQ263 gate.
+
+**Date errata.** The local clock is EST. The cloud boxes log in UTC, and several labels were written an hour or more ahead:
+- **v0.4.85** was dated 2026-11-23; it was committed 2026-11-22 23:31 EST. Fixed in its DEVLOG date line, the `notes/sketch.md` decision lines, and E61's note.
+- **The "outside review 2026-11-23 00:10"** (v0.4.84) was written at about 23:10 EST on 2026-11-22, and its file name `notes/reviews/2026-11-23-0010-review.md` is wrong. The three side-quest citations now say 2026-11-22 ~23:10, and the file keeps its name so existing links still work.
+- **The wave-6 part 3/4 registration headers** in `experiments/checks/PREDICTIONS.md` give 00:20/00:30. The commits are `2526428`/`9b78441` at 23:11/23:12 EST, before any of those jobs were dispatched. An erratum is appended there and the registered text is unchanged.
+
+**Quick review 23:33 (data engineer, Codex):** SQ299, a v3 build drop ledger (by source, licence and reason) with hard-fail split-disjointness asserts, recorded in the v3 manifest. Triage is in the review file.
+
+---
+
 ## v0.4.85: Goal 6: a final model on a 24 GB RTX 3090/4090 (plan, E61); SQ243 width effect (C198); SQ241; byte LR 3e-3; corpus v3 plan
-*2026-11-23*
+*2026-11-22*
 
 **New goal 6 (the human's request): ship the final model on a gaming GPU.** End the experiments with one model that runs batch-1 inference with a KV/state cache and lossless speculative decoding on a single 24 GB RTX 3090 or 4090. Added to the goals in DEVLOG and README; goal 5 now says the experiments run locally *or on cheap rented GPUs*.
 - **Plan:** `notes/final-model-plan.md` (planning subagent; the main agent re-derived the headline numbers).

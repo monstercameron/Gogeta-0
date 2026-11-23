@@ -624,3 +624,8 @@ Source: outside review 2026-11-23 00:10. C197's limitation (event 4): E34, which
   - **R1:** E32 beats E2 by ≥ 10% on the 4-seed means, so the C197 gap replicates.
   - **R2:** E32 beats the E1 7-seed mean by ≥ 5%.
 - **Queue order (changed, not a registration change):** wave 6 (SQ200/SQ234 init, Inkling SQ266/SQ271, SQ238), then SQ282/SQ283, then SQ263 (the 200M factorial gate), then F2. **E60 is gated** on SQ282 and SQ238 (the review argues E60's prior rests on width).
+
+## Erratum (v0.4.86): wall-clock labels in wave-6 parts 3 and 4
+- The headers "Fleet wave 6, part 3 (2026-11-23 ~00:20 ...)" and "part 4 (2026-11-23 ~00:30 ...)" carry wrong times. The git commits that added them are `2526428` (2026-11-22 23:11 EST) and `9b78441` (23:12 EST); the outside review they cite was written at about 23:10 EST (its file `notes/reviews/2026-11-23-0010-review.md` is misnamed). The cloud boxes log in UTC, which is the likely source of the confusion.
+- Both commits precede every SQ266/SQ271/SQ282/SQ283 dispatch (wave-6 jobs started after 23:17 EST, box logs 04:17 UTC and later), so "registered before dispatch" holds by git. The header text is left as registered.
+

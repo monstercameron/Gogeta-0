@@ -479,6 +479,6 @@
     "version": null,
     "config": "to be staged after M2 (notes/final-model-plan.md section 4)",
     "results": {},
-    "notes": "Human goal 2026-11-23: final model with caching and speculative decoding on a 24 GB 3090/4090. Plan and milestones M1-M5 in notes/final-model-plan.md; final training (~$500-650 for G-1B) needs the human's approval. Binding constraint is training compute and unique tokens, not VRAM."
+    "notes": "Human goal 2026-11-22: final model with caching and speculative decoding on a 24 GB 3090/4090. Plan and milestones M1-M5 in notes/final-model-plan.md; final training (~$500-650 for G-1B) needs the human's approval. Binding constraint is training compute and unique tokens, not VRAM."
   }
 ]

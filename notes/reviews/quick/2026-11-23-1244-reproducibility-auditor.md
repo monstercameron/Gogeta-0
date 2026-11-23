@@ -1,0 +1,15 @@
+# Quick review 2026-11-23-1244 - reproducibility auditor (Codex GPT-6 Luna high)
+
+- **Observation:** The ledger has 131 claims, including 71 `UNVERIFIED`; several definitions still lack scope or refutation criteria. Those gaps make later checks harder to reproduce consistently. (`experiments/claims-status.md`)
+- **Observation:** C80 is marked `VERIFIED`, but its 10/10 and 6/6 pass counts are recorded only in prose; saved test output is still pending. C3 also notes missing saved output for its exactness claim. (C80, C3; `experiments/claims-status.md`)
+- **Observation:** The loop go/no-go rule is disclosed as written after A2 seeds 2 and 4 were seen, and the observed seed already points against the rule. Treat that decision as post-hoc evidence, not a preregistered confirmatory result. (`DEVLOG.md`, v0.5.9)
+
+- **Idea:** [speculation] A compact provenance check could catch run folders whose recorded code, config, seed, or dataset digest does not match the registration. **Cheapest test:** CPU-only, about 5 minutes; audit one 13M-scale run folder against its registry entry and manifest. **Change the plan if:** any mismatch is found; quarantine affected results and add the check to the run-ingest path.
+- **Idea:** A ledger evidence check could flag `VERIFIED` claims whose cited output is missing or does not contain the stated numbers. **Cheapest test:** CPU-only, about 10 minutes; check C80 and C3’s cited artifacts. **Change the plan if:** either claim lacks durable supporting output; add an evidence limitation or status correction before relying on it.
+
+**Question for the main agent:** Is the A2 loop go/no-go rule’s post-hoc timing recorded in the claim evidence as well as the devlog?
+## Triage
+- Observation on C80: out of date. The saved output exists (`experiments/checks/results/test-runs/2026-11-23-C100-C80.txt`, cited in C80's ledger), and claim audit 1037 rated C80 SOLID on it. C3's evidence is the GPU rerun JSON (`experiments/checks/results/C3.json`, 12/12 checks); its open note concerns exactness output, not missing evidence.
+- Run-provenance check at ingest: merged into SQ274 (release-lint evidence and commit-provenance check). The A1 analysis already asserts registered commit, clean tree and v2 per run (v0.5.3), and A2's will too. SQ274 generalises that to every result that enters the ledger.
+- Ledger evidence check (cited output must exist and contain the stated numbers): merged into SQ274 as well. The "file exists" half is already enforced by `claims_list.py` ("never cite evidence that isn't on disk"); the "numbers match" half is SQ274's evidence-value check.
+- Question (is the loop rule's post-hoc timing recorded beyond the devlog?): yes. The disclosure is in the rule itself (PREDICTIONS, "A2 amendment 2", first bullet), which lists exactly which A2 scores had been seen. No claim rests on that rule yet. When E61's design cites it, the claim's limitations will repeat the disclosure, and the confirmatory evidence will be A2's registered P4 (A2f vs E24), which was fixed before dispatch.

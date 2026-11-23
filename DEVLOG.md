@@ -18,6 +18,43 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.10: A2 confirmed: assembled model -16.7% vs full fusion, full-precision version ties dense; human: keep all parts -> A3 (MoE core + ternary scope) registered
+*2026-11-23*
+
+**A2 reads out on all its registered predictions; the human asks for every part to stay. A3 is registered: MoE rescues the loop, and full-precision scope removes ternary's cost.**
+
+**A2, the assembled model** (fresh seeds 2-4, 200M tokens of code-py-v2, clean80 paired by seed; `experiments/checks/a2_assembled.py`, provenance OK). Every registered prediction landed in its range:
+
+| Comparison | Result | 95% CI | Prediction |
+|---|---|---|---|
+| **P1** assembled A2s vs full fusion E27 | **-16.7%** | [-17.7, -15.6] | -17% (in range) |
+| **P2** A2s vs dense E20 | +8.6% | [+8.1, +9.1] | +10% (in range) |
+| **P3** ternary inside the stack (A2s vs A2f) | +9.5% | [+8.3, +10.7] | +7% (in range) |
+| A2f (full-precision assembled) vs dense E20 | **-0.9%** | n = 3 | competitive |
+| **P4** A2f vs unshared GDN E24 | +3.5% | [+2.3, +4.8] (2 seeds; seed 3 pending) | +6% (in range) |
+| **P5** per-pass adapters (A2a vs A2s) | -0.1% | [-0.2, +0.1] | no effect |
+| **A1e alone** (ternary core only) vs E27, fresh seeds | **-7.6%** | [-8.1, -7.0] | -6% (confirmed) |
+
+- **Decisions:**
+  - The stack is **confirmed**: the A1 winners add up to -16.7% at matched FLOPs.
+  - The full-precision assembled model is **competitive with dense** per FLOP, with 39% fewer non-embedding params (15.1M vs 24.8M).
+  - The adapters are not adopted.
+  - The two remaining costs are ternary (+9.5%) and loops vs the unshared GDN stack (+3.5%).
+- **Human decision:** "I want all the parts assembled and their issues designed around or fixed!" Every ingredient stays. A2 amendment 2's loop go/no-go default is superseded; its comparison is reported as a cost to fix.
+- **A3, all parts** (registered before dispatch, fresh seeds 5-7):
+  - **A3m:** a ternary MoE FFN in the shared core (4 x 512, top-2), the same active FLOPs with more unique params. This is the loop rescue E60 stage 2 had planned.
+  - **A3x / A3y:** mixers or FFN kept in full precision, to locate ternary's cost.
+  - **A3mx:** all parts combined.
+  - **References:** A2s, A2f, E20, E24 on the same seeds.
+  - **Predictions:** MoE -3%; full-precision mixers -5%; full-precision FFN -3%; all parts -8% vs A2s, within about 1% of E24.
+- **Code** (off by default, bit-identical): MoE experts now support ternary (BitLinear-style fake quantisation with STE; this used to raise), plus `moe_core_only`, `ternary_mixer` and `ternary_ffn`. Tests: `tests/test_assembly.py` 12/12 and `tests.test_moe` 15/15 on CPU. The old "MoE + ternary raises" assertion is replaced by its new behaviour.
+- **A2 fleet:**
+  - 6 boxes ran; box 3 runs at about 89k tokens/s (4x slower than the rest), so its A2a seed 2 / E24 seed 3 pair finishes last.
+  - The A1 re-runs (A1i, A1z, A1k, A1b, A1f) are finishing and get analysed with the next version.
+  - Boxes are destroyed as they finish; wave spend so far is about $3.
+
+---
+
 ## v0.5.9: Outside review 12:40: side quests pruned to decision nodes D1-D6 (34 parked); loop go/no-go rule (disclosed post-hoc); data gate for E61
 *2026-11-23*
 

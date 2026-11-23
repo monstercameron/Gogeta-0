@@ -103,3 +103,40 @@ def test_loop_adapter_backprops():
     _, loss = m(x, targets=x, loops=3)
     loss.backward()
     assert m.adapt_up.grad is not None and m.adapt_up.grad.abs().sum() > 0
+
+
+def test_moe_with_ternary_experts_builds_quantises_and_backprops():
+    from gogeta.moe import MoEFFN
+    m = build(ternary=True, moe_experts=4, moe_top_k=2, moe_hidden=32).train()
+    moes = [x for x in m.modules() if isinstance(x, MoEFFN)]
+    assert moes and all(x.ternary for x in moes)
+    x = torch.randint(0, 97, (2, 16))
+    _, loss = m(x, targets=x, loops=2)
+    loss.backward()
+    assert moes[0].w_up.grad is not None and moes[0].w_up.grad.abs().sum() > 0
+    # quantisation changes the forward pass relative to the same weights in full precision
+    m.eval(); a = out(m); set_ternary_quant(m, False); b = out(m)
+    assert not torch.allclose(a, b)
+    assert set_ternary_quant(m, True) >= len(moes)
+
+
+def test_moe_core_only_keeps_swiglu_in_prelude_and_coda():
+    from gogeta.model import SwiGLU
+    from gogeta.moe import MoEFFN
+    m = build(moe_experts=4, moe_top_k=2, moe_hidden=32, moe_core_only=True)
+    assert all(isinstance(b.mlp, SwiGLU) for b in [*m.prelude, *m.coda])
+    assert all(isinstance(b.mlp, MoEFFN) for b in m.core)
+    assert "moe_core_only" in ModelConfig(**BASE, moe_experts=4, moe_core_only=True).to_dict()
+
+
+def test_ternary_scope_mixer_vs_ffn():
+    m = build(ternary=True, ternary_mixer=False)
+    for b in m.core:
+        assert not any(isinstance(x, BitLinear) for x in b.mixer.modules())
+        assert any(isinstance(x, BitLinear) for x in b.mlp.modules())
+    m = build(ternary=True, ternary_ffn=False)
+    for b in m.core:
+        assert any(isinstance(x, BitLinear) for x in b.mixer.modules())
+        assert not any(isinstance(x, BitLinear) for x in b.mlp.modules())
+    d = ModelConfig(**BASE).to_dict()
+    assert "ternary_mixer" not in d and "ternary_ffn" not in d and "moe_core_only" not in d

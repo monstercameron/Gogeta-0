@@ -332,8 +332,8 @@ class TestMoE(unittest.TestCase):
         self.assertAlmostEqual(moe.w_up.std().item() / 0.02, 1.0, delta=0.02)
         self.assertAlmostEqual(moe.w_down.std().item() / std_res, 1.0, delta=0.02)
         self.assertAlmostEqual(moe.router.weight.std().item() / 0.02, 1.0, delta=0.1)
-        with self.assertRaises(ValueError):
-            FusionDance(ModelConfig(**{**TINY_MOE, "ternary": True}))
+        # v0.5.10 (A3): MoE with ternary is supported (BitLinear-style fake-quantised experts); it used to raise
+        self.assertTrue(all(b.mlp.ternary for b in FusionDance(ModelConfig(**{**TINY_MOE, "ternary": True})).prelude if b.moe))
         with self.assertRaises(ValueError):
             FusionDance(ModelConfig(**{**TINY_MOE, "moe_top_k": 5}))
         with self.assertRaises(ValueError):

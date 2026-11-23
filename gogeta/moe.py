@@ -53,6 +53,21 @@ class MoEFFN(nn.Module):
         self.router = nn.Linear(d, E, bias=False)
         if cfg.moe_router_frozen:
             self.router.weight.requires_grad_(False)
+        # Ternary experts (A3, v0.5.10): BitLinear-style fake quantisation of each expert's weight matrices (absmean
+        # ternary, STE) and, with ternary_acts, per-token int8 absmax activations. The router stays full precision.
+        self.ternary = bool(getattr(cfg, "ternary", False)) and bool(getattr(cfg, "ternary_ffn", True))
+        self.quant_acts = bool(getattr(cfg, "ternary_acts", True))
+        self.quant_on = True
+
+    @staticmethod
+    def _tq(w: torch.Tensor) -> torch.Tensor:   # absmean ternary per matrix, straight-through
+        s = w.abs().mean().clamp(min=1e-5)
+        return w + ((w / s).round().clamp(-1, 1) * s - w).detach()
+
+    @staticmethod
+    def _aq(x: torch.Tensor) -> torch.Tensor:   # per-token int8 absmax, straight-through
+        s = 127.0 / x.abs().amax(dim=-1, keepdim=True).clamp(min=1e-5)
+        return x + ((x * s).round().clamp(-128, 127) / s - x).detach()
 
     @torch.no_grad()
     def reset_parameters(self, std: float, std_res: float):
@@ -77,6 +92,14 @@ class MoEFFN(nn.Module):
         return logits, probs, top_i, gates
 
     def _expert(self, e: int, xe: torch.Tensor) -> torch.Tensor:
+        if self.ternary and self.quant_on:
+            if self.quant_acts:
+                xe = self._aq(xe)
+            a, b = torch.matmul(xe, self._tq(self.w_up[e])).chunk(2, dim=-1)
+            hdn = F.silu(a) * b
+            if self.quant_acts:
+                hdn = self._aq(hdn)
+            return torch.matmul(hdn, self._tq(self.w_down[e]))
         a, b = torch.matmul(xe, self.w_up[e]).chunk(2, dim=-1)
         return torch.matmul(F.silu(a) * b, self.w_down[e])
 

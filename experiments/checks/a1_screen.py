@@ -26,7 +26,7 @@ PRED = {"A1a": (-0.015, -0.04, 0.005), "A1b": (-0.005, -0.02, 0.005), "A1c": (-0
 def gather():
     base = os.path.expanduser("~/fusiondance-data/cloud/fleet")
     out = []
-    for d in sorted(glob.glob(f"{base}/gogeta-cockpit-a1-*/fusiondance-data/runs/A1*")):
+    for d in sorted(glob.glob(f"{base}/gogeta-cockpit-a[12]-*/fusiondance-data/runs/A1*")):
         s = json.load(open(os.path.join(d, "summary.json")))
         name, m = os.path.basename(d), s.get("metrics", {})
         dl = glob.glob(f"{base}/*/Gogeta-0/experiments/stats/doclevel/{name}.json")
@@ -45,9 +45,10 @@ def gather():
 
 
 def main():
-    runs = [r for r in json.load(open(os.path.join(RES, "a1_runs.json")))["runs"] if r["clean80"] and r["tokens"] and r["tokens"] > 1e8]
+    runs = [r for r in json.load(open(os.path.join(RES, "a1_runs.json")))["runs"] if r["clean80"] and r["tokens"] and r["tokens"] > 1e8
+            and r["seed"] in (0, 1)]  # the screen is seeds 0-1; A1e seeds 2-4 belong to A2 amendment 1
     # provenance (quick review 11:39): registered commits only, clean tree, code-py-v2
-    ok_commits = ("36acccc", "482af19")
+    ok_commits = ("36acccc", "482af19", "f85ada5")  # f85ada5: A1 re-runs in the A2 wave (v0.5.4)
     bad = [r["run"] for r in runs if not str(r.get("git") or "").startswith(ok_commits)
            or "dirty" in str(r.get("git_describe") or "") or r.get("dataset") != "code-py-v2"]
     print("provenance:", "OK" if not bad else f"MISMATCH {bad}")

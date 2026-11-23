@@ -776,3 +776,32 @@ Prompted by outside review 2026-11-23 12:10 (`notes/reviews/2026-11-23-1210-revi
 - **Disclosure:** written AFTER some A2 runs were scored and seen by the main agent: A2f seed 2 = 0.2501, A2s seeds 2 and 4 = 0.2727 / 0.2716, A2a seed 4 = 0.2714, and E27 seed 4 = 0.3265, against E20 seed 2 = 0.2506 and E24 seed 2 = 0.2412 (both from SQ263). So this is not a blind registration. It fixes a decision rule; it does not change A2's registered predictions P1-P5 or their decision rules.
 - **Rule (D1/D3):** loops stay in the final-model design (E61) only if, at matched training FLOPs on clean80, the assembled full-precision model A2f beats the unshared GDN hybrid E24 by >= 1% over seeds 2-4 (paired by seed). Otherwise, or if A3 shows a benefit from looping that unique parameters do not explain, loops leave E61's default. They then stay only as a decode-time option, if SQ362 shows quality per decode-second favours them, or as the byte-refinement loop of the coarse-to-fine design (H-C2F, E14), which is a separate question.
 - **Expected outcome from the seen seed** (stated so the rule cannot be bent later): A2f seed 2 trails E24 seed 2 by about 3.7%, so the rule will most likely drop loops from E61's default. P4 (registered before dispatch) predicted A2f vs E24 = +6% (+2% to +10%).
+
+## A3 all-parts assembly (2026-11-23 ~13:05 EST, before dispatch): keep every component, design around its cost
+- **Human decision (2026-11-23, chat):** "I want all the parts assembled and their issues designed around or fixed". Loops and ternary therefore stay in the model. A2 amendment 2's go/no-go rule ("loops leave E61's default") is **superseded by the human's decision**. Its comparison (A2f vs E24) is still reported, as a cost to design around, not as a gate.
+- **A2 readout this builds on** (`experiments/checks/results/a2_assembled.json`, seeds 2-4):
+  - A2s vs E27 -16.7% [-17.7, -15.6];
+  - A2s vs E20 +8.6%;
+  - ternary inside the stack (A2s vs A2f) +9.5% [+8.3, +10.7];
+  - A2f vs E20 -0.9%;
+  - A2f vs E24 +3.5% (2 seeds; seed 3 pending);
+  - per-pass adapters 0.
+  So the two remaining costs are **ternary (+9.5%)** and **loops' unique-parameter deficit vs unshared GDN (+3.5%)**.
+- **Fixes under test** (one at a time on A2s, then combined; `experiments/staged-configs/a3/`; code in v0.5.10: ternary MoE experts, `moe_core_only`, `ternary_mixer`, `ternary_ffn`):
+  - **A3m** [8a28dbb4df6101cc], loops' fix: a ternary MoE FFN in the shared core (4 x 512, top-2). Active FFN width 1024 equals the dense FFN, so FLOPs match (0.189 GFLOP/token), with 22.2M total vs 15.1M active non-embedding params.
+  - **A3x** [a30c32f07a09ace9], ternary's fix, part 1: mixer projections in full precision, FFN ternary.
+  - **A3y** [09bc189f87337544], ternary's fix, part 2: FFN in full precision, mixers ternary.
+  - **A3mx** [53364a1125b533bd], **all parts**: GDN hybrid + shared loop 6x2 + contractive injection + ternary MoE core + full-precision mixers and ends.
+  - **References**, same fresh seeds: A2s (the assembled base), A2f (full precision), E20 (dense), E24 (unshared GDN).
+- **Seeds:** 5, 6 and 7 (fresh), 200M tokens of code-py-v2, lr 6e-3 for the A arms and the references' own LRs (E20/E24 3e-3). Paired by seed; clean80, log scale.
+- **Predictions** (each vs A2s unless stated):
+  - **Q1:** A3m -3% (range -6% to -1%).
+  - **Q2:** A3x -5% (-8% to -2%) and A3y -3% (-6% to 0%). The ternary cost sits more in the mixers than in the FFN.
+  - **Q3:** A3mx -8% (-12% to -4%).
+  - **Q4:** A3mx vs A2f +1% (-2% to +4%): most of ternary's cost is designed away.
+  - **Q5:** A3mx vs E24 +1% (-3% to +5%), and vs E20 -1% (-5% to +3%): the all-parts model is competitive with both references at matched active FLOPs.
+- **Decision rules:**
+  - A fix counts if its paired 95% CI (df 2) lies below 0 and the effect is <= -1%.
+  - The four fixes form one family, Holm-adjusted.
+  - The all-parts model is **competitive** if A3mx lies within 2% of E24 and at or below E20.
+  - Throughput and weight memory are reported next to it.

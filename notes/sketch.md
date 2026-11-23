@@ -86,6 +86,8 @@ The nice part is that looping costs extra compute and BitNet makes compute cheap
   - rental: the human authorised 5090-or-better boxes without naming an amount, so the agent caps itself at $25 for A1+A2 and at most 8 concurrent boxes, destroys each box as soon as its last job is pulled, and reports spend.
   - code-py-v3 (Stack v3) needs a separate download approval (45-120 GB), so v2 is "the new dataset" for now.
 
+- **2026-11-23 (v0.5.10), human decision:** "I want all the parts assembled and their issues designed around or fixed!" Every ingredient (GDN mixer, shared loops, ternary, MoE) stays in the model, and each cost is designed around instead of dropping the ingredient. This supersedes A2 amendment 2's loop go/no-go default. A3 tests the fixes: a ternary MoE core for the loops' unique-parameter deficit, and full-precision mixers or FFN to locate and remove ternary's cost.
+
 ## Status (2026-11-23, v0.5.7)
 
 - Phase: assembly (v0.5.0 onward). A1 (E62, exploratory, seeds 0-1, 200M code-py-v2, all vs E27), from v0.5.4: ternary in the core only -8.3%, fixed r = 4 -5.2%, 6x2 loop shape -11.6% (a parameter-changed arm, not a compensation), contractive injection -1.6% (marginal). v0.5.5: every winner still beats E27 at equal wall-clock. None of the winners' effects fell inside its registered range, except A1c's.

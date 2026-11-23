@@ -79,6 +79,9 @@ class ModelConfig:
     ternary_acts: bool = True         # ternary=True: also int8 absmax activations (BitNet b1.58); False = weights only
     ternary_fp_ends: bool = False     # ternary=True: prelude, coda and inject stay full precision (only the core is ternary)
     loop_adapter_rank: int = 0        # > 0: per-pass low-rank adapter after each core block (SQ357), passes >= loops_max share the last
+    ternary_mixer: bool = True        # ternary=True: mixer projections (attention qkv/o, GDN q/k/v/gate/o) ternary (A3)
+    ternary_ffn: bool = True          # ternary=True: FFN (SwiGLU or MoE experts) ternary (A3)
+    moe_core_only: bool = False       # moe_experts > 0: MoE FFN only in the shared core; prelude/coda keep SwiGLU (A3)
 
     @property
     def head_dim(self) -> int:
@@ -95,7 +98,7 @@ class ModelConfig:
 
 
 _ASSEMBLY_DEFAULTS = {"loop_embed": False, "inject_contractive": False, "ternary_acts": True, "ternary_fp_ends": False,
-                      "loop_adapter_rank": 0}
+                      "loop_adapter_rank": 0, "ternary_mixer": True, "ternary_ffn": True, "moe_core_only": False}
 
 
 # ----------------------------------------------------------------------------- BitLinear
@@ -134,7 +137,7 @@ def set_ternary_quant(model: nn.Module, on: bool) -> int:
     """Switch every BitLinear's quantisation on or off; returns how many layers changed."""
     n = 0
     for m in model.modules():
-        if isinstance(m, BitLinear) and m.quant_on != on:
+        if (isinstance(m, BitLinear) or (isinstance(m, MoEFFN) and m.ternary)) and m.quant_on != on:
             m.quant_on = on
             n += 1
     return n
@@ -261,16 +264,18 @@ class Block(nn.Module):
         super().__init__()
         self.kind = kind
         self.norm1, self.norm2 = nn.RMSNorm(cfg.d_model), nn.RMSNorm(cfg.d_model)
+        mcfg = replace(cfg, ternary=False) if (cfg.ternary and not cfg.ternary_mixer) else cfg   # A3 precision scope
+        fcfg = replace(cfg, ternary=False) if (cfg.ternary and not cfg.ternary_ffn) else cfg
         if kind == "attn":
-            self.mixer = Attention(cfg, None, rope)
+            self.mixer = Attention(mcfg, None, rope)
         elif kind == "swa":
-            self.mixer = Attention(cfg, cfg.window, rope)
+            self.mixer = Attention(mcfg, cfg.window, rope)
         elif kind == "gdn":
-            self.mixer = GatedDeltaNet(cfg)
+            self.mixer = GatedDeltaNet(mcfg)
         else:
             raise ValueError(f"unknown block kind {kind!r}")
         self.moe = bool(cfg.moe_experts)
-        self.mlp = MoEFFN(cfg) if self.moe else SwiGLU(cfg)
+        self.mlp = MoEFFN(fcfg) if self.moe else SwiGLU(fcfg)
 
     def forward(self, x, aux: list | None = None):
         x = x + self.mixer(self.norm1(x))
@@ -283,12 +288,12 @@ class Block(nn.Module):
 class FusionDance(nn.Module):
     def __init__(self, cfg: ModelConfig):
         super().__init__()
-        if cfg.moe_experts and cfg.ternary:
-            raise ValueError("moe_experts > 0 with ternary=True is not supported (no BitLinear for batched experts)")
         self.cfg = cfg
         self.rope = Rotary(cfg.head_dim, cfg.max_seq_len, cfg.rope_base)
         self.embed = nn.Embedding(cfg.vocab_size, cfg.d_model)
         ends_cfg = replace(cfg, ternary=False) if (cfg.ternary and cfg.ternary_fp_ends) else cfg
+        if cfg.moe_experts and cfg.moe_core_only:
+            ends_cfg = replace(ends_cfg, moe_experts=0)
         mk = lambda kinds, c: nn.ModuleList(Block(k, c, self.rope) for k in kinds)
         self.prelude, self.core, self.coda = mk(cfg.prelude, ends_cfg), mk(cfg.core, cfg), mk(cfg.coda, ends_cfg)
         for i, b in enumerate([*self.prelude, *self.core, *self.coda]):

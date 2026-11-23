@@ -1,0 +1,34 @@
+{
+ "run": "E27-20261123-053739-s18",
+ "experiment": "E27",
+ "seed": 18,
+ "checkpoint": "/root/fusiondance-data/checkpoints/E27-20261123-053739-s18//model.pt",
+ "window": 1024,
+ "overlap_source": "K9.json data.val_per_doc_overlap",
+ "bpc": {
+  "clean80": 0.5115143536776717,
+  "dup80": 0.3267235944527432,
+  "clean50": 0.590050614046839,
+  "dup50": 0.37004702540733325,
+  "all": 0.45190720694036246
+ },
+ "n_docs": {
+  "clean80": 2333,
+  "dup80": 1667,
+  "clean50": 1174,
+  "dup50": 2826
+ },
+ "chars": {
+  "clean80": 2668267,
+  "dup80": 1270516,
+  "clean50": 1465550,
+  "dup50": 2473233
+ },
+ "tokens": {
+  "clean80": 700222,
+  "dup80": 354938,
+  "clean50": 382410,
+  "dup50": 672750
+ },
+ "memorisation_gap_80": -0.18479075922492855
+}

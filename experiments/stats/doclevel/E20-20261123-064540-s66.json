@@ -1,0 +1,34 @@
+{
+ "run": "E20-20261123-064540-s66",
+ "experiment": "E20",
+ "seed": 66,
+ "checkpoint": "/root/fusiondance-data/checkpoints/E20-20261123-064540-s66//model.pt",
+ "window": 1024,
+ "overlap_source": "K9.json data.val_per_doc_overlap",
+ "bpc": {
+  "clean80": 0.4590151304722081,
+  "dup80": 0.2714226578005142,
+  "clean50": 0.5369485664658299,
+  "dup50": 0.31646681900933105,
+  "all": 0.3985042472859676
+ },
+ "n_docs": {
+  "clean80": 2333,
+  "dup80": 1667,
+  "clean50": 1174,
+  "dup50": 2826
+ },
+ "chars": {
+  "clean80": 2668267,
+  "dup80": 1270516,
+  "clean50": 1465550,
+  "dup50": 2473233
+ },
+ "tokens": {
+  "clean80": 700222,
+  "dup80": 354938,
+  "clean50": 382410,
+  "dup50": 672750
+ },
+ "memorisation_gap_80": -0.18759247267169388
+}

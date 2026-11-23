@@ -18,6 +18,40 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.97: F2 result: the fusion ingredients interact (I = -3.5%, SYNERGY; C201) - the registered prediction was wrong
+*2026-11-23*
+
+**F2, the registered 2×2×2 factorial interaction**, is analysed.
+- **Factors:** GDN, shared loops and ternary weights.
+- **Design:** 14 block applications, FLOPs-matched; 20M tokens on code-py-v2.
+- **Runs:** 217 (seed 0 excluded as registered).
+- **Analysis:** `experiments/design/f2_analysis.py` was committed in `ead5926` before its first run. Output: `experiments/checks/results/f2_analysis.json`.
+
+| Analysis | I = y111 − y100 − y010 − y001 + 2·y000 | 95% CI | df | Decision |
+|---|---|---|---|---|
+| Primary, seed-blocked | **−3.54%** | [−4.34%, −2.74%] | 140 | **SYNERGY** |
+| Sensitivity, unblocked Welch | −3.25% | [−4.00%, −2.50%] | 163 | SYNERGY |
+
+| Cell | Ingredients | Mean clean80 bpc | vs dense |
+|---|---|---|---|
+| 100 | GDN | **0.4243** | −7.3% |
+| 000 | dense | 0.4578 | |
+| 001 | ternary | 0.5025 | +9.8% |
+| 111 | full fusion | 0.5092 | +11.2% |
+| 010 | loops | 0.5172 | +13.0% |
+
+- **Read:** the three ingredients' penalties overlap, so the full fusion is about 3.5% better than the sum of its parts predicts. It is not a gain over dense: the full fusion is still 11% worse at this 20M horizon, where loops and ternary each cost 10–13%. GDN alone is the best cell.
+- **My registered prediction was wrong on both counts.** It said I = +0.5% ± 1.5% (P(I ≤ −1%) = 0.10) and that the full fusion would be the worst cell; loops-only is the worst.
+- **New claim C201, VERIFIED, with limitations:**
+  - the 20M horizon only; SQ263, the registered 200M check, is running and is unblinded now that this analysis is recorded;
+  - the display-blinding exposure in stage 1 (v0.4.88–v0.4.89);
+  - "synergy" means overlapping penalties.
+- **Micro devlog:** `experiments/devlogs/F2.md`.
+- **Data:** the F2 per-run score files (250) are now committed.
+- **README:** the status summary has the F2 sentence.
+
+---
+
 ## v0.4.96: Code-MoE layer for E60 (off by default, bit-identical); E60 stage 1 registered; outside review 02:09 (SQ320-SQ324)
 *2026-11-23*
 

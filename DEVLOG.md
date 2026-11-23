@@ -18,6 +18,31 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.108: Claim audit 2026-11-23-1103: 48 claims, no downgrades; C36 WRONG rejected against the paper table; INCONCLUSIVE added to the statistics policy
+*2026-11-23*
+
+**Claim audit 2026-11-23-1103.** 8 Codex GPT-6 Luna auditors reviewed 48 claims (8 batches of 6, all 8 runs ok). Verdicts: 16 SOLID, 13 WEAK, 18 NEEDS-EVIDENCE, 1 WRONG. Each non-SOLID verdict was checked against the primary files. **No downgrades.**
+
+- **Confirmed, limitations added:**
+  - C201: the 20M measurement stands; REFUTED means only that the synergy fails its own 200M criterion, which was registered at creation.
+  - C191: the clean K9 re-run supersedes the provenance concern.
+  - C61, C24, C21: paper-reported, not tested locally.
+  - C51: the 45.9% is an analytic projection-FLOP figure, not an end-to-end saving.
+  - C127: documented ISA facts are separate from inferred incompatibility.
+  - C125: "power-limited" is unsupported (1/55 power-cap samples).
+- **Rejected:**
+  - **C36 WRONG:** pdftotext of Hyperloop Table 1 shows the claim's percentages are right (Looped +2.2/+2.2/+3.3%, Transformer +1.4/+0.8/+1.3%, Hyperloop +1.9/+1.7/+1.2%); the auditor misattributed the rows. A limitation notes that the quoted sizes are the looped models'.
+  - **C201 "downgrade to PARTIAL":** the registered criterion and policy 2's REFUTED rule are both met.
+  - **Already handled by existing limitations or qualifiers:** C73, C193, C29, C190.
+  - **The 18 NEEDS-EVIDENCE verdicts:** they are on claims that are already UNVERIFIED, so they are consistent with status.
+- **Policy alignment:** `notes/statistics-policy.md` gains an INCONCLUSIVE row matching the ledger schema (a check whose own validity gate failed). C16 stays INCONCLUSIVE; the audit's WEAK verdict was really about this missing row. The decision is logged in `notes/sketch.md`.
+- **Process fix:** the first `record` calls passed Windows backslash paths, which the ledger rejected as evidence pointers. `claim-reviews.json` entries were normalised, and the 48 `audit_verdict` events were appended with forward-slash paths.
+- **Also:**
+  - The lm-eval snapshot files archived in v0.4.106 are renamed `*.snapshot`, so lm-eval can never register the upstream `utils.py`, which loads HF `code_eval` in-process (quick review 10:48). The sha256 values are unchanged, and C109's evidence points at the new path.
+  - The v0.4.107 erratum now attributes the blanked spans correctly: an unquoted heredoc when the main agent wrote the v0.4.106 spec.
+
+---
+
 ## v0.4.107: Outside review 10:38: loop-cost wording tied to unique params, E9 card fixed, SQ347-SQ351; v0.4.106 entry text restored
 *2026-11-23*
 
@@ -35,7 +60,7 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
   - Wall-clock frontier: rejected. SQ310/SQ338 cover it, and truncated-cosine reads are biased.
   - Strict held-out slice: done as SQ344 (in v0.4.106).
   - Doc-join audit: clean; SQ345.
-- **Erratum, v0.4.106 entry:** a shell-quoting error in the version cutter blanked five inline-code spans in that entry's C109 and C106 bullets. They are restored here; the v0.4.106 tag itself is unchanged.
+- **Erratum, v0.4.106 entry:** a shell-quoting error in how the main agent wrote that entry's spec (an unquoted heredoc, so bash ran the backticked spans; one tried to run `sandbox_home_probe.py` as a shell script and failed with a syntax error, no effect) blanked five inline-code spans in that entry's C109 and C106 bullets. They are restored here; the v0.4.106 tag itself is unchanged.
 
 ---
 

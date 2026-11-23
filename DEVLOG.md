@@ -18,6 +18,37 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.17: A3 final: all four fixes count (MoE core -3.3%, FP mixers -5.0%, FP FFN -5.2%, all parts -7.7%); the all-parts model ties full precision but trails unshared GDN by 4.4% (C206-C208)
+*2026-11-23*
+
+**A3 final: every fix counts, and the all-parts model ties the full-precision version, but it still trails unshared GDN. A2's decisions survive a post hoc Holm replay.**
+
+- **A3, final** (seeds 5-7, 200M tokens of code-py-v2, clean80 paired by seed; `experiments/checks/results/a3_assembled.json`, provenance OK). Every registered prediction (Q1-Q5) landed in its range, and all four fixes vs the assembled base A2s pass the registered Holm family:
+  - Q1: ternary MoE core (A3m) **-3.29% [-4.24, -2.33]**;
+  - Q2: full-precision mixers (A3x) **-5.02% [-6.11, -3.92]**, full-precision FFN (A3y) **-5.16% [-5.31, -5.01]**. The cost of ternary splits evenly, not mainly into the mixers as predicted, and the two recoveries sum to about the +9.5% full-precision gap;
+  - Q3: all parts (A3mx) **-7.67% [-9.03, -6.28]**, near-additive (A3m + A3x predicts -8.1%);
+  - Q4: A3mx vs A2f +1.36% [+0.09, +2.64]: most of ternary's cost is designed away;
+  - Q5: A3mx vs E24 **+4.35% [+2.39, +6.36]**, vs E20 +1.10% [-0.70, +2.93]. **The registered competitive rule (within 2% of E24 and at or below E20) is not met.**
+- **Secondary readouts:**
+  - weight memory (ternary at 1.58 bits): A3mx 44.0 MB vs E24 77.2 MB and E20 74.7 MB (`results/a3_memory.json`);
+  - training throughput: A3mx 288k tok/s vs E24 368k and E20 586k (RTX 5090).
+  So the all-parts model is the smallest and ties dense per FLOP, but is slower per wall-clock and 4.4% behind unshared GDN.
+- **New claims (VERIFIED, 3 fresh seeds, registered):**
+  - C206: ternary MoE core -3.3%;
+  - C207: ternary's cost splits evenly between mixers and FFN;
+  - C208: the all-parts model's standing, with its competitive rule not met and limitations for wall-clock and horizon.
+- **What this means for the design:** the remaining gap is loops' unique-parameter deficit vs unshared GDN (A2f vs E24 +3.2%), not ternary. The next lever is a longer-horizon point (SQ380), since the F2 interaction flipped sign between 20M and 200M.
+- **A2 multiplicity replay** (quick review 13:44; `experiments/checks/a2_holm.py`, `results/a2_holm.json`). A2 registered per-prediction rules, not a family. A post hoc Holm over all six A2 comparisons rejects P1-P4 and A1e and keeps P5's near-null, so no decision changes. The t-test helpers moved to `experiments/checks/tstat.py` (stdlib; p-values checked against the df 1/2 closed forms).
+- **A1 amendment 2:** A1a and A1i at seed 2 are training. A1a - A1i over seeds 0-1 is -3.19%.
+- **A4 incident:** the first four A4 jobs exited in 1 s, because the fleet worker ran `train_c2f.py` without `PYTHONPATH` and `import experiments` failed. Fixed in the worker and requeued at 13:53. A4 now trains at about 250k tok/s, and the four A4 variants (a-d) are running on seeds 5-7. The A4 runs are in the registry as E65 (running). A2 is marked done as E63 and A3 is added as E64.
+- **Quick reviews:**
+  - 13:44: A2 Holm replay done; evidence-bundle check merged into SQ274.
+  - 13:51: A1-vs-A2 calibration answered (A1e -8.3% screen vs -7.6% fresh).
+  - 13:54: checkpoints are model-only and written once.
+  - 13:59: SQ390 (contractive x precision 2x2); curvature probe merged into SQ365.
+
+---
+
 ## v0.5.16: A2 final: C204 (assembled recipe -16.7% vs full fusion) and C205 (ternary core only -7.6%) VERIFIED; A4 amendment 1 (A4d) fixes an aux-loss confound before any A4 run
 *2026-11-23*
 

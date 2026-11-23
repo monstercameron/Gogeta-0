@@ -1,0 +1,66 @@
+{
+ "check": "A3-weight-memory",
+ "vocab_size": 32768,
+ "bits": {
+  "ternary": 1.58,
+  "other": 16
+ },
+ "arms": {
+  "A2s": {
+   "params_total": 27668272,
+   "params_ternary": 11206656,
+   "ternary_share": 0.4050363535532685,
+   "weight_MB": 35.13654656,
+   "weight_MB_all_bf16": 55.336544
+  },
+  "A2f": {
+   "params_total": 27668272,
+   "params_ternary": 0,
+   "ternary_share": 0.0,
+   "weight_MB": 55.336544,
+   "weight_MB_all_bf16": 55.336544
+  },
+  "A3m": {
+   "params_total": 34755376,
+   "params_ternary": 18284544,
+   "ternary_share": 0.5260925388924004,
+   "weight_MB": 36.55286144,
+   "weight_MB_all_bf16": 69.510752
+  },
+  "A3x": {
+   "params_total": 27668272,
+   "params_ternary": 7077888,
+   "ternary_share": 0.25581243382311697,
+   "weight_MB": 42.578650880000005,
+   "weight_MB_all_bf16": 55.336544
+  },
+  "A3y": {
+   "params_total": 27668272,
+   "params_ternary": 4128768,
+   "ternary_share": 0.14922391973015156,
+   "weight_MB": 47.89443968,
+   "weight_MB_all_bf16": 55.336544
+  },
+  "A3mx": {
+   "params_total": 34755376,
+   "params_ternary": 14155776,
+   "ternary_share": 0.40729744946508417,
+   "weight_MB": 43.99496576,
+   "weight_MB_all_bf16": 69.510752
+  },
+  "E20": {
+   "params_total": 37366656,
+   "params_ternary": 0,
+   "ternary_share": 0.0,
+   "weight_MB": 74.733312,
+   "weight_MB_all_bf16": 74.733312
+  },
+  "E24": {
+   "params_total": 38620640,
+   "params_ternary": 0,
+   "ternary_share": 0.0,
+   "weight_MB": 77.24128,
+   "weight_MB_all_bf16": 77.24128
+  }
+ }
+}

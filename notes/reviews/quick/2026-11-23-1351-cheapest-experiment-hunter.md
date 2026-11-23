@@ -1,0 +1,13 @@
+# Quick review 2026-11-23-1351 - cheapest-experiment hunter (Codex GPT-6 Luna high)
+
+- **Observation:** A2’s final comparisons used three fresh seeds and reported paired intervals; A1’s component screen used two exploratory seeds, so those screen effects are less certain. (`DEVLOG.md`, v0.5.16; C204–C205)
+- **Observation:** The GPU queue has no pickable job while E8, A3, and A4 are running; Q15 is the next CPU item, estimated at 60 minutes. (`experiments/QUEUE.md`)
+- **Observation:** Recent reviews’ ideas have already been triaged into SQ386–SQ389, including the sandbox check, clean80 byte-decoder scorer, n=3 power analysis, and frozen-trunk sweep. (`notes/reviews/quick/2026-11-23-1344-reproducibility-auditor.md`; `experiments/side-quests.md`)
+
+- **Idea — [speculation] Calibrate the A1 screen against A2 confirmation. Hypothesis:** A1’s two-seed component-effect directions may not predict the fresh-seed A2 results. **Cheapest test:** Join the saved per-seed A1 and A2 results by comparison and calculate direction agreement, about 5 CPU minutes at 13M scale. **Change the plan if:** multiple directions reverse; rely less on two-seed screens when selecting future recipes.
+- **Idea — [speculation] Use a tiny held-out slice to check A3 ranking stability. Hypothesis:** A small clean80 subset may identify clear regressions between A3 arms before full scoring. **Cheapest test:** Score the same 100 clean80 documents for each available A3 checkpoint, about 2–5 GPU minutes at 13M scale. **Change the plan if:** subset rankings disagree with the full clean80 result; don’t use the slice as a decision gate.
+
+- **Question for the main agent:** Are the per-seed A1 screen and A2 confirmation results easy to join for this calibration?
+## Triage
+- Calibrate the A1 screen against A2 (and question: are they easy to join?): answered now, no new item. Only one A1 single-component effect was re-run on fresh seeds: A1e, -8.3% in the 2-seed screen vs -7.56% [-8.09, -7.02] at seeds 2-4 (A2 amendment 1, C205). Same direction, about 9% shrinkage, close to the winner's-curse shrink registered beforehand (-6% predicted). A2 tested the stacked recipe, not each component, so there is nothing else to join one to one. A1 amendment 2 (A1a vs A1i at seed 2, running now) adds a second calibration point. The A1 false-winner rate was already simulated (`results/a1_false_winner_sim.json`). Both points go into the A3 readout.
+- 100-doc clean80 slice as an early A3 gate: rejected. Every run is already scored on the full 2,333-doc clean80 set on its box in about a minute after training (385 scores per pull), so a subset saves nothing and no decision waits on it.

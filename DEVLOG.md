@@ -18,6 +18,28 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.28: Docs refresh (hourly); A3 amendment 2: A2f LR-robust, ternary cost +9.5% at each arm's best LR
+*2026-11-23*
+
+**Docs refresh (hourly), plus A3 amendment 2: A2f is LR-robust, so the ternary cost is +9.5% at each arm's best LR.**
+
+- **Docs** (Haiku, diff checked by the main agent; every cited status matches `experiments/claims-status.md`):
+  - README and `notes/sketch.md` brought to v0.5.27: C206-C208 VERIFIED again (v0.5.23), C210/C211 UNVERIFIED (v0.5.25), C213 as an out-of-corpus hypothesis with SQ400, the A2 headline's compute erratum (v0.5.22), and the hf.py fix (C80, v0.5.24).
+  - The sketch's decisions log gains v0.5.22-v0.5.27, and its claim counts match the ledger (141 claims).
+  - `post_training/SETUP.md` gains the wrapper breakage and fix and the current test counts (test_hf 11, test_rewards 30).
+  - The campaigns README is refreshed.
+- **A3 amendment 2** (registered v0.5.22; A2f seed 5, 200M, clean80; `results/a3_assembled.json`):
+
+  | | 3e-3 | 6e-3 | 1.2e-2 |
+  |---|---|---|---|
+  | A2f | 0.25104 | **0.24921** | 0.25853 |
+  | A2s vs A2f (ternary cost) | +8.71% | +10.15% | +9.73% |
+
+  A2f is LR-robust at 6e-3, which is its best. At each arm's best LR the ternary cost is +9.51%, so the full-precision gap is not an LR artifact. Recorded as evidence on C207.
+- **A2 amendment 3** (compute-matched E27, seeds 2-4) is running; seed 4 is on the last box. The readout script `experiments/checks/a2_compute_matched.py` is committed, and its result will be read out when the last seed lands.
+
+---
+
 ## v0.5.27: Outside review 15:07: dense capacity control for the MoE core (SQ401), GDN beta ablation (SQ402), eval-time pass count on A2s (SQ403, registered); init depth checked, no confound
 *2026-11-23*
 

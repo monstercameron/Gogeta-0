@@ -1,6 +1,6 @@
 # Post-training with Hugging Face TRL: setup guide (prepared, NOT activated)
 
-Status (2026-11-23, v0.4.104): the wrapper, reward sandbox and smoke tests exist and pass **on CPU with a
+Status (2026-11-23, v0.5.27): the wrapper, reward sandbox and smoke tests exist and pass **on CPU with a
 tiny random attn/swa model**. Nothing here has been run on the GPU, on a trained checkpoint, on
 GDN blocks, or on real data. Real SFT / GRPO / DPO runs are blocked on the items in
 [Blockers](#8-prerequisites-and-blockers).
@@ -58,6 +58,7 @@ Run everything from the repo root (`/mnt/c/Users/mreca/Desktop/Gogeta-0`) so `go
 | bf16 | [source] TRL configs default `bf16=True` unless `fp16` | smoke tests use `bf16=False` on CPU; bf16 on GPU untested |
 
 Other wrapper facts:
+- **v0.5.0 to v0.5.23 broke the wrapper; fixed in v0.5.24 (C80).** `GogetaConfig` lacked the eight assembly fields that `ModelConfig` gained in v0.5.0, so no model could be built (the guard failed loudly; no training or evaluation result used the wrapper). `FusionDanceBackbone.hidden()` now delegates to `FusionDance.forward(..., return_hidden=True)` instead of a hand-written mirror, so the assembly switches (loop_embed, contractive injection, adapters, ternary scope) reach the wrapper. Test: `TestAssembledConfig` (exact logit equality).
 - Non-persistent buffers: transformers 5 re-creates them **empty** in `from_pretrained`
   [source]. Our RoPE tables are non-persistent, so `GogetaForCausalLM._init_weights` recomputes
   them. [verified here]: with that branch disabled, a save/load round trip changes the
@@ -86,7 +87,7 @@ All CPU-only (`CUDA_VISIBLE_DEVICES=` is set inside the scripts), from the repo 
 
 ```bash
 P=~/.venvs/gogeta-rl/bin/python
-CUDA_VISIBLE_DEVICES= $P -m unittest post_training.test_hf post_training.test_rewards -v   # 27 tests, ~9 s
+CUDA_VISIBLE_DEVICES= $P -m unittest post_training.test_hf post_training.test_rewards -v   # 41 tests at v0.5.24 (test_hf 11, test_rewards 30), see the v0.5.24 line below
 CUDA_VISIBLE_DEVICES= $P post_training/grpo_smoke.py       # ~6-18 s
 CUDA_VISIBLE_DEVICES= $P post_training/sft_dpo_smoke.py    # ~5 s
 ```
@@ -97,7 +98,8 @@ CUDA_VISIBLE_DEVICES= $P post_training/sft_dpo_smoke.py    # ~5 s
   fused-LM-head log-probs equal `log_softmax` of our logits with left padding (< 1e-4);
   greedy `generate` equals a manual greedy loop; `save_pretrained`/`from_pretrained` round
   trip is exact and keeps the head/embedding tie; tokenizer decode(encode(s)) == s.
-- `test_rewards` (17 tests) OK: pass, fail, partial credit, infinite loop (timeout), sleep
+- v0.5.24 (2026-11-23): `test_hf` 11/11 OK (adds `TestAssembledConfig`) and `evals/test_wiring.py` 6/6 OK; saved output `experiments/checks/results/test-runs/2026-11-23-C80.txt`.
+- `test_rewards` (17 tests at v0.4.104; 30 since v0.5.11) OK: pass, fail, partial credit, infinite loop (timeout), sleep
   (wall-clock timeout), syntax error, runtime error, `sys.exit`, forged result line, 2 GB
   allocation under a 256 MB cap (MemoryError), network blocked, runs as `nobody` (cannot list
   `/root`), TRL-shaped call. `sandbox_info()` here: `runs_as_nobody=True, network_isolated=True,

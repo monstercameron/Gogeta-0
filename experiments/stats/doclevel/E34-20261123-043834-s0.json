@@ -1,0 +1,34 @@
+{
+ "run": "E34-20261123-043834-s0",
+ "experiment": "E34",
+ "seed": 0,
+ "checkpoint": "/root/fusiondance-data/checkpoints/E34-20261123-043834-s0//model.pt",
+ "window": 1024,
+ "overlap_source": "K9.json data.val_per_doc_overlap",
+ "bpc": {
+  "clean80": 0.45339187109696083,
+  "dup80": 0.20838834360052663,
+  "clean50": 0.5398927828984494,
+  "dup50": 0.2762747167955114,
+  "all": 0.37436215513122734
+ },
+ "n_docs": {
+  "clean80": 2333,
+  "dup80": 1667,
+  "clean50": 1174,
+  "dup50": 2826
+ },
+ "chars": {
+  "clean80": 2668267,
+  "dup80": 1270516,
+  "clean50": 1465550,
+  "dup50": 2473233
+ },
+ "tokens": {
+  "clean80": 700222,
+  "dup80": 354938,
+  "clean50": 382410,
+  "dup50": 672750
+ },
+ "memorisation_gap_80": -0.2450035274964342
+}

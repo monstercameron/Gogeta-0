@@ -1,0 +1,34 @@
+{
+ "run": "INK_e2_fixed_r2-20261123-042650-s0",
+ "experiment": "INK_e2_fixed_r2",
+ "seed": 0,
+ "checkpoint": "/root/fusiondance-data/checkpoints/INK_e2_fixed_r2-20261123-042650-s0//model.pt",
+ "window": 1024,
+ "overlap_source": "K9.json data.val_per_doc_overlap",
+ "bpc": {
+  "clean80": 0.4572365089659104,
+  "dup80": 0.22012334696023542,
+  "clean50": 0.539308393034941,
+  "dup50": 0.28679633313531216,
+  "all": 0.38075195367591286
+ },
+ "n_docs": {
+  "clean80": 2333,
+  "dup80": 1667,
+  "clean50": 1174,
+  "dup50": 2826
+ },
+ "chars": {
+  "clean80": 2668267,
+  "dup80": 1270516,
+  "clean50": 1465550,
+  "dup50": 2473233
+ },
+ "tokens": {
+  "clean80": 700222,
+  "dup80": 354938,
+  "clean50": 382410,
+  "dup50": 672750
+ },
+ "memorisation_gap_80": -0.23711316200567498
+}

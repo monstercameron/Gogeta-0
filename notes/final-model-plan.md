@@ -312,3 +312,21 @@ Added to `experiments/side-quests.md` by the main agent (v0.4.85):
 - **README "Goals":** `6. **Ship it on a gaming GPU:** a final model, sized by our scaling fit, that runs with caching and lossless speculative decoding on one 24 GB RTX 3090/4090.`
 
 **Wording note:** goal 5 ("Do it on a laptop") needs a clause, because the final training is rented and only inference is local.
+
+## Errata (v0.4.88, from the GPT-6.2 Astra feasibility review, each checked by the main agent)
+
+Full review: [`notes/feasibility-final-training-astra.md`](feasibility-final-training-astra.md). The corrections below override the text above.
+
+- **§2 ">15 GB to spare at every size and precision" is wrong.** G-3B in bf16 at 128k context leaves about **12.4 GB** (21.5 GB usable − 6.66 GB weights − 1.34 GB KV − 1 GB workspace − state). Both targets still fit with ample headroom; the conclusion "VRAM is not binding" stands.
+- **§4 separate-drafter cost ratio c ≈ 0.15 is inconsistent with its own inputs.** By bytes it is 0.62 / 2.45 ≈ **0.25**, and a launch floor can only raise it. At acceptance 0.7 and γ = 3 the idealised speedup is **≈ 1.44×**, not 1.5–2.1×, before verify and rollback costs. SQ298 must measure c directly.
+- **§4 prefill "~2 s at 32k" ignores the full-attention term.** Four causal full-attention layers add about 17.6 TFLOP at 32k, so prefill is **≥ ~2.45 s** at the assumed 40 TFLOP/s.
+- **§6 "M3 pilot at ~1/10 size" is wrong.** S (0.311B) is **25%** of G-1B. The pilot's role (out-of-sample check of the fit, drafter) is unchanged.
+- **Missing from the plan, now tracked:**
+  - the trainer has no epoch coverage: `TokenData.batch()` samples random windows with replacement;
+  - there is no multi-GPU path (DDP/FSDP, distributed sampler, global token accounting);
+  - mid-run checkpoint/resume is only a draft patch;
+  - SWA builds a dense T×T mask (8 GiB of integer temporaries at 32k);
+  - RoPE has no position offset.
+
+  These gate M3/M4 alongside SQ286/SQ294/SQ297.
+- **Cost check:** with the exact 1.226B shape, 6ND gives **$379–506** for 24–32B tokens at the measured E1 rate, before overhead (the plan's $371–495 used a rounded 1.2B). At 75% of the assumed throughput, compute alone is about $506–675.

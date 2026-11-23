@@ -1,0 +1,10 @@
+# Resume of campaign phase2b-replication (written by cockpit watchdog 2026-11-22T20:53:17.419). Cause: transient: campaign phase2b-replication ended (exit 143) with 8 of 11 items unfinished
+# Exactly the 8 unfinished item(s); finished ones are not repeated.
+E1  --seed 0 --lr 0.006
+E1  --seed 1 --lr 0.006
+E1  --seed 2 --lr 0.006
+E11 --seed 0 --lr 0.006
+E11 --seed 1 --lr 0.006
+E11 --seed 2 --lr 0.006
+E9  --seed 0 --lr 0.006
+E2  --seed 0 --lr 0.006

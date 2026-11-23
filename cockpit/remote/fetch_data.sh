@@ -49,6 +49,6 @@ echo "== rebuild from Hugging Face ($(nproc) CPUs)"
 python -P tools/prepare_data.py --steps download,filter,tokenize || { echo "DATA FAILED: prepare_data error"; exit 1; }
 echo "== verify against $MAN"
 if ! verify; then echo "DATA MISMATCH: see above; use the sha256-checked upload instead"; exit 3; fi
-if [ -n "$(git status --porcelain)" ]; then git status --porcelain; echo "DATA MISMATCH: repo assets changed"; exit 3; fi
+if [ -n "$(git status --porcelain --untracked-files=no)" ]; then git status --porcelain --untracked-files=no; echo "DATA MISMATCH: repo assets changed"; exit 3; fi
 [ "${KEEP:-0}" = 1 ] || rm -f "$OUT/docs_train.jsonl"   # 1 GB intermediate; KEEP=1 keeps it (byte-dataset builds need it)
 echo "DATA OK rebuilt + verified in $(( $(date +%s) - t0 ))s"

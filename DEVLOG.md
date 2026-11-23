@@ -18,6 +18,72 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.88: SQ200: the init handicap explained (C199 VERIFIED); SQ301: E1's d=256 edge survives LR tuning; GPT-6.2 Astra feasibility review + plan errata
+*2026-11-23*
+
+**SQ200 init 2×2 + SQ234** (registered I1–I4, 4 seeds per new arm, RTX 5090, clean80; `experiments/checks/results/sq200.json`):
+
+| Comparison | Effect | Paired 95% CI | Prediction |
+|---|---|---|---|
+| E0 flat vs E0 gogeta init | **−3.48%** | [−4.08%, −2.87%] | I1 PASS |
+| E10 gogeta vs E10 hf init | **+3.81%** | [+3.35%, +4.28%] | I2 PASS |
+| E1 flat vs E1 gogeta init | +0.04% | [−0.23%, +0.31%] | I3 FAIL |
+| E1 flat vs E10 hf | +0.07% | [−0.56%, +0.69%] | I4 not triggered (descriptive) |
+
+- **Read:**
+  - our scaled-residual init costs all-attention stacks about 3.5–3.8%;
+  - the GDN/SWA hybrid E1 does not care which init it gets;
+  - with flat init, E0 trails E10 by only +0.44%.
+- **Two consequences:**
+  - E1's original "3.6% better than E0" headline was an init artifact;
+  - C5's tie is not an init handicap on E1.
+- **New claim C199, VERIFIED** [4 seeds per arm; LRs not re-tuned per init]. C5 gets this as evidence (event 12).
+
+**SQ301, the LR-fair re-test of C198 at d = 256** (registered v0.4.87; seeds 0–1; run LRs read from each run's `meta.json`):
+
+| Model | lr 3e-3 | lr 6e-3 | lr 1.2e-2 |
+|---|---|---|---|
+| E1 | 0.3359 | 0.3311 | **0.3305** |
+| E10 | **0.3363** | 0.3371 | 0.3490 |
+
+- **At the best LRs**, E1 − E10 = **−1.71%** (s0 −1.68%, s1 −1.74%).
+- **W1 FAIL:** E10's best LR stays at 3e-3.
+- **W2 FAIL:** the gap widens instead of shrinking.
+- **Registered rule:** C198 keeps PARTIAL, with this as evidence.
+- **Caveats:**
+  - E1's best LR sits at the grid edge, so its edge may be understated;
+  - the init difference does not favour E1 (SQ200);
+  - two seeds only.
+- **Read:** at the smallest width the hybrid really is better, and the advantage fades by d = 384.
+
+**GPT-6.2 Astra feasibility review** (the human's request; Codex read-only; `notes/feasibility-final-training-astra.md`).
+- **Verdict:** advance the unlooped hybrid G-1B to an inference prototype plus a real-code scaling pilot, and hold the final-training rental.
+- **Per ingredient:**
+  - GDN/SWA: keep;
+  - loops: gate, unshared by default;
+  - ternary: gate against int8/int4 at equal deployed bytes;
+  - MoE: omit from the base run;
+  - bytes: a separate track.
+- **Four plan errors confirmed by the main agent and appended to `notes/final-model-plan.md` as errata:**
+  - G-3B at 128k leaves about 12.4 GB, not more than 15 GB;
+  - the drafter cost ratio is about 0.25, so the speedup is about 1.44×;
+  - 32k prefill takes at least ~2.45 s;
+  - the pilot is 25% of G-1B, not 1/10.
+- **Missing infrastructure it found:** epoch coverage (the loader samples with replacement), multi-GPU training, mid-run resume, the dense SWA mask and the RoPE offset. New SQ305 (deterministic coverage loader) and SQ306 (DDP/FSDP plus restore rehearsal).
+- **Decisions it leaves for the human:** data downloads, a new spending ceiling above $30/12h, G-3B, and the v1.0.0 definition.
+
+**Tooling:**
+- `notes/reviews/codex_run.ps1` gains optional `-Model`/`-Effort` (default unchanged: GPT-6 Luna, high).
+- `cockpit/remote/fetch_data.sh`'s final clean check now ignores untracked files: inference outputs had made a verified rebuild report a mismatch on w4-5.
+- 140 new clean80 score files are committed (F2 stage 1 so far, SQ282, SQ283, Inkling, SQ200, SQ238 arm A, SQ301).
+
+**Fleet:**
+- The operator hold (the human's interrupt, 00:3x) is lifted ("Resume").
+- Idle boxes are reassigned to F2 stage 1.
+- Every rented instance is accounted for (six, w4-1 … w4-6).
+
+---
+
 ## v0.4.87: Outside review 23:39: C198's d=256 result is noisy and LR-confounded (SQ301 registered); README scale caveat; SQ300-SQ304
 *2026-11-22*
 

@@ -17,6 +17,46 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.58: Claims ledger v2: immutable definitions + append-only events
+*2026-11-22*
+
+### Claims ledger redesign (the human's spec)
+**What** (a subagent built it; the main agent verified it): the ledger separates each claim's **immutable definition** from its **evolving evidence**.
+- **Layout:** one file per claim, `experiments/claims/ledger/C<n>.jsonl`.
+  - Line 1 is the `created` event holding the definition: ID, proposition (verbatim), scope (dataset, architecture, model size, precision, hardware), type (empirical / theoretical / implementation / external finding / hypothesis), refutation criteria, dependencies, origin.
+  - Every later line is an append-only event: evidence_added, status_change, limitation_added, audit_verdict, erratum, superseded. Each has a version, actor, evidence pointers and `verified_at` {commit, date}.
+  - Status, evidence, limitations and "last verified" are **derived**.
+- **The immutability rule:** the committed file must be an exact prefix of the working file.
+- **Writes go only through the API:** `python experiments/claims_list.py add-event` / `new-claim`, with per-claim locks.
+- **Views:** `experiments/claims/views/C<n>.md` and `experiments/claims-status.md`. The schema and rationale are in `experiments/claims/README.md`.
+- **Lint (`--check`, the release gate):** required fields, the type enum, evidence pointers that exist on disk, last-verified, dependency cycles, dependents of refuted claims, the definition-immutability and append-only checks, and the seed rule for VERIFIED.
+- `experiments/claims.md` is **frozen** as the v1 archive (only line 1 changed, to a frozen header; its sha256 is in `MIGRATION.json`).
+- `claim_review_batches.py` also counts `audit_verdict` events toward the 6-hour cool-down.
+
+**Migration** (`experiments/claims/migrate_v1.py`):
+- 117 IDs and 167 v1 rows → 167 events, matched 1:1 by `--verify`. 198 events in total.
+- Latest statuses are identical to v1: 23 VERIFIED, 14 PARTIAL, 6 REFUTED, 2 WRONG FOR OUR CODE, 72 UNVERIFIED.
+- Types: 56 external finding, 26 implementation, 18 hypothesis, 14 empirical, 3 theoretical (50 inferred, flagged).
+- 49 limitations were added, quoted verbatim, with the source line checked.
+- **Gaps are left visible, not invented:** "TBD (not stated at creation)" for scope (99–115 per field), refutation criteria (100) and dependencies (114).
+
+**Verified by the main agent**:
+- `claims_list.py --check` exits 0 (lint 0 fail, 0 warn);
+- `migrate_v1.py --verify`: 117 IDs, 167 rows, 167 events;
+- ledger tests pass (reported 15/15);
+- `claim_review_batches.py status` works unchanged.
+
+**AGENTS.md**: §0d-ter, §5 and §7 updated by the subagent; §0's "source of truth" line by the main agent. The audit brief now points auditors at the ledger files and views.
+**Known issues** (recorded, not hidden):
+- C107 holds two different propositions (it needs a new ID for the K9 one);
+- C5's refutation criteria name E10 while its proposition names E0;
+- `verified_at` for migrated rows is approximate;
+- the cockpit, `test_guard.py` and `repro/lint_science.py` still read the frozen v1 file (follow-ups).
+
+**Leak note**: the release helper had staged in-progress versions of `claims_list.py` (v0.4.50/51) and a v2 view (v0.4.53) before the store existed. This version completes that state.
+
+---
+
 ## v0.4.57: Byte-level refs (32 papers, 2025-26 survey); quick review 18:57 triaged
 *2026-11-22*
 

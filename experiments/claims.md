@@ -1,4 +1,4 @@
-# Claims ledger
+# Claims ledger: FROZEN archive (read-only since the v2 migration, 2026-11-22). The live ledger is `experiments/claims/` (one append-only event file per claim; see experiments/claims/README.md); add events with `python experiments/claims_list.py add-event`. Never edit this file: its line numbers are cited as provenance.
 
 Every claim Gogeta-0 relies on or states publicly, with its source and **whether this repo has verified it locally**. Rules: [AGENTS.md §0](../AGENTS.md).
 

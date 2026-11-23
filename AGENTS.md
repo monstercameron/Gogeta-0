@@ -12,7 +12,7 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
   - Target **≤ 15 minutes** (CPU-only if possible). If it can't run that fast, shrink it until it can.
   - Many tiny checks beat one big run.
 - **Verifiable means reproducible:** one script per check in `experiments/checks/` (seeded, runnable from the repo root, printing the measured numbers and a PASS/FAIL against the stated criterion). Commit it as part of a tagged version (no WIP commits, §1). Write the expected result and the pass criterion **before** running. Log the run in `notes/LABNOTEBOOK.md` with the exact numbers.
-- **The claims ledger is the source of truth:** `experiments/claims.md` lists every claim with its source, status and evidence. The statuses:
+- **The claims ledger is the source of truth:** `experiments/claims/ledger/C<n>.jsonl` (one file per claim: an immutable definition plus append-only events; schema and API in `experiments/claims/README.md`; readable view `experiments/claims-status.md`). `experiments/claims.md` is the frozen v1 archive (since v0.4.58). The statuses:
   - `VERIFIED`: a local check passed; cite the script, numbers and commit.
   - `REFUTED`: a local check failed. Keep it: a refuted claim is a result.
   - `PARTIAL`: verified only in a narrower form; say which.
@@ -136,12 +136,12 @@ If a rule conflicts with a direct instruction from the human in chat, follow the
 
 **Every hour, 8 Codex GPT-6 Luna (high) auditors review the claims ledger in parallel, to make the claims rock solid.** A single pass by a cheap model misses things, so each claim is re-audited repeatedly, with a **6-hour cool-down after each review**.
 
-- **Batching:** `python experiments/claim_review_batches.py plan --n 8 --per 6 --cooldown-h 6` picks the due claims. Settled claims (VERIFIED / PARTIAL / REFUTED / WRONG FOR OUR CODE) come first, then UNVERIFIED. Within a tier, never-reviewed claims come first, then the least recently reviewed. It splits them into 8 batches of up to 6. Claims reviewed in the last 6 h are skipped. History: `experiments/claim-reviews.json`.
+- **Batching:** `python experiments/claim_review_batches.py plan --n 8 --per 6 --cooldown-h 6` picks the due claims. Settled claims (VERIFIED / PARTIAL / REFUTED / WRONG FOR OUR CODE / INCONCLUSIVE) come first, then UNVERIFIED, and SUPERSEDED last. Within a tier, never-reviewed claims come first, then the least recently reviewed. It splits them into 8 batches of up to 6. Claims reviewed in the last 6 h are skipped. History: `experiments/claim-reviews.json` plus the `audit_verdict` events in the ledger.
 - **Auditors:** one read-only Codex run per batch, all 8 in parallel. Each runs `notes/reviews/codex_run.ps1` with the brief `notes/reviews/claim-audit-brief.md` (`{IDS}`, `{TS}` and `{K}` filled in), writing `notes/reviews/claims/<TS>-b<K>.md`.
-- **What auditors check:** for each claim, they read every ledger row, **open every evidence pointer and check the numbers match**, and judge the status against `notes/statistics-policy.md`, the K9 contamination caveat and later results. Verdicts: `SOLID`, `WEAK`, `WRONG`, `NEEDS-EVIDENCE` or `UNCHECKABLE`, each with a pointer and a suggested fix.
-- **The main agent verifies every non-SOLID verdict itself** before acting, because an auditor may be wrong. Confirmed problems get an append-only ledger row (downgrade, caveat or new pointer) with the evidence, plus a micro-devlog note. Rejected auditor findings get a one-line reason in the audit file's `## Triage` footer.
-- **Recording:** `python experiments/claim_review_batches.py record <audit_file> C5=WEAK:reason ...` logs each verdict, which starts that claim's 6-hour cool-down.
-- **Commits:** the hourly audit files, the review log and the resulting ledger rows go in as one PATCH version ("Claim audit <TS>"), pushed per §3. Downgrades are listed in the devlog entry.
+- **What auditors check:** for each claim, they read its definition and every event (`experiments/claims/views/C<n>.md`, generated from `experiments/claims/ledger/C<n>.jsonl`; migrated events cite their frozen `experiments/claims.md` line), **open every evidence pointer and check the numbers match**, check the result against the claim's scope and refutation criteria, and judge the status against `notes/statistics-policy.md`, the K9 contamination caveat and later results. Verdicts: `SOLID`, `WEAK`, `WRONG`, `NEEDS-EVIDENCE` or `UNCHECKABLE`, each with a pointer and a suggested fix.
+- **The main agent verifies every non-SOLID verdict itself** before acting, because an auditor may be wrong. Confirmed problems get a new ledger event from the main agent (`claims_list.py add-event`: a `status_change` downgrade, a `limitation_added` caveat or an `evidence_added` pointer) with the evidence, plus a micro-devlog note. Rejected auditor findings get a one-line reason in the audit file's `## Triage` footer.
+- **Recording:** `python experiments/claim_review_batches.py record <audit_file> C5=WEAK:reason ... [--version vX.Y.Z]` logs each verdict in `experiments/claim-reviews.json` **and** appends an `audit_verdict` event (actor `codex-auditor`) to the claim's ledger file, which starts that claim's 6-hour cool-down. An `audit_verdict` event never changes a status.
+- **Commits:** the hourly audit files, the review log and the resulting ledger events go in as one PATCH version ("Claim audit <TS>"), pushed per §3. Downgrades are listed in the devlog entry.
 - **Cost guard:** if Codex errors or rate-limits, skip the failed batches and don't fall back to 8 Claude agents. Their claims stay due for the next hour.
 
 ## 0e. Cockpit first: one interface, SQLite logs
@@ -257,19 +257,21 @@ The project stays at `0.y.z` while it's experimental.
 - Keep datasets and checkpoints **on the WSL filesystem** (e.g. `~/fusiondance-data/`), not under `/mnt/c/` (slow, and not committed anyway).
 - Every run is reproducible from a **config file plus a seed** committed to the repo. Results that make it into the devlog must name the config.
 - **EVERY EXPERIMENT ENDS BY UPDATING THE CLAIMS LEDGER. No exceptions.**
-  - The ledger lives at the root of `experiments/`: `experiments/claims.md` is the append-only source of truth, and `experiments/claims-status.md` is the generated current list.
+  - **The ledger is `experiments/claims/`** (schema, status definitions, event types, lint rules and a worked example: `experiments/claims/README.md`). Each claim is one file, `experiments/claims/ledger/C<n>.jsonl`. Its first line is the **immutable definition**: ID, proposition, scope (dataset, architecture, model size, precision, hardware), type (empirical / theoretical / implementation / external finding / hypothesis), refutation criteria, dependencies, created version and origin. Every later line is an **append-only event** (`created`, `evidence_added`, `status_change`, `limitation_added`, `audit_verdict`, `erratum`, `superseded`) with a timestamp, version, actor, status and reason, evidence pointers, limitations and `verified_at` {commit, date}. Current status, evidence, limitations and "last verified" are **derived** from the events; `experiments/claims-status.md` and `experiments/claims/views/C<n>.md` are generated views. `experiments/claims.md` is the **frozen v1 archive**: never edit it (the lint fails if it changes).
+  - **Never hand-edit ledger files. Write only through the API:** `python experiments/claims_list.py add-event C<n> --status ... --reason ... --evidence ... --version vX.Y.Z`, `new-claim ...`, `erratum ...` and `audit-verdict ...`. They validate before writing and regenerate the views.
   - This applies when any experiment, check, side quest, sweep or eval finishes, whether it passed, failed or was inconclusive:
-    1. append a ledger row for **every claim it tested** (an existing ID or a new one), with its status (`VERIFIED` / `PARTIAL` / `REFUTED` / `WRONG FOR OUR CODE` / `UNVERIFIED`) and the evidence: the numbers, the results file or run, and the version;
-    2. if it tested no existing claim, add a new claim stating what it found;
-    3. run `python experiments/claims_list.py` to regenerate `claims-status.md`.
-  - **An experiment isn't finished, and its version can't be cut, until the ledger and `claims-status.md` are updated in that same commit.**
-- **EVERY SETTLED CLAIM POINTS TO ITS EVIDENCE.** Any ledger row whose status is not `UNVERIFIED` must cite, in its evidence column, at least one concrete pointer a reader can open:
+    1. append an event for **every claim it tested**, with its status (`VERIFIED` / `PARTIAL` / `REFUTED` / `WRONG FOR OUR CODE` / `INCONCLUSIVE` / `UNVERIFIED`), the reason and the evidence: the results file or run, and the version. A VERIFIED status needs `--evidence-class` (and `--n-seeds` ≥ 3 for a training comparison), per `notes/statistics-policy.md`;
+    2. if it tested no existing claim, add a new claim with `new-claim`, stating the scope and the refutation criterion **before** the result where possible;
+    3. run `python experiments/claims_list.py` to regenerate the views and run the lint.
+  - **Definitions are immutable.** If a proposition must change, create a new claim with `new-claim --supersedes C<n> --reason ...`; the old one becomes `SUPERSEDED`. A typo fix, or filling a `TBD (not stated at creation)` field, is an `erratum` event that records the old and new text. The lint compares every ledger file with `git show HEAD:` and fails if a definition changed or any event was edited or removed.
+  - **An experiment isn't finished, and its version can't be cut, until its ledger events and the regenerated views are in that same commit.** `python experiments/claims_list.py --check` must exit 0 before a version is cut.
+- **EVERY SETTLED CLAIM POINTS TO ITS EVIDENCE.** Any event that sets a status other than `UNVERIFIED` (or the `evidence_added` events after it) must cite at least one concrete pointer a reader can open, and settled claims must have a `verified_at`:
   - a results file (`experiments/checks/results/<ID>.json`, `evals/results/<file>.json`);
   - an experiment card or micro devlog (`experiments/cards/<ID>.md`, `experiments/devlogs/<ID>.md`);
   - a run id with its version tag;
   - a source file and line, for code or "computed" claims.
 
-  Numbers alone ("−3.6%") or "see above" are not evidence. `experiments/claims_list.py` flags settled claims without a pointer, and a version can't be cut while any are flagged. Fix it by appending a row that adds the pointer; never edit old rows.
+  Numbers alone ("−3.6%") or "see above" are not evidence. Cited files must exist on disk (run ids and version tags count as pointers). `add-event` refuses an event that breaks this rule, and the lint in `experiments/claims_list.py` fails on any settled claim without a pointer; a version can't be cut while it fails. Fix it by appending an `evidence_added` event; never edit old events. The lint also flags for review every claim whose dependency is `REFUTED` or `WRONG FOR OUR CODE`.
 - **EVERY EXPERIMENT HAS ITS OWN MICRO DEVLOG:** `experiments/devlogs/<ID>.md`. This covers E-series runs, checks, side quests, sweeps and evals. It's created **when the experiment is registered**, and appended to (newest last, dated, with the version) at every step:
   - the plan and prediction (or a link to it);
   - each launch (command, commit, run id);
@@ -281,7 +283,7 @@ The project stays at `0.y.z` while it's experimental.
   - the decision taken.
 
   It's the experiment's lab notebook: messy is fine, missing is not. The **card** (`experiments/cards/<ID>.md`) stays the clean summary; the **micro devlog** is the full history; the **DEVLOG** block is the versioned summary.
-- **Claims list:** `experiments/claims-status.md` is the readable list of every claim with its **latest** status, generated from the append-only ledger `experiments/claims.md` by `python experiments/claims_list.py`. Regenerate and commit it with every version. Run artifacts (`~/fusiondance-data/runs/`) stay out of git; results are recorded in the ledger, cards, `experiments/checks/results/` and the registry.
+- **Claims list:** `experiments/claims-status.md` is the readable list of every claim, grouped by its **current** status, with type, scope, latest evidence, limitations and last verified. `experiments/claims/views/C<n>.md` gives each claim's full history. Both are generated from `experiments/claims/ledger/` by `python experiments/claims_list.py`. Regenerate and commit them with every version. Run artifacts (`~/fusiondance-data/runs/`) stay out of git; results are recorded in the ledger, cards, `experiments/checks/results/` and the registry.
 - **One checkout, no worktrees (§3), for subagents too.** Never use `git worktree`, `isolation: worktree`, or a copy of the repo elsewhere. `C:\Users\mreca\Desktop\FusionDance` is a stale v0.1.1 copy: never read results from it or write to it.
 - **Every experiment is tracked in `experiments/experiments.json`** (id, arc, question, status, version, config, results). Set `status` to `running` when it starts and `done`/`failed`/`abandoned` when it ends, fill in `results` (use `val_loss` for the site's power-level chart), and set `version` to the tag that records it. New experiments get the next `E<n>` id.
 - Compare variants at **matched compute** (or matched params *and* report compute). State which.
@@ -375,7 +377,9 @@ The project stays at `0.y.z` while it's experimental.
 | `experiments/launch/campaigns/` | Campaign files for `tools/launch_campaign.sh` (one launch per line) |
 | `experiments/INDEX.md` | **Generated** lookup table of every experiment, check and side quest (status, headline, reuse, card link). Read it first. |
 | `experiments/cards/<ID>.md` | Agent-facing documentation card per experiment/check/side quest (template: `_TEMPLATE.md`) |
-| `experiments/claims.md` | **Claims ledger** (§0): every claim we rely on, with source, status and evidence |
+| `experiments/claims/` | **Claims ledger** (§0, §5): `ledger/C<n>.jsonl` (immutable definition + append-only events, the source of truth), generated `views/C<n>.md`, `README.md` (schema, statuses, lint), `migrate_v1.py`, `MIGRATION.json`, `test_ledger.py` |
+| `experiments/claims_list.py`, `experiments/claims-status.md` | Ledger API/CLI (`add-event`, `new-claim`, `erratum`, `audit-verdict`, `show`, `lint`, `--check`) and the generated current-status list |
+| `experiments/claims.md` | Frozen v1 claims ledger (read-only archive since the v2 migration; its line numbers are cited as provenance) |
 | `experiments/checks/` | One small, seeded verification script per claim (§0), each ≤ ~15 min; side-quest scripts are prefixed `sq_` |
 | `cockpit/` | **Cockpit** (§0e): stdlib `core.py`, Textual TUI `tui.py`, MCP server `mcp_server.py`, SQLite log store `logdb.py`; start with `cockpit/README.md` |
 | `~/fusiondance-data/cockpit/gogeta.sqlite` | Run/event/error log store (data, not committed; schema in `cockpit/logdb.py`) |

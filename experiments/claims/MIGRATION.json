@@ -1,0 +1,156 @@
+{
+ "schema": 2,
+ "migrated_by": "experiments/claims/migrate_v1.py",
+ "migrated_at": "2026-11-22T19:03:07-05:00",
+ "version": "v0.4.58",
+ "source": "experiments/claims.md",
+ "source_sha256": "4befafce0d2a17bf03af764a512d7ab5fa6978a115e3c424c4f47ab475371f56",
+ "source_lines": 281,
+ "head_at_migration": "94c1438ffa7eabf0fe19e746bb2b4e7248e2bddf",
+ "counts": {
+  "ids": 117,
+  "rows": 167,
+  "events": 198,
+  "events_by_type": {
+   "created": 117,
+   "status_change": 15,
+   "limitation_added": 31,
+   "evidence_added": 35
+  },
+  "latest_status": {
+   "VERIFIED": 23,
+   "PARTIAL": 14,
+   "WRONG FOR OUR CODE": 2,
+   "REFUTED": 6,
+   "UNVERIFIED": 72
+  },
+  "types": {
+   "implementation": 26,
+   "hypothesis": 18,
+   "empirical": 14,
+   "theoretical": 3,
+   "external finding": 56
+  },
+  "type_inferred": 50,
+  "tbd": {
+   "scope.dataset": 111,
+   "scope.architecture": 108,
+   "scope.model_size": 113,
+   "scope.precision": 115,
+   "scope.hardware": 99,
+   "refutation_criteria": 100,
+   "dependencies": 114
+  },
+  "limitations": 49,
+  "dependencies": 3,
+  "non_claim_rows": 6
+ },
+ "frozen": true,
+ "frozen_sha256": "4befafce0d2a17bf03af764a512d7ab5fa6978a115e3c424c4f47ab475371f56",
+ "sections": {
+  "Verified or measured here": {
+   "line": 16,
+   "intro": ""
+  },
+  "Stated somewhere but not true of our code": {
+   "line": 32,
+   "intro": ""
+  },
+  "Not yet verified here (quoted from papers or theory)": {
+   "line": 40,
+   "intro": ""
+  },
+  "Proposed checks (not run yet)": {
+   "line": 60,
+   "intro": ""
+  },
+  "Verified by the TRL setup work (2026-11-22)": {
+   "line": 71,
+   "intro": ""
+  },
+  "Proposed by competitor review (pending review)": {
+   "line": 81,
+   "intro": "Source: [`notes/review-competitors.md`](../notes/review-competitors.md) (fact-check of an externally pasted analysis against primary sources, 2026-11-22). Nothing here has been run locally. \"XP-n\" refers to the experiments in that note; SQ30–SQ41 are their side-quest rows.\n**Overlap note (competitor review):** C59 (E2 loop = near-constant drift) is the same reading as the looped-transformer review's \"coda drowning\" claim (C41 in `notes/research-looped.md`). Keep one row when merging. C61 overlaps its SQ22 source (LT2 §3.4)."
+  },
+  "Proposed by looped-transformer research (pending review)": {
+   "line": 110,
+   "intro": "Source: [`notes/research-looped.md`](../notes/research-looped.md) (papers in `refs/11-looped-2026/`). All rows come from papers or from re-analysis, so all are `UNVERIFIED`. Overlaps with the competitor-review rows: C38 refines C65, C39–C40 refine C59, and C37 conflicts with C58."
+  },
+  "Science-gaps fix (2026-11-22): tuned reference control, LR tuning, replication": {
+   "line": 130,
+   "intro": ""
+  },
+  "Verdicts from checks K1–K6 and SQ6 (recorded for v0.4.0)": {
+   "line": 141,
+   "intro": "These update the status of earlier rows. Where they differ, this section is the current status, until the rows are consolidated."
+  },
+  "Proposed by Kimi Linear research (pending review)": {
+   "line": 157,
+   "intro": "Source: Kimi Linear, arXiv 2510.26692v2 (48B-total / 3B-active MoE, 1.4T tokens unless noted), and fla 0.6.0 `fla.ops.kda`. Details in [`notes/research-kimi-linear.md`](../notes/research-kimi-linear.md). All paper numbers are *reported*, at a scale ~3,000× ours."
+  },
+  "Proposed by benchmark-suite research (pending review)": {
+   "line": 174,
+   "intro": "Source: `notes/benchmark-suite.md` (survey, predictions written before running, scorecard) and `evals/`. All runs CPU only, ≤ 2 threads, via `tools/launch_cpu_job.sh`, 2026-11-22; the E0 checkpoint is `~/fusiondance-data/checkpoints/E0-20261122-122059-s0/model.pt` (seed 0)."
+  },
+  "Proposed by the 3D page work (main agent reviewed)": {
+   "line": 191,
+   "intro": ""
+  },
+  "Status updates (latest row per ID wins in claims-status.md)": {
+   "line": 197,
+   "intro": ""
+  },
+  "Proposed by hardware research (pending review)": {
+   "line": 205,
+   "intro": "Source: [`notes/hardware-spark.md`](../notes/hardware-spark.md) (NVIDIA RTX Spark N1X research, 2026-11-22; references in `refs/12-hardware/SOURCES.md`). Nothing here was run on the GPU by the research; every check below is a script with its prediction written in it, not yet registered in a tagged version. \"Documented\" = stated by an NVIDIA document, not checked locally."
+  },
+  "Status updates from K9 (v0.4.33)": {
+   "line": 237,
+   "intro": ""
+  },
+  "Evidence-pointer backfill (v0.4.36; AGENTS §5: every settled claim cites evidence)": {
+   "line": 247,
+   "intro": "Rows proposed by the backfill subagent; every cited path checked to exist by the main agent. C28: no findable evidence, so it is downgraded."
+  }
+ },
+ "non_claim_rows": [
+  {
+   "line": 64,
+   "section": "Proposed checks (not run yet)",
+   "text": "| K1 | C12, C15: memory/time vs context length per layer type | ~5 min GPU, no training | `experiments/checks/k1_memory_vs_length.py` |"
+  },
+  {
+   "line": 65,
+   "section": "Proposed checks (not run yet)",
+   "text": "| K2 | C14: BitLinear vs Linear speed (training + inference) | ~2 min GPU | `experiments/checks/k2_bitlinear_speed.py` |"
+  },
+  {
+   "line": 66,
+   "section": "Proposed checks (not run yet)",
+   "text": "| K3 | C16: MQAR recall, GDN vs SWA vs attn | ~15 min GPU (3 tiny models) | `experiments/checks/k3_mqar_recall.py` |"
+  },
+  {
+   "line": 67,
+   "section": "Proposed checks (not run yet)",
+   "text": "| K4 | C17: ternary gap vs model size at tiny scale | ~15 min GPU | `experiments/checks/k4_ternary_gap_vs_size.py` |"
+  },
+  {
+   "line": 68,
+   "section": "Proposed checks (not run yet)",
+   "text": "| K5 | C18: state tracking, single pass vs looped | ~10 min GPU | `experiments/checks/k5_state_tracking.py` |"
+  },
+  {
+   "line": 69,
+   "section": "Proposed checks (not run yet)",
+   "text": "| K6 | C20: does E2's loop converge? | ~3 min GPU, inference on the existing checkpoint | `experiments/checks/k6_loop_convergence.py` |"
+  }
+ ],
+ "known_issues": [
+  "C107: its first row (L187, benchmark suite) asserts 'E0 writes working solutions for in-distribution held-out problems ...'; its K9 row (L242) asserts a different proposition, 'The val split is exact-dedup only (no near-duplicate removal)', VERIFIED. Migrated faithfully (the definition is the first row; the K9 row is an event whose provenance.row_claim_text shows the other wording). Fix: a new claim for the K9 proposition and an audit/limitation event on C107.",
+  "Later rows often restate the claim in shortened words (e.g. C12 'SWA is O(n*w)'); the definition keeps the first row's wording and every row's own wording is kept in provenance.row_claim_text.",
+  "verified_at for migrated rows is the commit that recorded the row (git blame) unless the row cites a commit; the v1 ledger never recorded the code revision a check ran on.",
+  "Original actors (main agent vs subagent) are not recorded in claims.md; migrated events use actor 'migration'.",
+  "C5's refutation criteria are PREDICTIONS.md's Phase 2b rule, which is written against E10 (the tuned control), while C5's proposition names E0; PREDICTIONS.md says the ledger row is to be restated against E10.",
+  "The 6 rows of the 'Proposed checks' table (K1-K6 -> claims) carry no status and are not claim rows; they are kept verbatim in non_claim_rows."
+ ]
+}

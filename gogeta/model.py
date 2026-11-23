@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import math
 from contextlib import nullcontext
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 
 import torch
 import torch.nn as nn
@@ -72,6 +72,12 @@ class ModelConfig:
     moe_zloss_coef: float = 1e-3     # router z-loss weight (per MoE layer)
     moe_router_frozen: bool = False  # router weights requires_grad=False (frozen random router)
     moe_impl: str = "gather"         # "gather" (active compute only) | "dense" (all experts, static shapes)
+    # Assembly compensations (v0.4.109, A1 campaign). Every default reproduces the pre-assembly model bit for bit,
+    # and to_dict() omits a key while it holds its default, so existing configs and their hashes are unchanged.
+    loop_embed: bool = False          # learned per-pass vector added to h before each core pass (zero-init)
+    inject_contractive: bool = False  # h = lam * h + inject(...), lam = sigmoid(per-channel param), init 0.9 (Parcae-style)
+    ternary_acts: bool = True         # ternary=True: also int8 absmax activations (BitNet b1.58); False = weights only
+    ternary_fp_ends: bool = False     # ternary=True: prelude, coda and inject stay full precision (only the core is ternary)
 
     @property
     def head_dim(self) -> int:
@@ -81,26 +87,55 @@ class ModelConfig:
         d = asdict(self)
         if not self.moe_experts:
             d = {k: v for k, v in d.items() if not k.startswith("moe_")}
+        for k, v in _ASSEMBLY_DEFAULTS.items():
+            if d.get(k) == v:
+                d.pop(k)
         return d
+
+
+_ASSEMBLY_DEFAULTS = {"loop_embed": False, "inject_contractive": False, "ternary_acts": True, "ternary_fp_ends": False}
 
 
 # ----------------------------------------------------------------------------- BitLinear
 class BitLinear(nn.Linear):
-    """BitNet b1.58 linear: ternary weights (absmean) + int8 activations (absmax), STE."""
+    """BitNet b1.58 linear: ternary weights (absmean) + int8 activations (absmax), STE.
+
+    quant_acts=False keeps activations in full precision (weight-only ternary). quant_on=False makes the layer a plain
+    linear (used by train.ternary_start_frac: full-precision training first, ternary QAT from that fraction on)."""
+    quant_acts: bool = True
+    quant_on: bool = True
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if not self.quant_on:
+            return F.linear(x, self.weight, self.bias)
         w = self.weight
         scale = w.abs().mean().clamp(min=1e-5)
         w_q = (w / scale).round().clamp(-1, 1) * scale
         w = w + (w_q - w).detach()
-        s = 127.0 / x.abs().amax(dim=-1, keepdim=True).clamp(min=1e-5)
-        x_q = (x * s).round().clamp(-128, 127) / s
-        x = x + (x_q - x).detach()
+        if self.quant_acts:
+            s = 127.0 / x.abs().amax(dim=-1, keepdim=True).clamp(min=1e-5)
+            x_q = (x * s).round().clamp(-128, 127) / s
+            x = x + (x_q - x).detach()
         return F.linear(x, w, self.bias)
 
 
 def make_linear(cfg: ModelConfig, d_in: int, d_out: int) -> nn.Linear:
-    return (BitLinear if cfg.ternary else nn.Linear)(d_in, d_out, bias=False)
+    if not cfg.ternary:
+        return nn.Linear(d_in, d_out, bias=False)
+    lin = BitLinear(d_in, d_out, bias=False)
+    if not cfg.ternary_acts:
+        lin.quant_acts = False
+    return lin
+
+
+def set_ternary_quant(model: nn.Module, on: bool) -> int:
+    """Switch every BitLinear's quantisation on or off; returns how many layers changed."""
+    n = 0
+    for m in model.modules():
+        if isinstance(m, BitLinear) and m.quant_on != on:
+            m.quant_on = on
+            n += 1
+    return n
 
 
 # ----------------------------------------------------------------------------- pieces
@@ -251,15 +286,20 @@ class FusionDance(nn.Module):
         self.cfg = cfg
         self.rope = Rotary(cfg.head_dim, cfg.max_seq_len, cfg.rope_base)
         self.embed = nn.Embedding(cfg.vocab_size, cfg.d_model)
-        mk = lambda kinds: nn.ModuleList(Block(k, cfg, self.rope) for k in kinds)
-        self.prelude, self.core, self.coda = mk(cfg.prelude), mk(cfg.core), mk(cfg.coda)
+        ends_cfg = replace(cfg, ternary=False) if (cfg.ternary and cfg.ternary_fp_ends) else cfg
+        mk = lambda kinds, c: nn.ModuleList(Block(k, c, self.rope) for k in kinds)
+        self.prelude, self.core, self.coda = mk(cfg.prelude, ends_cfg), mk(cfg.core, cfg), mk(cfg.coda, ends_cfg)
         for i, b in enumerate([*self.prelude, *self.core, *self.coda]):
             if b.moe:
                 b.mlp.layer_idx = i
         if self.core:
             self.inj_norm_h, self.inj_norm_e = nn.RMSNorm(cfg.d_model), nn.RMSNorm(cfg.d_model)
-            self.inject = make_linear(cfg, 2 * cfg.d_model, cfg.d_model)
+            self.inject = make_linear(ends_cfg, 2 * cfg.d_model, cfg.d_model)
             self.inject.is_residual_out = True
+            if cfg.loop_embed:  # one vector per pass index (passes beyond loops_max reuse the last), zero-init below
+                self.loop_emb = nn.Parameter(torch.zeros(max(cfg.loops_max, cfg.loops), cfg.d_model))
+            if cfg.inject_contractive:  # lam = sigmoid(lam_logit) in (0, 1), init 0.9
+                self.lam_logit = nn.Parameter(torch.full((cfg.d_model,), math.log(0.9 / 0.1)))
         self.norm_out = nn.RMSNorm(cfg.d_model)
         self.head = nn.Linear(cfg.d_model, cfg.vocab_size, bias=False)
         if cfg.tie_embeddings:
@@ -299,7 +339,13 @@ class FusionDance(nn.Module):
             e, h = x, x
             for i in range(r):
                 with torch.no_grad() if i < n_nograd else nullcontext():
-                    h = h + self.inject(torch.cat([self.inj_norm_h(h), self.inj_norm_e(e)], dim=-1))
+                    inj = self.inject(torch.cat([self.inj_norm_h(h), self.inj_norm_e(e)], dim=-1))
+                    if self.cfg.inject_contractive:
+                        h = torch.sigmoid(self.lam_logit) * h + inj
+                    else:
+                        h = h + inj
+                    if self.cfg.loop_embed:
+                        h = h + self.loop_emb[min(i, self.loop_emb.shape[0] - 1)]
                     for b in self.core:
                         h = b(h, aux)
             x = h

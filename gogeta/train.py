@@ -38,7 +38,7 @@ from types import SimpleNamespace
 import numpy as np
 import torch
 
-from gogeta.model import FusionDance, ModelConfig
+from gogeta.model import FusionDance, ModelConfig, set_ternary_quant
 from gogeta.tracking import DATA, Run
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -329,6 +329,9 @@ def main():
             for gp in opt.param_groups:
                 gp["lr"] = lr
             r = loop_rng.randint(mc.loops_min, mc.loops_max) if looped else None
+            if tc.get("ternary_start_frac"):  # full-precision training first, ternary QAT from this fraction on (A1)
+                if set_ternary_quant(model, step >= tc["ternary_start_frac"] * total_steps):
+                    print(f"step {step}: ternary quantisation {'on' if step else 'off'}", flush=True)
             x, y = data.batch(tc["batch_size"], device)
             moe_stats = {} if is_moe(model) else None
             loss = forward_backward(fwd_model, x, y, r, micro_batches(tc)[1], moe_stats)

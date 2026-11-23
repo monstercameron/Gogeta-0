@@ -1,0 +1,45 @@
+{
+  "experiment": "A1e",
+  "description": "A1 assembly screen (A1e): F2 cell 111 (E27) with ONE compensation: ternary core only (ternary_fp_ends: prelude, coda and inject full precision). 200M tokens via --max-tokens, lr 6e-3 via --lr, code-py-v2.",
+  "model": {
+    "vocab_size": 8192,
+    "d_model": 384,
+    "n_heads": 6,
+    "mlp_hidden": 1024,
+    "window": 256,
+    "max_seq_len": 1024,
+    "ternary": true,
+    "prelude": [
+      "swa"
+    ],
+    "core": [
+      "gdn",
+      "gdn",
+      "swa"
+    ],
+    "coda": [
+      "attn"
+    ],
+    "loops": 4,
+    "loops_min": 1,
+    "loops_max": 7,
+    "bptt_loops": 4,
+    "ternary_fp_ends": true
+  },
+  "train": {
+    "dataset": "code-py-v2",
+    "seq_len": 1024,
+    "batch_size": 32,
+    "max_tokens": 20000000,
+    "lr": 0.006,
+    "min_lr_frac": 0.1,
+    "warmup_steps": 300,
+    "weight_decay": 0.1,
+    "beta1": 0.9,
+    "beta2": 0.95,
+    "grad_clip": 1.0,
+    "eval_every": 250,
+    "eval_seqs": 128,
+    "seed": 0
+  }
+}

@@ -18,6 +18,41 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.0: Assembly begins: compensation hooks + A1 screen registered; E60 done (MoE -2.7%, dense-wide FFN -4.2%; C203)
+*2026-11-23*
+
+**Assembly begins** (human goal: put the model together, compensate its challenges, use the new dataset, rent 5090-class GPUs). This version also completes **E60 stage 1** (Code-MoE, registered).
+
+**E60 stage 1** (code-py-v1, 200M tokens, 6 seeds per arm vs E1's 7 Phase 2b-5090 seeds; `experiments/checks/e60_stage1.py`):
+
+| Arm | vs E1, clean80 | 95% CI | Prediction |
+|---|---|---|---|
+| E60a: MoE FFN 4x512 top-2 (learned router) | **-2.72%** | [-3.00, -2.44] | M1 PASS |
+| E60b: frozen random router | -1.43% | (E60a beats it by 1.31%, paired [-1.54, -1.07]) | M3 FAIL: routing matters |
+| E60c: dense SwiGLU 2048, same total params | **-4.21%** | [-4.58, -3.84] | M2 PASS |
+
+- **Reading:** the dense, wider FFN beats the MoE by 1.56% at about the same wall time per run (5.19 vs 5.05 min on a 5090), so at this scale unique parameters in a plain FFN beat routed experts. This fits C197, where unique params are the lever.
+- **Ledger:** new claim **C203** (VERIFIED, 6 seeds, registered). Limitations: LR picked at 20M, v1 data, router balance not measured.
+
+**Assembly, stage A1 (registered, not yet run).** F2's 200M result is the problem to solve: the full fusion is 30.8% worse than dense, with anti-synergy (C202). A1 tests one compensation at a time on the full-fusion cell E27, seeds 0-1, 200M tokens of code-py-v2:
+- fixed r = 4 training (E27 trains with r ~ U{1..7});
+- a learned per-pass loop embedding;
+- contractive injection;
+- weight-only ternary;
+- ternary in the core only;
+- late ternary (full precision for the first half);
+- two loop shapes that hold 14 block applications but give the core more unique parameters (6 x 2, 4 x 3).
+
+The predictions and the winner rule (<= -1.0% paired, about 2 seed sd) are in `experiments/checks/PREDICTIONS.md`. Winners get stacked in A2.
+
+- **Code:** new `ModelConfig` switches `loop_embed`, `inject_contractive`, `ternary_acts`, `ternary_fp_ends`; `BitLinear.quant_on` and `set_ternary_quant()`; `train.ternary_start_frac`. All are off by default, and `to_dict()` omits them at their defaults, so existing configs and hashes are unchanged. Tests: `tests/test_assembly.py` 7/7 and `tests/test_moe.py` 12/12 on CPU. The GPU suite (`tests/test_model.py`) runs on the rented box before training.
+- **Also registered:** SQ340 (fp32 vs bf16 scoring) and SQ347 (copy-deficit probe), for the side-quest worker.
+- **Side-quest worker:** a Sonnet subagent works through the CPU side quests (SQ339, SQ341, SQ348, SQ346, SQ352, SQ345, SQ340, SQ347, SQ351, SQ61) on files disjoint from the assembly work.
+- **Quick reviews triaged:** 10:48 (safety: SQ352), 10:54 (code-model: SQ194 extended to the F2 cells), 11:03 (newcomer: a plain-words README block for the next docs refresh).
+- **Budget:** the human authorised 5090-or-better rentals. The agent caps itself at $25 for A1+A2 and at most 8 boxes, and destroys each box once its jobs are pulled.
+
+---
+
 ## v0.4.108: Claim audit 2026-11-23-1103: 48 claims, no downgrades; C36 WRONG rejected against the paper table; INCONCLUSIVE added to the statistics policy
 *2026-11-23*
 

@@ -18,20 +18,20 @@
 <header class="page-head"><div class="wrap">
   <span class="eyebrow">Experiment E60 · Code-MoE</span>
   <h1 class="exp-title">Code-MoE stage 1-2: MoE FFN as capacity (E1) and as a loop rescue (E2 vs E9)</h1>
-  <p class="status-line"><span class="pill planned">Charging</span>
-     
+  <p class="status-line"><span class="pill done">Fusion stable</span>
+     <span class="muted">recorded in v0.4.109</span>
      <span class="muted">config <code>experiments/staged-configs/e60/ (e60a_moe, e60b_frozen_router, e60c_dense2048); code gogeta/moe.py (v0.4.96)</code></span></p>
   <p class="lead"><b>The question:</b> At matched active FLOPs, does a dropless top-2 MoE FFN (4 experts x 512) lower clean80 bpc vs E1, how much of a dense total-param-matched control&#x27;s gain does it capture, does learned routing beat a frozen random router, and does MoE help the looped E2 more than its unlooped twin E9 (interaction I)?</p>
   
 </div></header>
 <section class="article"><div class="wrap prose">
   <p class="muted">No write-up yet.</p><aside class="prediction-box"><b>Prediction (written before the run)</b><p>Registered: experiments/checks/PREDICTIONS.md, section &#x27;E60 stage 1&#x27; (M1-M3, M5, M8; D1-D3), v0.4.96, before any run.</p></aside>
-  
+  <details class="viz-table"><summary>All recorded numbers</summary><div class="table-wrap"><table class="kv"><tbody><tr><th>Validation loss</th><td>None</td></tr><tr><th>clean80_bpc</th><td>{&#x27;E60a&#x27;: 0.26066, &#x27;E60b&#x27;: 0.26411, &#x27;E60c&#x27;: 0.25666, &#x27;E1_7seed&#x27;: 0.26794}</td></tr><tr><th>E60a_vs_E1</th><td>-2.72% [-3.00, -2.44] (Welch, 6 vs 7 seeds)</td></tr><tr><th>E60a_vs_E60b</th><td>-1.31% [-1.54, -1.07] (paired, 6 seeds)</td></tr><tr><th>E60c_vs_E1</th><td>-4.21% [-4.58, -3.84]</td></tr><tr><th>verdicts</th><td>M1 PASS, M2 PASS, M2b PASS, M3 FAIL (routing matters), D1 new claim C203</td></tr><tr><th>evidence</th><td>experiments/checks/results/e60_stage1.json</td></tr></tbody></table></div></details>
   <p class="muted small">New to the jargon? <a href="../learn.html">Start here</a> for plain-English definitions of loss, tokens, parameters and FLOPs.</p>
   <div class="pager"><a class="btn" href="E16.html">← E16</a><a class="btn" href="../devlog.html#experiments-section">All experiments</a><a class="btn" href="E61.html">E61 →</a></div>
 </div></section>
 <footer><div class="wrap">
-  <span>Gogeta-0 · FusionDance architecture · v0.4.108</span>
+  <span>Gogeta-0 · FusionDance architecture · v0.5.0</span>
   <span>An independent research project and fan homage, not affiliated with or endorsed by the Dragon Ball rights holders.</span>
 </div></footer>
 <script src="../assets/charts.js"></script>

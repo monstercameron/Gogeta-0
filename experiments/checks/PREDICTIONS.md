@@ -703,3 +703,33 @@ Source: outside review 2026-11-23 00:10. C197's limitation (event 4): E34, which
   - **D2:** the CI of E60a − E60b lies below 0 → learned routing matters; otherwise "the gain is capacity, not routing".
   - **D3:** compare E60a and E60c per measured GPU-minute.
 - **Context:** SQ282 (v0.4.94) found the C197 lever is unique params, not depth, so E60 is ungated. The stage-1 "max expert load > 0.6 or NaN" instability check gates stage 2.
+
+## A1 assembly screen (2026-11-23 ~11:40 EST, before dispatch): one compensation at a time on the full fusion
+- **Question:** at 200M the full fusion (F2 cell 111, E27) is 30.8% worse than dense and the ingredients interact with anti-synergy (C202). Which single compensation recovers the most of that gap?
+- **Base:** E27 `experiments/staged-configs/e27_fact111.json` at lr 6e-3, 200M tokens (`--max-tokens 200000000`), code-py-v2. The existing SQ263 runs, seeds 0-2, are the reference: clean80 0.3303 / 0.3268 / 0.3288, per-seed log sd 0.0053.
+- **Arms** (`experiments/staged-configs/a1/`, sha256-16 in brackets), each ONE change from E27, seeds 0 and 1, same LR and tokens:
+  - **A1a** [c7c46ee31e10fc94]: fixed r = 4 in training (r ~ U{1..7} in E27).
+  - **A1b** [c46c03ee356ea882]: learned per-pass loop embedding (zero-init).
+  - **A1c** [42c9df11a85e0538]: contractive injection, h = lam*h + inject, lam = sigmoid(per-channel), init 0.9.
+  - **A1d** [fb07718b3ca3a70e]: weight-only ternary (activations not quantised).
+  - **A1e** [26d96983d6d349ba]: ternary core only (prelude, coda and inject in full precision).
+  - **A1f** [0644beb7f8936d63]: late ternary: full precision for the first 50% of steps, ternary QAT after.
+  - **A1g** [fc2cd08286cce5f9]: loop shape, core of 6 blocks x r = 2 (r ~ U{1..3}): 15.1M vs 9.5M non-embedding params, same 14 applications.
+  - **A1h** [343590a98c4c6673]: loop shape, core of 4 blocks x r = 3 (r ~ U{1..5}): 11.4M non-embedding params.
+- **Metric:** clean80 doc-level bpc (v2 val), log scale. Effect = mean over seeds 0-1 of log(arm / E27 same seed): paired by seed, since the data order is shared.
+- **Predictions** (effect vs E27; negative = better):
+  - **A1a:** -1.5% (range -4% to +0.5%). **A1b:** -0.5% (-2% to +0.5%). **A1c:** -0.5% (-2.5% to +1.5%).
+  - **A1d:** -2% (-5% to 0%). **A1e:** -3% (-6% to -1%). **A1f:** -3% (-6% to -1%).
+  - **A1g:** -2% (-5% to +1%). **A1h:** -1% (-3% to +1%).
+  - At least one arm improves by >= 2%; none closes more than half of the 30.8% gap to dense.
+- **Decision rule (screen, exploratory under policy §4):** an arm is a **winner** if its paired 2-seed effect is <= -1.0% (about 2 seed sd) and both seeds point the same way. Winners are stacked in A2 (registered separately, 3 seeds, with dense E20 and GDN E24 as references). A1 changes no claim status.
+- **Throughput:** each arm's tokens/s vs E27 is reported (A1g and A1h change kernel shapes).
+
+## SQ340 (2026-11-23 ~11:40 EST, before running): fp32 vs bf16-emulated scoring of the 200M F2 cells
+- **Arms:** cells 000, 100 and 111 at their best LR, seeds 0-2, CPU, same clean v2 val doc subset: (a) fp32 everywhere, (b) q/k/v and the GDN output rounded to bf16 at the points where the GPU path casts (`gogeta/model.py` GatedDeltaNet.forward).
+- **Prediction:** for each cell, shift = log bpc under (b) minus under (a). |shift(111) - shift(100)| < 1 point, and no cell's shift exceeds 1 point. **Falsifier:** a cell moving by >= 1 point, or 111 moving >= 1 point more than 100, would mean the 200M F2 scores must be re-scored in fp32 before C202's wording stands.
+
+## SQ347 (2026-11-23 ~11:40 EST, before running): copy-deficit probe on the 200M F2 cells
+- **Design:** all 5 cells at their best LR, seeds 0-2, CPU. Synthetic sequences: filler from clean v2 val docs with a 32-token span copied after a gap of 128, 256 or 512 tokens, 200 sequences per gap (fixed seed 0). y = log of the mean NLL on the second copy's tokens.
+- **Estimand:** I_copy = y111 - y100 - y010 - y001 + 2·y000, with the seed-blocked estimator of `experiments/checks/sq263.py`.
+- **Prediction:** at gaps 256 and 512, I_copy > 0 with a seed-blocked 95% CI excluding 0, and |I_copy| within 0.5x to 2x of I_bpc (+6.2 log-points). **Falsifier:** |I_copy| < 1 point or the opposite sign at both gaps: the reversal would then be general modelling, not a recall deficit.

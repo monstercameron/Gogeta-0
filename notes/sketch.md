@@ -79,6 +79,13 @@ The nice part is that looping costs extra compute and BitNet makes compute cheap
 
 - **2026-11-23 (v0.4.108):** The statistics policy gains an INCONCLUSIVE status row, matching the ledger schema: a check that ran but failed its own validity gate is INCONCLUSIVE, not UNVERIFIED (C16 stays INCONCLUSIVE). C201 stays REFUTED under its own criterion, registered at creation, and its 20M measurement is noted as standing.
 
+- **2026-11-23 (v0.5.0), human goal:** "start putting the model together ... solve the unintuitive parts and find a way to compensate for its challenges, use the new dataset ... use the 5090 or greater VPS ... make sure all the components work well together". Plan:
+  - a Sonnet worker clears the CPU side quests on disjoint files;
+  - the main agent assembles the fusion on code-py-v2 at 200M tokens: A1 screens one compensation at a time on E27 (2 seeds), then A2 stacks the winners (3 seeds, with dense and GDN references);
+  - compensation hooks in `gogeta/model.py` are off by default and bit-identical;
+  - rental: the human authorised 5090-or-better boxes without naming an amount, so the agent caps itself at $25 for A1+A2 and at most 8 concurrent boxes, destroys each box as soon as its last job is pulled, and reports spend.
+  - code-py-v3 (Stack v3) needs a separate download approval (45-120 GB), so v2 is "the new dataset" for now.
+
 ## Status (2026-11-23, v0.4.104)
 
 - Results so far: E1 is not better than E10. C5 is REFUTED by its registered rule on the primary metric (E1 0.18% worse in the point estimate; the CI includes 0, so no difference detected; v0.4.78, qualifier v0.4.95). The 7-seed-per-arm Phase 2b-5090 replication puts E1 at +0.08% vs E10, CI spanning 0: no difference detected (v0.4.79). E1's 3.6% lead over E0 was an init artifact (SQ200: flat init brings E0 to +0.44% of E10; C199 PARTIAL): E0 trails E10 by about 3.7% (v0.4.70). Init explains part of that: all-attention stacks lose 3.5-3.8% under our default init, while E1 shows no detected effect at fixed LRs (C199, PARTIAL since v0.4.89). E11 (negative-eigenvalue GDN) is equivalent to E1 (C196 VERIFIED, -0.13%, within ±1%). Loops don't pay yet: E2 is 2.6% worse than E9 and 6.2% worse than E1 (C6/C7, one seed). Out of corpus, SQ99 shows no transfer (C192 REFUTED); the length effect is C193 (PARTIAL).

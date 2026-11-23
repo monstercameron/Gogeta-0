@@ -17,6 +17,28 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.4.75: Fleet wave 1 dispatched on 8x RTX 5090; wave 2 (registered A3/HPO items on v1) pinned to one SKU
+*2026-11-22*
+
+**The fleet is running** (the human: "spin up several of the cheapest 5090s max 8 concurrent and run all the experiments"; the N1X limited to light work).
+- **Boxes:** 8 RTX 5090s rented at $0.50–0.70/hr each, about $5.0/hr in total. They are outside mainland China (Hugging Face is blocked there), verified, reliability > 0.97, and labelled `gogeta-cockpit-w1-1`…`8`.
+- **Spend control:** within the human's $30 budget, about $29.58 of it left. The cockpit spend approval (human-only, TTY) was left open for the human to type; until then the boxes are rented through the Vast CLI under the human's chat go-ahead, and each is pulled and destroyed when its job list ends (AGENTS §0h).
+- **Wave 1 (registered in v0.4.74):**
+  - Phase 2b-5090: E10 and E1 × 7 seeds, E11 × 3, E9 and E2 × 1, at 200M tokens;
+  - SQ232 replay pairs;
+  - clean80 scoring of every checkpoint on the box;
+  - the six N1X Phase 2b checkpoints (E10/E1 × 3, the registered confirmatory Q12 set) uploaded to one 5090 for clean-val scoring, so the laptop stays cool.
+
+  Six boxes were up first, so wave 1 runs on them, balanced at 17–21 min of training each. The other two take wave 2.
+- **Wave 2 (registered here, before dispatch):** registered A3/HPO items that run on code-py-v1, judged by their v0.4.40 criteria on one SKU:
+  - the K7-5090 LR grid (tuning, no claim);
+  - H1 second seeds, H4 warmup-30 (E50/E51) and H2 horizon stage A;
+  - the A3 matched arms E30–E34 (1 seed each, as registered).
+- **Blocked:** everything on `code-py-v2` (most of A3), until its builder lands. A subagent is writing it, and the build will run on a rented box's CPU. E42–E45 also need a patch.
+- **`fetch_data.sh`:** a new `KEEP=1` option keeps `docs_train.jsonl` for the byte and v2 dataset builds.
+
+---
+
 ## v0.4.74: Expense ledger; outside review 21:10; fleet wave 1 registered (Phase 2b on 5090s at 7 seeds, SQ232)
 *2026-11-22*
 

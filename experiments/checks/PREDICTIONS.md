@@ -475,3 +475,12 @@ The predictions registered in v0.4.68 apply to exactly these staged configs (sha
   - E11 stays at seeds 0–2, and E9 and E2 at seed 0.
   - The registered test for R1 is the paired-by-seed difference over seeds 0–6 (Welch as a sensitivity check), on clean80 bpc, with Holm across the two Phase 2b-5090 confirmatory comparisons (E1 vs E10; E11 vs E1).
   - **The resolvable effect is stated before any result:** with an assumed per-arm sd of 0.0020 on val_loss (the N1X 3-seed sd), the 95% half-width of the paired mean difference at n = 7 is about 0.0018 (computed with sd_diff about 0.0020, an assumption).
+
+## Fleet wave 2 (2026-11-22 ~21:45, before dispatch): registered A3 items that run on code-py-v1, all on RTX 5090
+Nothing new is predicted here. This executes items registered in v0.4.40 (sections "Registered A3 design predictions" and "H. Fair HPO protocol and horizon check"), judged by their registered criteria, on **one SKU** (RTX 5090). References come from the same SKU: Phase 2b-5090 (wave 1) and K7-5090 below. Never pooled with N1X runs.
+- **K7-5090 (tuning, no claim):** the K7 LR grid re-run on the 5090 at seed 0, 20M tokens: E10 at {1e-3, 2e-3, 3e-3, 6e-3, 1.2e-2} (1.2e-2 is H0) and E1 at {1e-3, 2e-3, 3e-3, 6e-3, 1.2e-2}. A different chosen LR than the N1X's K7 is reported, not acted on mid-wave.
+- **H1:** seed 1 at the top-2 LRs, 20M: E10 at {2e-3, 3e-3}, E1 at {3e-3, 6e-3}.
+- **H4:** warmup-30 sensitivity, 20M: E50 (E10) at {3e-3, 6e-3}, E51 (E1) at {6e-3, 1.2e-2}.
+- **H2:** horizon check stage A at 200M, seed 0: E1 at 3e-3, E10 at 6e-3, E10 at 2e-3. H3 runs only if its registered condition holds.
+- **A3 matched arms** at 200M, seed 0, at their file LRs: E30, E31, E32, E33, E34. Registered design: "1 seed each".
+- **Blocked:** everything on code-py-v2 (E20–E27, E35, E36, E40–E53 except E50/E51). The builder is in progress, and the v2 items wait for its manifest. E42–E45 also need the GDN-flags patch.

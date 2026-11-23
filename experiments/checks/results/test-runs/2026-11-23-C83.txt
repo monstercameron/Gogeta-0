@@ -1,0 +1,37 @@
+== C83 re-run: post_training/test_rewards.py (venv gogeta-rl, CPU) 2026-11-23T17:06:52-05:00 HEAD 39febd2; tracked files clean except experiments/checks/sq339_cpu.py (unrelated worker edit) and in-progress docs/triage files
+test_extract_asserts (post_training.test_rewards.TestExtraction.test_extract_asserts) ... ok
+test_fenced (post_training.test_rewards.TestExtraction.test_fenced) ... ok
+test_plain (post_training.test_rewards.TestExtraction.test_plain) ... ok
+test_prompt_opened_fence (post_training.test_rewards.TestExtraction.test_prompt_opened_fence) ... ok
+test_auto_falls_back_and_says_so (post_training.test_rewards.TestFailClosed.test_auto_falls_back_and_says_so) ... ok
+test_bad_mode_and_network_conflict_rejected (post_training.test_rewards.TestFailClosed.test_bad_mode_and_network_conflict_rejected) ... ok
+test_grpo_reward_path_fails_closed_by_default (post_training.test_rewards.TestFailClosed.test_grpo_reward_path_fails_closed_by_default) ... ok
+test_mount_failure_fails_closed (post_training.test_rewards.TestFailClosed.test_mount_failure_fails_closed) ... ok
+test_require_raises_without_namespace_and_starts_no_child (post_training.test_rewards.TestFailClosed.test_require_raises_without_namespace_and_starts_no_child) ... ok
+test_controls (post_training.test_rewards.TestForgery.test_controls) ... ok
+test_forgeries_score_zero (post_training.test_rewards.TestForgery.test_forgeries_score_zero) ... ok
+test_partial_credit_unchanged (post_training.test_rewards.TestForgery.test_partial_credit_unchanged) ... ok
+test_tests_are_isolated_from_each_other (post_training.test_rewards.TestForgery.test_tests_are_isolated_from_each_other) ... ok
+test_negative_control (post_training.test_rewards.TestFsIsolation.test_negative_control) ... ok
+test_repo_and_windows_drive_hidden (post_training.test_rewards.TestFsIsolation.test_repo_and_windows_drive_hidden) ... ok
+test_repo_write_control_fails (post_training.test_rewards.TestFsIsolation.test_repo_write_control_fails) ... ok
+test_scratch_dirs_private (post_training.test_rewards.TestFsIsolation.test_scratch_dirs_private) ... ok
+test_exit_scores_zero (post_training.test_rewards.TestSandbox.test_exit_scores_zero) ... ok
+test_fail_and_partial (post_training.test_rewards.TestSandbox.test_fail_and_partial) ... ok
+test_forged_result_line_is_ignored (post_training.test_rewards.TestSandbox.test_forged_result_line_is_ignored) ... ok
+test_infinite_loop_times_out (post_training.test_rewards.TestSandbox.test_infinite_loop_times_out) ... ok
+test_memory_limit (post_training.test_rewards.TestSandbox.test_memory_limit) ... ok
+test_network_blocked_when_isolated (post_training.test_rewards.TestSandbox.test_network_blocked_when_isolated) ... ok
+test_no_tests_scores_zero (post_training.test_rewards.TestSandbox.test_no_tests_scores_zero) ... ok
+test_pass (post_training.test_rewards.TestSandbox.test_pass) ... ok
+test_runs_as_nobody_when_root (post_training.test_rewards.TestSandbox.test_runs_as_nobody_when_root) ... ok
+test_runtime_error_in_solution (post_training.test_rewards.TestSandbox.test_runtime_error_in_solution) ... ok
+test_sleep_times_out (post_training.test_rewards.TestSandbox.test_sleep_times_out) ... ok
+test_syntax_error (post_training.test_rewards.TestSandbox.test_syntax_error) ... ok
+test_reward_function_signature (post_training.test_rewards.TestTRLShape.test_reward_function_signature) ... ok
+
+----------------------------------------------------------------------
+Ran 30 tests in 6.407s
+
+OK
+exit 0

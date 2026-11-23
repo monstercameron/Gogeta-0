@@ -18,6 +18,29 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.37: Claim audit 2026-11-23-1702: 48 claims, 33 SOLID; C104 and C17 to UNVERIFIED; C83/C82 test outputs saved (30/30, smoke PASS); C5/C197/C196 objections rejected with caveats
+*2026-11-23*
+
+**Claim audit 2026-11-23-1702: 48 claims out of cool-down, 8 auditors. 33 SOLID, 15 non-SOLID, all checked. Two downgrades (C104, C17). Missing test outputs for C83 and C82 were re-run and saved. Three objections rejected with caveats.**
+
+- **Scope:** 48 claims, 8 Codex GPT-6 Luna auditors (`notes/reviews/claims/2026-11-23-1702-b1..b8.md`), all ok.
+- **Downgrades:**
+  - **C104** (OpenCoder's annealing corpus not decontaminated): PARTIAL -> **UNVERIFIED**. The ledger cites only a secondary summary and our corpus scan, which cannot establish the paper's procedure.
+  - **C17** (the ternary gap shrinks with size): PARTIAL -> **UNVERIFIED**. K4 scored the contaminated val (K9: 41.7% near-duplicates), and policy keeps contaminated metrics UNVERIFIED until a clean80 re-score.
+- **Evidence gaps fixed with saved runs:**
+  - **C83:** `post_training/test_rewards.py` 30/30 OK (`test-runs/2026-11-23-C83.txt`).
+  - **C82:** GRPO/SFT/DPO smoke tests PASS, with every logged number identical to SETUP.md's prose (`test-runs/2026-11-23-C82.txt`).
+- **Wording and scope limitations added** (confirmed WEAK, no status change): C109 (lm-eval 0.4.13 scope; stale limitation resolved), C8 (clean-subset scope), C202 (analytic vs actual compute), C106 ("protects" narrowed, plus the /proc gap), C128 (sm_12xa clause), C199 and C198 (no difference detected, not equivalence), C100 (stale pending-output limitation resolved).
+- **Rejected, with footers:**
+  - C5's downgrade: the registered rule was met, and the 7-seed CI excludes a practical 1% advantage; a caveat is added.
+  - C197's per-doc requirement: it is a training claim with seed as the unit, and section 5 covers benchmarks.
+  - C196's downgrade: the proposition is scoped to lr 6e-3; a caveat is added.
+- **Quick reviews:**
+  - 16:59: stale E11/Q17 queue items fixed (E11 is C196); SQ414 (do 20M screens predict 200M?).
+  - 17:04: in its file.
+
+---
+
 ## v0.5.36: GPU batch B1 read out: MoE core matches dense-2048 at 31% fewer FLOPs; learned GDN beta not needed; loop cost not an LR artifact; unique params beat a second pass ~2.4x per FLOP (20M screens)
 *2026-11-23*
 

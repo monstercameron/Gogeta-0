@@ -1,0 +1,50 @@
+== C82 re-run: post_training/grpo_smoke.py + sft_dpo_smoke.py (venv gogeta-rl, CPU) 2026-11-23T17:07:12-05:00 HEAD 39febd2
+== post_training/grpo_smoke.py
+{'loss': '-2.086e-07', 'grad_norm': '2.395', 'learning_rate': '0.001', 'num_tokens': '268', 'completions/mean_length': '16', 'completions/min_length': '16', 'completions/max_length': '16', 'completions/clipped_ratio': '1', 'completions/mean_terminated_length': '0', 'completions/min_terminated_length': '0', 'completions/max_terminated_length': '0', 'rewards/toy_reward/mean': '0.08757', 'rewards/toy_reward/std': '0.02423', 'rewards/code_reward/mean': '0', 'rewards/code_reward/std': '0', 'reward': '0.08757', 'reward_std': '0.02423', 'frac_reward_zero_std': '0', 'kl': '0', 'entropy': '8.998', 'clip_ratio/low_mean': '0', 'clip_ratio/high_mean': '0', 'clip_ratio/region_mean': '0', 'clip_ratio/low_min': '0', 'clip_ratio/high_max': '0', 'step_time': '1.959', 'epoch': '0.5'}
+{'loss': '5.296e-05', 'grad_norm': '2.289', 'learning_rate': '0.0006667', 'num_tokens': '536', 'completions/mean_length': '16', 'completions/min_length': '16', 'completions/max_length': '16', 'completions/clipped_ratio': '1', 'completions/mean_terminated_length': '0', 'completions/min_terminated_length': '0', 'completions/max_terminated_length': '0', 'rewards/toy_reward/mean': '0.1141', 'rewards/toy_reward/std': '0.1221', 'rewards/code_reward/mean': '0', 'rewards/code_reward/std': '0', 'reward': '0.1141', 'reward_std': '0.1221', 'frac_reward_zero_std': '0', 'kl': '0.001324', 'entropy': '8.998', 'clip_ratio/low_mean': '0', 'clip_ratio/high_mean': '0', 'clip_ratio/region_mean': '0', 'clip_ratio/low_min': '0', 'clip_ratio/high_max': '0', 'step_time': '1.577', 'epoch': '1'}
+{'loss': '7.899e-05', 'grad_norm': '2.143', 'learning_rate': '0.0003333', 'num_tokens': '800', 'completions/mean_length': '16', 'completions/min_length': '16', 'completions/max_length': '16', 'completions/clipped_ratio': '1', 'completions/mean_terminated_length': '0', 'completions/min_terminated_length': '0', 'completions/max_terminated_length': '0', 'rewards/toy_reward/mean': '0.07685', 'rewards/toy_reward/std': '0.01556', 'rewards/code_reward/mean': '0', 'rewards/code_reward/std': '0', 'reward': '0.07685', 'reward_std': '0.01556', 'frac_reward_zero_std': '0', 'kl': '0.00197', 'entropy': '8.998', 'clip_ratio/low_mean': '0', 'clip_ratio/high_mean': '0', 'clip_ratio/region_mean': '0', 'clip_ratio/low_min': '0', 'clip_ratio/high_max': '0', 'step_time': '2.339', 'epoch': '1.5'}
+{'train_runtime': '8.091', 'train_samples_per_second': '2.966', 'train_steps_per_second': '0.371', 'train_loss': '4.392e-05', 'epoch': '1.5'}
+
+==== GRPO smoke summary ====
+params: 697,024  steps: 3  wall: 8.6s  beta: 0.04
+  step=1  loss=-2.086e-07  reward=0.08757  reward_std=0.02423  rewards/toy_reward/mean=0.08757  rewards/code_reward/mean=0  kl=0  completions/mean_length=16
+  step=2  loss=5.296e-05  reward=0.1141  reward_std=0.1221  rewards/toy_reward/mean=0.1141  rewards/code_reward/mean=0  kl=0.001324  completions/mean_length=16
+  step=3  loss=7.899e-05  reward=0.07685  reward_std=0.01556  rewards/toy_reward/mean=0.07685  rewards/code_reward/mean=0  kl=0.00197  completions/mean_length=16
+code_reward calls (completions scored): 24
+parameter tensors changed: 29/29
+SMOKE: PASS
+(scratch output in /tmp/gogeta-grpo-smoke-4xh004ms; train_runtime=8.0913)
+exit 0
+== post_training/sft_dpo_smoke.py
+Adding EOS to train dataset:   0%|          | 0/8 [00:00<?, ? examples/s]Adding EOS to train dataset: 100%|██████████| 8/8 [00:00<00:00, 3601.03 examples/s]
+Tokenizing train dataset:   0%|          | 0/8 [00:00<?, ? examples/s]Tokenizing train dataset: 100%|██████████| 8/8 [00:00<00:00, 1540.61 examples/s]
+Building labels for train dataset:   0%|          | 0/8 [00:00<?, ? examples/s]Building labels for train dataset: 100%|██████████| 8/8 [00:00<00:00, 4544.82 examples/s]
+Truncating train dataset:   0%|          | 0/8 [00:00<?, ? examples/s]Truncating train dataset: 100%|██████████| 8/8 [00:00<00:00, 6717.60 examples/s]
+Dropping fully masked examples from train dataset:   0%|          | 0/8 [00:00<?, ? examples/s]Dropping fully masked examples from train dataset: 100%|██████████| 8/8 [00:00<00:00, 11479.45 examples/s]
+SFT tokenized example: len 33 | ends with <|eos|>: True | prompt tokens: 18 | loss tokens: 15 | prompt masked, completion kept: True
+{'loss': '8.947', 'grad_norm': '7.913', 'learning_rate': '0.001', 'entropy': '8.998', 'mean_token_accuracy': '0', 'num_tokens': '132', 'epoch': '0.5'}
+{'loss': '8.427', 'grad_norm': '5.009', 'learning_rate': '0.0006667', 'entropy': '8.998', 'mean_token_accuracy': '0.4667', 'num_tokens': '264', 'epoch': '1'}
+{'loss': '8.21', 'grad_norm': '3.939', 'learning_rate': '0.0003333', 'entropy': '8.998', 'mean_token_accuracy': '0.8', 'num_tokens': '396', 'epoch': '1.5'}
+{'train_runtime': '0.9258', 'train_samples_per_second': '12.96', 'train_steps_per_second': '3.24', 'train_loss': '8.528', 'epoch': '1.5'}
+
+==== SFT ====
+  step=1  loss=8.946650505065918  mean_token_accuracy=0.0
+  step=2  loss=8.427193641662598  mean_token_accuracy=0.46666666865348816
+  step=3  loss=8.210474014282227  mean_token_accuracy=0.800000011920929
+  parameter tensors changed: 29/29
+Adding EOS to train dataset:   0%|          | 0/8 [00:00<?, ? examples/s]Adding EOS to train dataset: 100%|██████████| 8/8 [00:00<00:00, 6544.65 examples/s]
+Tokenizing train dataset:   0%|          | 0/8 [00:00<?, ? examples/s]Tokenizing train dataset: 100%|██████████| 8/8 [00:00<00:00, 1276.08 examples/s]
+Dropping fully truncated examples from train dataset:   0%|          | 0/8 [00:00<?, ? examples/s]Dropping fully truncated examples from train dataset: 100%|██████████| 8/8 [00:00<00:00, 8031.22 examples/s]
+{'loss': '0.6931', 'grad_norm': '2.499', 'learning_rate': '0.001', 'entropy': '8.998', 'num_tokens': '264', 'logits/chosen': '-0.0003826', 'logits/rejected': '-0.0003852', 'mean_token_accuracy': '0', 'rewards/chosen': '0', 'rewards/rejected': '0', 'rewards/accuracies': '0', 'rewards/margins': '0', 'logps/chosen': '-134.9', 'logps/rejected': '-134.4', 'epoch': '0.5'}
+{'loss': '0.5735', 'grad_norm': '1.387', 'learning_rate': '0.0006667', 'entropy': '8.998', 'num_tokens': '528', 'logits/chosen': '0.003805', 'logits/rejected': '0.006763', 'mean_token_accuracy': '0.06667', 'rewards/chosen': '0.119', 'rewards/rejected': '-0.1367', 'rewards/accuracies': '1', 'rewards/margins': '0.2557', 'logps/chosen': '-133.7', 'logps/rejected': '-135.8', 'epoch': '1'}
+{'loss': '0.5299', 'grad_norm': '1.079', 'learning_rate': '0.0003333', 'entropy': '8.998', 'num_tokens': '792', 'logits/chosen': '-0.0005151', 'logits/rejected': '0.005101', 'mean_token_accuracy': '0.1333', 'rewards/chosen': '0.1481', 'rewards/rejected': '-0.2104', 'rewards/accuracies': '1', 'rewards/margins': '0.3585', 'logps/chosen': '-133.4', 'logps/rejected': '-136.5', 'epoch': '1.5'}
+{'train_runtime': '1.166', 'train_samples_per_second': '10.29', 'train_steps_per_second': '2.573', 'train_loss': '0.5988', 'epoch': '1.5'}
+
+==== DPO ====
+  step=1  loss=0.6931471824645996  rewards/margins=0.0  rewards/accuracies=0.0  mean_token_accuracy=0.0
+  step=2  loss=0.5734542012214661  rewards/margins=0.2556854486465454  rewards/accuracies=1.0  mean_token_accuracy=0.06666667014360428
+  step=3  loss=0.5298863053321838  rewards/margins=0.35847777128219604  rewards/accuracies=1.0  mean_token_accuracy=0.13333334028720856
+  parameter tensors changed: 29/29
+
+SFT: PASS | DPO: PASS
+exit 0

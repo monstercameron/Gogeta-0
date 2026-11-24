@@ -3220,6 +3220,258 @@
    "batch_file": "notes/reviews/claims/2026-11-23-1802-b8.md",
    "verdict": "WEAK",
    "note": "confirmed; paper-reported attribution limitation"
+  },
+  {
+   "id": "C203",
+   "ts": "2026-11-23T19:09:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b1.md",
+   "verdict": "SOLID",
+   "note": "E60 CIs match e60_stage1.json (exact t)"
+  },
+  {
+   "id": "C67",
+   "ts": "2026-11-23T19:09:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b1.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "paper absent, SQ33 parked; stays UNVERIFIED"
+  },
+  {
+   "id": "C33",
+   "ts": "2026-11-23T19:09:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b1.md",
+   "verdict": "WEAK",
+   "note": "paper attribution added (limitation, v0.5.49)"
+  },
+  {
+   "id": "C76",
+   "ts": "2026-11-23T19:09:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b1.md",
+   "verdict": "WEAK",
+   "note": "paper-reported limitation already recorded (v0.5.5)"
+  },
+  {
+   "id": "C42",
+   "ts": "2026-11-23T19:09:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b1.md",
+   "verdict": "WEAK",
+   "note": "paper attribution added; K5/E9 do not test it"
+  },
+  {
+   "id": "C26",
+   "ts": "2026-11-23T19:09:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b2.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "no SQ10/SQ12 result; stays UNVERIFIED"
+  },
+  {
+   "id": "C126",
+   "ts": "2026-11-23T19:09:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b2.md",
+   "verdict": "WEAK",
+   "note": "single-observation limitation added; 28 s interval objection rejected (12 s from load end)"
+  },
+  {
+   "id": "C32",
+   "ts": "2026-11-23T19:09:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b2.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ14/SQ16 not run"
+  },
+  {
+   "id": "C93",
+   "ts": "2026-11-23T19:09:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b2.md",
+   "verdict": "SOLID",
+   "note": "E10 sd 0.00203 matches, caveats kept"
+  },
+  {
+   "id": "C38",
+   "ts": "2026-11-23T19:09:02-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b2.md",
+   "verdict": "SOLID",
+   "note": "paper-scoped"
+  },
+  {
+   "id": "C102",
+   "ts": "2026-11-23T19:09:03-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b3.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "no local artifact for the HumanEval figures"
+  },
+  {
+   "id": "C124",
+   "ts": "2026-11-23T19:09:03-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b3.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ78 not run"
+  },
+  {
+   "id": "C123",
+   "ts": "2026-11-23T19:09:03-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b3.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ77 not run"
+  },
+  {
+   "id": "C117",
+   "ts": "2026-11-23T19:09:03-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b3.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ73 not run"
+  },
+  {
+   "id": "C71",
+   "ts": "2026-11-23T19:09:03-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b3.md",
+   "verdict": "SOLID",
+   "note": "supersession supported"
+  },
+  {
+   "id": "C74",
+   "ts": "2026-11-23T19:09:03-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b4.md",
+   "verdict": "SOLID",
+   "note": "paper figures match the research note"
+  },
+  {
+   "id": "C122",
+   "ts": "2026-11-23T19:09:03-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b4.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ77 not run"
+  },
+  {
+   "id": "C121",
+   "ts": "2026-11-23T19:09:03-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b4.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ76 not run"
+  },
+  {
+   "id": "C116",
+   "ts": "2026-11-23T19:09:03-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b4.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ72 not run"
+  },
+  {
+   "id": "C15",
+   "ts": "2026-11-23T19:09:03-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b4.md",
+   "verdict": "SOLID",
+   "note": "split into C190 supported by K1"
+  },
+  {
+   "id": "C35",
+   "ts": "2026-11-23T19:09:04-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b5.md",
+   "verdict": "WEAK",
+   "note": "scope limitation already recorded (v0.4.101, v0.5.5)"
+  },
+  {
+   "id": "C79",
+   "ts": "2026-11-23T19:09:04-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b5.md",
+   "verdict": "SOLID",
+   "note": "1.16x matches Kimi section 5.3"
+  },
+  {
+   "id": "C120",
+   "ts": "2026-11-23T19:09:04-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b5.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ76 compiled timings not run"
+  },
+  {
+   "id": "C115",
+   "ts": "2026-11-23T19:09:04-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b5.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ72 not run"
+  },
+  {
+   "id": "C34",
+   "ts": "2026-11-23T19:09:04-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b6.md",
+   "verdict": "SOLID",
+   "note": "inference wording, Ouro supports"
+  },
+  {
+   "id": "C78",
+   "ts": "2026-11-23T19:09:04-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b6.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "paper PDF added as evidence (v0.5.49)"
+  },
+  {
+   "id": "C119",
+   "ts": "2026-11-23T19:09:04-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b6.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ75 not run"
+  },
+  {
+   "id": "C75",
+   "ts": "2026-11-23T19:09:04-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b6.md",
+   "verdict": "WEAK",
+   "note": "narrowing limitation already recorded (v0.4.101, v0.5.5)"
+  },
+  {
+   "id": "C30",
+   "ts": "2026-11-23T19:09:05-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b7.md",
+   "verdict": "SOLID",
+   "note": "WEAK rejected, Ouro table lists 76.44 at T=4 in the OlympiadBench row"
+  },
+  {
+   "id": "C77",
+   "ts": "2026-11-23T19:09:05-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b7.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "Kimi Table 1 attribution added; local check is SQ91 E42 (not run)"
+  },
+  {
+   "id": "C118",
+   "ts": "2026-11-23T19:09:05-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b7.md",
+   "verdict": "SOLID",
+   "note": "SQ74 not run, UNVERIFIED justified"
+  },
+  {
+   "id": "C72",
+   "ts": "2026-11-23T19:09:05-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b7.md",
+   "verdict": "SOLID",
+   "note": "SQ50 timeout documented"
+  },
+  {
+   "id": "C69",
+   "ts": "2026-11-23T19:09:05-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b8.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "primary sources not archived"
+  },
+  {
+   "id": "C40",
+   "ts": "2026-11-23T19:09:05-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b8.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ14 not run; cause unverified"
+  },
+  {
+   "id": "C112",
+   "ts": "2026-11-23T19:09:05-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b8.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ71 not run"
+  },
+  {
+   "id": "C70",
+   "ts": "2026-11-23T19:09:05-05:00",
+   "batch_file": "notes/reviews/claims/2026-11-23-1902-b8.md",
+   "verdict": "NEEDS-EVIDENCE",
+   "note": "SQ50 GPU result missing"
   }
  ]
 }

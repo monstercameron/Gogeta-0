@@ -18,6 +18,32 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.49: Claim audit 2026-11-23-1902: 36 claims, 11 SOLID, 7 WEAK, 18 NEEDS-EVIDENCE, no downgrades; C30 WEAK rejected against the Ouro PDF
+*2026-11-23*
+
+**Claim audit 2026-11-23-1902: 36 claims, 8 auditors, all ok. 11 SOLID, 7 WEAK, 18 NEEDS-EVIDENCE. No status changes and no downgrades: every non-SOLID verdict was on an UNVERIFIED claim. Four attribution fixes and one pointer fix were confirmed; one WEAK verdict (C30) was rejected against the primary PDF.**
+
+- **Scope:** 36 claims out of cool-down, 8 Codex GPT-6 Luna auditors (`notes/reviews/claims/2026-11-23-1902-b1..b8.md`), with triage in each footer.
+  - 34 UNVERIFIED, plus C203 (VERIFIED, SOLID: the E60 intervals match `e60_stage1.json` after the exact-t fix) and C71 and C15 (SUPERSEDED, SOLID).
+- **Confirmed and fixed** (ledger events; statuses unchanged):
+  - **C33:** paper-reported limitation (Iso-Depth phi = 0.46 / 0.38 / 0.65, checked with pdftotext).
+  - **C42:** paper-reported limitation (Adaptive Loops Table 1: 1.687 vs 1.801, 0.813 vs 0.780). K5 and E9 do not test these figures.
+  - **C77:** the evidence pointer is replaced by Kimi Table 1 (5.70 without convolution vs 5.65). The local check is SQ91's E42 arm, which has not run; event 6 corrects my own wrong SQ pointer in event 5.
+  - **C78:** the Kimi Linear PDF (Fig. 1b, Fig. 7, section 6.3) is added as evidence.
+  - **C126:** a single-observation limitation (one cool-down, not a median; SQ79 measures repeated ones).
+- **Rejected:**
+  - **C30 WEAK:** Ouro's OlympiadBench row reads 76.44 at T=4 and 39.26 at T=8, so the table and the prose agree.
+  - **C126's 28 s interval:** the auditor measured from a reading taken during the run. From the end of the run to 59.5 C is about 12 s, so the patch's "~15 s" holds.
+- **Already addressed:** C76, C75 and C35 (their paper-reported limitations date from v0.4.101 and v0.5.5).
+- **NEEDS-EVIDENCE (18), all UNVERIFIED:** their checks have not run (SQ14, SQ16, SQ33, SQ50, SQ71-SQ78, SQ91), or their primary sources are not archived (C69, C102). They stay UNVERIFIED.
+- **Side fix:** the stale "requeued" status line in `experiments/devlogs/SQ50.md` now reads dropped and parked (v0.5.9), per C72's auditor.
+- **Quick reviews 18:53-19:04** (triage footers):
+  - SQ75 now also times the real input loader (predicted under 2% of wall time).
+  - SQ349 adds the C209 pair with `ast.parse` validity.
+  - New SQ432 tests API-symbol grounding by likelihood, true names vs decoys at use sites on SQ99 files, A2s vs E27 (CPU).
+
+---
+
 ## v0.5.48: Sandbox setsid escape fixed: PID namespace + bounded wait (SQ61); GRPO gate lifted; SQ428 inconclusive
 *2026-11-23*
 

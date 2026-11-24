@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-ffd23f"></a>
-  <a href="https://github.com/monstercameron/Gogeta-0/tags"><img alt="Version" src="https://img.shields.io/badge/version-v0.5.60-ff8a1f"></a>
+  <a href="https://github.com/monstercameron/Gogeta-0/tags"><img alt="Version" src="https://img.shields.io/badge/version-v0.5.61-ff8a1f"></a>
   <a href="https://monstercameron.github.io/Gogeta-0/"><img alt="Project site" src="https://img.shields.io/badge/site-live-3cff9a"></a>
   <img alt="Status: research" src="https://img.shields.io/badge/status-experimental%20research-4a90ff">
   <img alt="Python 3.12" src="https://img.shields.io/badge/python-3.12-3cff9a">
@@ -46,7 +46,7 @@
 
 **Gogeta-0** is a small causal language model for Python code, and the first model built on **FusionDance**: an architecture that fuses three separate answers to the three big costs of modern LLMs. It's an open, laptop-scale research project, and every experiment is written up honestly, failures included.
 
-> **Status: v0.5.60. Assembled and measured at 15M parameters; research paused.** Every FusionDance component trains and runs together, and the best recipe (A2s) beats the naive fusion by 16.7%, but it still trails a plain dense model in corpus. The next steps (a GPU batch, a bigger dataset and the final 1.2B model) wait on the human. Where things stand and how to resume: [`notes/CONTINUATION.md`](notes/CONTINUATION.md).
+> **Status: v0.5.61. Assembled and measured at 15M parameters; research paused.** Every FusionDance component trains and runs together, and the best recipe (A2s) beats the naive fusion by 16.7%, but it still trails a plain dense model in corpus. The next steps (a GPU batch, a bigger dataset and the final 1.2B model) wait on the human. Where things stand and how to resume: [`notes/CONTINUATION.md`](notes/CONTINUATION.md).
 
 - **What works:** linear-time GDN mixers, sliding-window and full attention, a shared looped core, BitNet ternary weights, a ternary MoE core, a coarse-to-fine byte decoder and self-speculative decoding all train end to end. Causality is exact on the production CUDA kernels (C3), and the code sandbox for RL is hardened (C83, C106).
 - **The headline:** the assembled model A2s beats the naive full fusion E27 by **16.7%** on clean80 bits per character (C209, VERIFIED; 16.2% at matched FLOPs). About **61%** of that gap is A2s's bigger shared core and its extra parameters. The rest is the A2 bundle (C215, VERIFIED: -6.85% at matched parameters and FLOPs), which is probably mostly the extra precision of its full-precision ends.

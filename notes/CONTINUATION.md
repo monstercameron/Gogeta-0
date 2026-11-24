@@ -26,12 +26,7 @@ bottom before restarting anything. Every fact here is in the repo: DEVLOG v0.5.4
 
 ## 2. What was running at the pause, and how to finish it
 
-- **SQ435** (loss-matched corruption control for C213; registered v0.5.54, frozen [9a53278250e80782]; UNMATCHED, so descriptive only). `--score --part 0` was still running in WSL at the pause. The automated permission check blocked killing it, so it was left to finish, writing `experiments/checks/results/sq435_part0.json`.
-  - Nothing is chained after part 0, so to finish, run in WSL (venv gogeta, `OMP_NUM_THREADS=4`, from the repo root, with `PYTHONPATH=.:experiments/checks`):
-    `python experiments/checks/sq435_loss_matched_corruption.py --score --part 1`, then `... --analyze`.
-  - Check first that `sha256sum experiments/checks/sq435_loss_matched_corruption.py` starts with 9a53278250e80782.
-  - Then record the result as descriptive in SQ435's row, with costs at p = 0, 0.5 and 1 against E24's bits/char at each level. No status change.
-  - If part 0 died, rerun it the same way; the script has no resume logic.
+- **SQ435** (loss-matched corruption control for C213) **finished after the pause (v0.5.61)**, UNMATCHED and descriptive. Renaming identifiers moves the ternary cost +9.5% -> +3.7%, the loop cost +3.1% -> -1.8% (its out-of-corpus value) and the assembly gain -16.8% -> -12.5%, at under half the out-of-corpus loss level. See `experiments/devlogs/SQ435.md`.
 - **SQ265** (per-pass gradient interference, A2f/A2s seeds 2-4, with E22/E27 comparators): `experiments/checks/sq265_pass_gradient_interference.py` is written and compiles but has not run. It is CPU work; run it after SQ435.
 - **No GPU box is rented.** `vastai show instances` showed 0 after C1's teardown. Check again before renting anything.
 - **The recurring jobs are cancelled** (quick review, outside review, claim audit, docs refresh). Restart them only if the human asks; their prompts are in section 6.
@@ -51,7 +46,7 @@ bottom before restarting anything. Every fact here is in the repo: DEVLOG v0.5.4
 
 ## 4. Suggested order when work resumes
 
-1. Finish SQ435 (section 2), run SQ265, and commit both as descriptive results.
+1. Run SQ265 (CPU, script ready) and commit it as a descriptive result.
 2. Atlas v2, all CPU on existing checkpoints (SQ439 row, "v2 metrics"):
    - the int8 zero rate per BitLinear input;
    - the GDN decay-regime shares;

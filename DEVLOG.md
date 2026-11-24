@@ -18,6 +18,20 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.61: SQ435 done (UNMATCHED, descriptive): renaming identifiers reproduces most of the out-of-corpus shift
+*2026-11-23*
+
+**SQ435 finished after the pause (the one job still running at the pause), UNMATCHED and so descriptive only. Renaming identifiers in in-corpus documents reproduces most of the out-of-corpus shift in all three effects at under half the out-of-corpus loss level, which favours C213's memorisation reading over pure loss-scale compression.**
+
+- **Run:** the frozen script [9a53278250e80782] was unchanged. Part 0 finished at 21:25, part 1 and the analysis at 22:43, serially. Renaming every user identifier takes E24 from 0.237 to only 0.74 bits/char, against the out-of-corpus 1.71, so the registered scale/memorisation labels do not apply.
+- **Readings** (seeds 2-4; in corpus -> half renamed -> all renamed -> out of corpus):
+  - ternary cost +9.52% -> +5.16% -> +3.70% [0.0, 7.4] -> +0.42%;
+  - loop cost +3.13% -> -0.38% -> -1.83% [-6.6, +3.0] -> -1.90%;
+  - assembly gain -16.8% -> -13.1% -> -12.5% -> -11.3%.
+- **Recorded:** evidence on C213 (status unchanged), devlog `experiments/devlogs/SQ435.md`, and SQ435's row. The continuation guide and sketch now show it done; SQ265 is the remaining CPU step.
+
+---
+
 ## v0.5.60: Site layout fixes after checking the live page (card grid, diagram label)
 *2026-11-23*
 

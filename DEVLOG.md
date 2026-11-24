@@ -18,6 +18,29 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.53: Outside review 19:37: SQ435-SQ438 (loss-matched C213 control, repetition x loops, 200M MoE control, latent EMA); tie/not-needed wording fixed; C19 int8 limitation
+*2026-11-23*
+
+**Outside review 19:37 + quick reviews 19:25-19:39: four new side quests (SQ435-SQ438). Wording fixes: "a tie" becomes "no difference detected", and "not needed" becomes "no cost detected (2 seeds)". C19 now records that our self-speculative decoder is not lossless under int8.**
+
+- **Outside review 19:37** (`notes/reviews/2026-11-23-1937-review.md`; it looks past C209, with triage in its footer):
+  - **SQ435 (next CPU readout):** a loss-matched corruption control for C213. Identifiers in in-corpus documents are renamed until E24's loss matches the out-of-corpus set. It separates memorisation from loss level, which SQ410 cannot.
+  - **SQ436:** repetition (20M x 1 epoch vs 5M x 4) and the loop-vs-unshared ordering, for E61's 3-epoch plan.
+  - **SQ437:** a 200M ternary dense-2048 control against the A3mx MoE core, with wall-clock reported.
+  - **SQ438:** EMA of the ternary latent weights (low priority).
+  - **Extensions:** SQ387 (score the byte decoder out of corpus too), SQ196 (free-running speculative acceptance; the bench's 0.869 is teacher-forced), SQ291 (off-diagonal N/D points; tokens = 20 x params identifies only the ratio) and SQ215 (conv-for-GDN inside A2s).
+  - **Wording:** the README now calls SQ401 "no difference detected; no equivalence margin, so not a tie" and SQ402 "under 0.5% in point estimate (2 seeds, no interval)". SQ402's row no longer says "not needed".
+  - **C19:** gains a limitation. Our v0.5.20 self-speculative decoder fails losslessness on 16 of 120 runs under int8 activations (30 of 30 pass with them off), and exact losslessness needs batch-invariant matmuls.
+  - **Rejected:** a NO-DIFFERENCE ledger status (it would rewrite registered verdicts; C5's row is already qualified).
+- **Quick reviews**, with triage footers:
+  - **19:25 skeptical peer:** SQ213's seed x document bootstrap now covers C209 too.
+  - **19:29 data engineer:** SQ239 adds the C209 pair by source config.
+  - **19:34 reproducibility auditor:** the C1 readout will be replayed twice from the committed rows with output hashes compared, and SQ418 adds data and environment identity to run summaries. A real A2s summary has the commit, the resolved config and the seed, but the dataset only by name.
+  - **19:39 cheapest-experiment hunter:** K3's generator is solvable by construction (distinct keys from one permutation), so the 8.6% is a training failure. Q15 now requires a generator assert.
+- **Batch C1** is still training (the first F-6 run finished in 10.3 minutes).
+
+---
+
 ## v0.5.52: Docs refresh (hourly)
 *2026-11-23*
 

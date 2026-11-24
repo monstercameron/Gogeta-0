@@ -942,3 +942,23 @@ All runs use code-py-v2, 20M tokens and one rented RTX 5090. They are explorator
 
 ## Process rule (2026-11-23 ~17:15 EST; outside review 17:10, 2.5): freeze the readout before dispatch
 From here on, every batch registration names its readout script and that script's sha256-16, committed before dispatch. Amendments made while a batch runs must say whether any result of that batch had been seen, which result, and whether the decision rule (not only the reading) changed. B1's three amendments met the disclosure part but not the frozen-script part; `experiments/checks/b1_readout.py` was written after B1 started.
+
+## GPU batch C1: SQ419, the parameter-matched control for C209 (2026-11-23 ~19:15 EST, before dispatch; GPU use under the standing goal's permission)
+**Readout script:** `experiments/checks/sq419_f6.py` [ff6a1eb01ef8caf0] (frozen; a dry run on synthetic rows only, no real data). **Config:** F-6 = A1g, `experiments/staged-configs/a1/a1g.json` [fc2cd08286cce5f9], unchanged since the A1 screen. It is E27's recipe (all-ternary, r ~ U{1..3}, plain injection, bptt_loops 4) with one change: a 6-block core [gdn, gdn, swa, gdn, gdn, swa]. That gives the same 14 block applications per token as E27 and A2s's core shape. One rented RTX 5090, code-py-v2, 200M tokens.
+
+- **Why:** C209 (A2s vs E27, -16.67%) mixes the 6-block shape and its about 1.6x unique parameters with the compensations (fixed r = 2, ternary core with full-precision ends, contractive injection). A1g ran on the selection seeds 0-1 at -11.6% [-12.3, -11.0] vs E27 (exploratory). This is its fresh-seed test at C209's own seeds, which separates the two parts (outside reviews 17:37 A and 18:08 section 4).
+- **Runs:** F-6 at lr 6e-3 on seeds 2, 3 and 4, paired with the existing A2 runs: A2s and E27 seeds 2-4 at 200M, with E27 seed 2 from SQ263, exactly as A2 P1. Plus an LR bracket on seed 5 at 3e-3, 6e-3 and 1.2e-2. Six runs, about 11 minutes each.
+- **Metric:** clean80 doc-level bpc, paired by seed, log scale, df 2, exact t. Clean50 and the 50-80 overlap band are descriptive.
+- **Estimands and predictions:**
+  - R1 = F-6 vs E27: -11.6% (range -14% to -9%).
+  - R2 = A2s vs F-6: -5.7% (range -8% to -3%).
+  - S = mean log(F6/E27) / mean log(A2s/E27), the share of C209's log gap explained by shape and parameters: 0.68 (range 0.5 to 0.8). Computed from A1g's -11.6% and C209's -16.67%.
+- **Rules (fixed now):**
+  - **S rule:** S >= 0.5 means C209's wording gains "most of the gap is the 6-block core shape and its extra unique parameters". S < 1/3 means "the compensations carry most of it". Otherwise "both".
+  - **R1:** a paired CI below 0 means A1g's parameter-changed gain replicates on fresh seeds; C209 records it as the shape component.
+  - **R2:** a paired CI below 0 creates a new claim, "the compensations improve the model at matched shape" (VERIFIED candidate: 3 fresh seeds, registered). It counts as LR-robust only if the seed-5 bracket puts 6e-3 within 1% of the bracket's best, as in A3 amendment 1. Otherwise it is PARTIAL with an LR limitation.
+  - A CI reaching 0 for R2 means "no compensation effect shown at matched shape", and C209 gains that limitation.
+- **Same box, not part of this readout:**
+  - the C3 production-kernel witness `experiments/checks/c3_window_witness.py --gpu` [439e7489974f2f56] (deterministic; the pass criteria are in the script);
+  - SQ75's profiler `experiments/checks/sq_hw_step_profile.py` [3949a9446b931034] (its prediction is in the script).
+- **Out of corpus:** scoring F-6 on the SQ99 set is not part of this registration. If it is done, it will be a separate amendment that names its script and hash before scoring.

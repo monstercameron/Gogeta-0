@@ -18,6 +18,28 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.50: GPU batch C1 registered: SQ419 = A1g (F-6) on fresh seeds 2-4 + LR bracket, readout frozen [ff6a1eb01ef8caf0]
+*2026-11-23*
+
+**GPU batch C1 registered before dispatch: SQ419, the parameter-matched control for C209. F-6 turns out to be A1g exactly, so this is A1g's fresh-seed test at C209's own seeds, and it takes about 70 GPU-minutes, not 4 hours.**
+
+- **What F-6 is:** E27's recipe (all-ternary, r ~ U{1..3}, plain injection, bptt_loops 4) with one change, A2s's 6-block core [gdn, gdn, swa, gdn, gdn, swa]. That is the A1 screen's arm A1g (`experiments/staged-configs/a1/a1g.json` [fc2cd08286cce5f9], unchanged): the same 14 block applications per token as E27, with about 1.6x its unique parameters. On the selection seeds 0-1 A1g gave -11.6% [-12.3, -11.0] vs E27 (exploratory).
+- **Runs:** F-6 at lr 6e-3 on seeds 2-4, paired with the existing A2s and E27 200M runs exactly as A2 P1, plus an LR bracket on seed 5 (3e-3, 6e-3, 1.2e-2).
+- **Cost:** a 5090 does 200M tokens in about 11 minutes (A2 runs: 314k tok/s; the queue's 4-hour estimate used the laptop's 44k tok/s), so six runs take about 70 GPU-minutes, about $1.
+- **Frozen readout:** `experiments/checks/sq419_f6.py` [ff6a1eb01ef8caf0], dry-run on synthetic rows only.
+- **Predictions:**
+  - R1 (F-6 vs E27): -11.6%, range -14% to -9%.
+  - R2 (A2s vs F-6): -5.7%, range -8% to -3%.
+  - S (the share of C209's log gap explained by shape and parameters): 0.68, range 0.5-0.8.
+- **Rules:**
+  - S >= 0.5 means "mostly shape"; S < 1/3 means "mostly compensations"; otherwise "both".
+  - R1's CI below 0 means A1g replicates.
+  - R2's CI below 0 creates a new claim that the compensations help at matched shape. It is VERIFIED only if the seed-5 bracket shows 6e-3 is LR-robust (within 1% of the best).
+- **Same box:** the C3 production-kernel witness (`c3_window_witness.py --gpu` [439e7489974f2f56]) and SQ75's step profiler ([3949a9446b931034]).
+- **Permission and budget:** GPU use rests on the standing goal's permission ("you have permissions to use the 5090 or greater"). The batch costs about $1-2 against the self-imposed $25 assembly cap ($13.83 used).
+
+---
+
 ## v0.5.49: Claim audit 2026-11-23-1902: 36 claims, 11 SOLID, 7 WEAK, 18 NEEDS-EVIDENCE, no downgrades; C30 WEAK rejected against the Ouro PDF
 *2026-11-23*
 

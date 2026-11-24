@@ -18,6 +18,26 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.58: Docs refresh (final pass before the pause)
+*2026-11-23*
+
+**Final docs pass before the pause: the README, sketch, campaigns README and continuation guide now match v0.5.57, and the site data and experiment index are rebuilt.**
+
+- **README:**
+  - The status paragraph says research is paused and links `notes/CONTINUATION.md`. Total spend is $44.85.
+  - C209's decomposition carries C215's caveat (probably mostly precision scope; SQ447 is the bit-matched control).
+  - A new results bullet covers SQ239, SQ410 and SQ385 (the effects hold at every overlap threshold and grow with overlap; both costs vanish or reverse late in the context).
+  - The atlas bullet scopes E24's 0.00% as a consistency check.
+- **notes/sketch.md:** the status moves to v0.5.57.
+  - Claim counts are 27 VERIFIED, 27 PARTIAL, 9 REFUTED, 2 WRONG FOR OUR CODE, 1 INCONCLUSIVE, 74 UNVERIFIED and 3 SUPERSEDED (143). C215 is new and C119 is now VERIFIED.
+  - The C1 cost is corrected to $0.84, and the next GPU batch is listed as waiting on the human.
+  - The decision log gains C215's scoping.
+- **experiments/launch/campaigns/README.md:** C1 is finished, and nothing runs on a GPU.
+- **notes/CONTINUATION.md:** the claim count is corrected to 74 of 143 UNVERIFIED.
+- Written by a Haiku docs subagent and checked by the main agent against the ledger, DEVLOG v0.5.56-57 and the continuation guide. Still running in the background: SQ435's finishing chain (part 0, then part 1, then the analysis, as frozen). Its result goes in once it lands.
+
+---
+
 ## v0.5.57: Research paused: continuation guide + fleet tooling saved; SQ239/SQ410/SQ385 and SQ195 results; C215 scoped to the precision-heavy bundle
 *2026-11-23*
 

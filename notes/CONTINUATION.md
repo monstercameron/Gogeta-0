@@ -113,4 +113,4 @@ The human set these up on 2026-11-22. Their full prompt texts are in the session
 - **F-6's checkpoints are lost** (the pull date filter is fixed in `tools/fleet/pull.sh`). Out-of-corpus scoring and an r-sweep of F-6 need a retrain.
 - **E27 seed 2's provenance:** the C1 readout lists its commit as "?", because `sq263_runs.json` carries no git field. That is the same run A2 P1 always used.
 - **Atlas lens readings are lenses, not probes.** Per-pass claims need trained auxiliary heads.
-- **75 of 142 claims are UNVERIFIED** (no saved-output evidence yet). Most wait on parked or unrun side quests.
+- **74 of 143 claims are UNVERIFIED** (no saved-output evidence yet). Most wait on parked or unrun side quests.

@@ -18,6 +18,39 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.55: Data-flow atlas (SQ439): first SWA layer is a moving average whose selectivity only serves in-corpus recall (SQ441); E27 prelude inert; passes past 2 idle; SQ442-SQ446 techniques
+*2026-11-23*
+
+**Data-flow atlas (SQ439, at the human's request): the first instrumented look inside the assembled model. The first attention layer is a causal moving average whose selectivity only serves in-corpus recall (SQ441). E27's ternary prelude is inert. Loop passes past 2 barely move the state. The coda carries the largest share out of corpus. Five technique side quests follow (SQ442-SQ446).**
+
+- **Atlas** (`experiments/checks/dataflow_atlas.py`, CPU, fp32): 15 checkpoints (A2s, A2f, E27, E24, E20, seeds 2-4), 12 windows of 1,024 tokens in corpus (clean80) and out of corpus (SQ99). It records every block boundary, every block's writes, the loop and injection, the ternary error per BitLinear, the GDN decay horizon and beta per head, and attention entropy and distance per head. Findings are in `experiments/devlogs/SQ439.md` and tables in `results/dataflow_atlas_summary.md`. Logit-lens readings of intermediate states are lenses, not probes.
+  - **First SWA layer:** every head is close to uniform over its 256-token window (entropy 5.3 nats, mean distance about 111 tokens).
+  - **E27's ternary prelude barely writes** (RMS 0.09 -> 0.14), so pass 1's input is entirely the injection. A2s's full-precision prelude writes a 5.6-RMS representation. This is a mechanism for A1e's -7.6%.
+  - **Loop:** E27's passes change the state by 2.04, 0.56, 0.32 and 0.22x (pass-to-pass cosine up to 0.998). A2s's pass 1 transforms (1.38x) and pass 2 refines (0.73x).
+  - **Injection share falls each pass:** 0.33 -> 0.20 for A2s and 1.00 -> 0.13 for E27. The contractive gate keeps 75% of the state.
+  - **The coda** does the largest lens-CE drop, especially out of corpus (A2s 6.55 -> 3.49 nats), and compresses the state to rank about 30.
+  - **Ternary error** is about 0.50-0.56 in the core and 0.64-0.83 at E27's end projections.
+  - **int8 activations are safe:** 0.4-2.6% error, with outliers only at MLP down inputs (crest 11-19).
+  - **Dense E20 builds outlier features** (anisotropy up to 0.37, crest about 10) while GDN E24 stays well conditioned (0.05-0.08, crest 3.7).
+- **SQ441 (eval-only):** replacing the first SWA layer's attention with an exact causal window mean costs, in corpus / out of corpus: E24 0.00% / 0.00%, A2f +0.6-0.9% / under 0.1%, A2s +3.0-5.5% / +0.1-0.4%, E27 +6.5-7.3% / about 0%. Out of corpus the first layer's selectivity is worthless; in corpus it serves recall. This is recorded as internal evidence on C213 (status unchanged).
+- **Technique side quests:**
+  - SQ442: an attention-free first layer, trained.
+  - SQ443: a per-projection precision map.
+  - SQ444: an output gain for ternary ends.
+  - SQ445: a pass budget from measured change (early exit, a pass-2 adapter).
+  - SQ446: coda capacity.
+  - SQ440 (learned readout over passes) is from the 20:07 review.
+- **Outside review 20:07** (data-flow focus, triage in its footer): its audit ideas were answered by the atlas. Its I3, I5 and I6 become atlas v2 metrics (int8 zero rate, decay-regime shares, far attention mass, a rescaled-e arm), and its logit-lens caveat goes on SQ348.
+- **Sandbox probes (quick review 19:59):** abstract and path Unix sockets are unreachable from sandboxed code (with a positive control), and 20 concurrent setsid jobs leave no survivors and no mount leaks (`sandbox_socket_concurrency.py`). This is evidence on C83 and C106. SQ61 now lists the Q14 gate: the world-writable sweep must pass.
+- **Quick reviews 19:49-20:19**, with triage footers:
+  - SQ288 adds energy per token and batch 4/16.
+  - SQ246 adds a calibration-vs-ranking split for C209.
+  - Q15 must confirm its redesign on held-out generator seeds.
+  - SQ4 records likelihood next to execution outcomes.
+  - C214's package-clustered intervals are already in SQ400 ([-2.18, -1.63]; A2s vs E27 [-12.02, -10.56]).
+
+---
+
 ## v0.5.54: SQ435 registered (loss-matched corruption control for C213, frozen 9a53278250e80782); SQ376 data gate passes (7 seeds)
 *2026-11-23*
 

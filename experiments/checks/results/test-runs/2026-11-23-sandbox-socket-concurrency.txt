@@ -1,0 +1,5 @@
+positive control (host connects): abstract True, path True
+unix sockets: PASS  (abstract and host-/tmp path both unreachable: passed 2/2, ran True)
+concurrency x20: PASS  timed_out 20/20, errors 0, slowest call 1.0s, wall 1.1s, survivors none, mounts identical True (32 -> 32)
+ALL PASS
+rc=0

@@ -18,6 +18,27 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.51: Outside review 19:18 + C1 amendment 1 (no result seen): FLOP-matched R1, 1.5e-3 LR edge, interval S rule; SQ433-SQ434
+*2026-11-23*
+
+**Outside review 19:18 + batch C1 amendment 1 (before any C1 result existed): a FLOP-matched R1 comparator, a 1.5e-3 lower LR edge for F-6 and A2s, an interval-based S rule, and comparator provenance. The readout is now [b28fa9546caa1d69]. Two new side quests: SQ433 (width-matched assembled model) and SQ434 (surprisal-binned C209 gap).**
+
+- **Amendment 1** (`experiments/checks/PREDICTIONS.md`, after the C1 registration). Disclosure: the box was still verifying data, and no training job had started.
+  - **R1cm = F-6 vs E27_cm** (221.6M tokens, FLOP-matched). E27 truncates backprop for r > 4 (bptt 4, r up to 7), which is part of its 11% compute deficit, while F-6 and A2s never truncate.
+  - **1.5e-3 seed-5 runs for F-6 and A2s.** A2s's existing bracket was best at its lowest point, 3e-3. Both runs were appended to C1's job list before the worker launched; the box now has 8 jobs. The LR rule is unchanged and labelled a one-seed check.
+  - **S now has a t-interval over the per-seed shares**, and its rule reads the interval: "mostly shape" needs the lower bound >= 0.5, "mostly compensations" needs the upper bound < 1/3. This is stricter than v0.5.50's point-estimate rule.
+  - **The readout lists every comparator's commit and the eval depth:** each arm is scored at its config's `loops` (E27 4, F-6 2, A2s 2).
+  - **Erratum:** v0.5.50 wrote A1g's screen result as "-11.6% [-12.3, -11.0]". The pair is A1g's two per-seed effects, not a confidence interval. The R1 prediction is now labelled a replication target.
+- **Outside review 19:18** (`notes/reviews/2026-11-23-1918-review.md`, triage in its footer):
+  - **SQ433:** A2s width-matched to E27's 9.5M unique parameters, seeds 2-4 at 200M. This is the other half of the parameter question, for the batch after C1.
+  - **SQ434:** C209's gap binned by E27's per-token surprisal (CPU).
+  - **SQ19** extends to E27 (bptt 7 vs 4).
+  - **SQ403** extends to E27 and F-6 (eval-r sweep).
+  - **I6 (bf16 beta)** is covered by SQ340 (at most a 0.0035% shift).
+- **Quick review 19:18 (newcomer):** the README and sketch said SQ419 waited for the human's go-ahead. They now say it is registered and running as batch C1, and the queue item is `running`. A "follow one result" map is queued for the next hourly docs refresh.
+
+---
+
 ## v0.5.50: GPU batch C1 registered: SQ419 = A1g (F-6) on fresh seeds 2-4 + LR bracket, readout frozen [ff6a1eb01ef8caf0]
 *2026-11-23*
 

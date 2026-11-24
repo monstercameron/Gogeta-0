@@ -962,3 +962,16 @@ From here on, every batch registration names its readout script and that script'
   - the C3 production-kernel witness `experiments/checks/c3_window_witness.py --gpu` [439e7489974f2f56] (deterministic; the pass criteria are in the script);
   - SQ75's profiler `experiments/checks/sq_hw_step_profile.py` [3949a9446b931034] (its prediction is in the script).
 - **Out of corpus:** scoring F-6 on the SQ99 set is not part of this registration. If it is done, it will be a separate amendment that names its script and hash before scoring.
+
+### Batch C1, amendment 1 (2026-11-23 ~19:30 EST; outside review 19:18, items 2.1-2.5)
+**Disclosure:** no C1 result existed or was seen. The box was still verifying the code-py-v2 data, and no training job had started (the worker had not launched). The decision rules below change as stated.
+**Readout script:** `experiments/checks/sq419_f6.py` is now [b28fa9546caa1d69] (was [ff6a1eb01ef8caf0]); dry-run on synthetic rows only.
+- **Second R1 comparator (2.1):** R1cm = F-6 (200M) vs the FLOP-matched E27_cm (221.6M tokens, seeds 2-4, `a2_cm_runs.json`). E27 truncates backprop when r > 4 (bptt_loops 4, r up to 7), so it does about 11% less training compute than F-6 and A2s, and R1cm removes that. Descriptive, no separate rule. If R1 and R1cm disagree in sign, or R1cm's CI reaches 0, the R1 rule's "replicates" wording gains "not at matched compute".
+- **LR lower edge (2.2, idea I4):** one more seed-5 run each for F-6 and A2s at 1.5e-3, because A2s's existing bracket was best at its lowest point (3e-3). The LR-robust rule is unchanged (6e-3 within 1% of the bracket's best, now over 1.5e-3 / 3e-3 / 6e-3 / 1.2e-2), and it is reported as a one-seed check. A2s's 3e-3 / 6e-3 / 1.2e-2 values come from `a3_assembled.json` (A3 amendment 1). If 6e-3 fails for A2s, C209 gains an LR limitation.
+- **S rule reads an interval (2.3):** S's 95% interval is a t-interval over the three per-seed shares, log(F6/E27) / log(A2s/E27).
+  - MOSTLY SHAPE now needs the interval's lower bound >= 0.5.
+  - MOSTLY COMPENSATIONS needs its upper bound < 1/3.
+  - Anything else reads BOTH, with the point estimate stated.
+  - This is stricter than the original point-estimate rule. S = 1 - (A2s vs F-6 share) by construction; it is a summary of R1, not new information.
+- **The R1 prediction is a replication target (2.4):** -11.6% is A1g's estimate on its selection seeds 0-1, so a hit is a replication, not an independent forecast. **Correction:** the registration above wrote A1g's result as "-11.6% [-12.3, -11.0]". That bracket is the two per-seed effects (seed 0 -12.3%, seed 1 -11.0%), not a confidence interval; a 2-seed screen computes none.
+- **Provenance and eval depth (2.5):** the readout lists each comparator's commit, and every arm is scored at its config's `loops` (E27 4, F-6 2, A2s 2), as in all A-series readouts (`score_doclevel.py` passes no loop count; `FusionDance.forward` uses `cfg.loops`).

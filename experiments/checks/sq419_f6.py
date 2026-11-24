@@ -32,7 +32,11 @@ RES = os.path.join(ROOT, "experiments", "checks", "results")
 SEEDS = (2, 3, 4)
 LR_MAIN = 0.006
 BRACKET_SEED = 5
-BRACKET = (0.003, 0.006, 0.012)
+# Amendment 1 (v0.5.51, before any C1 result existed; outside review 19:18): 1.5e-3 added as the lower edge for F-6 AND
+# A2s (A2s's seed-5 bracket was best at its lowest point, 3e-3), the FLOP-matched E27_cm as a second R1 comparator, an
+# interval for S (the S rule now reads the interval), and a comparator provenance list.
+BRACKET = (0.0015, 0.003, 0.006, 0.012)
+A2S_BRACKET_PRIOR = {0.003: 0.27291090098024345, 0.006: 0.27449415501561863, 0.012: 0.2836742872320863}  # a3_assembled.json
 PRED = {"R1_F6_vs_E27": (-0.14, -0.09), "R2_A2s_vs_F6": (-0.08, -0.03), "S": (0.5, 0.8)}
 
 
@@ -62,7 +66,17 @@ def gather():
              if r["cell"] == "E27" and r["seed"] == 2 and abs(r["lr"] - LR_MAIN) < 1e-12]
     for r in a2 + [{**r, "arm": "E27"} for r in e27s2]:
         rows.append({"run": r["run"], "arm": r["arm"], "seed": r["seed"], "lr": r["lr"], "clean80_ref": r["clean80"],
-                     "doclevel": _doclevel(base, r["run"])})
+                     "git": r.get("git"), "doclevel": _doclevel(base, r["run"])})
+    # amendment 1: FLOP-matched E27 (221.6M tokens, a2_cm_runs.json) and A2s's 1.5e-3 seed-5 bracket run (C1 box)
+    for r in json.load(open(os.path.join(RES, "a2_cm_runs.json")))["runs"]:
+        rows.append({"run": r["run"], "arm": "E27cm", "seed": r["seed"], "lr": r["lr"], "clean80_ref": r["clean80"],
+                     "flops": r.get("flops"), "git": r.get("git"), "doclevel": _doclevel(base, r["run"])})
+    for d in sorted(glob.glob(f"{base}/gogeta-cockpit-c1-*/fusiondance-data/runs/A2s-*")):
+        run = os.path.basename(d)
+        s = json.load(open(os.path.join(d, "summary.json")))
+        rows.append({"run": run, "arm": "A2s_bracket", "seed": s["seed"], "lr": s["config"]["train"].get("lr"),
+                     "tokens": s.get("metrics", {}).get("tokens"), "git": s.get("git", {}).get("commit"),
+                     "doclevel": _doclevel(base, run)})
     json.dump({"check": "SQ419-runs", "rows": rows}, open(os.path.join(RES, "sq419_runs.json"), "w", newline="\n"), indent=1)
     print(f"gathered {len(rows)} rows; missing doclevel: {[r['run'] for r in rows if not r['doclevel']]}")
 
@@ -118,18 +132,32 @@ def main():
         S = r1["mean_log"] / c209["mean_log"]
         per_seed_S = {s: math.log(y["F6"][s] / y["E27"][s]) / math.log(y["A2s"][s] / y["E27"][s])
                       for s in sorted(set(y["F6"]) & set(y["E27"]) & set(y["A2s"]))}
+        vals = list(per_seed_S.values())
+        s_ci = None
+        if len(vals) >= 2:  # amendment 1: t-interval over the per-seed shares (both numerator and denominator vary)
+            h = t_quantile(0.05, len(vals) - 1) * st.stdev(vals) / math.sqrt(len(vals))
+            s_ci = [st.mean(vals) - h, st.mean(vals) + h]
+        r1_cm = paired(y["F6"], y["E27cm"]) if "E27cm" in y else None
         out["metrics"][which] = {"R1_F6_vs_E27": r1, "R2_A2s_vs_F6": r2, "C209_A2s_vs_E27": c209, "S": S,
-                                 "S_per_seed": per_seed_S}
+                                 "S_per_seed": per_seed_S, "S_ci95_per_seed_t": s_ci,
+                                 "R1cm_F6_vs_E27_flop_matched": r1_cm}
     pm = out["metrics"].get("clean80", {})
     if "S" in pm:
         S, r1, r2 = pm["S"], pm["R1_F6_vs_E27"], pm["R2_A2s_vs_F6"]
         out["in_predicted_range"] = {"R1": PRED["R1_F6_vs_E27"][0] <= r1["rel"] <= PRED["R1_F6_vs_E27"][1],
                                      "R2": PRED["R2_A2s_vs_F6"][0] <= r2["rel"] <= PRED["R2_A2s_vs_F6"][1],
                                      "S": PRED["S"][0] <= S <= PRED["S"][1]}
+        lo, hi = pm["S_ci95_per_seed_t"] or (S, S)
         out["rule_S"] = ("MOSTLY SHAPE: C209 wording gains 'most of the gap is the 6-block core shape and its extra unique "
-                         "parameters'" if S >= 0.5 else
-                         "MOSTLY COMPENSATIONS: the compensations carry most of C209's gap" if S < 1 / 3 else
-                         "BOTH: shape and compensations each carry a substantial share")
+                         "parameters' (S interval lower bound >= 0.5)" if lo >= 0.5 else
+                         "MOSTLY COMPENSATIONS: the compensations carry most of C209's gap (S interval upper bound < 1/3)"
+                         if hi < 1 / 3 else
+                         "BOTH: the S interval spans a threshold; shape and compensations each carry a share "
+                         "(point estimate S = %.2f)" % S)
+        if pm.get("R1cm_F6_vs_E27_flop_matched"):
+            c = pm["R1cm_F6_vs_E27_flop_matched"]
+            out["R1cm_note"] = ("R1 at matched training FLOPs (F-6 200M vs E27 221.6M): %+.2f%% %s" %
+                                (100 * c["rel"], [round(100 * x, 2) for x in c.get("ci95", [])]))
         out["rule_R1"] = ("A1g's parameter-changed gain REPLICATES on fresh seeds (CI below 0)" if r1["ci95"][1] < 0
                           else "A1g's gain does not replicate on fresh seeds (CI reaches 0)")
         out["rule_R2"] = ("NEW CLAIM: the compensations improve the model at matched shape (paired CI below 0)"
@@ -143,6 +171,21 @@ def main():
                                    "lr_robust": gap <= 0.01, "best_lr": min(br, key=br.get)}
     else:
         out["lr_bracket_seed5"] = {"missing": [lr for lr in BRACKET if lr not in br]}
+    out["lr_bracket_seed5"]["note"] = "one-seed check (seed 5); not a seed-averaged LR optimum"
+    # amendment 1: A2s's bracket extended below with 1.5e-3 (3e-3 / 6e-3 / 1.2e-2 from A3 amendment 1)
+    a2b = dict(A2S_BRACKET_PRIOR)
+    for r in rows:
+        if r["arm"] == "A2s_bracket" and r["seed"] == BRACKET_SEED and abs(r["lr"] - 0.0015) < 1e-12:
+            a2b[0.0015] = metric(r, "clean80")
+    if a2b.get(0.0015):
+        best = min(a2b.values())
+        out["a2s_lr_bracket_seed5"] = {"clean80": a2b, "best_lr": min(a2b, key=a2b.get),
+                                       "gap_of_6e-3_to_best": a2b[LR_MAIN] / best - 1,
+                                       "lr_robust": a2b[LR_MAIN] / best - 1 <= 0.01}
+    else:
+        out["a2s_lr_bracket_seed5"] = {"missing": [0.0015]}
+    out["comparator_provenance"] = sorted({(r["arm"], r["seed"], r.get("git") or "?") for r in rows if r["arm"] != "F6"})
+    out["eval_depth"] = "each arm scored at its config's `loops` (E27 4, F-6 2, A2s 2), as in every A-series readout"
     json.dump(out, open(os.path.join(RES, "sq419.json"), "w", newline="\n"), indent=1)
     print(json.dumps({k: v for k, v in out.items() if k != "metrics"}, indent=1))
     if "S" in pm:

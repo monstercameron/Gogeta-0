@@ -18,6 +18,17 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.60: Site layout fixes after checking the live page (card grid, diagram label)
+*2026-11-23*
+
+**Site layout fixes found when checking the live v0.5.59 page.**
+
+- **Headline cards:** they now lay out as 4 across on wide screens, 2 x 2 at mid widths and 1 column on phones. Before, at about 800px they broke 3 + 1, leaving an orphaned card.
+- **Diagram:** the contractive-injection label in the A2s diagram is shortened ("h = λ·h + inject(h, e)") so it stays inside its box.
+- **Verified on the live GitHub Pages site:** v0.5.59's page, data (with E66 and E67) and styles deploy. Claim chips, headline cards and the A2s diagram render. At 375px there is no horizontal page overflow. A browser that cached v0.5.58's style.css and site-data.js shows the old styles and version until its cache expires (GitHub Pages caches for about 10 minutes).
+
+---
+
 ## v0.5.59: README and GitHub Pages site rewritten around the current state; registry gains E66 (B1) and E67 (C1)
 *2026-11-23*
 

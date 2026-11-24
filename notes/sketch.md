@@ -128,8 +128,9 @@ The nice part is that looping costs extra compute and BitNet makes compute cheap
 - **2026-11-23 (v0.5.53):** Wording rule: "a tie" becomes "no difference detected", and "not needed" becomes "no cost detected (2 seeds)". A NO-DIFFERENCE ledger status was rejected, since it would rewrite registered verdicts. C19 now records that the self-speculative decoder is not lossless under int8 activations.
 - **2026-11-23 (v0.5.54):** SQ435 registered before any scoring: a loss-matched corruption control for C213 (script hash 9a53278250e80782). Its result is diagnostic and changes no status.
 - **2026-11-23 (v0.5.55, at the human's request):** The data-flow atlas (SQ439) is descriptive. Its eval-only swap (SQ441) is recorded as internal evidence on C213, with no status change. Five technique side quests (SQ442-SQ446) follow.
+- **2026-11-23 (v0.5.57):** the human paused the research. The recurring review jobs are cancelled, and the next GPU batch waits for a go-ahead ("not yet"). The continuation guide is `notes/CONTINUATION.md`, and the session's fleet and version tooling is saved in `tools/fleet/`.
 
-## Status (2026-11-23, v0.5.56)
+## Status (2026-11-23, v0.5.57)
 
 - Data-flow atlas (SQ439, v0.5.55, descriptive): the first SWA layer acts as a causal moving average. Its eval-only swap (SQ441) costs E24 0.00% and at most 0.4% out of corpus, but E27 loses 6.5-7.3% in corpus. E27's ternary prelude is nearly inert (RMS 0.09 to 0.14). Loop passes past 2 change the state by at most about 0.3x. The coda carries the largest share out of corpus. Recorded as evidence on C213 with no status change (`experiments/devlogs/SQ439.md`).
 - Phase: full-stack assembly. Every component of the full stack is built (GDN, sliding-window and full attention, a shared loop with contractive injection, BitNet ternary, a ternary MoE core, coarse-to-fine bytes, self-speculative decoding). The costs are designed around or fixed, not dropped (human directive, v0.5.10).

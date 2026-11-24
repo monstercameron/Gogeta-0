@@ -18,6 +18,32 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.57: Research paused: continuation guide + fleet tooling saved; SQ239/SQ410/SQ385 and SQ195 results; C215 scoped to the precision-heavy bundle
+*2026-11-23*
+
+**Research paused by the human. The recurring review jobs are cancelled. The running work is finished or documented. A continuation guide (`notes/CONTINUATION.md`) and the session's fleet and version tooling (`tools/fleet/`) are in the repo. Also: the worker's SQ239/SQ410/SQ385 results, the loop-stability check (SQ195), and C215 is scoped down after the 20:52 outside review.**
+
+- **Pause:**
+  - The four recurring jobs (quick review, outside review, claim audit, docs refresh) are cancelled.
+  - No GPU box is rented.
+  - SQ435's part-0 scoring was left running (the automated permission check blocked stopping it, which matches the instruction to let running work finish). Part 1 and the analysis are written up in the guide as resume steps.
+  - SQ265 is written but not run.
+  - The next GPU batch (SQ447, SQ433, SQ442, SQ444, SQ448) waits for the human ("not yet").
+- **`notes/CONTINUATION.md`:** where the model stands, what was running and how to finish it, the decisions waiting on the human (the next GPU batch, code-py-v3 data, E61), a suggested order, tooling and rules, the four recurring jobs (to restart only on request), and known loose ends.
+- **`tools/fleet/`:** the batch scripts (rent, drive, dispatch, pull, destroy) and the version cutter, saved from the session scratchpad, with a README covering the paths to fix, a one-batch walkthrough and known traps. Checked for secrets: none.
+- **SQ239 / SQ410 / SQ385** (side-quest worker, CPU per-doc re-score of 30 checkpoints; spot-checked against `results/sq239.json`):
+  - The three effects hold at every overlap threshold: ternary +7.85 / +9.65 / +10.87%, loop +2.38 / +3.08 / +3.49%, assembly -15.28 / -16.67 / -17.93% (clean50 / clean80 / full).
+  - All three grow with train overlap: ternary +5.4 -> +18.1%, loop +1.5 -> +5.6%, assembly -13.8 -> -24.9%.
+  - Both costs vanish or reverse late in the context: loop -3.1% and ternary +0.2% at tokens 513-1024.
+- **SQ195 (loop stability):** the relative finite-difference gain (eps >= 3e-2) is below 1 for every pass. A2f 0.56 / 0.66; A2s 0.75-0.78 / 0.69-0.71; E27 0.61 -> 0.80 over 4 passes (late passes are near-identity). Out of corpus the A2 models contract less. At eps 1e-3 the ternary arms read 2-16, an int8 rounding artifact.
+- **Outside review 20:52** (triage in its footer):
+  - **C215 limitation:** its bundle includes the precision-scope change that alone gave -7.56% on E27 (C205), so C215 reads "the A2 bundle (more bits on the ends)" until SQ447, a bit-matched control, runs.
+  - **C213 limitation:** E24's 0.00% in SQ441 is a consistency check; the recall reading rests on A2s and E27 only.
+  - **New side quests:** SQ447 (bit-matched C215 control) and SQ448 (remove A2s's prelude). SQ393 notes the 3.3x storage ratio.
+- **Quick review 20:52 (systems):** C119 is scoped to one RTX 5090 and to inference from the non-gemm share, not bandwidth counters.
+
+---
+
 ## v0.5.56: C1 readout: C209 is mostly shape+params (S 0.61 [0.57, 0.65]); compensations -6.85% at matched params+FLOPs (C215 VERIFIED); C3 exact on CUDA; C119 VERIFIED
 *2026-11-23*
 

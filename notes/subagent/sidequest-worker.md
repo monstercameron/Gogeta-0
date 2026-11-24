@@ -100,3 +100,8 @@ Tests are AST-rewritten in the grader before the fork: every non-identity compar
 
 ## SQ407 (done; CPU fp32 only): scorer invariance, A2s / A2f / E27 seed 2, 200 docs, 6 configs
 Order: bit-identical at bs 1. Batch 8 vs 1: max per-doc rel diff A2s 7.1e-5, A2f 1.6e-7, E27 5.0e-4 (median 0); A2s-vs-E27 contrast range 1e-4 points (<0.1). Per-doc threshold 1e-4 exceeded for E27 only -> pin batch size for per-doc analyses; aggregates unaffected. Files: `experiments/checks/sq407_scorer_invariance.py`, `results/sq407.json`, `experiments/devlogs/SQ407.md`.
+
+## SQ376 update (7 seeds, as the row says): E1 22.04% (sd 0.29, n=7), E10 20.09% (sd 0.26, n=7) from the p2b fleet logs; all > 1%; late slope 5.3% / 4.4% over the last 17% of tokens. Script now header-free; same files (`sq376_data_gate.py`, `results/sq376.json`, `SQ376.md`).
+
+## SQ239 + SQ410 + SQ385 (done; exploratory): per-doc re-score of 30 checkpoints on all 4,000 v1 val docs
+Thresholds clean50/clean80/full: ternary +7.85/+9.65/+10.87%, loop +2.38/+3.08/+3.49%, assembly gain -15.28/-16.67/-17.93% (no flip, <30% change; only A3mx vs E20 flagged). Source: no sign reversal; A2s vs E27 differs 3.4 pts between configs. Parseability ~99.9%, no stratum. SQ410: costs and gain all grow with overlap (ternary +5.4->+18.1%, loop +1.5->+5.6%, gain -13.8->-24.9%). SQ385: loop cost +2.5/+2.0% in tokens 1-512 then -3.1% [-5.0,-1.1] at 513-1024; ternary +7.0/+6.7 then +0.2; gain -11.6 -> -25.6; distractor arm not run. Files: sq239_perdoc_rescore.py, sq239_analysis.py, sq239_parseability.py, results sq239.json, sq410.json, sq385.json, sq239_nll/, devlogs SQ239/SQ410/SQ385.

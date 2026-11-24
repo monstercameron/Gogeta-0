@@ -1,0 +1,20 @@
+{
+ "check": "SQ435-calibration",
+ "git": "1c98716",
+ "target_e24_ooc_bpc": 1.707383584891027,
+ "n_target_seeds": 6,
+ "history": [
+  {
+   "p": 0.0,
+   "e24_s2_bpc": 0.23348225217084867
+  },
+  {
+   "p": 1.0,
+   "e24_s2_bpc": 0.7166764671752056
+  }
+ ],
+ "p_star": 1.0,
+ "e24_s2_bpc_at_p_star": 0.7166764671752056,
+ "matched_within_1pct": false,
+ "unmatched_p1_below_target": true
+}

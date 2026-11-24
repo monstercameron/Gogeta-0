@@ -1,0 +1,8 @@
+sq419-f6-s2|--config experiments/staged-configs/a1/a1g.json --seed 2 --lr 6e-3 --max-tokens 200000000
+sq419-f6-s3|--config experiments/staged-configs/a1/a1g.json --seed 3 --lr 6e-3 --max-tokens 200000000
+sq419-f6-s4|--config experiments/staged-configs/a1/a1g.json --seed 4 --lr 6e-3 --max-tokens 200000000
+sq419-f6-s5-lr6e-3|--config experiments/staged-configs/a1/a1g.json --seed 5 --lr 6e-3 --max-tokens 200000000
+sq419-f6-s5-lr3e-3|--config experiments/staged-configs/a1/a1g.json --seed 5 --lr 3e-3 --max-tokens 200000000
+sq419-f6-s5-lr1.2e-2|--config experiments/staged-configs/a1/a1g.json --seed 5 --lr 1.2e-2 --max-tokens 200000000
+sq419-f6-s5-lr1.5e-3|--config experiments/staged-configs/a1/a1g.json --seed 5 --lr 1.5e-3 --max-tokens 200000000
+sq419-a2s-s5-lr1.5e-3|--config experiments/staged-configs/a2/a2s.json --seed 5 --lr 1.5e-3 --max-tokens 200000000

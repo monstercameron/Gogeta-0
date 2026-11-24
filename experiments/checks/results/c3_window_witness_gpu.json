@@ -1,0 +1,96 @@
+{
+ "config": {
+  "vocab_size": 97,
+  "d_model": 64,
+  "n_heads": 4,
+  "mlp_hidden": 128,
+  "window": 8,
+  "max_seq_len": 64,
+  "loops": 2,
+  "loops_min": 2,
+  "loops_max": 2,
+  "bptt_loops": 2
+ },
+ "T": 32,
+ "dtype": "float32 model, float64 diffs",
+ "device": "cuda",
+ "kernels": "production (fla on CUDA, bf16 autocast inside GDN)",
+ "causality": {
+  "attn": [
+   {
+    "t": 5,
+    "max_diff_before_t": 0.0,
+    "max_diff_at_or_after_t": 1.2776483297348022
+   },
+   {
+    "t": 16,
+    "max_diff_before_t": 0.0,
+    "max_diff_at_or_after_t": 1.233370065689087
+   },
+   {
+    "t": 31,
+    "max_diff_before_t": 0.0,
+    "max_diff_at_or_after_t": 0.9505000412464142
+   }
+  ],
+  "swa": [
+   {
+    "t": 5,
+    "max_diff_before_t": 0.0,
+    "max_diff_at_or_after_t": 1.2776483297348022
+   },
+   {
+    "t": 16,
+    "max_diff_before_t": 0.0,
+    "max_diff_at_or_after_t": 1.1687705758959055
+   },
+   {
+    "t": 31,
+    "max_diff_before_t": 0.0,
+    "max_diff_at_or_after_t": 0.988039493560791
+   }
+  ],
+  "gdn": [
+   {
+    "t": 5,
+    "max_diff_before_t": 0.0,
+    "max_diff_at_or_after_t": 1.3489956706762314
+   },
+   {
+    "t": 16,
+    "max_diff_before_t": 0.0,
+    "max_diff_at_or_after_t": 1.386425420641899
+   },
+   {
+    "t": 31,
+    "max_diff_before_t": 0.0,
+    "max_diff_at_or_after_t": 1.2674717903137207
+   }
+  ],
+  "looped_hybrid": [
+   {
+    "t": 5,
+    "max_diff_before_t": 0.0,
+    "max_diff_at_or_after_t": 0.6899183690547943
+   },
+   {
+    "t": 16,
+    "max_diff_before_t": 0.0,
+    "max_diff_at_or_after_t": 0.6829960346221924
+   },
+   {
+    "t": 31,
+    "max_diff_before_t": 0.0,
+    "max_diff_at_or_after_t": 0.5441779792308807
+   }
+  ]
+ },
+ "swa_cutoff": {
+  "window": 8,
+  "perturbed_token": 0,
+  "max_diff_positions_lt_window": 1.3694422543048859,
+  "max_diff_positions_ge_window": 0.0,
+  "pass": true
+ },
+ "all_pass": true
+}

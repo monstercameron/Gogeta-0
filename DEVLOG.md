@@ -18,6 +18,24 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.56: C1 readout: C209 is mostly shape+params (S 0.61 [0.57, 0.65]); compensations -6.85% at matched params+FLOPs (C215 VERIFIED); C3 exact on CUDA; C119 VERIFIED
+*2026-11-23*
+
+**GPU batch C1 read out (SQ419, frozen readout, all predictions in range): most of C209's gap is the bigger core and its parameters (S = 0.61 [0.57, 0.65]), and the compensations still give -6.85% at matched shape, parameters and FLOPs (new C215, VERIFIED). C3's exact-zero causality now holds on the production CUDA kernels, and C119 is VERIFIED by SQ75's profile. Cost $0.84.**
+
+- **Readout:** `experiments/checks/sq419_f6.py` [b28fa9546caa1d69, as registered], replayed twice to the identical output hash 3813769b833a7c3c (the 19:34 reproducibility rule). Seeds 2-4, 200M tokens, clean80, paired by seed, exact t.
+  - **R1, F-6 vs E27: -10.54% [-10.83, -10.25]** (predicted -11.6%, range -14% to -9%). A1g's parameter-changed gain replicates on fresh seeds. Against the FLOP-matched E27 it is -10.02% [-10.55, -9.48] (amendment 1).
+  - **R2, A2s vs F-6: -6.85% [-8.02, -5.67], p 0.0017** (predicted -5.7%, range -8% to -3%). F-6 and A2s are matched on unique parameters (15,084,976 vs 15,085,360) and FLOPs (3.78-3.79e16). This creates **C215, VERIFIED**: the compensations improve the recipe at matched shape. Limitations: not matched on weight bits (A2s's full-precision ends), the compensations are bundled, and in corpus only.
+  - **S = 0.61, interval [0.57, 0.65]** (predicted 0.68, range 0.5-0.8). The amended interval rule reads **MOSTLY SHAPE**, and C209 gains that decomposition as a limitation. Clean50 gives S 0.60 and the 50-80 overlap band 0.62, so the split does not depend on memorisation level.
+  - **LR:** on the seed-5 bracket (1.5e-3, 3e-3, 6e-3, 1.2e-2), 6e-3 is within 0.12% of F-6's best and 0.58% of A2s's best. A2s's optimum is now bracketed from below (1.5e-3 is worse than 3e-3). Both pass the robustness rule (one seed).
+- **C3:** the production-kernel witness ran unpatched on the 5090 (fla under bf16). Every block type shows exactly 0 change before a perturbed token, and the SWA cutoff is exact. ALL PASS, which lifts the reference-path-only scope.
+- **C119 VERIFIED by SQ75's registered criterion:** E0's compiled step is 53% gemm (non-gemm 0.47 >= 0.45) and 95.5% busy. E1 is 35% gemm, 6.3% fla GDN, 5.3% conv and 12% attention. Measured on a rented 5090, not the N1X; stdout is saved, and the JSON stayed on the box.
+- **Lost:** F-6's 8 checkpoints. `pull.sh` only fetched checkpoints named `-20261123-`, but the box's clock had passed midnight UTC (runs named `-20261124-`), and the box was destroyed after the pull. Score files and summaries were pulled, so the readout is complete. Eval-only follow-ups on F-6 (out of corpus, an r-sweep) need a retrain. The filter is fixed.
+- **Docs:** the hourly docs refresh (README atlas bullet, sketch status and decision-log lines for v0.5.53-55, the SETUP Q14 gate, the campaigns timestamp) was checked against SQ439 and DEVLOG, then updated here with C1's result in the README, the sketch and the queue (SQ419 done).
+- **Spend:** X8 $0.84 (credit 55.99 -> 55.149). Total $44.85; assembly-phase GPU spend $14.67 of the $25 cap.
+
+---
+
 ## v0.5.55: Data-flow atlas (SQ439): first SWA layer is a moving average whose selectivity only serves in-corpus recall (SQ441); E27 prelude inert; passes past 2 idle; SQ442-SQ446 techniques
 *2026-11-23*
 

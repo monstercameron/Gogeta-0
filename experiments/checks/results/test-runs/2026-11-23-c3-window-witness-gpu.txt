@@ -1,0 +1,6 @@
+causality attn           PASS  t=5: before 0.0e+00 after 1.3e+00  t=16: before 0.0e+00 after 1.2e+00  t=31: before 0.0e+00 after 9.5e-01
+causality swa            PASS  t=5: before 0.0e+00 after 1.3e+00  t=16: before 0.0e+00 after 1.2e+00  t=31: before 0.0e+00 after 9.9e-01
+causality gdn            PASS  t=5: before 0.0e+00 after 1.3e+00  t=16: before 0.0e+00 after 1.4e+00  t=31: before 0.0e+00 after 1.3e+00
+causality looped_hybrid  PASS  t=5: before 0.0e+00 after 6.9e-01  t=16: before 0.0e+00 after 6.8e-01  t=31: before 0.0e+00 after 5.4e-01
+swa cutoff (window 8): inside max 1.37e+00, outside max 0.00e+00 -> PASS
+ALL PASS

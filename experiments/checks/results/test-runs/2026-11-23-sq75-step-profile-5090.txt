@@ -1,0 +1,13 @@
+USDT:2026-11-24 00:24:37 5708:5708 SyncActivityProfilerHandler.cpp:39] profiler_start
+USDT:2026-11-24 00:24:38 5708:5708 SyncActivityProfilerHandler.cpp:46] profiler_stop
+  E0: {"wall_ms_per_step": 25.79, "gpu_busy_ms_per_step": 24.63, "busy_fraction": 0.955, "kernels_per_step": 302, "share": {"gemm": 0.5316, "inductor": 0.2749, "attention": 0.1447, "other": 0.0254, "optimizer": 0.0227, "copy": 0.0007}, "error": null}
+USDT:2026-11-24 00:25:14 5708:5708 SyncActivityProfilerHandler.cpp:39] profiler_start
+USDT:2026-11-24 00:25:14 5708:5708 SyncActivityProfilerHandler.cpp:46] profiler_stop
+  E1: {"wall_ms_per_step": 41.26, "gpu_busy_ms_per_step": 40.11, "busy_fraction": 0.972, "kernels_per_step": 615, "share": {"gemm": 0.35, "other": 0.2299, "inductor": 0.1692, "attention": 0.1196, "fla_gdn": 0.063, "conv": 0.0532, "optimizer": 0.0148, "copy": 0.0004}, "error": null}
+USDT:2026-11-24 00:25:16 5708:5708 SyncActivityProfilerHandler.cpp:39] profiler_start
+USDT:2026-11-24 00:25:16 5708:5708 SyncActivityProfilerHandler.cpp:46] profiler_stop
+  E2: {"wall_ms_per_step": 93.03, "gpu_busy_ms_per_step": 90.17, "busy_fraction": 0.969, "kernels_per_step": 1662, "share": {"gemm": 0.346, "other": 0.1988, "inductor": 0.1828, "attention": 0.1264, "fla_gdn": 0.0747, "conv": 0.065, "optimizer": 0.0057, "copy": 0.0004}, "error": null}
+
+== SQ75 verdicts ==
+  C119: VERIFIED: E0 non-gemm 0.47, busy/wall 0.95
+  -> experiments/checks/results/sq_hw_step_profile.json  (48.3 s)

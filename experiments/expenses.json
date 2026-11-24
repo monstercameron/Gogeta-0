@@ -125,6 +125,23 @@
    "purpose": "GPU batch B1 (25 runs at 20M tokens); human: 'Yes, rent one'",
    "evidence": "provider total 44.006 at 16:56 minus 43.271 at 15:47",
    "note": "controller est_cost 0.65 + boot/storage"
+  },
+  {
+   "id": "X8",
+   "date": "2026-11-23T20:47:00-05:00",
+   "type": "compute",
+   "provider": "vast.ai",
+   "amount": 0.84,
+   "estimated": false,
+   "resource": "1x RTX 5090 (gogeta-cockpit-c1-1, $0.504/h), 1.53 h; destroyed 20:47 (ALL C1 BOXES DESTROYED)",
+   "experiments": [
+    "SQ419",
+    "SQ75",
+    "C3"
+   ],
+   "purpose": "GPU batch C1: SQ419 F-6 (8 runs at 200M) plus the C3 GPU witness and the SQ75 profile; GPU use under the standing goal's permission",
+   "evidence": "provider credit 55.99 before C1, 55.149 after (2026-11-23 20:53)",
+   "note": "controller est_cost 0.77 + boot/storage"
   }
  ],
  "reconciliations": [

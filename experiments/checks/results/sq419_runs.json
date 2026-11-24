@@ -1,0 +1,790 @@
+{
+ "check": "SQ419-runs",
+ "rows": [
+  {
+   "run": "A1g-20261124-002533-s2",
+   "arm": "F6",
+   "seed": 2,
+   "lr": 0.006,
+   "tokens": 200015872.0,
+   "flops": 3.778228110596506e+16,
+   "params_non_embedding": 15084976,
+   "wall_min": 9.982736515998841,
+   "git": "b8d9fe5a19cf89ec4f6aaf8aed9df5d7b806a43b",
+   "git_describe": "v0.5.50",
+   "dataset": "code-py-v2",
+   "doclevel": {
+    "docs_val_sha256": "f821d119e552fd94e69414f35849f323cd6d3e9744c771b68da7b563e7e377a9",
+    "overlap_sha256": "8b90c135263abb06e69fcd698194af03ec4981ec3747fa0e2ad4a20314936aac",
+    "overlap_file_sha256": "74297f422c1da8acb832e21dc43451d1d46cd83c7ba45b7288b656a55992b0bf",
+    "run": "A1g-20261124-002533-s2",
+    "experiment": "A1g",
+    "seed": 2,
+    "checkpoint": "/root/fusiondance-data/checkpoints/A1g-20261124-002533-s2//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.29368436821872934,
+     "dup80": 0.13225785098027223,
+     "clean50": 0.36170149096173027,
+     "dup50": 0.1704533226527306,
+     "all": 0.24161372279964036
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.1614265172384571
+   }
+  },
+  {
+   "run": "A1g-20261124-003553-s3",
+   "arm": "F6",
+   "seed": 3,
+   "lr": 0.006,
+   "tokens": 200015872.0,
+   "flops": 3.790871143435469e+16,
+   "params_non_embedding": 15084976,
+   "wall_min": 9.451469922065735,
+   "git": "b8d9fe5a19cf89ec4f6aaf8aed9df5d7b806a43b",
+   "git_describe": "v0.5.50",
+   "dataset": "code-py-v2",
+   "doclevel": {
+    "docs_val_sha256": "f821d119e552fd94e69414f35849f323cd6d3e9744c771b68da7b563e7e377a9",
+    "overlap_sha256": "8b90c135263abb06e69fcd698194af03ec4981ec3747fa0e2ad4a20314936aac",
+    "overlap_file_sha256": "74297f422c1da8acb832e21dc43451d1d46cd83c7ba45b7288b656a55992b0bf",
+    "run": "A1g-20261124-003553-s3",
+    "experiment": "A1g",
+    "seed": 3,
+    "checkpoint": "/root/fusiondance-data/checkpoints/A1g-20261124-003553-s3//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.29072241648113195,
+     "dup80": 0.13173124943047973,
+     "clean50": 0.3579516729717528,
+     "dup50": 0.1692095579068217,
+     "all": 0.23943733131738304
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.15899116705065222
+   }
+  },
+  {
+   "run": "A1g-20261124-004544-s4",
+   "arm": "F6",
+   "seed": 4,
+   "lr": 0.006,
+   "tokens": 200015872.0,
+   "flops": 3.787531474383667e+16,
+   "params_non_embedding": 15084976,
+   "wall_min": 9.44762928088506,
+   "git": "b8d9fe5a19cf89ec4f6aaf8aed9df5d7b806a43b",
+   "git_describe": "v0.5.50",
+   "dataset": "code-py-v2",
+   "doclevel": {
+    "docs_val_sha256": "f821d119e552fd94e69414f35849f323cd6d3e9744c771b68da7b563e7e377a9",
+    "overlap_sha256": "8b90c135263abb06e69fcd698194af03ec4981ec3747fa0e2ad4a20314936aac",
+    "overlap_file_sha256": "74297f422c1da8acb832e21dc43451d1d46cd83c7ba45b7288b656a55992b0bf",
+    "run": "A1g-20261124-004544-s4",
+    "experiment": "A1g",
+    "seed": 4,
+    "checkpoint": "/root/fusiondance-data/checkpoints/A1g-20261124-004544-s4//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.29232601730414287,
+     "dup80": 0.1324886975862657,
+     "clean50": 0.3604264178724509,
+     "dup50": 0.16986234911675155,
+     "all": 0.24076799237647398
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.15983731971787718
+   }
+  },
+  {
+   "run": "A1g-20261124-005532-s5",
+   "arm": "F6",
+   "seed": 5,
+   "lr": 0.006,
+   "tokens": 200015872.0,
+   "flops": 3.769401842388173e+16,
+   "params_non_embedding": 15084976,
+   "wall_min": 9.398839525381725,
+   "git": "b8d9fe5a19cf89ec4f6aaf8aed9df5d7b806a43b",
+   "git_describe": "v0.5.50",
+   "dataset": "code-py-v2",
+   "doclevel": {
+    "docs_val_sha256": "f821d119e552fd94e69414f35849f323cd6d3e9744c771b68da7b563e7e377a9",
+    "overlap_sha256": "8b90c135263abb06e69fcd698194af03ec4981ec3747fa0e2ad4a20314936aac",
+    "overlap_file_sha256": "74297f422c1da8acb832e21dc43451d1d46cd83c7ba45b7288b656a55992b0bf",
+    "run": "A1g-20261124-005532-s5",
+    "experiment": "A1g",
+    "seed": 5,
+    "checkpoint": "/root/fusiondance-data/checkpoints/A1g-20261124-005532-s5//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.2936587807082416,
+     "dup80": 0.13316911002430254,
+     "clean50": 0.3619336370503977,
+     "dup50": 0.17075654721275002,
+     "all": 0.24189032978350783
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.16048967068393905
+   }
+  },
+  {
+   "run": "A1g-20261124-010517-s5",
+   "arm": "F6",
+   "seed": 5,
+   "lr": 0.003,
+   "tokens": 200015872.0,
+   "flops": 3.769401842388173e+16,
+   "params_non_embedding": 15084976,
+   "wall_min": 9.399448005358378,
+   "git": "b8d9fe5a19cf89ec4f6aaf8aed9df5d7b806a43b",
+   "git_describe": "v0.5.50",
+   "dataset": "code-py-v2",
+   "doclevel": {
+    "docs_val_sha256": "f821d119e552fd94e69414f35849f323cd6d3e9744c771b68da7b563e7e377a9",
+    "overlap_sha256": "8b90c135263abb06e69fcd698194af03ec4981ec3747fa0e2ad4a20314936aac",
+    "overlap_file_sha256": "74297f422c1da8acb832e21dc43451d1d46cd83c7ba45b7288b656a55992b0bf",
+    "run": "A1g-20261124-010517-s5",
+    "experiment": "A1g",
+    "seed": 5,
+    "checkpoint": "/root/fusiondance-data/checkpoints/A1g-20261124-010517-s5//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.29330505939982043,
+     "dup80": 0.13257576701234908,
+     "clean50": 0.36120193157841274,
+     "dup50": 0.17050242502650292,
+     "all": 0.2414593147505314
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.16072929238747136
+   }
+  },
+  {
+   "run": "A1g-20261124-011459-s5",
+   "arm": "F6",
+   "seed": 5,
+   "lr": 0.012,
+   "tokens": 200015872.0,
+   "flops": 3.769401842388173e+16,
+   "params_non_embedding": 15084976,
+   "wall_min": 9.398627122243246,
+   "git": "b8d9fe5a19cf89ec4f6aaf8aed9df5d7b806a43b",
+   "git_describe": "v0.5.50",
+   "dataset": "code-py-v2",
+   "doclevel": {
+    "docs_val_sha256": "f821d119e552fd94e69414f35849f323cd6d3e9744c771b68da7b563e7e377a9",
+    "overlap_sha256": "8b90c135263abb06e69fcd698194af03ec4981ec3747fa0e2ad4a20314936aac",
+    "overlap_file_sha256": "74297f422c1da8acb832e21dc43451d1d46cd83c7ba45b7288b656a55992b0bf",
+    "run": "A1g-20261124-011459-s5",
+    "experiment": "A1g",
+    "seed": 5,
+    "checkpoint": "/root/fusiondance-data/checkpoints/A1g-20261124-011459-s5//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.29746924740097586,
+     "dup80": 0.13885534945901432,
+     "clean50": 0.3648448457650264,
+     "dup50": 0.17606465316484918,
+     "all": 0.24630585628305207
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.15861389794196154
+   }
+  },
+  {
+   "run": "A1g-20261124-012445-s5",
+   "arm": "F6",
+   "seed": 5,
+   "lr": 0.0015,
+   "tokens": 200015872.0,
+   "flops": 3.769401842388173e+16,
+   "params_non_embedding": 15084976,
+   "wall_min": 9.397923266887664,
+   "git": "b8d9fe5a19cf89ec4f6aaf8aed9df5d7b806a43b",
+   "git_describe": "v0.5.50",
+   "dataset": "code-py-v2",
+   "doclevel": {
+    "docs_val_sha256": "f821d119e552fd94e69414f35849f323cd6d3e9744c771b68da7b563e7e377a9",
+    "overlap_sha256": "8b90c135263abb06e69fcd698194af03ec4981ec3747fa0e2ad4a20314936aac",
+    "overlap_file_sha256": "74297f422c1da8acb832e21dc43451d1d46cd83c7ba45b7288b656a55992b0bf",
+    "run": "A1g-20261124-012445-s5",
+    "experiment": "A1g",
+    "seed": 5,
+    "checkpoint": "/root/fusiondance-data/checkpoints/A1g-20261124-012445-s5//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.297716039562203,
+     "dup80": 0.13422733401732875,
+     "clean50": 0.3668795567973329,
+     "dup50": 0.17274844935839861,
+     "all": 0.24498020308325724
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.16348870554487424
+   }
+  },
+  {
+   "run": "A2s-20261123-170724-s2",
+   "arm": "A2s",
+   "seed": 2,
+   "lr": 0.006,
+   "clean80_ref": 0.2727080338742496,
+   "git": "f85ada5614fc3c5d44eca77f00183817fb7ef9e4",
+   "doclevel": {
+    "run": "A2s-20261123-170724-s2",
+    "experiment": "A2s",
+    "seed": 2,
+    "checkpoint": "/root/fusiondance-data/checkpoints/A2s-20261123-170724-s2//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.2727080338742496,
+     "dup80": 0.1191399629217868,
+     "clean50": 0.3375312471952841,
+     "dup50": 0.15540817969542503,
+     "all": 0.2231722530926632
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.15356807095246278
+   }
+  },
+  {
+   "run": "A2s-20261123-172442-s3",
+   "arm": "A2s",
+   "seed": 3,
+   "lr": 0.006,
+   "clean80_ref": 0.27239916179832974,
+   "git": "f85ada5614fc3c5d44eca77f00183817fb7ef9e4",
+   "doclevel": {
+    "run": "A2s-20261123-172442-s3",
+    "experiment": "A2s",
+    "seed": 3,
+    "checkpoint": "/root/fusiondance-data/checkpoints/A2s-20261123-172442-s3//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.27239916179832974,
+     "dup80": 0.11954475279461593,
+     "clean50": 0.33740560905491096,
+     "dup50": 0.15535557112978893,
+     "all": 0.22309358382925593
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.1528544090037138
+   }
+  },
+  {
+   "run": "E27-20261123-173447-s3",
+   "arm": "E27",
+   "seed": 3,
+   "lr": 0.006,
+   "clean80_ref": 0.3247607527141679,
+   "git": "f85ada5614fc3c5d44eca77f00183817fb7ef9e4",
+   "doclevel": {
+    "run": "E27-20261123-173447-s3",
+    "experiment": "E27",
+    "seed": 3,
+    "checkpoint": "/root/fusiondance-data/checkpoints/E27-20261123-173447-s3//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.3247607527141679,
+     "dup80": 0.1549561129698387,
+     "clean50": 0.3956265199124476,
+     "dup50": 0.1955378599280872,
+     "all": 0.26998761297293156
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.1698046397443292
+   }
+  },
+  {
+   "run": "A2s-20261123-170741-s4",
+   "arm": "A2s",
+   "seed": 4,
+   "lr": 0.006,
+   "clean80_ref": 0.2715624561347559,
+   "git": "f85ada5614fc3c5d44eca77f00183817fb7ef9e4",
+   "doclevel": {
+    "run": "A2s-20261123-170741-s4",
+    "experiment": "A2s",
+    "seed": 4,
+    "checkpoint": "/root/fusiondance-data/checkpoints/A2s-20261123-170741-s4//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.2715624561347559,
+     "dup80": 0.1199846069231875,
+     "clean50": 0.3361994341714611,
+     "dup50": 0.15539398903131804,
+     "all": 0.2226686524728418
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.15157784921156836
+   }
+  },
+  {
+   "run": "E27-20261123-171756-s4",
+   "arm": "E27",
+   "seed": 4,
+   "lr": 0.006,
+   "clean80_ref": 0.32648854199414135,
+   "git": "f85ada5614fc3c5d44eca77f00183817fb7ef9e4",
+   "doclevel": {
+    "run": "E27-20261123-171756-s4",
+    "experiment": "E27",
+    "seed": 4,
+    "checkpoint": "/root/fusiondance-data/checkpoints/E27-20261123-171756-s4//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.32648854199414135,
+     "dup80": 0.15756891345445154,
+     "clean50": 0.39774137968871087,
+     "dup50": 0.19749069886452714,
+     "all": 0.2720008764452313
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.1689196285396898
+   }
+  },
+  {
+   "run": "E27-20261123-072845-s2",
+   "arm": "E27",
+   "seed": 2,
+   "lr": 0.006,
+   "clean80_ref": 0.3287769216284437,
+   "git": null,
+   "doclevel": {
+    "run": "E27-20261123-072845-s2",
+    "experiment": "E27",
+    "seed": 2,
+    "checkpoint": "/root/fusiondance-data/checkpoints/E27-20261123-072845-s2//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.3287769216284437,
+     "dup80": 0.15610253168738045,
+     "clean50": 0.40008615457514357,
+     "dup50": 0.197818648860383,
+     "all": 0.2730780991215019
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.17267438994106324
+   }
+  },
+  {
+   "run": "E27-20261123-201328-s2",
+   "arm": "E27cm",
+   "seed": 2,
+   "lr": 0.006,
+   "clean80_ref": 0.326384288273947,
+   "flops": 3.792837544299725e+16,
+   "git": "4c716bdce13d70575a14d9e3b8ca1f440fb05e3a",
+   "doclevel": {
+    "docs_val_sha256": "f821d119e552fd94e69414f35849f323cd6d3e9744c771b68da7b563e7e377a9",
+    "overlap_sha256": "8b90c135263abb06e69fcd698194af03ec4981ec3747fa0e2ad4a20314936aac",
+    "overlap_file_sha256": "74297f422c1da8acb832e21dc43451d1d46cd83c7ba45b7288b656a55992b0bf",
+    "run": "E27-20261123-201328-s2",
+    "experiment": "E27",
+    "seed": 2,
+    "checkpoint": "/root/fusiondance-data/checkpoints/E27-20261123-201328-s2//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.326384288273947,
+     "dup80": 0.15649408237712437,
+     "clean50": 0.3971593216979841,
+     "dup50": 0.19717174295230816,
+     "all": 0.27158354783325567
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.16989020589682263
+   }
+  },
+  {
+   "run": "E27-20261123-202328-s3",
+   "arm": "E27cm",
+   "seed": 3,
+   "lr": 0.006,
+   "clean80_ref": 0.32384872579443846,
+   "flops": 3.801674724461773e+16,
+   "git": "4c716bdce13d70575a14d9e3b8ca1f440fb05e3a",
+   "doclevel": {
+    "docs_val_sha256": "f821d119e552fd94e69414f35849f323cd6d3e9744c771b68da7b563e7e377a9",
+    "overlap_sha256": "8b90c135263abb06e69fcd698194af03ec4981ec3747fa0e2ad4a20314936aac",
+    "overlap_file_sha256": "74297f422c1da8acb832e21dc43451d1d46cd83c7ba45b7288b656a55992b0bf",
+    "run": "E27-20261123-202328-s3",
+    "experiment": "E27",
+    "seed": 3,
+    "checkpoint": "/root/fusiondance-data/checkpoints/E27-20261123-202328-s3//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.32384872579443846,
+     "dup80": 0.1550504136017787,
+     "clean50": 0.3938413299327401,
+     "dup50": 0.19565997501636984,
+     "all": 0.26940019272882676
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.16879831219265976
+   }
+  },
+  {
+   "run": "E27-20261123-203531-s4",
+   "arm": "E27cm",
+   "seed": 4,
+   "lr": 0.006,
+   "clean80_ref": 0.3240888594154631,
+   "flops": 3.784203985800397e+16,
+   "git": "4c716bdce13d70575a14d9e3b8ca1f440fb05e3a",
+   "doclevel": {
+    "docs_val_sha256": "f821d119e552fd94e69414f35849f323cd6d3e9744c771b68da7b563e7e377a9",
+    "overlap_sha256": "8b90c135263abb06e69fcd698194af03ec4981ec3747fa0e2ad4a20314936aac",
+    "overlap_file_sha256": "74297f422c1da8acb832e21dc43451d1d46cd83c7ba45b7288b656a55992b0bf",
+    "run": "E27-20261123-203531-s4",
+    "experiment": "E27",
+    "seed": 4,
+    "checkpoint": "/root/fusiondance-data/checkpoints/E27-20261123-203531-s4//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.3240888594154631,
+     "dup80": 0.1547244859825974,
+     "clean50": 0.39472318693343283,
+     "dup50": 0.1952304784657322,
+     "all": 0.2694577344521354
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.16936437343286573
+   }
+  },
+  {
+   "run": "A2s-20261124-013429-s5",
+   "arm": "A2s_bracket",
+   "seed": 5,
+   "lr": 0.0015,
+   "tokens": 200015872.0,
+   "git": "b8d9fe5a19cf89ec4f6aaf8aed9df5d7b806a43b",
+   "doclevel": {
+    "docs_val_sha256": "f821d119e552fd94e69414f35849f323cd6d3e9744c771b68da7b563e7e377a9",
+    "overlap_sha256": "8b90c135263abb06e69fcd698194af03ec4981ec3747fa0e2ad4a20314936aac",
+    "overlap_file_sha256": "74297f422c1da8acb832e21dc43451d1d46cd83c7ba45b7288b656a55992b0bf",
+    "run": "A2s-20261124-013429-s5",
+    "experiment": "A2s",
+    "seed": 5,
+    "checkpoint": "/root/fusiondance-data/checkpoints/A2s-20261124-013429-s5//model.pt",
+    "window": 1024,
+    "overlap_source": "K9.json data.val_per_doc_overlap",
+    "bpc": {
+     "clean80": 0.27562716599585846,
+     "dup80": 0.11939420489258783,
+     "clean50": 0.3421491157846027,
+     "dup50": 0.15594940049985462,
+     "all": 0.2252317832573113
+    },
+    "n_docs": {
+     "clean80": 2333,
+     "dup80": 1667,
+     "clean50": 1174,
+     "dup50": 2826
+    },
+    "chars": {
+     "clean80": 2668267,
+     "dup80": 1270516,
+     "clean50": 1465550,
+     "dup50": 2473233
+    },
+    "tokens": {
+     "clean80": 700222,
+     "dup80": 354938,
+     "clean50": 382410,
+     "dup50": 672750
+    },
+    "memorisation_gap_80": -0.15623296110327062
+   }
+  }
+ ]
+}

@@ -402,3 +402,21 @@ table.kv th { width: 45%; }
   .viz-wrap .band-label { font-size: 17px; }
   .viz-root { padding: 12px; }
 }
+
+/* ---- claim-status chips and goal states (v0.5.59 landing page) ---- */
+.claim { display: inline-block; font: 700 .7rem/1.5 var(--font-mono); letter-spacing: .04em; padding: 1px 8px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+.claim.v { color: var(--green); }
+.claim.p { color: var(--gold); }
+.claim.r { color: var(--red); }
+.claim.u { color: var(--dim); }
+.claim.e { color: var(--blue); }
+.state { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line); font: 600 .82rem/1.4 var(--font-mono); color: var(--gold); }
+.state.off { color: var(--dim); }
+.state.ok { color: var(--green); }
+.status-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-bottom: 26px; }
+.status-grid .card h3 { font-size: 1rem; margin-bottom: 6px; }
+.status-grid .big { font: 700 1.9rem/1.1 var(--font-mono); color: #fff; margin: 4px 0 6px; }
+.status-grid .big.good { color: var(--green); }
+.status-grid .big.bad { color: var(--red); }
+.paused { border: 1px solid rgba(255,210,63,.45); background: rgba(255,210,63,.06); border-radius: 12px; padding: 14px 18px; margin: 0 0 22px; }
+.paused b { color: var(--gold); }

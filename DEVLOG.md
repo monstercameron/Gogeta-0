@@ -18,6 +18,27 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.59: README and GitHub Pages site rewritten around the current state; registry gains E66 (B1) and E67 (C1)
+*2026-11-23*
+
+**README and project site rewritten to show where the model actually stands. The README gets a short status block, the architecture as trained (A2s), a key-results table with claim statuses, a goals table with each goal's real state, and a compact Byte Quest. The landing page is rebuilt around the same facts. The experiment registry gains the two GPU batches it was missing (E66 = B1, E67 = C1).**
+
+- **README:**
+  - **Status block:** the 1,500-word status paragraph is replaced by a short block: what works, the headline with its decomposition (C209 61% shape and parameters, C215 scoped), the remaining gap to dense, what is not viable yet, and spend. It links `notes/CONTINUATION.md`.
+  - **Architecture:** the diagram now shows A2s as trained (full-precision prelude and coda, contractive injection, a 6-block ternary core run twice) with atlas readings.
+  - **Results:** "Results so far" is an 11-row question / result / claim table (paired clean80, statuses from the ledger), plus the SQ239/SQ410/SQ385 overlap and context findings.
+  - **Goals and Byte Quest:** the goals list became a table with each goal's state, and Byte Quest reports its measured results (E13, A4 +14.4%).
+  - **Cleanup:** the stale F2-era "Where we are" paragraph and "Start reading here" list are updated.
+- **Site (`docs/index.html`, `docs/assets/style.css`):**
+  - **Hero and scouter:** the hero states the pause, and the scouter shows A2s's real readings (15.1M params, 6 blocks x 2, -16.7% vs the naive fusion, +8.6% vs dense in corpus, -1.9% loop out of corpus).
+  - **New "Where we are" section:** four headline cards and the results table with claim-status chips.
+  - **Fusion section:** the diagram is redrawn as A2s (the v0 diagram showed a 3-block random-r core with an exit head that A2s does not use), with atlas findings.
+  - **Goals, Byte Quest and Ideas:** each card shows its state; Byte Quest reports measured results; Ideas lists what is next (SQ447, SQ442, scale).
+  - **Checks:** the page parses clean, and every anchor, local asset, CSS class and repo link resolves.
+- **Registry (`experiments/experiments.json`):** E66 (B1, v0.5.36) and E67 (C1/SQ419, v0.5.56) are added, so the site's roadmap and experiment pages cover them (`docs/experiments/E66.html`, `E67.html`). Both batches had been recorded only in DEVLOG and the side quests, which AGENTS section 5 does not allow.
+
+---
+
 ## v0.5.58: Docs refresh (final pass before the pause)
 *2026-11-23*
 

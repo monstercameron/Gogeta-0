@@ -679,5 +679,77 @@
       "evidence": "experiments/checks/results/a4_fullstack.json"
     },
     "notes": "Seeds 5-7, 200M tokens. val_loss = A4a's mean val nats per target token (v2 val, not clean80; SQ387). The full stack is NOT viable by the registered rule: the byte decoder costs +14.4% vs A3mx's BPE head. The second shared byte pass helps (-1.7%, Holm). First dispatch failed in 1 s on a missing PYTHONPATH in the fleet worker (13:51) and was requeued."
+  },
+  {
+    "id": "E66",
+    "arc": "Assembly",
+    "title": "GPU batch B1: MoE capacity, GDN write strength, core LR, loops vs unique params (20M screens)",
+    "question": "At 20M tokens: is the MoE core's gain capacity or routing (SQ401)? Does GDN's learned write strength matter (SQ402)? Is part of the loop cost step size (SQ404)? Do unique parameters beat a second pass at equal params (SQ350)?",
+    "prediction": "Registered: experiments/checks/PREDICTIONS.md, section 'GPU batch B1' (amended through v0.5.35).",
+    "ingredients": [
+      "A2s / A3m / A2s-core2048",
+      "E1 with fixed GDN beta 1.0 and 0.5",
+      "A2f with core LR multiplier 0.5 / 1 / 2, E24",
+      "A2f 6x2 vs 6x1"
+    ],
+    "metrics": [
+      "clean80 doc-level bpc, paired by seed (exploratory 20M screens)"
+    ],
+    "status": "done",
+    "version": "v0.5.36",
+    "config": "experiments/staged-configs/b1/",
+    "results": {
+      "val_loss": null,
+      "effects_paired": {
+        "SQ401_A3m_vs_A2s": -0.0101,
+        "SQ401_dense2048_vs_A3m": 0.0015,
+        "SQ402_beta1_vs_learned": -0.0047,
+        "SQ402_beta05_vs_learned": -0.0006,
+        "SQ404_best_mult_vs_mult1": -0.0016,
+        "SQ350_A2f_6x2_vs_6x1": -0.0133
+      },
+      "readout": "experiments/checks/results/b1_readout.json"
+    },
+    "notes": "No Holm gate opens; exploratory. The MoE core shows no difference from a dense FFN of the same total width (+0.15% [-0.88, +1.20]); fixing GDN's write strength costs no detectable loss (2 seeds); a core LR multiplier closes 9% of the loop cost; unique params beat a second pass about 2.4x per FLOP. One rented RTX 5090, $0.74 (X7)."
+  },
+  {
+    "id": "E67",
+    "arc": "Assembly",
+    "title": "GPU batch C1 (SQ419): parameter-matched decomposition of the A2 headline (F-6 = A1g on fresh seeds)",
+    "question": "How much of C209's 16.7% (A2s vs E27) is the 6-block core shape with its extra unique parameters, and how much is the A2 bundle of compensations?",
+    "prediction": "Registered: experiments/checks/PREDICTIONS.md, section 'GPU batch C1' and amendment 1 (R1 -11.6%, R2 -5.7%, S 0.68); readout sq419_f6.py [b28fa9546caa1d69].",
+    "ingredients": [
+      "F-6 (A1g: E27's recipe on A2s's 6-block core), seeds 2-4 at 200M",
+      "the existing A2s and E27 runs (A2 P1), the FLOP-matched E27",
+      "seed-5 LR bracket 1.5e-3 to 1.2e-2 for F-6 and A2s"
+    ],
+    "metrics": [
+      "clean80 doc-level bpc, paired by seed, exact t",
+      "clean50 and the 50-80 overlap band (descriptive)"
+    ],
+    "status": "done",
+    "version": "v0.5.56",
+    "config": "experiments/staged-configs/a1/a1g.json",
+    "results": {
+      "val_loss": null,
+      "clean80_bpc_F6": {
+        "s2": 0.29368,
+        "s3": 0.29072,
+        "s4": 0.29233
+      },
+      "effects_paired": {
+        "R1_F6_vs_E27": -0.1054,
+        "R1cm_F6_vs_E27_flop_matched": -0.1002,
+        "R2_A2s_vs_F6": -0.0685,
+        "S_share_of_C209_gap": 0.611
+      },
+      "decisions": {
+        "S_rule": "MOSTLY SHAPE (S interval [0.57, 0.65] lower bound >= 0.5)",
+        "R1": "A1g's gain replicates on fresh seeds",
+        "R2": "new claim C215 (VERIFIED; scoped in v0.5.57 as probably mostly precision scope)"
+      },
+      "readout": "experiments/checks/results/sq419.json"
+    },
+    "notes": "All three registered predictions in range. One rented RTX 5090, $0.84 (X8). F-6's checkpoints were lost to a pull date filter (fixed)."
   }
 ]

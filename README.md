@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-ffd23f"></a>
-  <a href="https://github.com/monstercameron/Gogeta-0/tags"><img alt="Version" src="https://img.shields.io/badge/version-v0.5.58-ff8a1f"></a>
+  <a href="https://github.com/monstercameron/Gogeta-0/tags"><img alt="Version" src="https://img.shields.io/badge/version-v0.5.59-ff8a1f"></a>
   <a href="https://monstercameron.github.io/Gogeta-0/"><img alt="Project site" src="https://img.shields.io/badge/site-live-3cff9a"></a>
   <img alt="Status: research" src="https://img.shields.io/badge/status-experimental%20research-4a90ff">
   <img alt="Python 3.12" src="https://img.shields.io/badge/python-3.12-3cff9a">
@@ -17,7 +17,7 @@
   <a href="https://monstercameron.github.io/Gogeta-0/devlog.html">Devlog page</a> ·
   <a href="https://monstercameron.github.io/Gogeta-0/learn.html">Learn</a> ·
   <a href="https://monstercameron.github.io/Gogeta-0/architecture.html">3D architecture</a> ·
-  <a href="#byte-quest-bytes-are-a-main-quest-now">Byte Quest</a> ·
+  <a href="#byte-quest-coarse-to-fine-bytes">Byte Quest</a> ·
   <a href="experiments/INDEX.md">Experiment index</a> ·
   <a href="experiments/QUEUE.md">Queue</a> ·
   <a href="experiments/claims-status.md">Claims status</a> ·
@@ -46,7 +46,13 @@
 
 **Gogeta-0** is a small causal language model for Python code, and the first model built on **FusionDance**: an architecture that fuses three separate answers to the three big costs of modern LLMs. It's an open, laptop-scale research project, and every experiment is written up honestly, failures included.
 
-> **Status: v0.5.58. First models trained; the first headline did not survive.** The project is in an **assembly phase** (v0.5.0 onward): the 200M factorial shows the three ingredients' penalties compound, so compensations are tested one at a time on the full fusion (the A1 screen, E62; exploratory, two seeds, v0.5.4: ternary in the core only -8.3%, fixed r -5.2%, and a 6x2 loop shape -11.6%, which is a parameter-changed arm and not a compensation, all vs E27), and the assembled model (A2, E63, fresh seeds 2-4; a recipe-level comparison: loop policy, injection, precision scope and core shape all differ from E27) beat the full fusion by **16.7%** with about 1.6x its unique parameters (15.1M vs 9.5M non-embedding; not parameter-matched, SQ419 decomposed it in v0.5.56: S = 0.61 [0.57, 0.65], so about 61% of the gap is the 6-block core shape and its parameters; the rest is C215, where A2s beats F-6 by -6.85% at matched shape, parameters and FLOPs (VERIFIED), which is probably mostly the precision scope, since the full-precision ends spend more bits; SQ447 is the bit-matched control) (CI [-17.9, -15.5], exact t since v0.5.45; the first headline was not at matched FLOPs, since E27 uses about 10% less compute, v0.5.22; against a FLOP-matched E27 the gap is **16.2%**, CI [-16.9, -15.5], v0.5.30); its full-precision version is 0.9% below dense per FLOP in point estimate (v0.5.10; no equivalence test, so not a tie). On the human's instruction to keep every part, A3 (all parts, final in v0.5.17) found that every fix counts (ternary MoE core -3.3%, full-precision mixers -5.0%, full-precision FFN -5.2%, all parts -7.7% vs A2s), but the all-parts model still trails the unshared GDN hybrid by 4.4% and is not shown to tie dense (point estimate +1.1% vs E20, 90% CI [-0.13, +2.33]; C206-C208 are VERIFIED after the learning-rate bracket passed, v0.5.23). A4, the full stack with a coarse-to-fine byte decoder around the A3 backbone, is final (v0.5.20): the byte decoder costs +14.4% against the BPE head, so the registered viability rule fails (C210 and C211, both UNVERIFIED until the clean80 score, SQ387; v0.5.25). Self-speculative decoding is built but not lossless under int8 activations (v0.5.20). The reward-harness forgery is fixed for the probed routes (SQ373, v0.5.11), and SQ411 (v0.5.40) closes the `__eq__` route by AST-rewriting the tests in the grader (C83, PARTIAL: other routes stay open), so the harness-level GRPO block is lifted. Against the proper transformer control (E10, Hugging Face Llama at the same shapes) at tuned learning rates, swapping five of six attention layers for linear-time layers (E1) is 0.18% worse in the point estimate, not better, on the pre-registered clean-val metric (3 seeds each; the 95% CI spans zero, so no difference is detected; **ledger C5: REFUTED** by its registered rule, v0.4.78, qualified in v0.4.95). The earlier "3.6% lower loss" was against our own dense baseline E0, which turned out to be handicapped by 3.7% (E0-parity fails). The looped version **doesn't pay off yet** (C6/C7: partial). A 3-seed replication at the tuned learning rates (E10 3e-3, E1 6e-3, from the K7 sweep) ran on the N1X for six of its eleven items (E10 and E1, seeds 0–2). It is paused by an operator hold after a thermal kill at 86.6 °C (the partial E11 seed 0 run was discarded; DEVLOG v0.4.73). The 7-seed-per-arm replication on rented RTX 5090s (Phase 2b-5090, DEVLOG v0.4.74–v0.4.79) is done: E1 is **+0.08% vs E10** (paired 95% CI [−0.00087, +0.00132], p 0.64): no difference detected. Its sign matches the N1X test, but the CI spans zero. E11 (negative-eigenvalue Gated DeltaNet) is **equivalent to E1** within ±1% (C196, VERIFIED, 3 seeds, TOST p 0.002). Cloud (SQ220, `experiments/devlogs/SQ220.md`): the RTX 5090 is the fastest and cheapest card per token of the three we tried (C195, PARTIAL: one seed, 20M tokens, the 3090 and 5090 reproduce the N1X's loss within tolerance). A window sweep (SQ214, exploratory, 4 seeds) found E1's sliding window of 256 beats full context by 1.3%. The deduplicated **code-py-v2** dataset is built (v0.4.77: two machines produced byte-identical files; 71% of v1's train docs, 77% of its tokens), unblocking most of the A3 design; v2 validation is redrawn, so its numbers are not comparable with v1. Scale looks like the lever rather than loops: at E2's training FLOPs, 14 unshared blocks (E32, about 2.3× E1's unique parameters) reach about 7% lower clean80 bpc than E1 (C197, VERIFIED on 4 seeds at 200M; the lever is unique parameters, not depth, SQ282). The registered 2×2×2 factorial (F2: GDN × loops × ternary) looked mildly synergistic at 20M tokens (interaction −3.5%, C201), but at the registered 200M horizon it **reverses** (C202, PARTIAL: 3 seeds per cell): the ingredients' penalties compound (interaction **+6.21 log-points**, about +6.4% as a ratio; seed-blocked CI [+4.20, +8.22]; SQ263, C202). The interaction rises steadily through training, from −4.0% at step 250 to +4.5% at the last in-training eval (SQ337). At 200M, GDN alone is 4% better than dense per FLOP, but it takes 1.62× the dense wall time, so it is 8% worse at equal wall-clock (SQ338). Per-FLOP figures are analytic counts: sliding-window layers are counted at their window but run as a dense-masked T x T kernel (C12). Loops cost 10.6% (at matched FLOPs, looping also halves the unique parameters, 12.3M vs 27.9M, so this is partly the unique-parameter effect of C197), ternary 15.8%, and the full fusion is **30.8% worse** than dense. C201 is REFUTED by its own registered 200M check. The depth result (C197) now replicates on 4 seeds (SQ283: E32 beats E1 by 7.2% and the looped E2 by 12.2%; C197 VERIFIED). At each model's best learning rate, a 5-block model widened to the same parameters (E34) ties E32 (SQ282), so the lever is unique parameters at matched FLOPs, not depth as such; the earlier "E34 is 14% worse" was a learning-rate artifact. The deep stack does need its depth-scaled init (SQ308). The fleet waves 1–3b ran 106 training runs on eight rented RTX 5090s (0 failed runs) for **$6.54** (`experiments/expenses.json`, X4). The fleet is torn down (0 instances; the $30 GPU budget is spent: $30.13 in total, v0.4.103–v0.4.104). SQ243 and SQ241 (wave 4, 4 seeds each) are in: at d = 512 no E1–E10 difference is detected (+0.05%; not a registered equivalence), and at d = 256 E1 is better: 1.24% at the original LRs and 1.71% at each arm's best LR (SQ301, 2 seeds, LRs selected on the same seeds; C198 PARTIAL; the fresh-seed check SQ307 is inconclusive: −1.64%, all four seeds favour E1, but the CI [−3.66%, +0.43%] spans zero). Param-matched E1 is 0.61% worse than E10. SQ200 found our default init costs all-attention stacks about 3.5–3.8% while E1 shows no detected effect (C199 PARTIAL, fixed LRs); SQ308 (20M, 3 seeds) found the 14-block model's edge over E1 depends on the depth-scaled init: 2.6% better with it, no advantage with flat init (C197 limitation). The final model (goal 6) is planned as E61; its training needs the human's approval. The F2 factorial ran in two stages (the blinded seed-level sigma, 0.00873, set N_final at 221; per-run scores were visible during stage 1, disclosed in v0.4.89) and has been analysed: the 20M result (C201) and the 200M check (C202) are above. The recurrent decode kernel for Gated DeltaNet now works (C2 verified; the earlier NaN was our call-site bug, C110). **Caveat (K9, v0.4.33):** 41.7% of our validation documents turned out to be near-duplicates of training text, because the corpus repeats many problems, so every loss number so far is inflated. The clean80 metric drops only the 80%+ band: 1,159 of its 2,333 documents (49.7%) still have 50-79% overlap, so SQ410 reads every headline by overlap band. All loss numbers are provisional until the clean-validation re-score; all checkpoints will be re-scored on that cleaned set before any claim is settled. Since v0.5.21: `gogeta/hf.py` (the Hugging Face wrapper) could not build any model from v0.5.0 to v0.5.23; it is fixed in v0.5.24 and C80 is VERIFIED on saved output. A claim audit (v0.5.25) moved C210 and C211 to UNVERIFIED. Out of corpus (SQ379, v0.5.26), the ternary and loop costs of the assembled model shrink while the assembly gain survives; this is hypothesis C213 (PARTIAL since v0.5.38). Its registered replication SQ400 met all seven predictions on the 330-file SQ99 out-of-corpus set: the ternary cost is not distinguishable from 0 (+0.42% [-0.92, +1.77], n 6), and the loop cost reverses sign (A2f vs E24 -1.91% [-3.40, -0.40], C214, VERIFIED on that one set). The final model is therefore judged on out-of-corpus quality next to clean80. The v0.5.27 outside review registered SQ401 to SQ403 (dense capacity control for the MoE core, GDN write strength, eval-time pass count). GPU batch B1 (registered v0.5.31, amended through v0.5.35) ran on one rented RTX 5090 and was read out in v0.5.36 (20M tokens, exploratory, no ledger status changed): the MoE core matches a dense 2048-wide FFN at 31% fewer FLOPs (SQ401: no difference detected; no equivalence margin was set, so not a tie); a fixed GDN write strength costs under 0.5% in point estimate (SQ402, 2 seeds, no interval); a core learning-rate multiplier closes 9% of the loop cost, so the loop cost is not an LR artifact (SQ404); and unique parameters beat a second pass about 2.4x per FLOP (SQ350). No Holm gate opens. Total spend is $44.85 (v0.5.56, `experiments/expenses.json`). The assembly fleet is torn down ($13.09 for A1-A4, v0.5.30). See [Results](#results-so-far) and the [claims list](experiments/claims-status.md). **Early warning (SQ99, exploratory):** on Python from outside the training corpus we see no evidence of E1's in-corpus advantage (3.4% on our cleaned validation set): the out-of-corpus gap is +0.4% with a package-clustered 95% CI of −0.1% to +1.0%. The tuned, replicated checkpoints will be re-checked. A length re-analysis (C193, v0.4.66) adds: on short out-of-corpus files E1 keeps its ~3.9% advantage, on files over ~1,200 tokens it is ~1.1% worse, so the effect looks like long-context ability rather than corpus memorisation (length is confounded with file type; exploratory, n=1). The ledger marks C192 (transfer out of corpus) REFUTED under its registered pooled test, and C193 (the length effect) PARTIAL. And our dense baseline E0 itself trails the reference Llama (E10) by ~3.7% at identical shapes (possible init handicap, SQ200), so E1's headline lead over E0 may be largely a baseline artifact: Phase 2b compares E1 against E10. C16 (GDN recall vs plain linear attention) is INCONCLUSIVE: its K3 control failed the validity gate, and the check must be redesigned ([queue](experiments/QUEUE.md), Q15/Q16). **Research is paused (v0.5.57):** the running work is finished or documented, and the next GPU batch waits for the human. Resume steps are in [notes/CONTINUATION.md](notes/CONTINUATION.md).
+> **Status: v0.5.59. Assembled and measured at 15M parameters; research paused.** Every FusionDance component trains and runs together, and the best recipe (A2s) beats the naive fusion by 16.7%, but it still trails a plain dense model in corpus. The next steps (a GPU batch, a bigger dataset and the final 1.2B model) wait on the human. Where things stand and how to resume: [`notes/CONTINUATION.md`](notes/CONTINUATION.md).
+
+- **What works:** linear-time GDN mixers, sliding-window and full attention, a shared looped core, BitNet ternary weights, a ternary MoE core, a coarse-to-fine byte decoder and self-speculative decoding all train end to end. Causality is exact on the production CUDA kernels (C3), and the code sandbox for RL is hardened (C83, C106).
+- **The headline:** the assembled model A2s beats the naive full fusion E27 by **16.7%** on clean80 bits per character (C209, VERIFIED; 16.2% at matched FLOPs). About **61%** of that gap is A2s's bigger shared core and its extra parameters. The rest is the A2 bundle (C215, VERIFIED: -6.85% at matched parameters and FLOPs), which is probably mostly the extra precision of its full-precision ends.
+- **The gap that remains:** in corpus A2s is **8.6% worse than dense** E20 at the same tokens. Ternary weights cost about +9.7% and the loop about +3.1%. Out of corpus (Python files from outside the training data), the ternary cost is not distinguishable from 0 and the loop *helps* (-1.9%, C214, VERIFIED). The final model is judged out of corpus.
+- **Not viable yet:** the byte decoder costs +14.4% against the token head (C210, UNVERIFIED pending clean80), and self-speculative decoding is not lossless under int8 activations (C19).
+- **Spend so far:** $44.85 of rented GPU time ([`experiments/expenses.json`](experiments/expenses.json)). The authoritative state of every claim is [`experiments/claims-status.md`](experiments/claims-status.md).
 
 ## The pitch
 
@@ -58,89 +64,83 @@ Modern LLMs are expensive along three separate axes, and the research community 
 | 🌀 | **Parameters**: more reasoning depth means more layers | **Looped depth** | Run one shared block *r* times: depth comes from compute, not weights |
 | 🪶 | **Bits**: every weight stored in 16-bit precision | **Ternary weights** (BitNet b1.58) | Every weight is −1, 0 or +1: ~1.58 bits. With dedicated ternary kernels, matrix multiplies could become additions (ours are simulated, so no speedup yet) |
 
-**FusionDance fuses all three, and Gogeta-0 is the first model to try it.** The bet is that they cover each other's weak spots. Linear-time mixers are weak at multi-step state tracking, and looping adds exactly that depth. Looping costs compute, and ternary weights could make compute cheap once real ternary kernels replace our floating-point simulation. The 200M result says the three penalties do not simply cancel: they compound ([C202](experiments/claims-status.md), PARTIAL). So the project is in an **assembly phase** (v0.5.0): we test one compensation at a time on the full fusion, and claim a stack only once it works.
+**FusionDance fuses all three, and Gogeta-0 is the first model to try it.** The bet was that they cover each other's weak spots. At 200M tokens the naive fusion showed the opposite: the three penalties compound ([C202](experiments/claims-status.md), PARTIAL; the full fusion is 30.8% worse than dense). Since v0.5.0 the project has been in an **assembly phase**: fix one weak spot at a time on the full fusion, then stack only what works.
 
-## The architecture
+## The architecture (as trained: A2s)
 
 ```mermaid
 flowchart LR
     T([tokens]) --> E[Embed<br/>8k vocab]
-    E --> P[Prelude<br/>sliding-window attn]
-    P --> G1
-    subgraph CORE ["Core × r (shared weights)"]
-        G1[Gated DeltaNet] --> G2[Gated DeltaNet] --> S[Sliding-window attn]
+    E --> P[Prelude<br/>sliding-window attn<br/>full precision]
+    P --> I[Contractive injection<br/>h = λ·h + inject]
+    subgraph CORE ["Shared core × 2 (fixed), ternary"]
+        G1[GDN] --> G2[GDN] --> S1[SWA] --> G3[GDN] --> G4[GDN] --> S2[SWA]
     end
-    S -. loop r times .-> G1
-    S --> D[Coda<br/>full attention · runs once]
+    I --> G1
+    S2 -. second pass .-> I
+    S2 --> D[Coda<br/>full attention · full precision]
     D --> N([next token])
 ```
 
-**The one rule: nothing quadratic lives inside the loop.** Anything inside the loop is paid *r* times, so the only full-attention layer sits outside it and runs once. It's also the only layer whose memory grows with the length of the input.
-
-The diagram above is the **token-level** model that E0–E11 train. A second, planned architecture, the **coarse-to-fine byte model**, keeps the same stack but changes *what* it runs on and *where* the loop sits: see [Byte Quest](#byte-quest-bytes-are-a-main-quest-now) below. It is a design concept, not a trained model.
-
-## Byte Quest: bytes are a main quest now
-
-<p align="center">
-  <img src="docs/assets/byte-quest-c2f.svg" alt="Coarse-to-fine byte model: raw bytes, a narrow byte encoder, patches of P bytes, an E1-style global stack on patches, expansion back to bytes with a one-patch causal shift, a shared-weight byte refinement loop run r times with raw bytes re-injected, and a 256-way byte head. Design concept, not trained." width="640">
-</p>
-
-**Why bytes.** No tokenizer to train or ship; exact characters (identifiers, digits, indentation) instead of opaque token ids; robustness to odd spellings and unseen text; and an 8,192-way output head (21% of E1's per-token compute) replaced by a 256-way one.
-
-**The coarse-to-fine idea: depth where the information is, iteration where the errors are.** A narrow byte encoder pools every *P* bytes into a patch. The E1-style global stack runs once, on patches only (1/*P* as many positions). Its output is shifted by **one patch** so a byte never sees its own patch's summary (the causal fix from MegaByte), expanded back to byte positions, and then a small **shared-weight byte refinement loop** runs *r* times at byte resolution, with the raw bytes re-injected each pass and a loss on every pass. The skeleton (encoder → global patches → decoder) is known work (MegaByte, BLT, H-Net); the hypothesis worth testing is the narrower one, that *shared* byte refinement beats an unshared decoder of equal FLOPs. Design: [`notes/analysis-coarse-to-fine.md`](notes/analysis-coarse-to-fine.md).
-
-**Estimated cost** (estimates from that note, not measurements): at P = 4 the design costs about 1.04× / 1.19× / 1.48× E1's training FLOPs per token of text at r = 1 / 2 / 4, versus about 3.6× for a flat byte-level E1.
-
-| Experiment | Question (E12 and E14-E16 planned, not run; E13 partly run, below) |
-|---|---|
-| [E12: flat byte-level E1](experiments/cards/E12.md) | Is a flat byte model (vocab 256, T = 4,096 bytes, E1's mixers) competitive with BPE-E1 at matched FLOPs and at matched bytes? |
-| [E13: patch granularity sweep](experiments/cards/E13.md) | How does patch size (P = 2 / 4 / 8) trade quality against cost with a single-pass byte decoder? |
-| [E14: byte refinement loop sweep](experiments/cards/E14.md) | At matched FLOPs, does a shared-weight refinement loop (r = 1 / 2 / 4, gated, per-pass loss) beat a single-pass decoder and an equal-FLOP unshared decoder? |
-| [E15: parallel-then-refine decoding](experiments/cards/E15.md) | Can predicting all P bytes of the next patch at once and refining over r < P passes match byte-autoregressive quality? |
-| [E16: byte quest × FusionDance](experiments/cards/E16.md) | Does the best byte decoder combine with a looped global core (E2-style) and a ternary global core? |
-
-All five are registered (arc "Byte Quest (granularity x loops)" in [`experiments/experiments.json`](experiments/experiments.json)). Their predictions are registered in [`experiments/checks/PREDICTIONS.md`](experiments/checks/PREDICTIONS.md) (section "Registered Byte Quest predictions E12-E16", v0.4.68), and the 30 staged configs are bound to those predictions by hash (same file, v0.4.69). **First byte runs (v0.4.85, RTX 5090, 20M bytes, exploratory):** the SQ188 LR check picked lr 3e-3, and the E13 patch-size sweep at 20M bytes found P = 2 best (exploratory; matched bytes, not matched FLOPs). SQ374 (v0.5.15) then scored the existing E13a/E13b byte runs on clean80: fixed byte patches are far too costly (E13b +63% and E13a +36% bits per char vs E1; one seed each, no ledger claim).
-
-**The honest caveat.** The literature says byte models trail BPE below roughly 4B parameters on code ([`notes/research-byte-level-2025-26.md`](notes/research-byte-level-2025-26.md)), so "beats BPE-E1" is *not* the claim. The arc's claims are about **granularity and loops**: how patch size trades quality for cost, and whether shared byte-level refinement buys anything over equal-FLOP unshared depth (E2's loop did not pay at token level, ledger C6). If all byte variants trail BPE but the loop beats its control, that is still a result.
-
-Explore it: the [3D architecture page](https://monstercameron.github.io/Gogeta-0/architecture.html?model=c2f_byte) has a "C2F-byte (concept)" model with a patch-size slider and the loops slider; the [site section](https://monstercameron.github.io/Gogeta-0/#bytes) has the same diagram.
-
-## Goals
-
-1. **Fuse the three:** show that linear-time mixing, looped depth and ternary weights *stack* in one causal LLM.
-2. **Think in loops, not out loud:** replace part of chain-of-thought with silent latent loops, spending compute instead of tokens and memory.
-3. **The Rival Loop:** build critique → fix into the recurrence, with per-loop scoring, a grounded critic head, and adversarial damage-and-repair.
-4. **Make loops pay at inference:** self-speculative decoding (draft with a few loops, verify with all of them, no extra model).
-5. **Do it on a laptop:** small models, one-ingredient-at-a-time ablations, and results reported as *scaling shapes*: quality per bit, per FLOP, and cost vs context length.
-6. **Ship it on a gaming GPU:** a final model, sized by our own scaling fit (primary target ~1.2B params), that runs with a KV/state cache and lossless speculative decoding on one 24 GB RTX 3090/4090 ([plan](notes/final-model-plan.md)).
+- **Shared core:** six blocks (four Gated DeltaNet, two sliding-window attention) run twice with the same ternary weights. Before each pass, the prelude's output is re-injected through a learned contractive gate (λ about 0.75).
+- **Full precision outside the loop:** the prelude, coda and injection stay full precision. On the naive fusion that one change alone is worth -7.6% (C205).
+- **Fixed loop count:** a fixed r beats a random one (C212, PARTIAL).
+- **One full-attention layer:** the coda's full attention runs once, outside the loop.
+- **Size:** about 15.1M unique non-embedding parameters, trained on 200M tokens of the deduplicated `code-py-v2` corpus. Config: [`experiments/staged-configs/a2/a2s.json`](experiments/staged-configs/a2/a2s.json).
+- **Inside the model:** the [data-flow atlas](experiments/devlogs/SQ439.md) (SQ439, descriptive) measured what passes between these layers:
+  - the first sliding-window layer behaves as a causal moving average;
+  - pass 1 transforms the state and pass 2 refines it;
+  - every pass contracts perturbations;
+  - the coda does the most work on unfamiliar code;
+  - int8 activations are safe.
 
 ## Results so far
 
-200M tokens of Python each, seed 0, full validation split (contaminated: see K9; the registered verdicts use clean val). Lower loss is better.
+All numbers are clean80 doc-level bits per character: validation documents with under 80% 13-gram overlap with training, which is our primary metric, since the raw split was 41.7% near-duplicates (K9). They are paired by seed, and lower is better. Statuses are from the [claims ledger](experiments/claims-status.md).
 
-| Experiment | Layout | Params (non-emb) | Val loss | vs E0 | Compute |
-|---|---|---|---|---|---|
-| [E0: dense baseline](experiments/writeups/E0.md) | 6 × full attention | 10.6M | 0.606 | n/a | 1.0× |
-| [**E1: linear-time mixers**](experiments/writeups/E1.md) | 1 attention + 3 Gated DeltaNet + 2 sliding-window | 11.1M | **0.585** | **−3.6%** | 0.94× |
-| E10: Llama control (the proper baseline) | 6 × full attention (Hugging Face Llama, same shapes) | 10.6M | 0.582 | −4.0% | 1.0× |
-| [E2: looped core](experiments/writeups/E2.md) | `[SWA] → [GDN, GDN, SWA] × 4 → [attn]` | 9.5M | 0.619 | +2.0% | 2.0× |
+| Question | Result | Claim |
+|---|---|---|
+| Do linear-time mixers beat a tuned transformer? | E1 hybrid vs Llama control E10: +0.08% (7 seeds), no difference detected | C5, REFUTED by its registered rule |
+| Do loops beat more unique parameters? | No. At matched FLOPs, 14 unshared blocks beat E1 by about 7% (4 seeds); unique params buy about 2.4x more than a second pass | C197, VERIFIED |
+| Do the three ingredients stack naively? | No. They compound: interaction +6.21 log-points, and the full fusion is 30.8% worse than dense | C202, PARTIAL |
+| Does the assembled recipe fix the fusion? | A2s vs E27: **-16.67%** [-17.86, -15.46]; at matched FLOPs -16.18% | C209, VERIFIED |
+| How much of that is parameters? | About 61% (S = 0.61 [0.57, 0.65]); F-6 (E27's recipe on A2s's core) vs E27: -10.5% | C209 (decomposition) |
+| What is the rest? | A2s vs F-6 at matched params and FLOPs: **-6.85%** [-8.02, -5.67], probably mostly the full-precision ends | C215, VERIFIED (scoped) |
+| How far from dense? | A2s vs E20: +8.58% [7.99, 9.18]; its full-precision twin A2f: -0.86% [-2.57, +0.89], no difference detected | E63 (A2) |
+| Out of corpus? | Ternary cost +0.42% [-0.92, +1.77]; loop cost **-1.91%** [-3.40, -0.40]; assembly gain -11.3% | C214, VERIFIED; C213, PARTIAL |
+| Every part at once (ternary MoE core)? | Every fix counts, but A3mx trails the unshared GDN stack by 4.4% and is not shown to tie dense | C208, VERIFIED |
+| Coarse-to-fine bytes? | +14.4% vs the token head, so not viable yet | C210, UNVERIFIED |
+| Long context beyond the training length? | GDN hybrid vs dense: -60.7% [-69.8, -51.5] (3 seeds) | SQ351, exploratory |
 
-**In plain English:**
-- **Against the right control, the cheaper layers show no detected advantage.** E1 beat our E0 baseline, but E0 was handicapped: the Llama control E10 at the same shapes is 4% better than E0. In the registered 3-seed test at tuned learning rates, E1 is 0.18% worse than E10 in the point estimate on clean validation, with a CI that spans zero (C5: REFUTED by its registered rule, v0.4.78, qualified in v0.4.95). The 7-seed replication on rented RTX 5090s is done: E1 is +0.08% vs E10, no difference detected.
-- **Loops don't pay yet (C6, PARTIAL).** The looped model was 2% worse at twice the cost. On the 5090s, E2 is 2.6% worse than its unlooped twin E9 (one seed each, descriptive; C6 is PARTIAL, not established).
-- **Scale, so far.** At matched FLOPs, a 14-block unshared stack with about 2.3× the unique parameters beats E1 by about 7% on four seeds at 200M (C197, VERIFIED). SQ243/SQ241/SQ301 test the width axis: no difference detected at d = 512, E1 1.2–1.7% better at d = 256 (C198, PARTIAL), and param-matched E1 0.61% worse than E10.
-- **The fusion does not stack at 200M (C202, PARTIAL).** The registered 2×2×2 factorial (GDN × loops × ternary) has overlapping penalties at 20M but compounding ones at 200M: interaction +6.21 log-points (seed-blocked CI [+4.20, +8.22]), so the full fusion is 30.8% worse than dense while GDN alone is 4% better per FLOP. C202 is PARTIAL (3 seeds per cell; learning-rate coverage at 200M is incomplete for two cells, SQ342).
-- **The assembled model beats the full fusion (A2, E63; C209, VERIFIED at recipe level: fresh seeds 2-4, 200M tokens).** The assembled recipe (prelude attention, a shared 6-block core run twice with ternary blocks and contractive injection, coda attention) has 16.7% lower clean80 bits per char than the full fusion, with about 1.6x its unique non-embedding parameters (15.1M vs 9.5M; not parameter-matched; SQ419, v0.5.56, puts about 61% of the gap on the shape and its parameters, S = 0.61 [0.57, 0.65], and the rest on the A2 bundle (C215), which is probably mostly the precision scope; SQ447 is the bit-matched control) (95% CI [-17.9, -15.5]; exact t quantile, v0.5.45) and is 8.6% above dense per FLOP. Its full-precision version is 0.9% below dense per FLOP in point estimate (n = 3; no equivalence test and no ledger claim, so not a tie). Two costs remain: ternary (+9.5% inside the stack) and loops (+3.2% vs the unshared GDN stack, A2f vs E24, 3 seeds). This is a recipe-level result, not a mechanism claim (v0.5.10). Its headline holds at matched FLOPs: against a FLOP-matched E27 (seeds 2-4, 221.6M tokens) it is -16.18% [-16.87, -15.48] (v0.5.30). The first headline was not at matched FLOPs (erratum, v0.5.22). Out of corpus (SQ400, v0.5.38, registered), the ternary cost is not distinguishable from 0 (+0.42% [-0.92, +1.77]) and the loop cost reverses sign (A2f vs E24 -1.91% [-3.40, -0.40]; C214, VERIFIED on that one out-of-corpus set), while the 11% assembly gain survives; that is hypothesis C213 (PARTIAL).
-- **All-parts model and full stack (A3, A4; v0.5.17 and v0.5.20).** On fresh seeds 5-7 every A3 fix counts, but the all-parts model (C208, VERIFIED) trails the unshared GDN hybrid by 4.4% and is not shown to tie dense E20 (+1.1%, 90% CI [-0.13, +2.33]); its learning rate is now bracketed (v0.5.23). The tokens-as-patches byte decoder on that backbone (A4, C210 and C211, UNVERIFIED until the clean80 score, SQ387) costs +14.4% in nats per token against the BPE head, so the full stack is not viable yet; the design-around is registered as SQ394. Self-speculative decoding works but is not lossless under int8 activations (v0.5.20).
-- **Inside the assembled model (data-flow atlas, SQ439, v0.5.55; descriptive).** The first sliding-window layer acts as a causal moving average. Replacing its attention with an exact window mean costs E24 0.00% (a consistency check only: E24's first-layer heads are exactly uniform, so the swap is a no-op) and at most 0.4% out of corpus across the arms, but the ternary-heavy E27 loses 6.5-7.3% in corpus. The recall reading rests on A2s and E27 only, and is descriptive (12 windows per slice). E27's ternary prelude is nearly inert (residual RMS 0.09 to 0.14), and E27's loop passes 3 and 4 change the state by 0.32x and 0.22x. The coda carries the largest share out of corpus. These are readings of 15 checkpoints with logit-lens caveats, recorded as evidence on C213 with no status change ([SQ439](experiments/devlogs/SQ439.md)).
-- **Overlap and context (SQ239, SQ410, SQ385, v0.5.57; descriptive, CPU per-document re-score of 30 checkpoints).** The three effects hold at every overlap threshold: ternary +7.85 / +9.65 / +10.87%, loop +2.38 / +3.08 / +3.49%, and assembly -15.28 / -16.67 / -17.93% (clean50 / clean80 / full). All three grow with training overlap: ternary +5.4% to +18.1%, loop +1.5% to +5.6%, assembly -13.8% to -24.9%. Both costs vanish or reverse late in the context: loop -3.1% and ternary +0.2% at tokens 513-1024.
-- **Long context (SQ351, exploratory: 3 seeds, 153 long out-of-corpus files; no ledger claim yet).** Beyond the 1,024-token training length, the GDN hybrid's loss is -60.7% vs dense (95% CI [-69.8, -51.5]), while dense degrades by +160% past its window. This is the first measured, not analytic, evidence for the linear-time pillar.
-- **Fixed vs random loop depth (A1 amendment 2, C212, PARTIAL).** Training the shared loop at fixed r = 4 beats random r with full backprop by 3.2% (paired 95% CI [-3.7, -2.6], 3 seeds). Seeds 0-1 both chose and tested the fixed arm, so the fresh seed alone gives -3.1% (v0.5.33).
-- **Copying (SQ347, registered; prediction not met).** Beyond the sliding window, the GDN cells copy far worse than dense (+32% and +37% at gap 256), and the interaction's confidence intervals include 0 at gaps 256 and 512. The assembled model needs a fix for this; the planned one is more full attention outside the loop (SQ383, v0.5.13).
-- **Our best guess at why (not yet settled; C7 partial, one checkpoint).** Tested with 1–12 loops, it does best at 4, the average it was trained with, and gets *worse* beyond the trained range. It learned a routine, not "more thinking = better", which is what the Rival Loop is designed to fix.
-- **Not confirmed yet:** each result is a single seed or a single-SKU replication. The registered confirmatory test is still the N1X one (Q12), and the unlooped control ([E9](experiments/writeups/E9.md)) has one 5090 seed.
+What the per-document re-score adds (SQ239, SQ410, SQ385; descriptive, 30 checkpoints):
+- **Every gap grows with overlap with the training data:** ternary +5.4% to +18.1%, loop +1.5% to +5.6%, assembly gain -13.8% to -24.9%. Part of what these comparisons measure is memorisation.
+- **Both costs fade late in a document:** at tokens 513-1,024 the loop cost is -3.1% and the ternary cost +0.2%.
 
-Every experiment has a page with interactive charts and a plain-English explainer on the **[project site](https://monstercameron.github.io/Gogeta-0/)**, e.g. [E2: why the loop disappoints](https://monstercameron.github.io/Gogeta-0/experiments/E2.html). The **[full roadmap](experiments/experiments.json)** runs E0 → E9: ternary weights, the full fusion (→ `v1.0.0`), adaptive loops, the Rival Loop, loops vs chain-of-thought, and self-speculative decoding.
+The full history is in [`DEVLOG.md`](DEVLOG.md), and every experiment has a page with charts and a plain-English explainer on the **[project site](https://monstercameron.github.io/Gogeta-0/)**.
+
+## Goals
+
+| Goal | State |
+|---|---|
+| 1. **Fuse the three** (linear-time mixing, looped depth, ternary weights) | Assembled and working; not yet competitive with dense in corpus |
+| 2. **Think in loops, not out loud** | Loops help out of corpus and late in context, but per FLOP unique parameters still win (C197) |
+| 3. **The Rival Loop** (critique → fix inside the recurrence) | Not built |
+| 4. **Make loops pay at inference** (self-speculative decoding) | Built; not lossless under int8 activations |
+| 5. **Do it on a laptop**, reporting scaling shapes | All results are 15M-parameter models; scale is untested |
+| 6. **Ship it on a gaming GPU** (about 1.2B params, [plan](notes/final-model-plan.md)) | Waits on a bigger dataset (code-py-v3, human approval) and the human's go-ahead for training |
+
+## Byte Quest: coarse-to-fine bytes
+
+<p align="center">
+  <img src="docs/assets/byte-quest-c2f.svg" alt="Coarse-to-fine byte model: raw bytes, a narrow byte encoder, patches of P bytes, a global stack on patches, expansion back to bytes with a one-patch causal shift, a shared-weight byte refinement loop, and a 256-way byte head." width="560">
+</p>
+
+**The idea:** no tokenizer, exact characters, and depth where the information is. A global stack runs on patches of bytes, and a small shared-weight loop refines at byte resolution ([design note](notes/analysis-coarse-to-fine.md)).
+
+**What happened:**
+- **Fixed byte patches were far too costly:** E13 scored +36% and +63% bits per char vs E1 (exploratory).
+- **Tokens as patches around the A3 backbone was better but still costly:** A4 (E65, v0.5.20) costs +14.4% against the token head. Its second shared byte pass does help (-1.7%).
+- **Bytes are not viable at this scale yet.** That matches the literature, where bytes trail BPE below about 4B parameters on code. The design-around is SQ394. E12 and E14-E16 are registered but not run.
 
 ## Run report forms
 
@@ -157,16 +157,10 @@ Tested on Ubuntu 24.04 under WSL2 with an NVIDIA Blackwell GPU (ARM64). Any rece
 
 **No GPU or data download needed for a first check:** after step 1, `CUDA_VISIBLE_DEVICES= python -m unittest tests.test_options tests.test_moe` builds and trains tiny FusionDance models on synthetic tokens on CPU, checking bit-identical defaults, causality and the MoE option (28 tests, about 10 s; 1 GDN test is skipped without a GPU).
 
-**Start reading here:** the status paragraph at the top. The three results that define the project so far are:
+**Start reading here:** the status block at the top, then the results table. The questions that shaped the project:
 - the hybrid shows no detected advantage over a tuned Llama control (C5);
 - more unique parameters at matched FLOPs beat loops (C197);
-- the fusion ingredients' penalties overlap at 20M but compound at 200M (C201 is REFUTED by its registered 200M check; C202 is PARTIAL).
-
-### Where we are, in plain words
-
-F2 is the registered 2×2×2 test of three ingredients: a Gated DeltaNet (linear-time) mixer, shared looped layers, and ternary weights, each switched on or off at matched compute. The clean80 and clean50 scores are validation subsets whose documents overlap little with the training data, so they are the numbers we trust most (our original validation split was 41.7% near-duplicates, K9). At 200M tokens the three penalties compound rather than cancel: the full fusion is 30.8% worse than dense, with an interaction of +6.2 log-points ([C202](experiments/claims-status.md), PARTIAL: 3 seeds per cell, and some learning-rate coverage is still missing, [SQ342](experiments/side-quests.md)). A feed-forward test (E60, C203) finds that a mixture-of-experts layer beats the E1 hybrid by 2.7%, and a plain dense wider layer beats it by 4.2% at about twice the feed-forward compute. The project is now in its full-stack phase (v0.5.12): the A1 screen (E62) has tested one compensation at a time on the full fusion (such as a fixed loop count or contractive loop injection), with exploratory results in v0.5.4; the assembled model (A2, E63) beat the full fusion by 16.7% on fresh seeds and its full-precision version is 0.9% below dense in point estimate (v0.5.10; not an equivalence test). A3 (all parts, final in v0.5.17) found that every fix counts, but the all-parts model still trails the unshared GDN hybrid by 4.4% (C208, VERIFIED). A4, the full stack with coarse-to-fine bytes around the A3 backbone, is final (v0.5.20): the byte decoder costs +14.4% (C210, UNVERIFIED until the clean80 score, SQ387), so the full stack is not viable yet. Self-speculative decoding is built but not lossless under int8 activations (v0.5.20). Predictions and winner rules are registered in [PREDICTIONS.md](experiments/checks/PREDICTIONS.md).
-
-> **Research is paused (2026-11-23, v0.5.57).** Where things stand, what was running, the decisions waiting on the human and how to resume are in [`notes/CONTINUATION.md`](notes/CONTINUATION.md).
+- the naive fusion's penalties compound at 200M (C202), and the assembled recipe fixes most of that (C209, C215).
 
 ### How to follow one result
 
@@ -181,7 +175,7 @@ Worked example: [C209](experiments/claims/views/C209.md), the claim that the ass
 ### Glossary
 
 - **A1 / A2 / A3 / A4:** assembly stages. A1 is the one-change screen (one compensation at a time on the full fusion, E62, two seeds). A2 is the stacked assembled model on fresh seeds, against dense and GDN references (E63). A3 is the all-parts model on fresh seeds 5-7 (registered v0.5.10): a ternary MoE FFN in the shared core, plus full-precision mixers or FFN to locate ternary's cost. A4 is the full stack, registered in v0.5.15 and final in v0.5.20: coarse-to-fine bytes (tokens as patches) around the A3 backbone, with a shared-weight byte refinement loop and an unshared single-pass decoder as a parameter-matched control (v0.5.12).
-- **E-numbers:** registered experiments (E0 to E63), each with a row in [`experiments/INDEX.md`](experiments/INDEX.md).
+- **E-numbers:** registered experiments (E0 to E67), each with a row in [`experiments/INDEX.md`](experiments/INDEX.md).
 - **F2 cells 000 to 111:** the registered 2×2×2 factorial of GDN mixer × shared loops × ternary weights, one digit per ingredient (1 = on). 000 is the all-off base and 111 is the full fusion.
 - **clean80 / clean50:** validation documents with under 80% (clean80, the primary metric) or under 50% (clean50) of their 13-grams in the training data.
 - **Matched FLOPs:** arms compared at equal analytic training FLOPs per token. Equal wall-clock is a separate check (SQ338, v0.4.104).

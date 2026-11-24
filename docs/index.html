@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gogeta-0 · FusionDance</title>
-  <meta name="description" content="Gogeta-0: the first FusionDance language model. Linear-time mixers, looped depth and ternary weights, fused into one tiny LLM.">
+  <meta name="description" content="Gogeta-0: the first FusionDance language model. Linear-time mixers, looped depth and ternary weights, fused into one small code LLM: assembled, measured, and honestly written up.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
@@ -17,9 +17,9 @@
     <a class="brand" href="./">GOGETA<span>-<span class="zero">0</span></span></a>
     <div class="nav-links">
       <a href="learn.html">Start here</a>
-      <a href="#goals">Goals</a>
-      <a href="#fighters">Fighters</a>
+      <a href="#status">Status</a>
       <a href="#fusion">Fusion</a>
+      <a href="#goals">Goals</a>
       <a href="architecture.html">3D Model</a>
       <a href="#bytes">Byte Quest</a>
       <a href="#ideas">Ideas</a>
@@ -36,147 +36,134 @@
       <p class="subtitle">The first <b>FusionDance</b> language model</p>
       <p class="lede">
         Three efficiency techniques that each beat one cost of modern LLMs: <strong>context</strong>,
-        <strong>parameters</strong> and <strong>bits</strong>. Fused into one tiny causal model and trained on a laptop.
-        If the dance is in sync, they stack. If not, we'll write down exactly what broke.
+        <strong>parameters</strong> and <strong>bits</strong>. Fused into one small model for Python code.
+        Naively the three penalties <em>compound</em>. The assembled recipe recovers most of the loss, and every component now trains and runs together.
+        It is not yet competitive with a plain dense model, and the research is paused for the next decisions.
       </p>
       <div class="cta">
-        <a class="btn primary" href="#fusion">See the fusion ⚡</a>
+        <a class="btn primary" href="#status">Where we are ⚡</a>
         <a class="btn" href="devlog.html">Experiment log →</a>
         <a class="btn" href="learn.html">New to this? Start here</a>
       </div>
     </div>
 
     <aside class="scouter" aria-label="Model readout">
-      <h3>◉ SCOUTER READOUT</h3>
+      <h3>◉ SCOUTER READOUT · A2s</h3>
       <dl>
-        <dt>target</dt><dd>causal LM</dd>
-        <dt>unique params</dt><dd>~13M</dd>
-        <dt>effective depth</dt><dd>×4 loops</dd>
-        <dt>bits / weight</dt><dd>1.58</dd>
-        <dt>quadratic layers in loop</dt><dd>0</dd>
-        <dt>layers growing with context</dt><dd>1</dd>
+        <dt>target</dt><dd>causal code LM</dd>
+        <dt>unique params</dt><dd>15.1M</dd>
+        <dt>shared core</dt><dd>6 blocks × 2</dd>
+        <dt>bits / core weight</dt><dd>1.58</dd>
+        <dt>vs naive fusion</dt><dd>−16.7%</dd>
+        <dt>vs dense, in corpus</dt><dd>+8.6%</dd>
+        <dt>loop, out of corpus</dt><dd>−1.9%</dd>
       </dl>
       <div class="reading">
-        <span>POWER LEVEL</span><span class="blink">MEASURING…</span>
+        <span>POWER LEVEL</span><span class="blink">PAUSED</span>
       </div>
     </aside>
   </div>
 </header>
 
-<!-- ============ GOALS ============ -->
-<section id="goals">
+<!-- ============ STATUS ============ -->
+<section id="status">
   <div class="wrap">
-    <p class="kicker">Mission</p>
-    <h2>Five goals, <span class="hl">one fusion</span></h2>
-    <p class="section-lede">An experimental research repo. Small models, one-ingredient-at-a-time ablations, and honest write-ups, including the failures.</p>
-    <div class="grid c5">
-      <div class="card goal"><div class="num">01</div><h3>Fuse the three</h3><p>Linear-time mixing, looped depth and ternary weights in one causal LLM, and show they stack rather than fight.</p></div>
-      <div class="card goal"><div class="num">02</div><h3>Think in loops</h3><p>Replace part of chain-of-thought with silent latent loops: spend compute instead of tokens and memory.</p></div>
-      <div class="card goal"><div class="num">03</div><h3>The Rival Loop</h3><p>Build critique → fix into the recurrence, with a grounded critic and adversarial damage-and-repair.</p></div>
-      <div class="card goal"><div class="num">04</div><h3>Loops pay at inference</h3><p>Self-speculative decoding: draft with a few loops, verify with all of them. No extra model.</p></div>
-      <div class="card goal"><div class="num">05</div><h3>On a laptop</h3><p>Everything trains and runs locally. The headline is quality per bit, per FLOP, and how cost scales with context.</p></div>
-    </div>
-  </div>
-</section>
+    <p class="kicker">Where we are</p>
+    <h2>Assembled, measured, <span class="hl">not yet competitive</span></h2>
+    <div class="paused"><b>Research is paused.</b> The next GPU batch, a bigger dataset (code-py-v3) and training the final ~1.2B model all wait on the project owner. Everything needed to resume is in <a href="https://github.com/monstercameron/Gogeta-0/blob/main/notes/CONTINUATION.md">the continuation guide</a>.</div>
 
-<!-- ============ FIGHTERS ============ -->
-<section id="fighters" class="alt">
-  <div class="wrap">
-    <p class="kicker">The fighters</p>
-    <h2>Three techniques, <span class="hl">three different costs</span></h2>
-    <p class="section-lede">Each one is strong on its own and has a known weak spot. The bet is that each weak spot is covered by one of the other two.</p>
-    <div class="grid c3">
-      <article class="card fighter" style="--c: var(--blue)">
-        <span class="role">Attacks: context cost</span>
-        <h3>Linear-time mixers</h3>
-        <p>Gated DeltaNet / Mamba-style recurrent state plus sliding-window attention. By design, memory stays fixed-size instead of growing with every token (our current sliding-window kernel still uses a dense O(n²) mask).</p>
-        <div class="stat"><span>Mixing cost (design)</span><b>O(n²) → O(n)</b></div>
-        <div class="bar"><i style="--w: 86%"></i></div>
-        <p class="weak"><b>Weak spot:</b> limited multi-step state tracking per layer. <br>Covered by <em>loops</em>, which add depth.</p>
-      </article>
-      <article class="card fighter" style="--c: var(--orange)">
-        <span class="role">Attacks: parameters</span>
-        <h3>Looped depth</h3>
-        <p>One shared block applied <i>r</i> times. Depth comes from compute instead of new weights, and harder inputs can get more passes.</p>
-        <div class="stat"><span>Depth per weight</span><b>× r</b></div>
-        <div class="bar"><i style="--w: 74%"></i></div>
-        <p class="weak"><b>Weak spot:</b> every pass costs compute. <br>Covered by <em>ternary</em>, which could make compute cheap with real ternary kernels (ours only simulate it, so no speedup yet).</p>
-      </article>
-      <article class="card fighter" style="--c: var(--gold)">
-        <span class="role">Attacks: bits</span>
-        <h3>Ternary weights</h3>
-        <p>BitNet b1.58: every weight is −1, 0 or +1. About 1.58 bits each. With dedicated ternary kernels, matrix multiplies could turn into additions; our code only simulates the rounding, so for now it is slower, not faster.</p>
-        <div class="stat"><span>Bits per weight</span><b>16 → 1.58</b></div>
-        <div class="bar"><i style="--w: 92%"></i></div>
-        <p class="weak"><b>Weak spot:</b> rounding error could compound across loops. <br>Countered by <em>per-loop norms and input re-injection</em>. We'll measure it.</p>
-      </article>
+    <div class="status-grid">
+      <div class="card"><h3>Assembly fixes the fusion</h3><div class="big good">−16.7%</div><p>A2s vs the naive full fusion E27 on clean80 bits per char (16.2% at matched FLOPs). <span class="claim v">C209 VERIFIED</span></p></div>
+      <div class="card"><h3>…mostly through size</h3><div class="big">61%</div><p>of that gap is A2s's bigger shared core and its extra parameters (S = 0.61 [0.57, 0.65]). The rest, −6.85% at matched parameters and FLOPs, is probably mostly the full-precision ends. <span class="claim v">C215 VERIFIED</span></p></div>
+      <div class="card"><h3>Still behind dense in corpus</h3><div class="big bad">+8.6%</div><p>A2s vs a plain dense model at the same tokens. Ternary costs about +9.7% and the loop about +3.1%.</p></div>
+      <div class="card"><h3>Out of corpus, the costs vanish</h3><div class="big good">−1.9%</div><p>On Python from outside the training data, the loop helps and the ternary cost is indistinguishable from 0. The final model is judged here. <span class="claim v">C214 VERIFIED</span></p></div>
     </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Question</th><th>Result (clean80 bits/char, paired by seed)</th><th>Claim</th></tr></thead>
+        <tbody>
+          <tr><td>Do linear-time mixers beat a tuned transformer?</td><td>E1 hybrid vs Llama control: +0.08% over 7 seeds, no difference detected</td><td><span class="claim r">C5 REFUTED</span></td></tr>
+          <tr><td>Do loops beat more unique parameters?</td><td>No. 14 unshared blocks beat E1 by ~7% at matched FLOPs; unique params buy ~2.4× more than a second pass</td><td><span class="claim v">C197 VERIFIED</span></td></tr>
+          <tr><td>Do the three stack naively?</td><td>No. Their penalties compound (+6.21 log-points); the full fusion is 30.8% worse than dense</td><td><span class="claim p">C202 PARTIAL</span></td></tr>
+          <tr><td>Does the assembled recipe fix it?</td><td>A2s vs E27: −16.67% [−17.86, −15.46]</td><td><span class="claim v">C209 VERIFIED</span></td></tr>
+          <tr><td>Full-precision twin vs dense?</td><td>A2f vs dense E20: −0.86% [−2.57, +0.89], no difference detected</td><td><span class="claim e">E63</span></td></tr>
+          <tr><td>Out of corpus?</td><td>Ternary +0.42% [−0.92, +1.77]; loop −1.91% [−3.40, −0.40]; assembly gain −11.3%</td><td><span class="claim v">C214 VERIFIED</span> <span class="claim p">C213 PARTIAL</span></td></tr>
+          <tr><td>Every part at once (ternary MoE core)?</td><td>Every fix counts, but trails the unshared GDN stack by 4.4%</td><td><span class="claim v">C208 VERIFIED</span></td></tr>
+          <tr><td>Long context beyond training length?</td><td>GDN hybrid vs dense: −60.7% [−69.8, −51.5]</td><td><span class="claim e">SQ351 exploratory</span></td></tr>
+          <tr><td>Coarse-to-fine bytes?</td><td>+14.4% vs the token head: not viable yet</td><td><span class="claim u">C210 UNVERIFIED</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted small">clean80 = validation documents with under 80% 13-gram overlap with training (the raw split was 41.7% near-duplicates). Statuses come from the <a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/claims-status.md">claims ledger</a>, which wins over this page if they ever disagree. All models are about 15M parameters trained on 200M tokens; scale is untested.</p>
   </div>
 </section>
 
 <!-- ============ FUSION ============ -->
-<section id="fusion">
+<section id="fusion" class="alt">
   <div class="wrap">
     <p class="kicker">The fusion</p>
-    <h2>The <span class="hl">FusionDance</span> architecture</h2>
-    <p class="section-lede">A small, unshared prelude and coda around one shared core block that loops. v0 layout:</p>
+    <h2>The <span class="hl">FusionDance</span> architecture, as trained</h2>
+    <p class="section-lede">A2s, the best assembled recipe: a full-precision prelude and coda around one shared, ternary core that runs twice.</p>
 
     <div class="fusion">
-      <svg class="diagram" viewBox="0 0 520 620" role="img" aria-label="FusionDance architecture diagram: embed, prelude, looped core of Gated DeltaNet and sliding-window attention with an exit head, then a coda with one full attention layer.">
+      <svg class="diagram" viewBox="0 0 520 680" role="img" aria-label="A2s architecture: embed, a full-precision sliding-window prelude, a contractive injection, a shared ternary core of six blocks (GDN, GDN, SWA, GDN, GDN, SWA) run twice, then a full-precision full-attention coda.">
         <defs>
           <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#7a84b8"/></marker>
-          <marker id="ahg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ffd23f"/></marker>
         </defs>
         <text x="260" y="22" text-anchor="middle" class="sm">tokens</text>
         <path class="arrow" d="M260,30 L260,48"/>
-        <rect class="box" x="150" y="52" width="220" height="40" rx="10"/>
-        <text x="260" y="77" text-anchor="middle">Embed · 8k vocab</text>
-        <path class="arrow" d="M260,92 L260,112"/>
-        <rect class="swa" x="110" y="116" width="300" height="48" rx="10"/>
-        <text x="260" y="137" text-anchor="middle">Prelude</text>
-        <text x="260" y="155" text-anchor="middle" class="sm">sliding-window attn + MLP</text>
-        <path class="arrow" d="M260,164 L260,184"/>
+        <rect class="box" x="150" y="52" width="220" height="38" rx="10"/>
+        <text x="260" y="76" text-anchor="middle">Embed · 8k vocab</text>
+        <path class="arrow" d="M260,90 L260,106"/>
+        <rect class="swa" x="110" y="110" width="300" height="46" rx="10"/>
+        <text x="260" y="130" text-anchor="middle">Prelude · full precision</text>
+        <text x="260" y="148" text-anchor="middle" class="sm">sliding-window attn + MLP</text>
+        <path class="arrow" d="M260,156 L260,174"/>
+        <rect class="exit" x="120" y="178" width="280" height="42" rx="10"/>
+        <text x="260" y="197" text-anchor="middle">Contractive injection</text>
+        <text x="260" y="213" text-anchor="middle" class="sm">h = λ·h + inject(norm h, norm e) · λ ≈ 0.75</text>
+        <path class="arrow" d="M260,220 L260,238"/>
 
-        <rect class="core" x="50" y="188" width="410" height="292" rx="18"/>
-        <text x="72" y="217" class="lbl">CORE × r</text>
-        <text x="440" y="214" text-anchor="end" class="sm">input re-injected each pass</text>
+        <rect class="core" x="50" y="242" width="410" height="318" rx="18"/>
+        <text x="72" y="268" class="lbl">CORE × 2</text>
+        <text x="440" y="266" text-anchor="end" class="sm">shared · ternary · fixed r</text>
+        <rect class="gdn" x="100" y="282" width="320" height="34" rx="8"/><text x="260" y="304" text-anchor="middle">Gated DeltaNet + MLP</text>
+        <rect class="gdn" x="100" y="324" width="320" height="34" rx="8"/><text x="260" y="346" text-anchor="middle">Gated DeltaNet + MLP</text>
+        <rect class="swa" x="100" y="366" width="320" height="34" rx="8"/><text x="260" y="388" text-anchor="middle">Sliding-window attn + MLP</text>
+        <rect class="gdn" x="100" y="408" width="320" height="34" rx="8"/><text x="260" y="430" text-anchor="middle">Gated DeltaNet + MLP</text>
+        <rect class="gdn" x="100" y="450" width="320" height="34" rx="8"/><text x="260" y="472" text-anchor="middle">Gated DeltaNet + MLP</text>
+        <rect class="swa" x="100" y="492" width="320" height="34" rx="8"/><text x="260" y="514" text-anchor="middle">Sliding-window attn + MLP</text>
+        <path class="loop" d="M420,509 C 505,509 505,199 400,199"/>
+        <text x="492" y="360" class="lbl" text-anchor="middle">×2</text>
 
-        <rect class="gdn" x="90" y="232" width="340" height="44" rx="9"/>
-        <text x="260" y="259" text-anchor="middle">Gated DeltaNet + MLP</text>
-        <path class="arrow" d="M260,276 L260,288"/>
-        <rect class="gdn" x="90" y="290" width="340" height="44" rx="9"/>
-        <text x="260" y="317" text-anchor="middle">Gated DeltaNet + MLP</text>
-        <path class="arrow" d="M260,334 L260,346"/>
-        <rect class="swa" x="90" y="348" width="340" height="44" rx="9"/>
-        <text x="260" y="375" text-anchor="middle">Sliding-window attn + MLP</text>
-
-        <path class="dash" d="M170,392 L170,416"/>
-        <rect class="exit" x="80" y="416" width="180" height="48" rx="9"/>
-        <text x="170" y="436" text-anchor="middle">exit head</text>
-        <text x="170" y="454" text-anchor="middle" class="sm">per-loop loss · critic</text>
-
-        <path class="loop" d="M430,372 C 505,372 505,254 434,254"/>
-        <text x="488" y="320" class="lbl" text-anchor="middle">×r</text>
-
-        <path class="arrow" d="M350,392 L350,500"/>
-        <rect class="full" x="110" y="504" width="300" height="52" rx="10"/>
-        <text x="260" y="526" text-anchor="middle">Coda · full attention + MLP</text>
-        <text x="260" y="545" text-anchor="middle" class="sm">the only O(n²) layer · runs once</text>
-        <path class="arrow" d="M260,556 L260,584"/>
-        <text x="260" y="606" text-anchor="middle" class="sm">next token</text>
+        <path class="arrow" d="M260,560 L260,584"/>
+        <rect class="full" x="110" y="588" width="300" height="50" rx="10"/>
+        <text x="260" y="609" text-anchor="middle">Coda · full attention + MLP</text>
+        <text x="260" y="627" text-anchor="middle" class="sm">full precision · runs once</text>
+        <path class="arrow" d="M260,638 L260,656"/>
+        <text x="260" y="674" text-anchor="middle" class="sm">next token</text>
       </svg>
 
       <div>
         <div class="rule">
-          <p class="kicker">The one rule</p>
-          <p>Nothing quadratic lives inside the loop (by design). Anything inside the loop runs <i>r</i> times, so the only full-attention layer sits outside it and runs once. Today's sliding-window kernel still uses a dense mask, so it is O(n²) until a block-sparse kernel replaces it.</p>
+          <p class="kicker">What the measurements say</p>
+          <p>The <a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/devlogs/SQ439.md">data-flow atlas</a> instrumented this model at every layer boundary.</p>
+          <ul>
+            <li>The first sliding-window layer behaves like a plain moving average.</li>
+            <li>Pass 1 transforms the state; pass 2 refines it.</li>
+            <li>Every pass shrinks perturbations, so the loop is stable.</li>
+            <li>The coda does the most work on unfamiliar code.</li>
+            <li>int8 activations are safe.</li>
+          </ul>
+          <p>These readings are descriptive.</p>
         </div>
         <ul class="legend">
-          <li style="--c: var(--blue)"><span><b>Gated DeltaNet</b>: linear-time mixing with a fixed-size memory that can <i>overwrite</i>, not just add, which gives better recall than plain linear attention.</span></li>
-          <li style="--c: var(--violet)"><span><b>Sliding-window attention</b>: exact attention over the last ~256 tokens for local precision. O(n·w) in principle; our current kernel uses a dense mask, so it is still O(n²).</span></li>
-          <li style="--c: var(--gold)"><span><b>The loop</b>: the same weights run <i>r</i> times. Training samples random <i>r</i>; at inference you choose how hard to think.</span></li>
-          <li style="--c: var(--green)"><span><b>Exit head</b>: a cheap readout after every pass. It drives per-loop training, the critic, early stopping and self-speculative drafts.</span></li>
-          <li style="--c: var(--red)"><span><b>Coda</b>: a single full-attention layer for exact long-range recall. It's the only part whose memory grows with context.</span></li>
+          <li style="--c: var(--blue)"><span><b>Gated DeltaNet</b>: linear-time mixing with a fixed-size memory that can <i>overwrite</i>. Its heads learn horizons from about 7 to over 2,000 tokens.</span></li>
+          <li style="--c: var(--violet)"><span><b>Sliding-window attention</b>: exact attention over the last 256 tokens. Our kernel still uses a dense mask, so it is O(n²) for now.</span></li>
+          <li style="--c: var(--gold)"><span><b>The loop</b>: the same ternary weights run twice. A fixed count beats a random one (<span class="claim p">C212 PARTIAL</span>), and unique parameters still buy more per FLOP than a second pass (<span class="claim v">C197</span>).</span></li>
+          <li style="--c: var(--green)"><span><b>Contractive injection</b>: the prelude's output is re-injected before each pass through a learned gate, so the state cannot blow up.</span></li>
+          <li style="--c: var(--red)"><span><b>Full-precision ends</b>: the prelude, coda and injection stay full precision. On the naive fusion that alone is worth −7.6%. A ternary prelude barely writes anything.</span></li>
         </ul>
         <p class="cta" style="margin-top: 22px"><a class="btn primary" href="architecture.html">Explore the model in 3D ⚡</a></p>
       </div>
@@ -184,61 +171,59 @@
   </div>
 </section>
 
+<!-- ============ GOALS ============ -->
+<section id="goals">
+  <div class="wrap">
+    <p class="kicker">Mission</p>
+    <h2>The goals, <span class="hl">and where each one stands</span></h2>
+    <p class="section-lede">An experimental research repo: small models, one ingredient at a time, honest write-ups, including the failures.</p>
+    <div class="grid c5">
+      <div class="card goal"><div class="num">01</div><h3>Fuse the three</h3><p>Linear-time mixing, looped depth and ternary weights in one causal LLM.</p><div class="state">Assembled and working; not yet competitive with dense in corpus</div></div>
+      <div class="card goal"><div class="num">02</div><h3>Think in loops</h3><p>Spend silent compute instead of written-out tokens and memory.</p><div class="state">Loops help out of corpus and late in context; per FLOP, unique parameters still win</div></div>
+      <div class="card goal"><div class="num">03</div><h3>The Rival Loop</h3><p>Critique and fix inside the recurrence.</p><div class="state off">Not built</div></div>
+      <div class="card goal"><div class="num">04</div><h3>Loops pay at inference</h3><p>Self-speculative decoding: draft with one pass, verify with two.</p><div class="state">Built; not lossless under int8 activations</div></div>
+      <div class="card goal"><div class="num">05</div><h3>Ship it on a gaming GPU</h3><p>A ~1.2B final model on one 24 GB card.</p><div class="state off">Waits on a bigger dataset and a go-ahead</div></div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ BYTE QUEST ============ -->
 <section id="bytes" class="alt">
   <div class="wrap">
-    <p class="kicker">Main quest</p>
-    <h2>Byte Quest: <span class="hl">granularity &times; loops</span></h2>
-    <p class="section-lede">Bytes are a main quest now. <b>Design concept, not a trained model:</b> every number on this page is an estimate from <a href="https://github.com/monstercameron/Gogeta-0/blob/main/notes/analysis-coarse-to-fine.md">the design note</a>, and experiments E12&ndash;E16 are planned, not run.</p>
+    <p class="kicker">Side quest</p>
+    <h2>Byte Quest: <span class="hl">coarse-to-fine bytes</span></h2>
+    <p class="section-lede">No tokenizer, exact characters, and a 256-way head. A global stack runs on patches, and a small shared loop refines at byte resolution. <b>Tested, and not viable at this scale yet</b>, as the literature predicts below about 4B parameters on code.</p>
     <div class="fusion">
-      <img class="diagram" src="assets/byte-quest-c2f.svg" width="760" height="930" alt="Coarse-to-fine byte model: raw bytes, a narrow byte encoder, patches of P bytes, an E1-style global stack on patches, expansion back to bytes with a one-patch causal shift, a shared-weight byte refinement loop run r times with raw bytes re-injected, and a 256-way byte head. Design concept, not trained." style="background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px; max-width: 100%; height: auto;">
+      <img class="diagram" src="assets/byte-quest-c2f.svg" width="760" height="930" alt="Coarse-to-fine byte model: raw bytes, a byte encoder, patches, a global stack on patches, expansion back to bytes with a one-patch causal shift, a shared-weight byte refinement loop, and a 256-way byte head." style="background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 8px; max-width: 100%; height: auto;">
       <div>
-        <div class="rule">
-          <p class="kicker">The idea</p>
-          <p><b>Depth where the information is, iteration where the errors are.</b> The heavy E1-style stack runs once, on patches of <i>P</i> bytes. A small shared-weight block then loops <i>r</i> times at byte resolution to fix spelling, digits and syntax.</p>
-        </div>
         <ul class="legend">
-          <li style="--c: var(--blue)"><span><b>Why bytes:</b> no tokenizer, exact characters, robustness to odd spellings, and a 256-way head instead of an 8,192-way one.</span></li>
-          <li style="--c: var(--gold)"><span><b>Causality:</b> global states are shifted by one patch, so a byte never sees its own patch's summary.</span></li>
-          <li style="--c: var(--green)"><span><b>Estimated cost</b> at P = 4: about 1.04&times; / 1.19&times; / 1.48&times; E1 for r = 1 / 2 / 4 (a flat byte model would be about 3.6&times;).</span></li>
-          <li style="--c: var(--red)"><span><b>Honest caveat:</b> the literature says bytes trail BPE below roughly 4B parameters on code. The claims here are about granularity and loops, not beating BPE-E1.</span></li>
+          <li style="--c: var(--red)"><span><b>Fixed byte patches (E13):</b> +36% and +63% bits per char vs E1. Far too costly. (exploratory)</span></li>
+          <li style="--c: var(--gold)"><span><b>Tokens as patches around the A3 backbone (A4, E65):</b> +14.4% vs the token head. The second shared byte pass does help (−1.7%). <span class="claim u">C210 UNVERIFIED</span></span></li>
+          <li style="--c: var(--blue)"><span><b>Next:</b> the design-around is SQ394. E12 and E14–E16 are registered but not run.</span></li>
         </ul>
-        <p class="cta" style="margin-top: 22px"><a class="btn primary" href="architecture.html?model=c2f_byte">Explore the byte model in 3D &#9889;</a> <a class="btn" href="https://github.com/monstercameron/Gogeta-0#byte-quest-bytes-are-a-main-quest-now">README section</a></p>
+        <p class="cta" style="margin-top: 22px"><a class="btn primary" href="architecture.html?model=c2f_byte">Explore the byte model in 3D ⚡</a> <a class="btn" href="https://github.com/monstercameron/Gogeta-0#byte-quest-coarse-to-fine-bytes">README section</a></p>
       </div>
     </div>
-    <div class="table-wrap" style="margin-top: 26px">
-      <table>
-        <thead><tr><th>Experiment (planned)</th><th>Question</th><th>On GitHub</th></tr></thead>
-        <tbody>
-          <tr><td><a href="experiments/E12.html"><strong>E12</strong></a> Flat byte-level E1</td><td>Is a flat byte model (vocab 256, T = 4,096 bytes) competitive with BPE-E1 at matched FLOPs and at matched bytes?</td><td><a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/cards/E12.md">card</a> &middot; <a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/devlogs/E12.md">micro devlog</a></td></tr>
-          <tr><td><a href="experiments/E13.html"><strong>E13</strong></a> Patch granularity sweep</td><td>How does patch size (P = 2 / 4 / 8) trade quality against cost with a single-pass byte decoder?</td><td><a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/cards/E13.md">card</a> &middot; <a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/devlogs/E13.md">micro devlog</a></td></tr>
-          <tr><td><a href="experiments/E14.html"><strong>E14</strong></a> Byte refinement loop sweep</td><td>At matched FLOPs, does a shared-weight refinement loop (r = 1 / 2 / 4) beat a single-pass decoder and an equal-FLOP unshared one?</td><td><a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/cards/E14.md">card</a> &middot; <a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/devlogs/E14.md">micro devlog</a></td></tr>
-          <tr><td><a href="experiments/E15.html"><strong>E15</strong></a> Parallel-then-refine</td><td>Can predicting a whole patch at once and refining over r &lt; P passes match byte-by-byte quality?</td><td><a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/cards/E15.md">card</a> &middot; <a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/devlogs/E15.md">micro devlog</a></td></tr>
-          <tr><td><a href="experiments/E16.html"><strong>E16</strong></a> Byte quest &times; FusionDance</td><td>Does the best byte decoder combine with a looped global core and a ternary global core?</td><td><a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/cards/E16.md">card</a> &middot; <a href="https://github.com/monstercameron/Gogeta-0/blob/main/experiments/devlogs/E16.md">micro devlog</a></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="muted small">Statuses update live in the <a href="#roadmap">roadmap</a> below and on the <a href="devlog.html#experiments-section">experiment log</a>.</p>
   </div>
 </section>
 
 <!-- ============ BUDGETS ============ -->
-<section id="budgets" class="alt">
+<section id="budgets">
   <div class="wrap">
     <p class="kicker">The science</p>
     <h2>Three budgets, <span class="hl">measured separately</span></h2>
     <p class="section-lede">
       <i>n</i> = context length, <i>L</i> = layers, <i>r</i> = loop count, <i>S</i> = fixed recurrent-state size.
-      At laptop scale the absolute megabytes are tiny, so the result we care about is how each cost <b>scales</b>. The FusionDance column is the design target: our sliding-window layers still use a dense-mask kernel (O(n²)), and ternary weights are simulated in floating point.
+      The FusionDance column is the design target. Today our sliding-window layers still use a dense-mask kernel (O(n²)), and ternary weights are simulated in floating point, so the speed and memory wins need dedicated kernels.
     </p>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Budget</th><th>Standard transformer</th><th>FusionDance</th><th>What we measure</th></tr></thead>
         <tbody>
-          <tr><td><strong>Weight memory</strong></td><td><span class="math">L · p · 16 bits</span></td><td class="good"><span class="math">(P<sub>pre</sub> + P<sub>core</sub> + P<sub>coda</sub>) · 1.58 bits</span><br>depth from loops, not layers</td><td>quality per bit</td></tr>
-          <tr><td><strong>Sequence memory</strong></td><td><span class="math">O(L · n)</span> KV cache</td><td class="good"><span class="math">O(r · S)</span> fixed + <span class="math">O(n)</span> for one layer</td><td>memory vs context length</td></tr>
+          <tr><td><strong>Weight memory</strong></td><td><span class="math">L · p · 16 bits</span></td><td class="good"><span class="math">(P<sub>pre</sub> + P<sub>coda</sub>) · 16 + P<sub>core</sub> · 1.58 bits</span><br>depth from loops, not layers</td><td>quality per bit</td></tr>
+          <tr><td><strong>Sequence memory</strong></td><td><span class="math">O(L · n)</span> KV cache</td><td class="good"><span class="math">O(S)</span> fixed + <span class="math">O(n)</span> for one layer</td><td>memory vs context length</td></tr>
           <tr><td><strong>Mixing compute</strong></td><td><span class="math">O(L · n²)</span></td><td class="good"><span class="math">O(r · n)</span> + <span class="math">O(n²)</span> once</td><td>quality per FLOP</td></tr>
-          <tr><td><strong>Reasoning depth</strong></td><td>fixed <span class="math">L</span></td><td class="good"><span class="math">r</span> passes, adaptive per token (later)</td><td>accuracy vs <i>r</i></td></tr>
+          <tr><td><strong>Reasoning depth</strong></td><td>fixed <span class="math">L</span></td><td class="good"><span class="math">r</span> passes over shared weights</td><td>accuracy vs <i>r</i></td></tr>
         </tbody>
       </table>
     </div>
@@ -246,30 +231,30 @@
 </section>
 
 <!-- ============ IDEAS ============ -->
-<section id="ideas">
+<section id="ideas" class="alt">
   <div class="wrap">
     <p class="kicker">Big ideas</p>
-    <h2>What we're <span class="hl">actually testing</span></h2>
-    <p class="section-lede">These are the claims, stated so they can be shown wrong.</p>
+    <h2>What we're <span class="hl">testing next</span></h2>
+    <p class="section-lede">Each idea is stated so it can be shown wrong, and each card says where it stands.</p>
     <div class="grid c2">
-      <article class="card idea"><div class="icon">🌀</div><h3>Think in loops, not out loud</h3>
-        <p>Chain-of-thought reasons by writing tokens, and every token grows memory and attention cost. Latent loops reason silently. How much written reasoning can loops replace at matched compute?</p></article>
-      <article class="card idea"><div class="icon">⚔️</div><h3>The Rival Loop</h3>
-        <p>Agents improve code with a critique → fix cycle. We build that rivalry into the recurrence: every pass is scored, a critic head trained on the real loss decides when to stop, and adversarial damage-and-repair teaches loops to fix their own mistakes.</p></article>
+      <article class="card idea"><div class="icon">⚖️</div><h3>Is the A2 bundle just more bits?</h3>
+        <p>C215's −6.85% may come mostly from the full-precision ends. A bit-matched control (SQ447) gives the naive recipe the same ends.</p><div class="state">Registered idea; first in the next GPU batch</div></article>
+      <article class="card idea"><div class="icon">🪶</div><h3>An attention-free first layer</h3>
+        <p>The first sliding-window layer acts as a moving average. Swapping it for an exact window mean costs at most 0.4% out of corpus, so train it that way and drop its attention (SQ442).</p><div class="state">Eval-only check done; training test queued</div></article>
       <article class="card idea"><div class="icon">⚡</div><h3>Instant transmission</h3>
-        <p>A looped model can draft for itself: 1–2 passes guess the next few tokens, and the full loop count verifies them. Self-speculative decoding with no separate drafter.</p></article>
-      <article class="card idea"><div class="icon">📈</div><h3>Scaling shape over raw numbers</h3>
-        <p>Only one layer's memory grows with context, and nothing inside the loop is quadratic. We report curves (cost vs context, quality vs bits, quality vs loops), not single numbers.</p></article>
+        <p>A looped model drafts for itself: one pass guesses, two passes verify. No separate drafter.</p><div class="state">Built; exact losslessness needs batch-invariant kernels</div></article>
+      <article class="card idea"><div class="icon">📈</div><h3>Does it hold at scale?</h3>
+        <p>Every result is at ~15M parameters. A mid-scale run against dense, judged on quality per byte and tokens per second, comes before the 1.2B model.</p><div class="state off">Needs the bigger dataset and a go-ahead</div></article>
     </div>
   </div>
 </section>
 
 <!-- ============ ROADMAP ============ -->
-<section id="roadmap" class="alt">
+<section id="roadmap">
   <div class="wrap">
     <p class="kicker">Training arcs</p>
     <h2>The road to <span class="hl">v1.0.0</span></h2>
-    <p class="section-lede">One ingredient at a time, so that if the fusion fails we know which ingredient broke it. Statuses update live from the <a href="devlog.html">experiment log</a>.</p>
+    <p class="section-lede">One ingredient at a time, so that if the fusion fails we know which ingredient broke it. Statuses update from the <a href="devlog.html">experiment log</a>.</p>
     <div class="arcs" id="arcs"></div>
   </div>
 </section>

@@ -18,6 +18,27 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.52: Docs refresh (hourly)
+*2026-11-23*
+
+**Docs refresh (hourly): the README gains a "How to follow one result" walk-through (C209) and a definition of each claim status. The sketch status, the campaigns README and post_training/SETUP.md now match v0.5.48-v0.5.51.**
+
+- **README:**
+  - A new section walks one result end to end for C209: its ledger view, the evidence JSONs (`a2_assembled.json`, `a2_compute_matched.json`), the registration ("A2 assembled model" and "A2 amendment 3"), the running control SQ419 (batch C1) with its readout `sq419_f6.py`, and the queue entry.
+  - The glossary defines VERIFIED, PARTIAL and UNVERIFIED. UNVERIFIED means "no saved-output evidence yet", not "probably true".
+  - This was asked for by the 19:18 newcomer quick review.
+- **notes/sketch.md:**
+  - The status moves to v0.5.51: the setsid escape is fixed in v0.5.48, and SQ419 is running as batch C1.
+  - Two decision-log lines were missing and are added: v0.5.47-48 (the GRPO re-gate and its fix) and v0.5.50-51 (C1 registration and amendment 1).
+- **experiments/launch/campaigns/README.md:** a row for batch C1, which the fleet dispatched (it is not a campaign file), and the queue timestamp.
+- **post_training/SETUP.md:**
+  - Test counts are 48 (test_rewards 37 since v0.5.48).
+  - Descendant cleanup is now listed as fixed, with the probe and self-test outputs (17/17).
+  - The open SQ61 items are the resource budget, the world-writable sweep and the /proc PID view.
+- Written by a Haiku docs subagent. The main agent checked each changed fact and path against DEVLOG, PREDICTIONS.md, QUEUE.md and the saved test outputs.
+
+---
+
 ## v0.5.51: Outside review 19:18 + C1 amendment 1 (no result seen): FLOP-matched R1, 1.5e-3 LR edge, interval S rule; SQ433-SQ434
 *2026-11-23*
 

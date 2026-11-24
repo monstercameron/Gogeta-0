@@ -1,6 +1,6 @@
 # Post-training with Hugging Face TRL: setup guide (prepared, NOT activated)
 
-Status (2026-11-23, v0.5.40): the wrapper, reward sandbox and smoke tests exist and pass **on CPU with a
+Status (2026-11-23, v0.5.48): the wrapper, reward sandbox and smoke tests exist and pass **on CPU with a
 tiny random attn/swa model**. Nothing here has been run on the GPU, on a trained checkpoint, on
 GDN blocks, or on real data. Real SFT / GRPO / DPO runs are blocked on the items in
 [Blockers](#8-prerequisites-and-blockers).
@@ -87,7 +87,7 @@ All CPU-only (`CUDA_VISIBLE_DEVICES=` is set inside the scripts), from the repo 
 
 ```bash
 P=~/.venvs/gogeta-rl/bin/python
-CUDA_VISIBLE_DEVICES= $P -m unittest post_training.test_hf post_training.test_rewards -v   # 45 tests at v0.5.40 (test_hf 11 at v0.5.24, test_rewards 34 at v0.5.40)
+CUDA_VISIBLE_DEVICES= $P -m unittest post_training.test_hf post_training.test_rewards -v   # 48 tests at v0.5.48 (test_hf 11 at v0.5.24, test_rewards 37 at v0.5.48)
 CUDA_VISIBLE_DEVICES= $P post_training/grpo_smoke.py       # ~6-18 s
 CUDA_VISIBLE_DEVICES= $P post_training/sft_dpo_smoke.py    # ~5 s
 ```
@@ -99,7 +99,7 @@ CUDA_VISIBLE_DEVICES= $P post_training/sft_dpo_smoke.py    # ~5 s
   greedy `generate` equals a manual greedy loop; `save_pretrained`/`from_pretrained` round
   trip is exact and keeps the head/embedding tie; tokenizer decode(encode(s)) == s.
 - v0.5.24 (2026-11-23): `test_hf` 11/11 OK (adds `TestAssembledConfig`) and `evals/test_wiring.py` 6/6 OK; saved output `experiments/checks/results/test-runs/2026-11-23-C80.txt`.
-- `test_rewards` (17 tests at v0.4.104; 30 since v0.5.11; 34 since v0.5.40) OK: pass, fail, partial credit, infinite loop (timeout), sleep
+- `test_rewards` (17 tests at v0.4.104; 30 since v0.5.11; 34 since v0.5.40; 37 since v0.5.48, three of them descendant tests) OK: pass, fail, partial credit, infinite loop (timeout), sleep
   (wall-clock timeout), syntax error, runtime error, `sys.exit`, forged result line, 2 GB
   allocation under a 256 MB cap (MemoryError), network blocked, runs as `nobody` (cannot list
   `/root`), TRL-shaped call. `sandbox_info()` here: `runs_as_nobody=True, network_isolated=True,
@@ -185,11 +185,12 @@ stdlib only, no venv packages), fresh temp cwd, env reduced to PATH/LANG; networ
 
 **Status at v0.5.11 (SQ373 and SQ61; committed devlogs `experiments/devlogs/SQ373.md`, `SQ61.md`).**
 
-- **Reward forgery: fixed for the probe's cases (SQ373, C83).** The child is now a grader process that forks a worker. The worker runs the solution and the tests inside the same namespaced sandbox and rlimits. The grader binds every function it uses before the solution runs, each test runs in a fresh shallow copy of the solution's namespace with pristine builtins, the stdin nonce is dropped in the worker, and the result comes back over a pipe that only the grader turns into the final line. Every forgery probe (exec/compile no-op, AssertionError swallowing, `__main__` and `sys.modules` tampering, `os._exit`/`sys.exit`, printed forged result lines, trace hooks, background threads) now scores 0 on a failing test. Honest pass, honest fail and partial credit are unchanged. `python -m unittest post_training.test_rewards`: 34 tests OK at v0.5.40 (the 30 of v0.5.11 plus four added with SQ411).
+- **Reward forgery: fixed for the probe's cases (SQ373, C83).** The child is now a grader process that forks a worker. The worker runs the solution and the tests inside the same namespaced sandbox and rlimits. The grader binds every function it uses before the solution runs, each test runs in a fresh shallow copy of the solution's namespace with pristine builtins, the stdin nonce is dropped in the worker, and the result comes back over a pipe that only the grader turns into the final line. Every forgery probe (exec/compile no-op, AssertionError swallowing, `__main__` and `sys.modules` tampering, `os._exit`/`sys.exit`, printed forged result lines, trace hooks, background threads) now scores 0 on a failing test. Honest pass, honest fail and partial credit are unchanged. `python -m unittest post_training.test_rewards`: 34 tests OK at v0.5.40 (the 30 of v0.5.11 plus four added with SQ411); 37 tests OK at v0.5.48 (saved output `experiments/checks/results/test-runs/2026-11-23-test-rewards-fixed.txt`).
 - **SQ411 closes the `__eq__` route (v0.5.40; DEVLOG v0.5.40).** The grader AST-rewrites each test before the fork, so every non-identity comparison and every assert/`not` truthiness goes through a strict check over exact builtin value types (or containers of them). The probe's 14 forgery arms go from 1/1 to 0/1, and honest solutions that return custom classes now fail closed, by design.
 - **Residual forgery routes (not closed).** Solution code can still imitate the worker's side of the pipe (find the fds via `/proc/self/fd` and write a forged result), defeat a test through solution-defined helpers the test calls, use `.equals`-style methods, or pass any/all over forged iterables (C83). Closing these needs a process the solution cannot touch. Not attempted.
 - **Filesystem and network (SQ61, C105/C106).** `run_tests(..., fs_isolation="auto"|"require"|"off")` builds a private mount namespace (tmpfs over /mnt, /tmp, /dev/shm, /run, /var/tmp; nested uid 65534) with no network. `code_exec_reward`, the GRPO path, defaults to `"require"` and fails closed: it refuses to score rather than run unisolated. The repo-write control and the fail-closed tests are in `post_training/test_rewards.py`. `evals/sandbox.py` delegates to the same harness and keeps its self-test.
-- **Still open (SQ61 row):** the resource-budget test, the world-writable-path sweep, and descendant cleanup (a `setsid` grandchild; PID namespace or cgroup kill).
+- **Descendant cleanup (SQ61, v0.5.48): fixed.** Each sandbox child is PID 1 of its own PID namespace (`unshare -p -f --kill-child`). On timeout the harness SIGKILLs PID 1, which kills every process in that namespace, including `setsid` descendants. The wait for the pipes is bounded (5 s), and the harness fails closed if anything survives. The probe `experiments/checks/sandbox_kill_cleanup.py` kills a setsid child in 1.0 s with no survivors (saved output `experiments/checks/results/test-runs/2026-11-23-sandbox-kill-cleanup-fixed.txt`). The sandbox self-test passes 17 of 17 checks, including the fail-closed probe `setsid_descendant_killed` (`experiments/checks/results/test-runs/2026-11-23-sandbox-selftest-fixed.txt`).
+- **Still open (SQ61 row):** the resource-budget test, the world-writable-path sweep, and a /proc PID view.
 - **Not a security boundary.** Inside the namespace the rest of the root filesystem stays world-readable. With `fs_isolation="off"`, or "auto" on a host without a working namespace, the child can still write to /tmp, /dev/shm and, under WSL, `/mnt/c` (C105, verified 2026-11-22 on the old path). For real RL, wrap the same harness in a container or bubblewrap/nsjail with a read-only root and a tmpfs work dir, and log/inspect high-reward completions. Throughput
 [verified here, trivial solution, CPU shared with another job]: 29.5 ms per completion serially,
 64 completions in 0.47 s with the default 8 threads.

@@ -18,6 +18,23 @@ Every entry is one commit and one annotated git tag (rules in [AGENTS.md](AGENTS
 
 ---
 
+## v0.5.54: SQ435 registered (loss-matched corruption control for C213, frozen 9a53278250e80782); SQ376 data gate passes (7 seeds)
+*2026-11-23*
+
+**SQ435 registered before any scoring: a loss-matched corruption control that tests whether C213's out-of-corpus shrinkage follows loss level or corpus membership. SQ376 (data gate) passes: more tokens still pay at this scale.**
+
+- **SQ435** (`experiments/checks/PREDICTIONS.md`, script `sq435_loss_matched_corruption.py` [9a53278250e80782], proposal `sq435_proposal.md`).
+  - **Design:** rename user identifiers in 1,000 in-corpus clean80 docs (consistent per doc, length-preserving) until E24 matches its out-of-corpus loss, then score the A2 family there.
+  - **Predictions:** about half way between the in-corpus and out-of-corpus costs (ternary +3%, loop +0.5%).
+  - **Rule:** f < 0.25 reads "scale artifact", f > 0.75 reads "memorisation stands", otherwise "mixed". UNMATCHED if E24 misses the target loss by more than 3%. The result is diagnostic: it qualifies C213 and changes no status.
+  - **Leak check:** v1 val docs never enter v2 train (`build_v2.py`), so the documents are unseen by the v2-trained checkpoints.
+  - The worker wrote the script and proposal; I checked them.
+- **SQ376 data gate** (side-quest worker; checked against `results/sq376.json`): on the Phase 2b fleet, 7 seeds each, val loss falls 22.0% (E1) and 20.1% (E10) from 100M to 197M tokens, and the last 17% of tokens still gives 5.3% and 4.4%. The gate passes. Part of the late gain is cosine annealing (the schedule ends at 200M), and the eval is 128 code-py-v1 sequences. This supports the v3 data plan; any download stays human-only.
+- **Quick review 19:44 (ML theorist):** SQ246 adds a temperature-scaling split of C209's gap (ranking vs calibration).
+- **Worker progress:** the SQ239/SQ410/SQ385 per-document re-score is at 24 of 30 checkpoints. Batch C1 is still training.
+
+---
+
 ## v0.5.53: Outside review 19:37: SQ435-SQ438 (loss-matched C213 control, repetition x loops, 200M MoE control, latent EMA); tie/not-needed wording fixed; C19 int8 limitation
 *2026-11-23*
 

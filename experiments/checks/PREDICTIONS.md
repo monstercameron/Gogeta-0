@@ -975,3 +975,17 @@ From here on, every batch registration names its readout script and that script'
   - This is stricter than the original point-estimate rule. S = 1 - (A2s vs F-6 share) by construction; it is a summary of R1, not new information.
 - **The R1 prediction is a replication target (2.4):** -11.6% is A1g's estimate on its selection seeds 0-1, so a hit is a replication, not an independent forecast. **Correction:** the registration above wrote A1g's result as "-11.6% [-12.3, -11.0]". That bracket is the two per-seed effects (seed 0 -12.3%, seed 1 -11.0%), not a confidence interval; a 2-seed screen computes none.
 - **Provenance and eval depth (2.5):** the readout lists each comparator's commit, and every arm is scored at its config's `loops` (E27 4, F-6 2, A2s 2), as in all A-series readouts (`score_doclevel.py` passes no loop count; `FusionDance.forward` uses `cfg.loops`).
+
+## SQ435 loss-matched corruption control for C213 (2026-11-23 ~19:50 EST, before calibrating or scoring; outside review 19:37, idea A)
+**Script:** `experiments/checks/sq435_loss_matched_corruption.py` [9a53278250e80782] (frozen; only its model-free `--selftest` has run). **Full proposal**, adopted as written: `experiments/checks/sq435_proposal.md`, written by the side-quest worker, checked by the main agent.
+- **Design:** rename user identifiers (not keywords, builtins, attributes or imports) with probability p, consistently per doc and length-preserving, in 1,000 clean80 docs of the code-py-v1 val set. Bisect p on a disjoint 200-doc sample until E24 seed 2 matches E24's mean SQ99 bits/char. Then score A2s, A2f, E27, E24 and E20 at seeds 2-4, uncorrupted and at p*, plus dose points p*/2 and min(1, 2p*) on seeds 2-3.
+- **Leak check (main agent):** v1 val docs are never in v2 train. `build_v2.py` draws v2 train only from v1 train docs, and v1 val docs are v2 val candidates or dropped. So the v2-trained checkpoints have not seen these documents. This is the same in-corpus set as SQ379/SQ400's clean80-300.
+- **Predictions:**
+  - ternary cost at matched loss +3% (range 0 to +6%);
+  - loop cost +0.5% (range -1.5% to +2%);
+  - assembly gain A2s vs E27 between -12% and -16%.
+- **Rule:**
+  - For each cost, f = (matched - out of corpus) / (in corpus - out of corpus), with the in-corpus value measured on the same 1,000 uncorrupted docs and the out-of-corpus value from SQ400 (+0.42%, -1.90%).
+  - f < 0.25 reads "scale artifact", f > 0.75 reads "memorisation stands", otherwise "mixed".
+  - The overall label needs both costs to agree and E24 within 3% of the target loss; otherwise the run is UNMATCHED and descriptive.
+  - The result is diagnostic: it qualifies C213's mechanism and changes no status by itself.
